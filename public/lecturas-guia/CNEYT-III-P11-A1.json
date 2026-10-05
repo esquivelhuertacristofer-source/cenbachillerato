@@ -1,0 +1,54 @@
+{
+  "codigo": "CNEYT-III-P11-A1",
+  "conceptos": [
+    { "termino": "Atmósfera reductora", "idea": "Atmósfera primitiva sin oxígeno libre, rica en metano, amoniaco e hidrógeno." },
+    { "termino": "Gran Oxidación", "idea": "Cuando las cianobacterias llenaron de O₂ los océanos y la atmósfera." },
+    { "termino": "Ciclo del oxígeno", "idea": "La fotosíntesis produce O₂ y la respiración lo consume devolviendo CO₂." },
+    { "termino": "Óxidos básicos y ácidos", "idea": "Oxígeno con metal da óxido básico; con no metal, óxido ácido." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Una Tierra primitiva sin oxígeno",
+      "idea": "Según Oparin-Haldane, la atmósfera primitiva era reductora: sin O₂ libre y rica en metano, amoniaco, vapor de agua e hidrógeno.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Gases de la atmósfera primitiva", "puntos": ["Metano (CH₄)", "Amoniaco (NH₃)", "Vapor de agua (H₂O) e hidrógeno (H₂)", "Dióxido de carbono (CO₂)"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué significa que la atmósfera primitiva fuera «reductora»?", "opciones": ["Que tenía mucho oxígeno libre", "Que no tenía oxígeno libre y predominaban sustancias que ceden electrones", "Que era más delgada que la actual"], "correcta": 1, "porque": "Reductora es lo contrario de oxidante: sin O₂ libre y con sustancias capaces de ceder electrones." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "La Gran Oxidación",
+      "idea": "Hace unos 2400 millones de años, las cianobacterias liberaron O₂ por fotosíntesis y transformaron la atmósfera en oxidante.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Atmósfera reductora", "texto": "Sin oxígeno libre." },
+        { "titulo": "~2400 millones de años", "texto": "Aparecen organismos fotosintéticos, sobre todo cianobacterias." },
+        { "titulo": "Liberan O₂", "texto": "6 CO₂ + 6 H₂O → C₆H₁₂O₆ + 6 O₂" },
+        { "titulo": "Atmósfera oxidante", "texto": "El O₂ llena océanos y aire: hoy ~21%." }
+      ] },
+      "comprueba": { "pregunta": "Sin las cianobacterias, ¿qué habría pasado según el texto?", "opciones": ["No existiría la vida que respira oxígeno", "La atmósfera tendría más oxígeno", "No habría metano"], "correcta": 0, "porque": "La vida que respira oxígeno solo fue posible gracias al O₂ que liberaron los organismos fotosintéticos." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "El oxígeno circula: su ciclo",
+      "idea": "La fotosíntesis produce O₂, la respiración lo consume y devuelve CO₂; además, el O₂ forma el ozono que nos protege del UV.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Fotosíntesis", "texto": "Plantas, algas y cianobacterias producen O₂." },
+        { "titulo": "Respiración", "texto": "Los seres vivos consumen O₂ y devuelven CO₂." },
+        { "titulo": "De vuelta", "texto": "El CO₂ regresa a la fotosíntesis." },
+        { "titulo": "Ozono (O₃)", "texto": "Se forma del O₂ en la estratósfera y filtra el ultravioleta." }
+      ] },
+      "comprueba": { "pregunta": "De noche, sin luz, ¿qué hace una planta con el oxígeno?", "opciones": ["Lo produce más rápido", "Lo convierte en ozono", "Lo consume al respirar"], "correcta": 2, "porque": "El texto aclara que también las plantas, de noche, consumen O₂ en la respiración y devuelven CO₂." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Óxidos y lluvia ácida",
+      "idea": "El oxígeno con metales forma óxidos básicos y con no metales óxidos ácidos; estos últimos causan la lluvia ácida.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Óxido básico", "puntos": ["Oxígeno + metal", "2 Mg + O₂ → 2 MgO", "En agua da bases (hidróxidos)"] },
+        { "titulo": "Óxido ácido", "puntos": ["Oxígeno + no metal", "S + O₂ → SO₂", "En agua da ácidos: lluvia ácida"] }
+      ] },
+      "comprueba": { "pregunta": "El calcio es un metal. Al reaccionar con oxígeno, ¿qué tipo de óxido forma?", "opciones": ["Un óxido ácido", "Un óxido básico", "No forma óxido"], "correcta": 1, "porque": "Cuando el oxígeno reacciona con un metal se forma un óxido básico, que en agua da una base." }
+    }
+  ]
+}

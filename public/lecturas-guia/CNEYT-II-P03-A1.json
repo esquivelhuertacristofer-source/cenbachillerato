@@ -1,0 +1,40 @@
+{
+  "codigo": "CNEYT-II-P03-A1",
+  "conceptos": [
+    { "termino": "Termodinámica", "idea": "Estudia cómo se relacionan calor, trabajo y temperatura." },
+    { "termino": "Energía interna (ΔU)", "idea": "Cambia según el calor que entra y el trabajo que sale." },
+    { "termino": "Entropía (S)", "idea": "Tendencia natural de los sistemas a la desorganización." },
+    { "termino": "Proceso irreversible", "idea": "Ocurre espontáneamente en un solo sentido, como el calor de caliente a frío." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Primera ley: la energía se conserva",
+      "idea": "El cambio de energía interna es el calor que absorbe el sistema menos el trabajo que realiza.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Primera ley", "expr": "ΔU = Q − W", "leyenda": "ΔU cambio de energía interna · Q calor absorbido · W trabajo realizado" }
+      ] },
+      "comprueba": { "pregunta": "Según ΔU = Q − W, ¿por qué un motor necesita combustible todo el tiempo?", "opciones": ["Porque al realizar trabajo su energía interna debe reponerse", "Porque la energía se destruye al moverse", "Porque el combustible enfría el motor"], "correcta": 0, "porque": "Al realizar trabajo, el sistema gasta energía interna, que debe reponerse constantemente con combustible." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Segunda ley: la entropía siempre aumenta",
+      "idea": "En todo proceso real la entropía del universo crece: por eso el calor va de lo caliente a lo frío.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lo que explica la segunda ley", "puntos": ["El calor fluye solo del cuerpo caliente al frío", "Ningún motor es 100% eficiente", "Los procesos naturales son irreversibles"] }
+      ] },
+      "comprueba": { "pregunta": "Dejas un café caliente en un cuarto fresco. ¿Qué pasa espontáneamente?", "opciones": ["El café se calienta más", "El café cede calor y se enfría", "No hay intercambio de calor"], "correcta": 1, "porque": "Por la segunda ley, el calor fluye espontáneamente del cuerpo caliente al frío, nunca al revés." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Refrigeradores, motores y seres vivos",
+      "idea": "Las leyes de la termodinámica explican cómo funcionan los aparatos y por qué los seres vivos necesitan energía constante.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Refrigerador", "puntos": ["Usa trabajo eléctrico", "Lleva calor del interior frío al exterior caliente"] },
+        { "titulo": "Motor de combustión", "puntos": ["Química → calor", "Parte del calor → trabajo mecánico"] },
+        { "titulo": "Seres vivos", "puntos": ["Mantienen baja entropía", "Consumen energía continuamente"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué un refrigerador necesita estar conectado a la corriente?", "opciones": ["Porque el calor fluye solo de frío a caliente", "Porque necesita trabajo para mover calor contra el flujo espontáneo", "Porque produce frío de la nada"], "correcta": 1, "porque": "Pasar calor del interior frío al exterior caliente va contra el flujo espontáneo, y eso requiere trabajo eléctrico." }
+    }
+  ]
+}

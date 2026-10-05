@@ -1,0 +1,44 @@
+{
+  "codigo": "CNEYT-VI-P03-A1",
+  "conceptos": [
+    { "termino": "Metabolismo", "idea": "Todas las reacciones con que la célula obtiene y usa energía." },
+    { "termino": "Fotosíntesis", "idea": "En el cloroplasto, la luz convierte CO₂ y agua en glucosa y O₂." },
+    { "termino": "Respiración aerobia", "idea": "Con oxígeno, la célula saca unos 36 ATP de cada glucosa." },
+    { "termino": "Fermentación", "idea": "Ruta sin oxígeno, mucho menos eficiente, que regenera NAD⁺." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Fotosíntesis: fabricar glucosa con luz",
+      "idea": "En el cloroplasto, primero se captura la luz y luego se usa esa energía para fijar CO₂ y hacer glucosa.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Reacciones luminosas (tilacoides)", "texto": "Capturan la luz, producen ATP y NADPH y liberan O₂ del agua." },
+        { "titulo": "Ciclo de Calvin (estroma)", "texto": "Usa ATP y NADPH para fijar CO₂ y sintetizar glucosa." },
+        { "titulo": "Ecuación general", "texto": "6 CO₂ + 6 H₂O + luz → C₆H₁₂O₆ + 6 O₂" }
+      ] },
+      "comprueba": { "pregunta": "¿De qué molécula sale el O₂ que liberan las plantas?", "opciones": ["Del CO₂", "De la glucosa", "Del agua"], "correcta": 2, "porque": "Las reacciones luminosas liberan O₂ a partir del agua." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Respiración aerobia en tres etapas",
+      "idea": "La glucosa se oxida en citoplasma y mitocondria; la cadena transportadora produce la mayor parte del ATP.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Glucólisis (citoplasma)", "texto": "Glucosa → 2 piruvatos; 2 ATP netos y 2 NADH." },
+        { "titulo": "Ciclo de Krebs (matriz)", "texto": "Oxida los piruvatos: 2 ATP, 8 NADH y 2 FADH₂." },
+        { "titulo": "Cadena transportadora", "texto": "NADH y FADH₂ ceden electrones; la ATP sintasa da unos 32 ATP." },
+        { "titulo": "Total", "texto": "Unos 36 ATP por glucosa." }
+      ] },
+      "comprueba": { "pregunta": "¿En qué etapa se produce la mayor parte del ATP?", "opciones": ["En la cadena transportadora de electrones", "En la glucólisis", "En el ciclo de Krebs"], "correcta": 0, "porque": "La cadena transportadora produce unos 32 de los ~36 ATP; glucólisis y Krebs aportan solo 2 cada una." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Fermentación: energía sin oxígeno",
+      "idea": "Sin oxígeno, la fermentación regenera NAD⁺ para seguir con la glucólisis, pero rinde mucho menos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Láctica", "puntos": ["Piruvato → lactato", "Músculos en ejercicio intenso", "Solo 2 ATP"] },
+        { "titulo": "Alcohólica", "puntos": ["Piruvato → etanol + CO₂", "La hacen las levaduras"] }
+      ] },
+      "comprueba": { "pregunta": "Corres a toda velocidad y a tus músculos les falta oxígeno. ¿Qué producen?", "opciones": ["Etanol", "Lactato", "Glucosa"], "correcta": 1, "porque": "En el ejercicio intenso los músculos hacen fermentación láctica: convierten el piruvato en lactato." }
+    }
+  ]
+}

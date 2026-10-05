@@ -1,0 +1,50 @@
+{
+  "codigo": "IN-III-P01-A1",
+  "conceptos": [
+    { "termino": "Past Simple", "idea": "El tiempo para hablar de acciones ya completadas en el pasado." },
+    { "termino": "Regular verbs", "idea": "Forman el pasado agregando -ed: walk → walked." },
+    { "termino": "Irregular verbs", "idea": "Tienen un pasado especial que hay que memorizar: go → went." },
+    { "termino": "Did / didn't", "idea": "Auxiliares para preguntar y negar; con ellos el verbo vuelve a su forma base." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Pasado simple: los verbos regulares",
+      "idea": "El Past Simple cuenta acciones terminadas; a la mayoría de los verbos solo les agregas -ed.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Regla general", "expr": "verbo + -ed", "leyenda": "walk → walked, watch → watched, play → played" },
+        { "nombre": "Consonante + y", "expr": "y → i + -ed", "leyenda": "study → studied" }
+      ] },
+      "comprueba": { "pregunta": "Siguiendo la regla de study, ¿cuál es el pasado de try?", "opciones": ["tryed", "tried", "tryied"], "correcta": 1, "porque": "Como en study → studied, la y cambia a i y se agrega -ed: tried." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Irregulares: hay que memorizarlos",
+      "idea": "Muchos verbos comunes tienen un pasado especial que no termina en -ed.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Verbos irregulares", "puntos": ["go → went", "eat → ate", "see → saw", "have → had"] },
+        { "titulo": "Más irregulares", "puntos": ["make → made", "buy → bought", "come → came", "sleep → slept"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «Last night I ___ pizza.» (eat)", "opciones": ["eated", "eat", "ate"], "correcta": 2, "porque": "Eat es irregular: su pasado es ate, no se le agrega -ed." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Cuándo pasó: expresiones de tiempo",
+      "idea": "Palabras como yesterday, last week o two days ago señalan que la acción ya ocurrió.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Expresiones de tiempo", "puntos": ["yesterday (ayer)", "last week (la semana pasada)", "last night (anoche)", "two days ago (hace dos días)", "in 2020"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estas expresiones pide pasado simple?", "opciones": ["last weekend", "tomorrow", "every day"], "correcta": 0, "porque": "Last weekend habla de un momento ya pasado, como last week o last night." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Negar y preguntar con did",
+      "idea": "Para negar usa didn't y para preguntar usa Did; en ambos casos el verbo regresa a su forma base.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Negativa", "expr": "subject + didn't + base verb", "leyenda": "I didn't go to school yesterday." },
+        { "nombre": "Pregunta", "expr": "Did + subject + base verb?", "leyenda": "Did you go to the park? Yes, I did. / No, I didn't." }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál oración es correcta?", "opciones": ["She didn't went to school.", "She didn't go to school.", "She don't went to school."], "correcta": 1, "porque": "Después de didn't el verbo va en forma base: didn't go, no didn't went." }
+    }
+  ]
+}

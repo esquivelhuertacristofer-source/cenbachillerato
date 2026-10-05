@@ -1,0 +1,36 @@
+{
+  "codigo": "CD-I-P01-A1",
+  "conceptos": [
+    { "termino": "Hardware", "idea": "Todo lo que puedes tocar del dispositivo: pantalla, procesador, cámara, memoria." },
+    { "termino": "Software", "idea": "Los programas e instrucciones que le dicen al hardware qué hacer." },
+    { "termino": "Memoria RAM", "idea": "Memoria de trabajo temporal: guarda lo que el procesador necesita en este momento." },
+    { "termino": "Almacenamiento", "idea": "Disco duro, SSD o memoria interna: guarda tus archivos de forma permanente." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Hardware y software trabajan juntos",
+      "idea": "Tu dispositivo combina piezas que puedes tocar (hardware) con programas que les dicen qué hacer (software).",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Hardware", "puntos": ["Se puede tocar físicamente", "Pantalla, procesador, RAM", "Disco, cámara, micrófono"] },
+        { "titulo": "Software", "puntos": ["Programas e instrucciones", "Sistema operativo: Android, iOS, Windows, Linux", "Aplicaciones y controladores"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué es WhatsApp: hardware o software?", "opciones": ["Hardware, porque está en el celular", "Software, porque es una aplicación", "Ninguno de los dos"], "correcta": 1, "porque": "WhatsApp es una aplicación, es decir, un programa: no se puede tocar físicamente, así que es software." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Las piezas clave por dentro",
+      "idea": "Cada componente tiene un trabajo: el CPU ejecuta, la RAM guarda lo inmediato, el almacenamiento guarda lo permanente y la GPU procesa imágenes.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Componentes y su función", "puntos": ["CPU: el cerebro, ejecuta instrucciones", "RAM: memoria de trabajo temporal", "Almacenamiento: guarda archivos para siempre", "GPU: procesa imágenes y videos"] }
+      ] },
+      "comprueba": { "pregunta": "Guardas una foto y al día siguiente sigue ahí. ¿Qué componente la conserva?", "opciones": ["La memoria RAM", "El procesador", "El almacenamiento"], "correcta": 2, "porque": "El almacenamiento guarda los archivos de forma permanente; la RAM solo guarda lo que se usa en ese momento." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Para qué te sirve saberlo",
+      "idea": "Conocer los componentes te ayuda a entender fallas, decidir mejor y no caer en especificaciones engañosas.",
+      "comprueba": { "pregunta": "Tu celular se traba al abrir varias apps a la vez. Según la lectura, ¿qué podría explicarlo?", "opciones": ["Poca RAM o un procesador lento", "Una pantalla muy grande", "Tener muchas fotos en la galería"], "correcta": 0, "porque": "La lectura dice que un celular se traba por poca RAM o por un procesador lento." }
+    }
+  ]
+}

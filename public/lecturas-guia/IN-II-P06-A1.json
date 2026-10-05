@@ -1,0 +1,51 @@
+{
+  "codigo": "IN-II-P06-A1",
+  "conceptos": [
+    { "termino": "Excuse me", "idea": "La frase cortés para empezar a pedirle ayuda a alguien en la calle." },
+    { "termino": "Turn left / right", "idea": "Gira a la izquierda o a la derecha: la base para dar indicaciones." },
+    { "termino": "Prepositions of place", "idea": "Palabras como next to, opposite o between que ubican un lugar con precisión." },
+    { "termino": "Landmarks", "idea": "Puntos de referencia locales, como el OXXO o la taquería, para orientar a alguien." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Pedir indicaciones con cortesía",
+      "idea": "Primero abre con Excuse me y luego haz tu pregunta: How do I get to...? o Where is...?",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "1. Abre con cortesía", "puntos": ["Excuse me, could you help me?"] },
+        { "titulo": "2. Haz tu pregunta", "puntos": ["How do I get to the nearest pharmacy?", "Where is the bus station?", "Is there a bank near here?", "Is it far from here?"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres preguntarle a un desconocido cómo llegar al museo. ¿Cuál es el inicio más cortés?", "opciones": ["Where is the museum?", "Excuse me, could you help me?", "Go to the museum."], "correcta": 1, "porque": "La lectura recomienda empezar con una disculpa cortés, Excuse me, could you help me?, y después hacer la pregunta." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Dar indicaciones: giros y ubicaciones",
+      "idea": "Usa frases como turn left o go straight ahead para el camino, y preposiciones de lugar para ubicar el destino.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Para moverse", "puntos": ["Turn left at the traffic light.", "Turn right at the corner.", "Go straight ahead for two blocks.", "Take the first street on the left."] },
+        { "titulo": "Para ubicar", "puntos": ["next to (junto a)", "opposite / across from (enfrente de)", "between (entre)", "in front of / behind (delante de / detrás de)"] }
+      ] },
+      "comprueba": { "pregunta": "La papelería está justo al lado de la panadería. ¿Qué preposición usas?", "opciones": ["next to", "opposite", "behind"], "correcta": 0, "porque": "Next to significa junto a o al lado de. Opposite es enfrente y behind es detrás." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Puntos de referencia y transporte en México",
+      "idea": "En México solemos orientar con lugares conocidos en vez de calles, y conviene saber nombrar el transporte o ir a pie.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Con puntos de referencia", "puntos": ["Go past the OXXO", "Turn left at the taqueria", "It is right next to the pharmacy"] },
+        { "titulo": "Transporte", "puntos": ["camion (bus), metro, pesero (minibus), taxi", "bicicletas publicas (public bicycles)", "on foot: it is only a five-minute walk"] }
+      ] },
+      "comprueba": { "pregunta": "«Go past the OXXO and turn left at the taqueria.» ¿Qué estrategia usa?", "opciones": ["Nombres de calles y números", "Coordenadas de un mapa", "Puntos de referencia locales"], "correcta": 2, "porque": "Orienta con lugares que todos conocen, el OXXO y la taquería: es la navegación por puntos de referencia, muy común en México." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "Practica: guía a una turista",
+      "idea": "Una turista busca el health center: respóndele con al menos cuatro frases de la lectura.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Escucha", "texto": "Excuse me, I am looking for the health center. Is it far?" },
+        { "titulo": "Piensa el camino", "texto": "Imagina el mapa de tu zona y sus puntos de referencia." },
+        { "titulo": "Indica", "texto": "Usa al menos cuatro frases: giros, go straight ahead y preposiciones de lugar." }
+      ] }
+    }
+  ]
+}

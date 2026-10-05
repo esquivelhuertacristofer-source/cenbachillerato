@@ -1,0 +1,32 @@
+{
+  "codigo": "PFH-III-P02-A1",
+  "conceptos": [
+    { "termino": "Pacto social", "idea": "Acuerdo entre personas que da origen y justifica al Estado." },
+    { "termino": "Velo de ignorancia", "idea": "Elegir reglas sin saber qué lugar ocuparás en la sociedad." },
+    { "termino": "Enfoque de capacidades", "idea": "Justicia es que cada persona pueda desarrollar sus capacidades y florecer." },
+    { "termino": "Filosofía de la liberación", "idea": "Pensar la política desde el oprimido, el «otro» excluido." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "¿Para qué existe el Estado?",
+      "idea": "Para Hobbes el Estado garantiza la supervivencia; para Locke y Rousseau protege derechos y depende del consentimiento.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Hobbes (siglo XVII)", "puntos": ["Estado de naturaleza: guerra de todos contra todos", "Pacto y soberano poderoso", "Justificado porque garantiza la supervivencia"] },
+        { "titulo": "Locke y Rousseau", "puntos": ["Protege libertad, propiedad y vida", "Legitimidad por consentimiento de los gobernados", "Si viola derechos, el pueblo puede rebelarse"] }
+      ] },
+      "comprueba": { "pregunta": "Un gobierno pierde su legitimidad porque viola los derechos de su pueblo y este se rebela. ¿Qué visión justifica la rebelión?", "opciones": ["La de Hobbes", "La de Locke y Rousseau", "Ninguna de las dos"], "correcta": 1, "porque": "Para Locke y Rousseau el Estado depende del consentimiento; si viola los derechos naturales, el pueblo tiene derecho a rebelarse." }
+    },
+    {
+      "parrafos": [3, 4, 5],
+      "titulo": "Justicia social: Rawls, Nussbaum, Dussel",
+      "idea": "La justicia se ha pensado tras un velo de ignorancia, como desarrollo de capacidades y desde la experiencia del oprimido.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Rawls (1971)", "puntos": ["Velo de ignorancia", "Libertades básicas para todos", "Desigualdades solo si benefician a los más desfavorecidos"] },
+        { "titulo": "Nussbaum", "puntos": ["No bastan libertades formales", "Salud, participación, cuerpo, emociones, afiliación", "Justa es la sociedad que deja florecer"] },
+        { "titulo": "Dussel", "puntos": ["La modernidad ignoró a los colonizados", "Parte del «otro» excluido", "Una política que incluya a todos"] }
+      ] },
+      "comprueba": { "pregunta": "En clase deben inventar las reglas de una escuela sin saber si serán alumnos, maestros o conserjes. ¿Qué idea están aplicando?", "opciones": ["El estado de naturaleza", "El enfoque de capacidades", "El velo de ignorancia"], "correcta": 2, "porque": "Rawls propone elegir las reglas sin saber qué lugar ocuparíamos: eso es el velo de ignorancia." }
+    }
+  ]
+}

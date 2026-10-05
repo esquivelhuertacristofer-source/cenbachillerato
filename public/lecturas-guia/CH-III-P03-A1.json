@@ -1,0 +1,56 @@
+{
+  "codigo": "CH-III-P03-A1",
+  "conceptos": [
+    { "termino": "Tesis", "idea": "Afirmación interpretativa sobre el pasado que se puede debatir y respaldar." },
+    { "termino": "Multiperspectividad", "idea": "Incluir las voces de distintos grupos que vivieron el mismo proceso." },
+    { "termino": "Historia del presente", "idea": "Los procesos del pasado siguen operando hoy bajo nuevas formas." },
+    { "termino": "Determinismo", "idea": "Presentar los hechos como inevitables, como si no pudieran haber sido de otra manera." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Cuatro piezas de una narrativa argumentada",
+      "idea": "Una narrativa histórica organiza los hechos alrededor de una tesis y la sostiene con argumentos y evidencias.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Tesis", "texto": "Interpretación debatible, no un simple dato." },
+        { "titulo": "Argumentos", "texto": "Razones que sostienen la tesis." },
+        { "titulo": "Evidencias", "texto": "Documentos, cifras, testimonios, fotografías." },
+        { "titulo": "Conclusión", "texto": "Retoma la tesis, pesa los argumentos y abre preguntas." }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estas frases es una tesis y no un simple dato?", "opciones": ["Cárdenas llegó a la presidencia en 1934", "La Revolución Mexicana comenzó en 1910", "La Reforma Agraria cardenista cumplió los principios agraristas, pero con límites estructurales"], "correcta": 2, "porque": "Una tesis es una interpretación que se puede debatir y respaldar; las fechas solas son datos." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Más que cronología: por qué y quiénes",
+      "idea": "Narrar no es solo enlistar fechas: explica por qué ocurrió, con qué consecuencias y desde las voces de distintos actores.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Relato cronológico", "puntos": ["1934: Cárdenas llega a la presidencia", "1936: reparto masivo de tierras", "1938: expropiación del petróleo"] },
+        { "titulo": "Narrativa argumentada", "puntos": ["Por qué ocurrió: presión campesina, tensiones con élites", "Quién resistió y por qué", "Qué cambió y qué quedó incompleto"] }
+      ] },
+      "comprueba": { "pregunta": "Tu ensayo sobre la Reforma Agraria solo cita discursos del gobierno. ¿Qué le falta?", "opciones": ["Multiperspectividad", "Más fechas", "Una lista de causas"], "correcta": 0, "porque": "Una narrativa con solo la voz del Estado es incompleta; hay que incluir a ejidatarios, hacendados, trabajadoras y otros actores." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Causas encadenadas e historia del presente",
+      "idea": "Las consecuencias se vuelven causas de procesos posteriores, y el pasado sigue operando hoy con nuevas formas.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Cardenismo", "texto": "Intenta corregir la desigualdad rural." },
+        { "titulo": "Décadas siguientes", "texto": "La desigualdad se reconstituye con nuevas formas." },
+        { "titulo": "1994", "texto": "El EZLN reabre el debate sobre la tierra y los pueblos indígenas." },
+        { "titulo": "Hoy", "texto": "El debate sigue activo." }
+      ] },
+      "comprueba": { "pregunta": "¿Qué idea expresa la «historia del presente»?", "opciones": ["El pasado terminó y no influye hoy", "Los procesos del pasado siguen operando en el presente", "Solo importa lo que pasó este año"], "correcta": 1, "porque": "La historia del presente señala que los procesos históricos no terminan: continúan bajo nuevas formas." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Tres errores que debilitan tu narrativa",
+      "idea": "Evita el anacronismo, el presentismo y el determinismo: lo que ocurrió pudo ocurrir de otra manera.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Anacronismo", "puntos": ["Dar a actores del pasado ideas que no podían tener"] },
+        { "titulo": "Presentismo", "puntos": ["Juzgar el pasado con valores del presente"] },
+        { "titulo": "Determinismo", "puntos": ["Presentar los hechos como inevitables"] }
+      ] },
+      "comprueba": { "pregunta": "Alguien afirma: «La expropiación petrolera tenía que pasar sí o sí, no había otra opción». ¿Qué error comete?", "opciones": ["Anacronismo", "Determinismo", "Presentismo"], "correcta": 1, "porque": "Presentar un hecho como inevitable, como si no hubiera podido ocurrir de otra manera, es determinismo." }
+    }
+  ]
+}

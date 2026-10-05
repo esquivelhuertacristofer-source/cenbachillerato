@@ -1,0 +1,37 @@
+{
+  "codigo": "IN-I-P04-A1",
+  "conceptos": [
+    { "termino": "Información personal", "idea": "Nombre, edad, origen, nacionalidad, teléfono, dirección y correo." },
+    { "termino": "Nacionalidad", "idea": "Es un adjetivo y en inglés va con mayúscula: Mexican, American." },
+    { "termino": "Número telefónico", "idea": "Se dice dígito por dígito." },
+    { "termino": "Formularios", "idea": "Etiquetas como First name, Last name, Date of birth, Zip code." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Preguntas y respuestas clave",
+      "idea": "Cada pregunta personal tiene una respuesta modelo; casi todas empiezan con «What's your…?».",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Pregunta", "puntos": ["What's your name?", "How old are you?", "Where are you from?", "What's your nationality?", "What's your phone number?"] },
+        { "titulo": "Respuesta", "puntos": ["My name is... / I'm...", "I'm [edad] years old.", "I'm from [ciudad/país].", "I'm Mexican / American / French...", "It's [número]."] }
+      ] },
+      "comprueba": { "pregunta": "Te preguntan «Where are you from?». ¿Qué respondes?", "opciones": ["I'm 16 years old.", "My name is Sofía.", "I'm from Oaxaca."], "correcta": 2, "porque": "«Where are you from?» pregunta de dónde eres; se responde con «I'm from [ciudad/país]»." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Nacionalidades y teléfonos",
+      "idea": "Las nacionalidades llevan mayúscula y los teléfonos se dicen dígito por dígito.",
+      "visual": { "tipo": "ejemplo", "titulo": "Decir un teléfono en inglés", "lineas": ["Número: 55-1234-5678", "55 → five five", "1234 → one two three four", "5678 → five six seven eight"], "resultado": "five five, one two three four, five six seven eight" },
+      "comprueba": { "pregunta": "¿Cuál está bien escrito en inglés?", "opciones": ["I'm Canadian.", "I'm canadian.", "i'm canadian."], "correcta": 0, "porque": "En inglés las nacionalidades se escriben con mayúscula, y el pronombre «I» también." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Llenar un formulario",
+      "idea": "Reconocer las etiquetas te permite llenar cualquier formulario en inglés sin confundir los datos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Etiquetas comunes", "puntos": ["First name (nombre)", "Last name / Surname (apellido)", "Date of birth (fecha de nacimiento)", "Address (dirección)", "Zip code (código postal)", "Email address (correo electrónico)"] }
+      ] },
+      "comprueba": { "pregunta": "En un formulario dice «Surname». ¿Qué escribes ahí?", "opciones": ["Tu nombre", "Tu apellido", "Tu código postal"], "correcta": 1, "porque": "«Last name» o «Surname» significan apellido." }
+    }
+  ]
+}

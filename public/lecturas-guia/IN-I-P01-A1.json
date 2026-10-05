@@ -1,0 +1,52 @@
+{
+  "codigo": "IN-I-P01-A1",
+  "conceptos": [
+    { "termino": "Saludos formales/informales", "idea": "«Hi» y «Hello» son informales; «Good morning» y similares, más formales." },
+    { "termino": "Verbo «to be»", "idea": "Ser o estar: lo usas para decir tu nombre, edad y origen." },
+    { "termino": "Contracción «I'm»", "idea": "La forma corta de «I am»." },
+    { "termino": "Mayúsculas en inglés", "idea": "Nombres propios, el pronombre «I» y el inicio de cada oración." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Saludar según el contexto",
+      "idea": "Elige el saludo según qué tan formal es la situación, y responde «Nice to meet you too» al conocer a alguien.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Informales", "puntos": ["Hello", "Hi"] },
+        { "titulo": "Más formales", "puntos": ["Good morning", "Good afternoon", "Good evening"] },
+        { "titulo": "Al conocer a alguien", "puntos": ["Nice to meet you (mucho gusto)", "Respuesta: Nice to meet you too"] }
+      ] },
+      "comprueba": { "pregunta": "Llegas a una entrevista a las 9 de la mañana. ¿Qué saludo es más adecuado?", "opciones": ["Hi", "Good morning", "Bye"], "correcta": 1, "porque": "«Good morning» es un saludo formal para la mañana; «Hi» es informal y «Bye» es una despedida." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Preséntate con «to be»",
+      "idea": "Con «I am» o «I'm» dices tu nombre, tu edad y de dónde eres.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Nombre", "expr": "I'm [nombre].", "leyenda": "Soy [nombre]. También: I am [nombre]." },
+        { "nombre": "Edad", "expr": "I'm [edad] years old.", "leyenda": "Tengo [edad] años." },
+        { "nombre": "Origen", "expr": "I'm from [ciudad/país].", "leyenda": "Soy de [ciudad/país]." }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo dices «Tengo 15 años» en inglés?", "opciones": ["I have 15 years.", "I'm from 15.", "I'm 15 years old."], "correcta": 2, "porque": "La edad se dice con el verbo «to be»: «I'm [edad] years old», no con «have»." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Presentar a otros y despedirte",
+      "idea": "Usa «This is» o «His/Her name is» para presentar a alguien, y elige entre varias despedidas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Presentar a otra persona", "puntos": ["This is [nombre]", "His name is [nombre]", "Her name is [nombre]"] },
+        { "titulo": "Despedirte", "puntos": ["Goodbye", "Bye", "See you later", "See you tomorrow"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres presentar a tu amiga Ana a un compañero. ¿Qué dices?", "opciones": ["This is Ana.", "His name is Ana.", "I'm Ana."], "correcta": 0, "porque": "«This is [nombre]» presenta a otra persona; «His» es para hombres y «I'm» es para presentarte tú." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Mayúsculas que no se olvidan",
+      "idea": "En inglés siempre van con mayúscula los nombres propios, el pronombre «I» y la primera palabra de la oración.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Siempre con mayúscula", "puntos": ["Nombres propios", "El pronombre «I» (yo)", "La primera palabra de cada oración"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál oración está bien escrita?", "opciones": ["my name is Luis and i'm from Puebla.", "My name is Luis and I'm from Puebla.", "My name is luis and I'm from puebla."], "correcta": 1, "porque": "Lleva mayúscula la primera palabra, el pronombre «I» y los nombres propios Luis y Puebla." }
+    }
+  ]
+}

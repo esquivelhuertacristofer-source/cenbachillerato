@@ -1,0 +1,41 @@
+{
+  "codigo": "PM-II-P08-A1",
+  "conceptos": [
+    { "termino": "Polinomio", "idea": "Expresión de varios términos; el trinomio tiene exactamente tres." },
+    { "termino": "Producto notable", "idea": "Una multiplicación tan frecuente que conviene memorizar su resultado." },
+    { "termino": "Binomios conjugados", "idea": "Mismos términos, uno con más y otro con menos: (a + b)(a − b)." },
+    { "termino": "Diferencia de cuadrados", "idea": "Lo que dan los conjugados: a² − b², porque el término del medio se cancela." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Operar con trinomios y polinomios",
+      "idea": "Para sumar se agrupan términos semejantes; para multiplicar, cada término de uno multiplica a cada término del otro.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sumar o restar", "puntos": ["Agrupa los términos semejantes", "Opera sus coeficientes"] },
+        { "titulo": "Multiplicar", "puntos": ["Cada término de uno por cada término del otro", "Luego reduce los semejantes"] }
+      ] },
+      "comprueba": { "pregunta": "Al multiplicar (x + 1)(x² + x + 1), ¿cuántos productos parciales calculas antes de reducir?", "opciones": ["3", "5", "6"], "correcta": 2, "porque": "Cada uno de los 2 términos del primero multiplica a los 3 del segundo: 2 × 3 = 6 productos." }
+    },
+    {
+      "parrafos": [1, 2, 3],
+      "titulo": "Binomio al cuadrado: suma y resta",
+      "idea": "Un binomio al cuadrado da el primero al cuadrado, el doble producto y el segundo al cuadrado.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Suma al cuadrado", "expr": "(a + b)² = a² + 2ab + b²", "leyenda": "(x + 3)² = x² + 6x + 9" },
+        { "nombre": "Resta al cuadrado", "expr": "(a − b)² = a² − 2ab + b²", "leyenda": "(x − 4)² = x² − 8x + 16: el último término siempre es positivo" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto es (x − 5)²?", "opciones": ["x² − 25", "x² − 10x + 25", "x² − 10x − 25"], "correcta": 1, "porque": "a² − 2ab + b² con a = x y b = 5: x² − 10x + 25. El último término siempre es positivo." }
+    },
+    {
+      "parrafos": [4, 5, 6],
+      "titulo": "Conjugados y binomio al cubo",
+      "idea": "Los conjugados dan una diferencia de cuadrados; dominar estos patrones te deja multiplicar mentalmente y luego factorizar rápido.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Conjugados", "expr": "(a + b)(a − b) = a² − b²", "leyenda": "(x + 5)(x − 5) = x² − 25: el término del medio se cancela" },
+        { "nombre": "Binomio al cubo", "expr": "(a + b)³ = a³ + 3a²b + 3ab² + b³" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto es (x + 6)(x − 6)?", "opciones": ["x² − 36", "x² + 36", "x² − 12x + 36"], "correcta": 0, "porque": "Son conjugados: dan a² − b² = x² − 36. Los términos +6x y −6x se cancelan." }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "codigo": "PM-IV-P01-A1",
+  "conceptos": [
+    { "termino": "Función", "idea": "Regla que a cada entrada le asigna exactamente una salida." },
+    { "termino": "Dominio", "idea": "El conjunto de valores de entrada." },
+    { "termino": "Rango o codominio", "idea": "El conjunto donde están los valores de salida." },
+    { "termino": "Prueba de línea vertical", "idea": "Si una vertical corta la gráfica en más de un punto, no es función." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Exactamente una salida por entrada",
+      "idea": "Una función asigna a cada entrada exactamente una salida; en una gráfica, la prueba de la línea vertical lo revisa.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sí es función", "puntos": ["Cada entrada tiene exactamente una salida", "Una parábola pasa la prueba de la línea vertical"] },
+        { "titulo": "No es función", "puntos": ["Una entrada da dos salidas distintas", "Una circunferencia completa: una vertical la corta dos veces"] }
+      ] },
+      "comprueba": { "pregunta": "Una tabla asigna a x = 2 los valores y = 5 y y = 7. ¿Es una función?", "opciones": ["Sí, porque tiene dos salidas", "No, porque una entrada da dos salidas", "Sí, siempre que x sea positiva"], "correcta": 1, "porque": "En una función cada entrada tiene exactamente una salida. Aquí x = 2 tiene dos, así que no lo es." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Funciones en la vida cotidiana",
+      "idea": "Siempre que una cantidad depende de otra con un solo valor posible, hay una función.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Funciones a tu alrededor", "puntos": ["Velocidad de un auto en el Periférico según el tiempo", "Temperatura del Pico de Orizaba según la altitud (~6 °C menos cada 1 000 m)", "Costo de una llamada según los minutos", "Precio del metro: una función constante"] }
+      ] },
+      "comprueba": { "pregunta": "Un estacionamiento cobra lo mismo sin importar cuántas horas te quedes. ¿Qué tipo de función es el cobro?", "opciones": ["Lineal creciente", "Cuadrática", "Constante"], "correcta": 2, "porque": "La salida no cambia aunque cambie la entrada, como el precio del metro: es una función constante." }
+    },
+    {
+      "parrafos": [4, 5, 6],
+      "titulo": "Cuatro maneras de representar una función",
+      "idea": "Tabla, gráfica, fórmula y palabras muestran la misma función; saber pasar de una a otra es la habilidad clave.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Tabular", "puntos": ["Pares (x, y)", "Fácil de leer, pero limitada"] },
+        { "titulo": "Gráfica", "puntos": ["Curva en el plano", "Muestra tendencias, máximos y mínimos"] },
+        { "titulo": "Algebraica", "puntos": ["f(x) = 2x + 3", "Calcula cualquier valor"] },
+        { "titulo": "Verbal", "puntos": ["Descripción en palabras", "Natural, pero menos precisa"] }
+      ] },
+      "comprueba": { "pregunta": "«La altura aumenta 2 metros por cada segundo transcurrido». ¿Qué representación es?", "opciones": ["Verbal", "Tabular", "Algebraica"], "correcta": 0, "porque": "Describe la relación con palabras, sin tabla, gráfica ni fórmula: es la representación verbal." }
+    }
+  ]
+}

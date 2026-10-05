@@ -1,0 +1,32 @@
+{
+  "codigo": "IN-II-P03-A1",
+  "conceptos": [
+    { "termino": "Can (ability)", "idea": "Algo que sabes hacer: I can swim." },
+    { "termino": "Can (permission)", "idea": "Algo que se permite hacer: You can leave early." },
+    { "termino": "Can't / cannot", "idea": "La forma negativa: no sabes o no está permitido." },
+    { "termino": "Sin -s", "idea": "«Can» no cambia con ningún sujeto: she can, he can." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Habilidad o permiso",
+      "idea": "«Can» sirve para decir lo que sabes hacer y lo que se permite hacer.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ability (saber hacer)", "puntos": ["I can swim.", "She can speak three languages.", "They can't cook."] },
+        { "titulo": "Permission (estar permitido)", "puntos": ["Can I use your phone?", "You can leave class early today.", "You can't park here."] }
+      ] },
+      "comprueba": { "pregunta": "En la entrada de un museo dice «You can't take photos». ¿Qué expresa «can't» aquí?", "opciones": ["Que no sabes tomar fotos", "Que no está permitido tomar fotos", "Que la cámara no funciona"], "correcta": 1, "porque": "Es un uso de permiso: «can't» indica que algo no está permitido, como en «You can't park here»." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Cómo se arma con «can»",
+      "idea": "«Can» nunca lleva -s; para preguntar va primero y para negar se usa cannot o can't.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Afirmativa", "expr": "sujeto + can + verbo", "leyenda": "He can swim. (sin -s)" },
+        { "nombre": "Pregunta", "expr": "Can + sujeto + verbo?", "leyenda": "Can you help me? Can she drive?" },
+        { "nombre": "Negativa", "expr": "sujeto + can't (cannot) + verbo", "leyenda": "She can't come to the party." }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál oración está bien escrita?", "opciones": ["She cans drive.", "She can drives.", "She can drive."], "correcta": 2, "porque": "«Can» no cambia con ningún sujeto y el verbo va en forma base: «She can drive»." }
+    }
+  ]
+}

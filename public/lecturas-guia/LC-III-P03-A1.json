@@ -1,0 +1,39 @@
+{
+  "codigo": "LC-III-P03-A1",
+  "conceptos": [
+    { "termino": "Género literario", "idea": "Grupo de textos que comparten convenciones de forma, contenido y propósito." },
+    { "termino": "Lírica", "idea": "Expresa estados interiores con figuras retóricas, ritmo y musicalidad." },
+    { "termino": "Drama", "idea": "Texto escrito para representarse, con actos, escenas y diálogo." },
+    { "termino": "Ensayo", "idea": "No ficción en la que el autor reflexiona o argumenta con voz propia." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Los géneros y la narrativa",
+      "idea": "Conocer los géneros te deja leer cada texto con sus propias reglas; la narrativa cuenta historias.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Novela", "puntos": ["Extensa", "Múltiples personajes y tramas"] },
+        { "titulo": "Cuento", "puntos": ["Breve", "Concentrado en un efecto"] },
+        { "titulo": "Crónica", "puntos": ["Entre lo real y lo literario"] }
+      ] },
+      "comprueba": { "pregunta": "Un texto de tres páginas construye todo hacia un final sorpresivo. ¿Qué forma narrativa es más probable?", "opciones": ["Novela", "Crónica", "Cuento"], "correcta": 2, "porque": "El cuento es breve y está concentrado en un efecto." }
+    },
+    {
+      "parrafos": [2, 3, 4],
+      "titulo": "Lírica, drama y ensayo",
+      "idea": "La lírica expresa lo interior, el drama se escribe para representarse y el ensayo reflexiona con voz propia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lírica", "puntos": ["Estados interiores y percepciones", "Figuras retóricas, ritmo y musicalidad", "No siempre rima"] },
+        { "titulo": "Drama", "puntos": ["Para ser representado", "Actos, escenas y diálogo", "Tragedia, comedia y drama moderno"] },
+        { "titulo": "Ensayo", "puntos": ["No ficción", "Reflexiona, argumenta o interpreta", "Acepta la subjetividad y el estilo"] }
+      ] },
+      "comprueba": { "pregunta": "Una obra de teatro termina con los personajes reconciliados y en armonía. ¿Qué subgénero dramático es?", "opciones": ["Tragedia", "Comedia", "Drama moderno"], "correcta": 1, "porque": "La comedia presenta conflictos que terminan en armonía; la tragedia, en pérdida." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Cuando los géneros se mezclan",
+      "idea": "Un poema puede narrar, una novela puede contener ensayos y un drama puede ser poético.",
+      "comprueba": { "pregunta": "Una novela incluye capítulos en los que el narrador reflexiona sobre la libertad. ¿Qué muestra?", "opciones": ["Que los géneros pueden mezclarse", "Que ya no es literatura", "Que es una obra de teatro"], "correcta": 0, "porque": "Los géneros se mezclan: una novela puede tener ensayos dentro, y reconocerlo es parte de una lectura sofisticada." }
+    }
+  ]
+}

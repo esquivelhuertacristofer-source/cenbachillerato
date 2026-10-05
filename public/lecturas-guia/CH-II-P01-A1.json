@@ -1,0 +1,53 @@
+{
+  "codigo": "CH-II-P01-A1",
+  "conceptos": [
+    { "termino": "Historicidad", "idea": "Somos producto de la historia y, a la vez, agentes que construyen el futuro." },
+    { "termino": "Autobiografía histórica", "idea": "Contar tu historia personal conectándola con los grandes procesos históricos." },
+    { "termino": "Historia oral", "idea": "Recuperar memorias, relatos y tradiciones de las comunidades." },
+    { "termino": "México Profundo", "idea": "Para Bonfil Batalla, la civilización mesoamericana viva que coexiste y resiste." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Somos producto de la historia",
+      "idea": "Tu idioma, comida y oportunidades vienen de la historia, pero tú también la construyes; siempre miras desde tu momento histórico.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Producto de la historia", "puntos": ["El idioma que hablas", "Lo que comes y crees", "Las oportunidades que se abren o cierran"] },
+        { "titulo": "Agentes de la historia", "puntos": ["Tus acciones cotidianas construyen el futuro"] },
+        { "titulo": "Gadamer", "puntos": ["No hay perspectiva «desde ningún lugar»", "Interpretamos desde nuestra posición histórica"] }
+      ] },
+      "comprueba": { "pregunta": "Según Gadamer, ¿desde dónde interpretamos el mundo?", "opciones": ["Desde una perspectiva neutral, fuera de la historia", "Solo desde los libros de texto", "Desde nuestra posición histórica, cultural y social"], "correcta": 2, "porque": "Gadamer señaló que no hay perspectiva «desde ningún lugar»: siempre estamos situados en un momento histórico." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "La autobiografía histórica",
+      "idea": "Narrar tu historia conectándola con procesos más amplios te ayuda a explorar tu propia historicidad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Preguntas para empezar", "puntos": ["¿Dónde naciste y por qué tus padres estaban ahí?", "¿Por qué tu familia tiene ese origen?", "¿Qué crisis o migraciones explican su situación?"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál pregunta es propia de una autobiografía histórica?", "opciones": ["¿Cuál es mi color favorito?", "¿Qué crisis o migración explica por qué mi familia vive aquí?", "¿Qué calificación saqué en historia?"], "correcta": 1, "porque": "La autobiografía histórica conecta tu historia personal con procesos amplios como crisis, migraciones y transformaciones." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Huellas de la historia en tu familia",
+      "idea": "El Porfiriato, la Revolución y la crisis de 1994 cambiaron dónde y cómo viven hoy muchas familias mexicanas.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Porfiriato", "texto": "Haciendas e inversión extranjera; migraciones del campo a las ciudades y a la frontera norte." },
+        { "titulo": "Revolución (1910-1920)", "texto": "Millones de familias campesinas reciben tierras ejidales." },
+        { "titulo": "Crisis de 1994", "texto": "«Efecto Tequila»: devaluación, desempleo y quiebras de hogares y pequeñas empresas." },
+        { "titulo": "1995-2000", "texto": "La emigración mexicana a Estados Unidos alcanza cifras récord." }
+      ] },
+      "comprueba": { "pregunta": "Un tío tuyo se fue a Estados Unidos en 1997 tras perder su negocio. ¿Con qué proceso histórico podría conectarse?", "opciones": ["El reparto de tierras ejidales", "El Porfiriato", "La crisis de 1994"], "correcta": 2, "porque": "La crisis de 1994 provocó quiebras y aceleró la migración a Estados Unidos, que alcanzó cifras récord entre 1995 y 2000." }
+    },
+    {
+      "parrafos": [6, 7],
+      "titulo": "Memoria histórica y poder",
+      "idea": "La historia oral rescata el México Profundo, y quien controla el relato del pasado orienta el presente.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Bonfil Batalla (México Profundo, 1987)", "puntos": ["Civilización mesoamericana viva", "Coexiste y resiste frente al México de las élites"] },
+        { "titulo": "Enrique Florescano", "puntos": ["La memoria histórica es una forma de poder", "Quien controla el relato del pasado orienta el presente"] }
+      ] },
+      "comprueba": { "pregunta": "Entrevistas a tu abuela sobre las tradiciones de su pueblo. ¿Qué herramienta usas?", "opciones": ["La historia oral", "El calendario gregoriano", "Un mapa histórico"], "correcta": 0, "porque": "La historia oral recupera memorias, relatos y tradiciones de las comunidades." }
+    }
+  ]
+}

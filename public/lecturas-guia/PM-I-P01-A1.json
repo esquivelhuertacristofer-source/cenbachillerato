@@ -1,0 +1,29 @@
+{
+  "codigo": "PM-I-P01-A1",
+  "conceptos": [
+    { "termino": "Construcción colectiva", "idea": "Las matemáticas las hicieron muchas culturas durante miles de años." },
+    { "termino": "Sistema posicional base 60", "idea": "El de los babilonios; por eso una hora tiene 60 minutos." },
+    { "termino": "Pensamiento matemático", "idea": "Empieza por reconocer las matemáticas que ya usas a diario." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Muchas culturas, muchas necesidades",
+      "idea": "Las matemáticas son una creación de muchas culturas y reflejan las necesidades de quienes las desarrollaron.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Quiénes aportaron", "puntos": ["Babilonios: numeración posicional en base 60", "Mayas: el cero, de forma independiente", "Árabes: sistematizaron el álgebra", "Hipatia y Emmy Noether: pensamiento abstracto"] },
+        { "titulo": "Para qué las necesitaban", "puntos": ["Agricultores: medir tierras y calcular cosechas", "Arquitectos: geometría", "Comerciantes: fracciones y porcentajes"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué medimos el tiempo en 60 segundos y 60 minutos?", "opciones": ["Por el sistema decimal árabe", "Por el sistema en base 60 de los babilonios", "Por el cero maya"], "correcta": 1, "porque": "Los babilonios crearon una numeración posicional en base 60 que todavía usamos para medir el tiempo." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Matemáticas en tu día a día",
+      "idea": "Usas matemáticas al calcular tiempos, dinero, recetas y espacios; reconocerlo es el primer paso del pensamiento matemático.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cuando…", "puntos": ["calculas cuánto tardas en llegar", "decides si te alcanza el dinero", "ajustas una receta para más personas", "estimas si un objeto cabe en un espacio"] }
+      ] },
+      "comprueba": { "pregunta": "Duplicas una receta porque vendrán más invitados. ¿Estás usando matemáticas?", "opciones": ["Sí, aunque no lo notes", "No, es solo cocinar", "Solo si usas calculadora"], "correcta": 0, "porque": "Ajustar una receta para más personas es uno de los usos cotidianos de las matemáticas que menciona la lectura." }
+    }
+  ]
+}

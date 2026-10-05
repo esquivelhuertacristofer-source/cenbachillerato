@@ -1,0 +1,51 @@
+{
+  "codigo": "IN-I-P05-A1",
+  "conceptos": [
+    { "termino": "Question words", "idea": "Palabras para preguntar: Where, When, What time." },
+    { "termino": "Preposiciones de lugar", "idea": "next to, near, in front of, behind, between, on the corner of." },
+    { "termino": "at, on, in", "idea": "at para horas, on para días, in para meses y años." },
+    { "termino": "Decir la hora", "idea": "nine o'clock, nine fifteen, nine thirty o half past nine." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Las palabras para preguntar",
+      "idea": "Where pregunta por un lugar, When por un momento y What time por una hora.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Where (dónde)", "puntos": ["Where is the library?"] },
+        { "titulo": "When (cuándo)", "puntos": ["When does the class start?"] },
+        { "titulo": "What time (a qué hora)", "puntos": ["What time is it?"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber en qué lugar está el gimnasio. ¿Con qué palabra empiezas?", "opciones": ["When", "Where", "What time"], "correcta": 1, "porque": "«Where» significa dónde: sirve para preguntar por un lugar." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "¿Dónde está? Preposiciones de lugar",
+      "idea": "Preguntas con «Where is [lugar]?» y respondes «It is» más una preposición de lugar.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Preposiciones de lugar", "puntos": ["next to (al lado de)", "near (cerca de)", "in front of (enfrente de)", "behind (detrás de)", "between (entre)", "on the corner of (en la esquina de)"] }
+      ] },
+      "comprueba": { "pregunta": "La tienda está entre el banco y la escuela. ¿Qué preposición usas?", "opciones": ["behind", "near", "between"], "correcta": 2, "porque": "«Between» significa entre: «It is between the bank and the school»." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Horas, días y meses: at, on, in",
+      "idea": "Usa at para horas exactas, on para días e in para meses y años.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "at · horas", "puntos": ["The class is at 9 o'clock"] },
+        { "titulo": "on · días", "puntos": ["The exam is on Monday"] },
+        { "titulo": "in · meses y años", "puntos": ["The holiday is in December"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «The party is ___ Friday.»", "opciones": ["at", "on", "in"], "correcta": 1, "porque": "Friday es un día de la semana, y para los días se usa «on»." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Preguntas para la vida diaria",
+      "idea": "Con estas estructuras ya puedes pedir ubicaciones y horarios en situaciones reales.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ejemplos cotidianos", "puntos": ["Excuse me, where is the bathroom?", "What time does the store close?", "Is there a pharmacy near here?"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber a qué hora cierra la tienda. ¿Qué preguntas?", "opciones": ["What time does the store close?", "Where is the store?", "Is there a store near here?"], "correcta": 0, "porque": "«What time» pregunta por la hora: «What time does the store close?» significa ¿A qué hora cierra la tienda?" }
+    }
+  ]
+}

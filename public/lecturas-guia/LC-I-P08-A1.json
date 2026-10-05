@@ -1,0 +1,92 @@
+{
+  "codigo": "LC-I-P08-A1",
+  "conceptos": [
+    {
+      "termino": "Exposición oral",
+      "idea": "Organizar ideas sobre un tema y comunicarlas claro, en orden y para tu audiencia."
+    },
+    {
+      "termino": "Planificación",
+      "idea": "Definir el tema, investigar y seleccionar la información relevante."
+    },
+    {
+      "termino": "Apoyos visuales",
+      "idea": "Diapositivas, carteles u objetos que acompañan la exposición."
+    },
+    {
+      "termino": "Lenguaje corporal",
+      "idea": "Contacto visual, voz segura y postura: cómo dices lo que dices."
+    }
+  ],
+  "partes": [
+    {
+      "parrafos": [
+        0,
+        1
+      ],
+      "titulo": "Las fases de una buena exposición",
+      "idea": "Exponer bien empieza mucho antes de hablar: planificas, organizas, preparas apoyos y ensayas.",
+      "visual": {
+        "tipo": "pasos",
+        "items": [
+          {
+            "titulo": "Planificación",
+            "texto": "Define el tema, investiga y selecciona lo relevante."
+          },
+          {
+            "titulo": "Organización",
+            "texto": "Introducción, desarrollo y conclusión."
+          },
+          {
+            "titulo": "Apoyos visuales",
+            "texto": "Diapositivas, carteles u objetos, si los usas."
+          },
+          {
+            "titulo": "Práctica",
+            "texto": "Ensaya antes de presentar."
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "Ya tienes tus diapositivas listas, pero nunca has dicho la exposición en voz alta. ¿Qué fase te falta?",
+        "opciones": [
+          "La planificación",
+          "La práctica",
+          "La organización"
+        ],
+        "correcta": 1,
+        "porque": "La práctica consiste en ensayar antes de presentar."
+      }
+    },
+    {
+      "parrafos": [
+        2
+      ],
+      "titulo": "Cómo lo dices también comunica",
+      "idea": "El público observa tu contacto visual, tu voz y tu postura tanto como escucha tu contenido.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Durante la exposición",
+            "puntos": [
+              "Contacto visual con el público",
+              "Voz segura",
+              "Postura corporal"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "Un expositor con buen contenido lee todo mirando al piso. ¿Qué descuida?",
+        "opciones": [
+          "El contacto visual con el público",
+          "La investigación",
+          "La conclusión"
+        ],
+        "correcta": 0,
+        "porque": "La audiencia también observa cómo lo decimos: el contacto visual es tan importante como el contenido."
+      }
+    }
+  ]
+}

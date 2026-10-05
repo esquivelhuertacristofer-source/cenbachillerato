@@ -1,0 +1,23 @@
+{
+  "codigo": "PM-I-P09-A1",
+  "conceptos": [
+    { "termino": "Potencia", "idea": "Una multiplicación repetida de la misma base: 5³ = 5 × 5 × 5." },
+    { "termino": "Base y exponente", "idea": "La base es el número que se multiplica; el exponente, cuántas veces." },
+    { "termino": "Exponente negativo", "idea": "Indica el inverso de la base: 2⁻¹ = 1/2." },
+    { "termino": "Radicación", "idea": "La operación inversa de la potencia: √49 = 7 porque 7² = 49." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Potencias y raíces: operaciones inversas",
+      "idea": "Una potencia abrevia una multiplicación repetida, y la raíz la deshace: √49 = 7 porque 7² = 49.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Potencia", "expr": "5³ = 5 × 5 × 5 = 125", "leyenda": "5 es la base y 3 el exponente" },
+        { "nombre": "Misma base", "expr": "2³ × 2² = 2⁵", "leyenda": "Al multiplicar se suman los exponentes" },
+        { "nombre": "Exponente 0 y negativo", "expr": "7⁰ = 1   ·   3⁻² = 1/3² = 1/9", "leyenda": "El negativo indica el inverso de la base" },
+        { "nombre": "Raíz", "expr": "√49 = 7 porque 7² = 49", "leyenda": "49 es el radicando; el índice es 2" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto vale 2⁻³?", "opciones": ["−8", "1/8", "−6"], "correcta": 1, "porque": "Un exponente negativo indica el inverso de la base: 2⁻³ = 1/2³ = 1/8. No vuelve negativo el resultado." }
+    }
+  ]
+}

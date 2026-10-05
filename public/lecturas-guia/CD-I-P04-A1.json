@@ -1,0 +1,41 @@
+{
+  "codigo": "CD-I-P04-A1",
+  "conceptos": [
+    { "termino": "Algoritmo", "idea": "Conjunto de instrucciones ordenadas para resolver un problema o completar una tarea." },
+    { "termino": "Algoritmo de recomendación", "idea": "Decide qué video, publicación o resultado ves primero en una plataforma." },
+    { "termino": "No neutralidad", "idea": "Los algoritmos persiguen objetivos, casi siempre que pases más tiempo en la plataforma." },
+    { "termino": "Polarización", "idea": "Efecto de promover contenido que provoca indignación, miedo o sorpresa." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Qué es un algoritmo",
+      "idea": "Un algoritmo es una serie de instrucciones ordenadas; lo usan cocineros, médicos y computadoras.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Algoritmos en la vida diaria", "puntos": ["Cocineros: recetas", "Médicos: protocolos de diagnóstico", "Computadoras: todo lo que les pedimos"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estos es un algoritmo?", "opciones": ["Las instrucciones paso a paso para armar un mueble", "Una foto de un mueble", "El precio de un mueble"], "correcta": 0, "porque": "Un algoritmo es un conjunto de instrucciones ordenadas para completar una tarea, como armar un mueble." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Quién decide lo que ves",
+      "idea": "En internet, los algoritmos de cada plataforma eligen qué contenido aparece frente a ti y en qué orden.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Qué decide cada algoritmo", "puntos": ["YouTube: el siguiente video recomendado", "Instagram: qué publicaciones salen primero", "TikTok: aprende tus gustos por el tiempo en cada video", "Google: el orden de los resultados"] }
+      ] },
+      "comprueba": { "pregunta": "Según la lectura, ¿qué analiza el algoritmo de TikTok para aprender tus preferencias?", "opciones": ["Tu lista de contactos", "Cuánto tiempo pasas en cada video", "El modelo de tu celular"], "correcta": 1, "porque": "La lectura dice que TikTok analiza cuánto tiempo pasas en cada video y así aprende tus preferencias." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "No son neutrales: úsalos con conciencia",
+      "idea": "Buscan que pases más tiempo en la plataforma y premian lo que enoja o asusta; entenderlo te deja cuestionar lo que ves.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Objetivo", "texto": "Maximizar tu tiempo en la plataforma para mostrarte más anuncios." },
+        { "titulo": "Estrategia", "texto": "Promover contenido con reacciones fuertes: indignación, miedo, sorpresa." },
+        { "titulo": "Efecto", "texto": "Puede amplificar la desinformación y la polarización." },
+        { "titulo": "Tu respuesta", "texto": "Cuestionar lo que ves y buscar fuentes diversas." }
+      ] },
+      "comprueba": { "pregunta": "Tu feed se llena de publicaciones que te indignan. Según la lectura, ¿por qué podría pasar?", "opciones": ["Porque el algoritmo es neutral y muestra todo por igual", "Porque solo hay ese tipo de contenido en internet", "Porque el contenido que genera reacciones fuertes te retiene más tiempo"], "correcta": 2, "porque": "Los algoritmos buscan que pases más tiempo y tienden a promover lo que genera reacciones emocionales fuertes." }
+    }
+  ]
+}

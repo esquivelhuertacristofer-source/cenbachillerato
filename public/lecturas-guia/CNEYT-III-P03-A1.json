@@ -1,0 +1,50 @@
+{
+  "codigo": "CNEYT-III-P03-A1",
+  "conceptos": [
+    { "termino": "Fotosíntesis", "idea": "Convierte la energía de la luz en energía química guardada en glucosa." },
+    { "termino": "Cloroplasto", "idea": "Organelo vegetal donde ocurre la fotosíntesis." },
+    { "termino": "Clorofila", "idea": "Pigmento que absorbe luz roja y azul-violeta y refleja la verde." },
+    { "termino": "Tasa fotosintética", "idea": "La velocidad de la fotosíntesis: depende de luz, CO₂, temperatura y agua." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La ecuación de la vida",
+      "idea": "Con luz, el CO₂ y el agua se convierten en glucosa y oxígeno; de ese proceso dependen casi todos los seres vivos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Ecuación general", "expr": "6CO₂ + 6H₂O + luz → C₆H₁₂O₆ + 6O₂", "leyenda": "Dióxido de carbono + agua → glucosa + oxígeno" }
+      ] },
+      "comprueba": { "pregunta": "¿De dónde sale el oxígeno que respiramos?", "opciones": ["Es un subproducto de la fotosíntesis", "Lo producen los animales al respirar", "Se forma de la glucosa"], "correcta": 0, "porque": "La ecuación muestra 6O₂ como producto: el oxígeno es un subproducto de la fotosíntesis." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Dos fases dentro del cloroplasto",
+      "idea": "En los tilacoides la luz produce ATP, NADPH y oxígeno; en el estroma, el ciclo de Calvin fija CO₂ y hace glucosa.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Reacciones de luz", "puntos": ["Ocurren en los tilacoides", "Necesitan luz solar directa", "Producen ATP y NADPH", "Liberan oxígeno al descomponer el agua"] },
+        { "titulo": "Ciclo de Calvin", "puntos": ["Ocurre en el estroma", "Usa el ATP y el NADPH", "Fija el CO₂ del aire", "Sintetiza glucosa"] }
+      ] },
+      "comprueba": { "pregunta": "¿En qué fase se fija el CO₂ para fabricar glucosa?", "opciones": ["En las reacciones de luz", "En el ciclo de Calvin", "En la descomposición del agua"], "correcta": 1, "porque": "El ciclo de Calvin, en el estroma, usa ATP y NADPH para fijar el CO₂ y sintetizar glucosa." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Pigmentos y factores que la aceleran",
+      "idea": "La clorofila capta la luz roja y azul-violeta; la rapidez de la fotosíntesis depende de luz, CO₂, temperatura y agua.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Factores de la tasa fotosintética", "puntos": ["Intensidad luminosa (hasta cierto límite)", "Concentración de CO₂", "Temperatura óptima para las enzimas", "Disponibilidad de agua"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué vemos verdes las hojas?", "opciones": ["Porque la clorofila absorbe la luz verde", "Porque los carotenoides son verdes", "Porque la clorofila refleja la luz verde"], "correcta": 2, "porque": "La clorofila absorbe sobre todo luz roja y azul-violeta y refleja la verde, que es la que llega a tus ojos." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "La milpa: luz aprovechada en capas",
+      "idea": "Maíz, frijol y calabaza ocupan alturas distintas y así aprovechan mejor la luz por unidad de área.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Maíz (arriba)", "texto": "Es alto y capta la luz directa del sol." },
+        { "titulo": "Frijol (en medio)", "texto": "Trepa y ocupa los niveles intermedios." },
+        { "titulo": "Calabaza (abajo)", "texto": "Cubre el suelo y aprovecha la luz difusa." }
+      ] },
+      "comprueba": { "pregunta": "En la milpa, ¿qué planta aprovecha la luz difusa a ras del suelo?", "opciones": ["El maíz", "La calabaza", "El frijol"], "correcta": 1, "porque": "La calabaza cubre el suelo y aprovecha la luz difusa que pasa entre el maíz y el frijol." }
+    }
+  ]
+}

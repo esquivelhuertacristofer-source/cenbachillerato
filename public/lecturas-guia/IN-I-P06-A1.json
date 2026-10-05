@@ -1,0 +1,44 @@
+{
+  "codigo": "IN-I-P06-A1",
+  "conceptos": [
+    { "termino": "Apariencia física", "idea": "Altura, complexión, cabello y ojos para describir a una persona." },
+    { "termino": "Verbo «to wear»", "idea": "Usar o llevar puesto: dice qué ropa trae alguien." },
+    { "termino": "It is + adjetivo", "idea": "La estructura para describir el clima: It is sunny, It is cold." },
+    { "termino": "Describir con respeto", "idea": "Usar términos descriptivos y neutros, sin connotaciones negativas." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Cómo se ve una persona",
+      "idea": "Describe a alguien por su altura, complexión, cabello y ojos, siempre con respeto a la diversidad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Altura y complexión", "puntos": ["tall (alto), short (bajo)", "medium height (estatura mediana)", "slim/thin (delgado), heavy-set (robusto)"] },
+        { "titulo": "Cabello", "puntos": ["long/short hair", "straight/curly/wavy hair", "blonde/brown/black/gray hair"] },
+        { "titulo": "Ojos", "puntos": ["blue/green/brown/black eyes"] }
+      ] },
+      "comprueba": { "pregunta": "Tu amigo tiene el cabello rizado. ¿Cómo lo dices en inglés?", "opciones": ["He has straight hair.", "He has wavy hair.", "He has curly hair."], "correcta": 2, "porque": "«Curly» es rizado; «straight» es liso y «wavy» es ondulado." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Qué lleva puesto: «to wear»",
+      "idea": "Para decir qué ropa trae alguien usas el verbo «to wear».",
+      "visual": { "tipo": "ejemplo", "titulo": "Describir la ropa", "lineas": ["Verbo: to wear (usar / llevar puesto)", "She is wearing a red dress and black shoes."], "resultado": "Ella lleva un vestido rojo y zapatos negros." },
+      "comprueba": { "pregunta": "¿Qué verbo usas para decir que alguien lleva una chamarra azul?", "opciones": ["to wear", "to be from", "to like"], "correcta": 0, "porque": "«To wear» significa usar o llevar puesto, y es el verbo para hablar de la ropa." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "¿Qué tiempo hace?",
+      "idea": "El clima se describe con «It is» más un adjetivo, o con «It is raining / snowing».",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "It is + adjetivo", "puntos": ["sunny (soleado), cloudy (nublado)", "rainy (lluvioso), windy (ventoso)", "cold (frío), hot, warm (templado)", "foggy (con niebla)"] },
+        { "titulo": "Lo que está pasando", "puntos": ["It is raining (Está lloviendo)", "It is snowing (Está nevando)"] }
+      ] },
+      "comprueba": { "pregunta": "Miras por la ventana y el cielo está lleno de nubes. ¿Qué dices?", "opciones": ["It is sunny.", "It is cloudy.", "It is snowing."], "correcta": 1, "porque": "«Cloudy» significa nublado." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Describir con respeto",
+      "idea": "Al describir personas, elige palabras descriptivas y neutras, sin connotaciones negativas."
+    }
+  ]
+}

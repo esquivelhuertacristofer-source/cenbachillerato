@@ -1,0 +1,58 @@
+{
+  "codigo": "CNEYT-V-P01-A1",
+  "conceptos": [
+    { "termino": "Inercia", "idea": "La resistencia de un cuerpo a cambiar su movimiento; crece con su masa." },
+    { "termino": "Fuerza neta", "idea": "La suma de todas las fuerzas: produce la aceleración, F = ma." },
+    { "termino": "Acción-reacción", "idea": "Las fuerzas vienen en pares iguales y opuestos, sobre cuerpos distintos." },
+    { "termino": "Diagrama de cuerpo libre", "idea": "Dibujo con todas las fuerzas que actúan sobre un objeto." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Primera ley: la inercia",
+      "idea": "Un cuerpo sigue en reposo o en línea recta a velocidad constante mientras ninguna fuerza neta lo cambie.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ejemplos de inercia en el texto", "puntos": ["Pipa de PEMEX que frena: el líquido sigue hacia adelante", "Por eso lleva deflectores internos", "Sin cinturón, los ocupantes salen proyectados al frenar"] }
+      ] },
+      "comprueba": { "pregunta": "Vas de pie en un camión que arranca de golpe y te vas hacia atrás. ¿Qué ley lo explica?", "opciones": ["La ley de la inercia", "La ley de acción-reacción", "La ley de gravitación"], "correcta": 0, "porque": "Tu cuerpo tiende a seguir en su estado de movimiento (reposo) mientras el camión acelera: eso es inercia." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Segunda ley: F = ma",
+      "idea": "La fuerza neta es la masa por la aceleración: con ella calculas cuánto acelera un cuerpo.",
+      "visual": { "tipo": "ejemplo", "titulo": "Una patada a un balón de 0.43 kg", "lineas": ["F = 215 N,  m ≈ 0.43 kg", "a = F ÷ m", "a = 215 ÷ 0.43"], "resultado": "a ≈ 500 m/s²" },
+      "comprueba": { "pregunta": "Si empujas con la misma fuerza un objeto con el doble de masa, su aceleración…", "opciones": ["se duplica", "no cambia", "es la mitad"], "correcta": 2, "porque": "Como a = F/m, al duplicar la masa con la misma fuerza, la aceleración queda a la mitad." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Tercera ley: acción y reacción",
+      "idea": "Si A empuja a B, B empuja a A con la misma fuerza en sentido contrario; las fuerzas actúan sobre cuerpos distintos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Acción", "puntos": ["El cohete expulsa gases hacia atrás"] },
+        { "titulo": "Reacción", "puntos": ["Los gases impulsan al cohete hacia adelante"] }
+      ] },
+      "comprueba": { "pregunta": "Al nadar empujas el agua hacia atrás con las manos. ¿Qué te hace avanzar?", "opciones": ["Tu inercia", "La fuerza que el agua ejerce sobre ti hacia adelante", "Tu peso"], "correcta": 1, "porque": "Por acción-reacción, el agua te empuja con una fuerza igual y de sentido contrario a la que tú le aplicas." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Diagramas de cuerpo libre",
+      "idea": "Un DCL dibuja todas las fuerzas sobre un objeto: peso, normal, tensión y fricción.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Peso", "expr": "W = m·g", "leyenda": "Siempre hacia abajo" },
+        { "nombre": "Plano inclinado", "expr": "W·sen θ (paralela) y W·cos θ (perpendicular)", "leyenda": "La perpendicular es igual y opuesta a la normal" },
+        { "nombre": "Fricción estática", "expr": "fₑ ≤ μₑ·N", "leyenda": "Impide que empiece el movimiento" },
+        { "nombre": "Fricción cinética", "expr": "f_c = μ_c·N,  con μ_c < μ_e", "leyenda": "Actúa mientras hay movimiento" }
+      ] },
+      "comprueba": { "pregunta": "Una caja ya se desliza por el piso. ¿Qué fricción actúa sobre ella?", "opciones": ["Estática", "Cinética", "Ninguna"], "correcta": 1, "porque": "La fricción cinética actúa durante el movimiento; la estática solo impide que el movimiento comience." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Newton contra los sismos",
+      "idea": "Las normas de construcción de la CDMX usan F = ma para calcular las fuerzas sísmicas de diseño.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Fuerza sísmica de diseño", "expr": "F_sísmica = masa del edificio × aceleración del suelo", "leyenda": "Segunda ley aplicada a un edificio" }
+      ] },
+      "comprueba": { "pregunta": "Con la misma aceleración del suelo, ¿qué edificio recibe mayor fuerza sísmica?", "opciones": ["El de mayor masa", "El de menor masa", "Ambos reciben la misma"], "correcta": 0, "porque": "Como F = masa × aceleración del suelo, a igual aceleración, más masa implica más fuerza." }
+    }
+  ]
+}

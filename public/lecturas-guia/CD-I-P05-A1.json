@@ -1,0 +1,30 @@
+{
+  "codigo": "CD-I-P05-A1",
+  "conceptos": [
+    { "termino": "Derechos digitales", "idea": "Derechos humanos fundamentales aplicados al entorno tecnológico." },
+    { "termino": "Derecho al olvido", "idea": "Pedir que borren datos tuyos que ya no son relevantes o dañan tu reputación." },
+    { "termino": "Discriminación algorítmica", "idea": "Cuando un sistema automatizado decide en tu contra por raza, género o clase." },
+    { "termino": "Cifrado", "idea": "Herramienta que tienes derecho a usar para proteger tus comunicaciones." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Cinco derechos que sí tienes",
+      "idea": "Tus derechos humanos también valen en línea: privacidad, olvido, no discriminación, acceso a internet y seguridad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Derechos digitales", "puntos": ["Privacidad: nadie entra a tus datos sin permiso", "Olvido: pedir que borren datos irrelevantes", "No discriminación algorítmica", "Acceso a internet: llave de otros derechos", "Seguridad: usar cifrado"] }
+      ] },
+      "comprueba": { "pregunta": "Un sitio sigue mostrando una noticia vieja tuya que daña tu reputación. ¿Qué derecho puedes ejercer?", "opciones": ["Derecho al acceso a internet", "Derecho al olvido", "Derecho a la seguridad digital"], "correcta": 1, "porque": "El derecho al olvido permite pedir que se eliminen datos que ya no son relevantes o afectan tu reputación." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cómo hacerlos valer",
+      "idea": "Para ejercer tus derechos debes conocerlos, saber a quién reclamar y usar herramientas para protegerte.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Primero", "texto": "Reclama a quien trata tus datos." },
+        { "titulo": "Si no responde o responde mal", "texto": "Acude a la Secretaría Anticorrupción y Buen Gobierno." }
+      ] },
+      "comprueba": { "pregunta": "Una tienda en línea usa tus datos sin permiso. ¿A quién reclamas primero?", "opciones": ["A la tienda que trata tus datos", "A la Secretaría Anticorrupción y Buen Gobierno", "A tu compañía de internet"], "correcta": 0, "porque": "En México se reclama primero a quien trata tus datos; si no responde o responde mal, ante la Secretaría." }
+    }
+  ]
+}

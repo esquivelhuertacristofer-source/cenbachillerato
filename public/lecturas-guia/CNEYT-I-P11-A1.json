@@ -1,0 +1,42 @@
+{
+  "codigo": "CNEYT-I-P11-A1",
+  "conceptos": [
+    { "termino": "Naturaleza corpuscular", "idea": "La materia está hecha de partículas: átomos, iones y electrones." },
+    { "termino": "Corriente eléctrica", "idea": "Electrones que se mueven de forma ordenada por un material." },
+    { "termino": "Conductor", "idea": "Material con electrones libres que deja pasar la corriente, como el cobre." },
+    { "termino": "Semiconductor", "idea": "Conduce en condiciones controladas, como el silicio de los chips." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Partículas con carga y energía",
+      "idea": "La materia está hecha de partículas con energía; cuando los electrones se mueven ordenadamente hay corriente eléctrica.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cargas", "puntos": ["Electrón: negativa", "Protón: positiva"] },
+        { "titulo": "Cómo interactúan", "puntos": ["Iguales se repelen", "Opuestas se atraen"] }
+      ] },
+      "comprueba": { "pregunta": "Acercas dos objetos cargados negativamente. ¿Qué pasa?", "opciones": ["Se atraen", "No pasa nada", "Se repelen"], "correcta": 2, "porque": "Cargas iguales se repelen y cargas opuestas se atraen." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Conductores, aislantes y semiconductores",
+      "idea": "No todos los materiales dejan pasar la corriente igual: por eso los cables son de metal forrado de plástico.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Conductores", "puntos": ["Tienen electrones libres", "Cobre, aluminio", "Cables"] },
+        { "titulo": "Aislantes", "puntos": ["Casi no dejan pasar corriente", "Plástico, vidrio, madera seca", "Forro de los cables"] },
+        { "titulo": "Semiconductores", "puntos": ["Conducen en condiciones controladas", "Silicio", "Chips, computadoras, celulares"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué el mango de un desarmador de electricista es de plástico?", "opciones": ["Porque el plástico es aislante", "Porque el plástico es conductor", "Porque el plástico es semiconductor"], "correcta": 0, "porque": "El plástico casi no deja pasar la corriente: es aislante, igual que el forro de los cables." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Tecnologías que transforman energía",
+      "idea": "Pilas, focos y paneles solares convierten una forma de energía en otra gracias a la relación entre partículas y energía.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Pila o batería", "expr": "energía química → energía eléctrica" },
+        { "nombre": "Foco", "expr": "energía eléctrica → luz + calor" },
+        { "nombre": "Panel solar", "expr": "energía de la luz → energía eléctrica" }
+      ] }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "codigo": "IN-III-P05-A1",
+  "conceptos": [
+    { "termino": "Must", "idea": "Obligación fuerte, que viene de quien habla o de una autoridad." },
+    { "termino": "Mustn't", "idea": "Prohibición: algo que no está permitido hacer." },
+    { "termino": "Have to", "idea": "Obligación que viene de fuera: una regla, un plazo o una necesidad." },
+    { "termino": "Don't have to", "idea": "No hay obligación: puedes hacerlo si quieres, pero es opcional." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Must y mustn't: regla y prohibición",
+      "idea": "Must expresa una obligación fuerte; mustn't, algo que no está permitido.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "MUST", "puntos": ["Obligación fuerte o regla", "Students must wear their uniform.", "I must call my grandmother today."] },
+        { "titulo": "MUSTN'T", "puntos": ["Prohibición: no está permitido", "You mustn't use your phone during the exam.", "You mustn't run inside the building."] }
+      ] },
+      "comprueba": { "pregunta": "Un letrero del laboratorio prohíbe comer. ¿Qué dice?", "opciones": ["You mustn't eat here.", "You must eat here.", "You don't have to eat here."], "correcta": 0, "porque": "Mustn't expresa prohibición: comer ahí no está permitido." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Have to y don't have to",
+      "idea": "Have to es una obligación por una regla o necesidad externa; don't have to significa que es opcional.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "HAVE TO", "puntos": ["Obligación externa", "I have to wear glasses.", "She has to finish her project by Friday."] },
+        { "titulo": "DON'T HAVE TO", "puntos": ["Sin obligación: es opcional", "You don't have to come if you don't want to.", "He doesn't have to wear a tie on Fridays."] }
+      ] },
+      "comprueba": { "pregunta": "El sábado no hay clases, así que no es necesario levantarte temprano. ¿Qué dices?", "opciones": ["I mustn't get up early.", "I don't have to get up early.", "I have to get up early."], "correcta": 1, "porque": "No es obligatorio, pero tampoco está prohibido: eso es don't have to." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Mustn't frente a don't have to",
+      "idea": "Mustn't prohíbe; don't have to solo dice que no es necesario, pero puedes hacerlo si quieres.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Mustn't = forbidden", "puntos": ["NO puedes hacerlo", "You mustn't eat in the library."] },
+        { "titulo": "Don't have to = not necessary", "puntos": ["Puedes hacerlo si quieres", "You don't have to eat in the library."] }
+      ] },
+      "comprueba": { "pregunta": "«You don't have to bring a dictionary.» ¿Qué significa?", "opciones": ["Está prohibido traerlo", "Es obligatorio traerlo", "Puedes traerlo, pero no es necesario"], "correcta": 2, "porque": "Don't have to indica que no es necesario; no lo prohíbe como mustn't." }
+    }
+  ]
+}

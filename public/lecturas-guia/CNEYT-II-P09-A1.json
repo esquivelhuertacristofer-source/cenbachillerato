@@ -1,0 +1,42 @@
+{
+  "codigo": "CNEYT-II-P09-A1",
+  "conceptos": [
+    { "termino": "Sistema termodinámico", "idea": "La parte del universo que estudias, separada del entorno por fronteras." },
+    { "termino": "Variables de estado", "idea": "Presión, volumen, temperatura y moles: describen cómo está un gas." },
+    { "termino": "Gas ideal", "idea": "Modelo de gas cuyas partículas no interactúan y cumplen PV = nRT." },
+    { "termino": "Primera ley", "idea": "La energía se conserva: ΔU = Q − W." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Sistemas, fronteras y variables de estado",
+      "idea": "Un sistema es abierto, cerrado o aislado según lo que cruza sus fronteras, y su estado se describe con P, V, T y n.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Abierto", "puntos": ["Intercambia materia y energía", "Ejemplo: olla destapada"] },
+        { "titulo": "Cerrado", "puntos": ["Intercambia solo energía", "Ejemplo: olla con tapa"] },
+        { "titulo": "Aislado", "puntos": ["No intercambia nada", "Ejemplo: termo ideal"] }
+      ] },
+      "comprueba": { "pregunta": "Un frasco de vidrio bien tapado que se calienta al sol. ¿Qué tipo de sistema es?", "opciones": ["Abierto", "Cerrado", "Aislado"], "correcta": 1, "porque": "Recibe energía (calor del sol) pero la tapa impide que entre o salga materia: es un sistema cerrado." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "El gas ideal: PV = nRT",
+      "idea": "El gas ideal supone partículas sin interacción y de volumen despreciable; describe bien a los gases reales a baja presión y alta temperatura.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Ecuación de estado", "expr": "P·V = n·R·T", "leyenda": "P presión · V volumen · n moles · T temperatura" },
+        { "nombre": "Constante de los gases", "expr": "R = 8.314 J/mol·K" }
+      ] },
+      "comprueba": { "pregunta": "¿En qué condiciones el modelo de gas ideal describe mejor a un gas real?", "opciones": ["Baja presión y alta temperatura", "Alta presión y baja temperatura", "Solo en el cero absoluto"], "correcta": 0, "porque": "El texto dice que el modelo funciona muy bien con gases reales a baja presión y alta temperatura." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Calor, trabajo y la primera ley",
+      "idea": "El calor y el trabajo transfieren energía; el cambio de energía interna es el calor que entra menos el trabajo que hace el sistema.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Primera ley", "expr": "ΔU = Q − W", "leyenda": "ΔU cambio de energía interna · Q calor que entra · W trabajo que hace el sistema" },
+        { "nombre": "Equivalencia de Joule", "expr": "1 cal = 4.184 J" }
+      ] },
+      "comprueba": { "pregunta": "Un gas recibe calor y no realiza ningún trabajo (W = 0). ¿Qué pasa con su energía interna?", "opciones": ["Disminuye", "No cambia", "Aumenta en lo mismo que el calor recibido"], "correcta": 2, "porque": "Con W = 0, la primera ley queda ΔU = Q: todo el calor que entra aumenta la energía interna." }
+    }
+  ]
+}

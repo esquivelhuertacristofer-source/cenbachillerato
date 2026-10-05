@@ -1,0 +1,54 @@
+{
+  "codigo": "CNEYT-V-P04-A1",
+  "conceptos": [
+    { "termino": "Onda", "idea": "Perturbación que viaja transportando energía, pero no materia." },
+    { "termino": "Transversal y longitudinal", "idea": "La perturbación va perpendicular o paralela a la dirección en que viaja la onda." },
+    { "termino": "Frecuencia", "idea": "Ciclos por segundo, en Hz; en el sonido, más frecuencia es tono más agudo." },
+    { "termino": "Efecto Doppler", "idea": "La frecuencia que percibes cambia si la fuente o tú se mueven." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Qué es una onda y sus tipos",
+      "idea": "Una onda lleva energía sin llevar materia; según cómo vibra, es transversal o longitudinal.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Transversales", "puntos": ["Vibran perpendicular a la propagación", "Cuerda tensa", "Ondas sísmicas S", "Luz"] },
+        { "titulo": "Longitudinales", "puntos": ["Vibran paralelo a la propagación", "Sonido", "Ondas sísmicas P"] }
+      ] },
+      "comprueba": { "pregunta": "Sacudes una cuerda hacia arriba y abajo y la onda avanza hacia la pared. ¿Qué tipo de onda es?", "opciones": ["Longitudinal", "Transversal", "No es una onda"], "correcta": 1, "porque": "La cuerda vibra de arriba abajo, perpendicular a la dirección en que avanza la onda: es transversal." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Cómo se mide una onda",
+      "idea": "Amplitud, período, frecuencia y longitud de onda describen una onda; su velocidad es v = λ · f.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Frecuencia y período", "expr": "f = 1 ÷ T", "leyenda": "f en hertz (Hz), T en segundos" },
+        { "nombre": "Velocidad de la onda", "expr": "v = λ · f", "leyenda": "λ es la distancia de cresta a cresta" },
+        { "nombre": "Sonido en el aire (20 °C)", "expr": "v ≈ 340 m/s", "leyenda": "En agua ≈ 1,480 m/s; en sólidos puede superar 5,000 m/s" }
+      ] },
+      "comprueba": { "pregunta": "Subes el volumen de una canción sin cambiar la nota. ¿Qué parámetro de la onda aumentó?", "opciones": ["La frecuencia", "La longitud de onda", "La amplitud"], "correcta": 2, "porque": "En el sonido, mayor amplitud significa mayor volumen; la frecuencia es la que define el tono." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Ondas sísmicas y la alerta SASMEX",
+      "idea": "Las ondas P llegan antes que las S; SASMEX las detecta y avisa a la CDMX antes del golpe destructivo.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Ocurre el sismo", "texto": "Se generan ondas P (≈ 8 km/s) y ondas S (≈ 4 km/s)." },
+        { "titulo": "Sensores en la costa", "texto": "En Guerrero y Oaxaca detectan primero las ondas P." },
+        { "titulo": "Alerta a la velocidad de la luz", "texto": "Una señal de radio o celular llega a la Ciudad de México." },
+        { "titulo": "Margen de 40 a 120 s", "texto": "Tiempo para evacuar, detener el metro y preparar hospitales antes de las ondas S." }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué las ondas S no atraviesan el núcleo líquido de la Tierra?", "opciones": ["Porque solo se propagan por sólidos", "Porque son más rápidas que las P", "Porque son longitudinales"], "correcta": 0, "porque": "Las ondas S son transversales y solo viajan por sólidos; eso ayudó a descubrir que el núcleo externo es líquido." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "El efecto Doppler",
+      "idea": "Si la fuente se acerca, oyes un tono más agudo; si se aleja, uno más grave.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "La ambulancia se acerca", "puntos": ["Las ondas se comprimen", "Mayor frecuencia", "Tono más agudo"] },
+        { "titulo": "La ambulancia se aleja", "puntos": ["Las ondas se expanden", "Menor frecuencia", "Tono más grave"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo usa un radar de velocidad el efecto Doppler?", "opciones": ["Mide el volumen del motor", "Compara la frecuencia del eco con la de la onda que emitió", "Cuenta cuántas ondas P llegan"], "correcta": 1, "porque": "El radar emite una onda de frecuencia conocida y mide la diferencia de frecuencia del eco para calcular la velocidad." }
+    }
+  ]
+}

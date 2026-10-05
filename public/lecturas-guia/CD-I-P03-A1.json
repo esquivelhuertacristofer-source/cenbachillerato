@@ -1,0 +1,38 @@
+{
+  "codigo": "CD-I-P03-A1",
+  "conceptos": [
+    { "termino": "Datos personales", "idea": "Lo que buscas, ves, compras y expresas: con eso pagas las apps gratuitas." },
+    { "termino": "Perfil de usuario", "idea": "Retrato detallado que arman las plataformas con tus datos para venderlo o influirte." },
+    { "termino": "Colonialismo de datos", "idea": "Extracción de información sobre las personas como si fuera un recurso natural." },
+    { "termino": "Norte Global", "idea": "Países desde donde se crean la mayoría de contenidos, algoritmos e IA." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Lo gratis se paga con datos",
+      "idea": "Las apps gratuitas recolectan tus datos para armar perfiles que venden a anunciantes o usan para influir en ti.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Usas la app", "texto": "Buscas, ves videos, compras, chateas." },
+        { "titulo": "Recolectan datos", "texto": "Qué ves, cuánto tiempo, a qué hora, con quién hablas, qué emociones expresas." },
+        { "titulo": "Construyen tu perfil", "texto": "Un retrato detallado de quién eres." },
+        { "titulo": "Lo aprovechan", "texto": "Lo venden a anunciantes o lo usan para influir en tu comportamiento." }
+      ] },
+      "comprueba": { "pregunta": "Una red social no te cobra nada. Según la lectura, ¿con qué pagas?", "opciones": ["Con tus datos", "Con nada, es un servicio gratuito", "Con la batería de tu celular"], "correcta": 0, "porque": "La lectura dice que en las apps gratuitas pagas con algo más valioso que el dinero: tus datos." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Colonialismo de datos",
+      "idea": "Los datos de millones de mexicanos los controlan empresas de Estados Unidos o China, bajo leyes de otros países.",
+      "comprueba": { "pregunta": "¿Por qué algunos académicos hablan de «colonialismo de datos»?", "opciones": ["Porque México vende sus datos a otros países", "Porque se extrae información de las personas como un recurso, desde otros países", "Porque las plataformas mexicanas dominan internet"], "correcta": 1, "porque": "Lo describen como extracción de recursos donde el recurso es la información de las personas, controlada por empresas extranjeras." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Consumidores, no productores",
+      "idea": "La mayoría de contenidos, algoritmos e IA se crean en inglés desde el Norte Global; en México sobre todo consumimos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Norte Global", "puntos": ["Produce contenidos y algoritmos", "Crea sistemas de IA", "Mayoría en inglés"] },
+        { "titulo": "Usuarios en México", "puntos": ["Principalmente consumidores", "Usan lo que otros diseñan"] }
+      ] }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "codigo": "CNEYT-V-P06-A1",
+  "conceptos": [
+    { "termino": "Reflexión", "idea": "La luz rebota en una superficie con el mismo ángulo con que llegó." },
+    { "termino": "Índice de refracción", "idea": "n = c/v: cuanto mayor, más lenta viaja la luz en ese medio." },
+    { "termino": "Reflexión total interna", "idea": "Pasado el ángulo crítico, la luz ya no sale y rebota completa hacia adentro." },
+    { "termino": "Dispersión", "idea": "Cada color se refracta distinto, y la luz blanca se separa en el arcoíris." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Reflexión: la luz rebota",
+      "idea": "El ángulo de incidencia es igual al de reflexión; el tipo de espejo decide cómo es la imagen.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Espejo plano", "puntos": ["Imagen virtual y derecha", "Del mismo tamaño que el objeto"] },
+        { "titulo": "Espejo cóncavo", "puntos": ["Concentra los rayos en un foco", "Imagen real o virtual según la posición", "Telescopios, linternas de auto"] },
+        { "titulo": "Espejo convexo", "puntos": ["Imagen siempre virtual y menor", "Mayor campo visual", "Retrovisores, espejos de tiendas"] }
+      ] },
+      "comprueba": { "pregunta": "Una tienda quiere vigilar un pasillo amplio con un solo espejo. ¿Cuál le conviene?", "opciones": ["Uno convexo", "Uno plano", "Uno cóncavo"], "correcta": 0, "porque": "Los espejos convexos dan imágenes menores pero con mayor campo visual: por eso se usan como espejos de seguridad." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Refracción y la ley de Snell",
+      "idea": "Al cambiar de medio, la luz cambia de velocidad y se dobla; la ley de Snell dice cuánto.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Índice de refracción", "expr": "n = c ÷ v", "leyenda": "Aire ≈ 1.00 · agua 1.33 · vidrio ≈ 1.50 · diamante 2.42" },
+        { "nombre": "Ley de Snell", "expr": "n₁ · sen θ₁ = n₂ · sen θ₂" },
+        { "nombre": "Ángulo crítico", "expr": "θ_c = arcsen(n₂ ÷ n₁),  con n₁ > n₂", "leyenda": "Si se supera, hay reflexión total interna" }
+      ] },
+      "comprueba": { "pregunta": "Un rayo pasa del aire al agua. ¿Hacia dónde se dobla?", "opciones": ["Se aleja de la normal", "Hacia la normal", "No se dobla"], "correcta": 1, "porque": "Al pasar a un medio de mayor índice (más denso ópticamente), la luz se dobla hacia la normal." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Lentes y el ojo humano",
+      "idea": "Las lentes doblan la luz para formar imágenes; tu ojo es una y los lentes corrigen sus defectos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lente convergente (convexa)", "puntos": ["Junta los rayos en un foco, f > 0", "Corrige la hipermetropía (globo muy corto)"] },
+        { "titulo": "Lente divergente (cóncava)", "puntos": ["Separa los rayos, foco virtual, f < 0", "Corrige la miopía (globo muy largo)"] },
+        { "titulo": "Ecuación de Gauss", "puntos": ["1/f = 1/d_o + 1/d_i"] }
+      ] },
+      "comprueba": { "pregunta": "Tu amigo ve borroso el pizarrón porque su globo ocular es demasiado largo. ¿Qué lente necesita?", "opciones": ["Convergente", "Ninguna", "Divergente"], "correcta": 2, "porque": "Un globo ocular demasiado largo es miopía, y la miopía se corrige con lentes divergentes." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Fibra óptica y arcoíris",
+      "idea": "La reflexión total interna guía la luz por la fibra óptica; la dispersión separa la luz blanca en colores.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Fibra óptica", "puntos": ["La luz rebota dentro de un núcleo de vidrio", "Supera el ángulo crítico y no escapa", "Lleva internet a millones de hogares"] },
+        { "titulo": "Dispersión", "puntos": ["n depende de la longitud de onda", "El violeta se refracta más que el rojo", "Arcoíris: arco a 42° del antisolar"] }
+      ] },
+      "comprueba": { "pregunta": "Al pasar luz blanca por un prisma, ¿qué color se desvía más?", "opciones": ["El rojo", "El violeta", "Todos por igual"], "correcta": 1, "porque": "La luz violeta, de longitud de onda menor, se refracta más que la roja." }
+    }
+  ]
+}

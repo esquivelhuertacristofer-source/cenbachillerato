@@ -1,0 +1,56 @@
+{
+  "codigo": "CNEYT-III-P05-A1",
+  "conceptos": [
+    { "termino": "Atmósfera", "idea": "Capa de gases que protege de la radiación UV y regula la temperatura." },
+    { "termino": "Hidrosfera", "idea": "Toda el agua del planeta: océanos, hielo, agua subterránea y superficial." },
+    { "termino": "Litosfera", "idea": "Capa sólida exterior, dividida en placas tectónicas que se mueven." },
+    { "termino": "Biosfera", "idea": "Todos los seres vivos, que interactúan con los otros subsistemas y los transforman." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Un planeta de subsistemas: la atmósfera",
+      "idea": "La Tierra tiene cuatro subsistemas conectados; la atmósfera nos protege del UV y, con el efecto invernadero, mantiene unos 15 °C.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "78%", "etiqueta": "Nitrógeno en la atmósfera", "barra": 78 },
+        { "valor": "21%", "etiqueta": "Oxígeno en la atmósfera", "barra": 21 },
+        { "valor": "15 °C", "etiqueta": "Temperatura media actual" },
+        { "valor": "−18 °C", "etiqueta": "Temperatura media sin efecto invernadero natural" }
+      ] },
+      "comprueba": { "pregunta": "Si no existiera el efecto invernadero natural, ¿qué pasaría con la Tierra?", "opciones": ["Sería mucho más fría", "Sería mucho más caliente", "No cambiaría su temperatura"], "correcta": 0, "porque": "Sin efecto invernadero la temperatura media sería de −18 °C en lugar de 15 °C." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Hidrosfera: casi toda el agua es salada",
+      "idea": "Los océanos guardan el 97% del agua y regulan el clima absorbiendo calor y CO₂.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "97%", "etiqueta": "Océanos", "barra": 97 },
+        { "valor": "~2%", "etiqueta": "Glaciares y casquetes polares", "barra": 2 },
+        { "valor": "~0.7%", "etiqueta": "Aguas subterráneas", "barra": 0.7 },
+        { "valor": "<0.3%", "etiqueta": "Agua superficial dulce", "barra": 0.3 }
+      ] },
+      "comprueba": { "pregunta": "Sin contar los océanos, ¿dónde hay más agua en la Tierra?", "opciones": ["En ríos y lagos", "En glaciares y casquetes polares", "En aguas subterráneas"], "correcta": 1, "porque": "Glaciares y casquetes tienen ~2%, más que el agua subterránea (~0.7%) y la superficial dulce (<0.3%)." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Litosfera: placas en movimiento",
+      "idea": "La capa sólida está dividida en placas que se mueven de 2 a 10 cm por año y causan sismos, volcanes y montañas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Efectos de las placas", "puntos": ["Sismos", "Volcanes", "Formación de montañas"] },
+        { "titulo": "El vulcanismo libera", "puntos": ["CO₂", "Vapor de agua", "SO₂"] }
+      ] },
+      "comprueba": { "pregunta": "Un volcán hace erupción y lanza vapor de agua y CO₂. ¿Qué subsistemas conecta?", "opciones": ["Solo la litosfera", "Hidrosfera y biosfera", "Litosfera y atmósfera"], "correcta": 2, "porque": "El vulcanismo saca gases de la litosfera hacia la atmósfera, conectando ambos subsistemas." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Biosfera: la vida transforma el planeta",
+      "idea": "Los seres vivos interactúan con los otros tres subsistemas y los modifican.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Plantas fijan CO₂", "puntos": ["Atmósfera y biosfera"] },
+        { "titulo": "Corales hacen arrecifes", "puntos": ["Hidrosfera, litosfera y biosfera"] },
+        { "titulo": "Raíces desintegran roca", "puntos": ["Litosfera y biosfera"] }
+      ] },
+      "comprueba": { "pregunta": "Las raíces de un árbol rompen poco a poco una roca. ¿Qué subsistemas interactúan?", "opciones": ["Litosfera y biosfera", "Atmósfera e hidrosfera", "Hidrosfera y biosfera"], "correcta": 0, "porque": "La roca es litosfera y el árbol es biosfera: el texto da este mismo ejemplo." }
+    }
+  ]
+}

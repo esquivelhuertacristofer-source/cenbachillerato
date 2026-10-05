@@ -1,0 +1,56 @@
+{
+  "codigo": "IN-V-P08-A1",
+  "conceptos": [
+    { "termino": "Proyecto final", "idea": "Demuestras lo aprendido: leer, escribir, hablar y escuchar en inglés." },
+    { "termino": "Draft", "idea": "La primera versión: lo importante es comunicar tus ideas, no la perfección." },
+    { "termino": "Revision", "idea": "Revisar contenido, estructura y lenguaje antes de la versión final." },
+    { "termino": "Feedback constructivo", "idea": "Comentarios específicos y respetuosos que ayudan a mejorar el trabajo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3, 4, 5, 6],
+      "titulo": "Cinco tipos de proyecto posibles",
+      "idea": "Puedes elegir entre póster, mini-artículo, podcast, video breve o propuesta de acción; cada uno tiene partes obligatorias.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Escritos", "puntos": ["Academic Poster: título, introducción, gráficos, conclusiones y referencias", "Short Academic Article: 300-500 palabras con tesis", "Action Proposal: problema, solución, acciones y resultados"] },
+        { "titulo": "Audio y video", "puntos": ["Podcast: 3-5 minutos con guión (script) y grabación", "Short Video: 2-4 minutos; puede llevar subtítulos en español"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres proponer una solución al problema de la basura en tu escuela. ¿Qué tipo de proyecto encaja mejor?", "opciones": ["Action Proposal", "Podcast", "Academic Poster"], "correcta": 0, "porque": "La propuesta de acción plantea un problema real de tu comunidad o escuela, una solución, acciones concretas y resultados esperados." }
+    },
+    {
+      "parrafos": [7, 8, 9, 10, 11, 12, 13],
+      "titulo": "Las seis etapas de producción",
+      "idea": "Un buen proyecto pasa por seis etapas, de la lluvia de ideas a la versión final que incorpora la retroalimentación.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Brainstorming", "texto": "Escribe todas las ideas sin juzgarlas." },
+        { "titulo": "Topic selection", "texto": "Elige el tema más relevante, interesante y factible." },
+        { "titulo": "Research", "texto": "Fuentes recientes, confiables y relevantes." },
+        { "titulo": "Draft", "texto": "Primera versión: enfócate en comunicar." },
+        { "titulo": "Revision", "texto": "Revisa contenido, estructura y lenguaje." },
+        { "titulo": "Final version", "texto": "Incorpora la retroalimentación y entrega." }
+      ] },
+      "comprueba": { "pregunta": "Encuentras un artículo de un blog anónimo de hace 20 años. Según los criterios de Research, ¿qué le falla?", "opciones": ["Solo que es muy largo", "No es reciente ni de una fuente confiable", "Nada, cualquier fuente sirve"], "correcta": 1, "porque": "Una fuente debe ser reciente (últimos 5-10 años), confiable (universidad, gobierno u organización reconocida) y relevante." }
+    },
+    {
+      "parrafos": [14, 15, 16, 17],
+      "titulo": "Dar y recibir retroalimentación en inglés",
+      "idea": "Elogia algo específico, sugiere mejoras con respeto y recibe los comentarios con apertura.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Elogiar", "puntos": ["That's a great point.", "Your introduction is very clear and engaging."] },
+        { "titulo": "Sugerir", "puntos": ["Have you considered adding [element]?", "One suggestion would be to..."] },
+        { "titulo": "Recibir", "puntos": ["Thank you for your feedback.", "That's a good point. I hadn't thought about that."] }
+      ] },
+      "comprueba": { "pregunta": "«I think the conclusion could be a bit more specific.» ¿Qué tipo de comentario es?", "opciones": ["Recibir retroalimentación", "Elogio positivo", "Sugerencia de mejora respetuosa"], "correcta": 2, "porque": "Propone mejorar un aspecto concreto (la conclusión) de forma respetuosa: es una sugerencia de mejora." }
+    },
+    {
+      "parrafos": [18, 19],
+      "titulo": "Las cuatro habilidades en tu proyecto",
+      "idea": "El proyecto integra reading, writing, speaking y listening: cada etapa pone en juego al menos una.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Reading y Writing", "puntos": ["Reading: investigar fuentes y analizar textos", "Writing: borrador, texto final o guión"] },
+        { "titulo": "Speaking y Listening", "puntos": ["Speaking: presentar y dar retroalimentación oral", "Listening: comprender comentarios y recursos en inglés"] }
+      ] },
+      "comprueba": { "pregunta": "Presentas tu proyecto frente al grupo. ¿Qué habilidad estás usando principalmente?", "opciones": ["Reading", "Speaking", "Writing"], "correcta": 1, "porque": "Presentar el proyecto y participar en sesiones de retroalimentación oral corresponden a Speaking." }
+    }
+  ]
+}

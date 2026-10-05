@@ -1,0 +1,48 @@
+{
+  "codigo": "CH-II-P03-A1",
+  "conceptos": [
+    { "termino": "Sentido histórico", "idea": "Mirar el presente preguntando cómo llegó a ser lo que es." },
+    { "termino": "Microhistoria", "idea": "La historia también se hace en pueblos, comunidades y familias, no solo en palacios." },
+    { "termino": "Memoria colectiva", "idea": "Recuerdo compartido del pasado que le da identidad y cohesión a un grupo." },
+    { "termino": "Presentismo", "idea": "Juzgar el pasado con los valores de hoy, sin considerar su contexto." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Sentido histórico: una forma de mirar",
+      "idea": "No es memorizar fechas: es preguntarte cómo llegó a ser lo que es cualquier fenómeno del presente.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Herencia colonial", "texto": "Una de las raíces de la desigualdad en México." },
+        { "titulo": "Porfiriato", "texto": "Concentración de la tierra." },
+        { "titulo": "Últimas décadas", "texto": "Crisis económicas." },
+        { "titulo": "Hoy", "texto": "La desigualdad se entiende mirando ese proceso." }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál pregunta muestra sentido histórico?", "opciones": ["¿En qué año fue la Reforma?", "¿Cómo llegó mi colonia a tener los problemas que tiene hoy?", "¿Cuántos presidentes ha tenido México?"], "correcta": 1, "porque": "El sentido histórico busca explicar cómo un fenómeno del presente llegó a ser lo que es, no solo acumular fechas." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Microhistoria y memoria colectiva",
+      "idea": "La historia vive en los detalles de un pueblo, y un mismo evento puede recordarse de formas opuestas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Microhistoria", "puntos": ["Luis González y González", "San José de Gracia (1968)", "Un pueblo michoacano refleja la Independencia, la Reforma y la Revolución"] },
+        { "titulo": "Memoria colectiva", "puntos": ["Maurice Halbwachs", "12 de octubre: «Día de la Raza» que celebra el mestizaje", "Para muchos pueblos indígenas: inicio de un genocidio y un despojo"] }
+      ] },
+      "comprueba": { "pregunta": "Investigas cómo vivió la Revolución tu propio pueblo a partir de sus familias. ¿Qué enfoque usas?", "opciones": ["Microhistoria", "Presentismo", "Historia oficial"], "correcta": 0, "porque": "La microhistoria muestra que los grandes procesos nacionales se reflejan en pueblos, comunidades y familias." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Usos políticos y errores al mirar atrás",
+      "idea": "Los gobiernos seleccionan el pasado para legitimarse, y al interpretarlo hay que evitar el presentismo y el anacronismo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Presentismo", "puntos": ["Juzgar el pasado con valores de hoy", "Ej.: juzgar a los conquistadores del siglo XVI con los derechos humanos del XXI"] },
+        { "titulo": "Anacronismo", "puntos": ["Atribuir al pasado ideas o prácticas que no existían", "Es el error opuesto"] }
+      ] },
+      "comprueba": { "pregunta": "Alguien escribe que los mexicas usaban el celular para comunicarse. ¿Qué error comete?", "opciones": ["Presentismo", "Anacronismo", "Microhistoria"], "correcta": 1, "porque": "Atribuir al pasado prácticas que no existían en esa época es anacronismo." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "Sentido histórico y ciudadanía crítica",
+      "idea": "Entender el pasado te deja cuestionar relatos oficiales y ver que el presente fue construido y puede transformarse."
+    }
+  ]
+}

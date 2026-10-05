@@ -1,0 +1,37 @@
+{
+  "codigo": "PM-III-P07-A1",
+  "conceptos": [
+    { "termino": "Ecuación lineal", "idea": "Igualdad con la variable elevada a la primera potencia: ax + b = c." },
+    { "termino": "Incógnita", "idea": "El valor x que buscas para que la igualdad sea verdadera." },
+    { "termino": "Operación inversa", "idea": "La que deshace a otra: una suma se quita restando; una multiplicación, dividiendo." },
+    { "termino": "Verificar", "idea": "Sustituir tu resultado en la ecuación original y ver que ambos lados coinciden." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Cuatro pasos para resolver",
+      "idea": "Con operaciones inversas despejas la incógnita, y siempre verificas sustituyendo en la ecuación original.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Agrupa", "texto": "La variable de un lado y los números del otro, con operaciones inversas." },
+        { "titulo": "Simplifica", "texto": "Reduce cada lado de la igualdad." },
+        { "titulo": "Despeja", "texto": "Divide entre el coeficiente de la incógnita." },
+        { "titulo": "Verifica", "texto": "Sustituye en la ecuación original: ambos lados deben ser iguales." }
+      ] },
+      "comprueba": { "pregunta": "Resuelve 4x + 6 = 26.", "opciones": ["x = 8", "x = 5", "x = 20"], "correcta": 1, "porque": "Restas 6: 4x = 20. Divides entre 4: x = 5. Verificas: 4(5) + 6 = 26." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Traducir un plan de datos",
+      "idea": "Plantear es traducir el problema al lenguaje matemático: cargo fijo más costo por unidad igual al total.",
+      "visual": { "tipo": "ejemplo", "titulo": "Plan de 200 pesos más 15 pesos por GB adicional; factura de 425", "lineas": ["200 + 15x = 425", "15x = 425 − 200 = 225", "x = 225 ÷ 15 = 15", "Verifica: 200 + 15(15) = 200 + 225 = 425"], "resultado": "Se consumieron 15 GB adicionales" },
+      "comprueba": { "pregunta": "Con el mismo plan, si la factura fuera de 320 pesos, ¿cuántos GB adicionales se consumieron?", "opciones": ["8", "12", "21"], "correcta": 0, "porque": "200 + 15x = 320, entonces 15x = 120 y x = 120 ÷ 15 = 8 GB." }
+    },
+    {
+      "parrafos": [3, 4, 5],
+      "titulo": "Mezclas y ahorro: la misma estructura",
+      "idea": "Mezclas, ahorros y planes comparten la estructura de la ecuación lineal: una cantidad que cambia de forma constante.",
+      "visual": { "tipo": "ejemplo", "titulo": "Tienes 350 pesos y ahorras 80 por semana hasta juntar 1,150", "lineas": ["350 + 80x = 1150", "80x = 1150 − 350 = 800", "x = 800 ÷ 80"], "resultado": "x = 10 semanas" },
+      "comprueba": { "pregunta": "Tienes 100 pesos y ahorras 50 por semana hasta juntar 600. ¿Qué ecuación lo modela?", "opciones": ["100x + 50 = 600", "50 + 600x = 100", "100 + 50x = 600"], "correcta": 2, "porque": "Lo que ya tienes (100) más lo que ahorras cada semana (50 por x semanas) debe dar 600." }
+    }
+  ]
+}

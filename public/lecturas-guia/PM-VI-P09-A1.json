@@ -1,0 +1,59 @@
+{
+  "codigo": "PM-VI-P09-A1",
+  "conceptos": [
+    { "termino": "Distribución normal", "idea": "La campana simétrica donde los datos se amontonan cerca del promedio." },
+    { "termino": "Media μ", "idea": "El centro de la campana y su eje de simetría." },
+    { "termino": "Desviación estándar σ", "idea": "Qué tan ancha es la campana: cuánto se alejan los datos del centro." },
+    { "termino": "Puntuación z", "idea": "Cuántas desviaciones estándar está un valor arriba o abajo de la media." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "La campana de Gauss",
+      "idea": "Estaturas, pesos o calificaciones se amontonan cerca del promedio y escasean en los extremos: forman una campana simétrica.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Medir miles de casos", "texto": "Estaturas, costales de maíz, calificaciones de un examen nacional." },
+        { "titulo": "Graficar", "texto": "Cuántos casos hay de cada valor." },
+        { "titulo": "Aparece la campana", "texto": "Muchos cerca del promedio, cada vez menos en los extremos." }
+      ] },
+      "comprueba": { "pregunta": "En la estatura de miles de personas, ¿dónde hay más casos?", "opciones": ["En los valores más altos", "Repartidos igual en todos los valores", "Cerca del promedio"], "correcta": 2, "porque": "En una distribución normal los valores se amontonan cerca del promedio y se vuelven raros en los extremos." }
+    },
+    {
+      "parrafos": [1, 2],
+      "titulo": "μ y σ definen la campana",
+      "idea": "μ coloca el centro y σ decide el ancho; por la simetría, media, mediana y moda caen en el mismo punto.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Media μ", "puntos": ["Centro y eje de simetría", "Cambiarla desplaza la campana sin deformarla", "Aquí coinciden media, mediana y moda"] },
+        { "titulo": "Desviación estándar σ", "puntos": ["Qué tan ancha es la campana", "σ pequeña: alta y angosta", "σ grande: baja y ancha"] }
+      ] },
+      "comprueba": { "pregunta": "Dos grupos tienen la misma media, pero el grupo A tiene σ mucho más pequeña. ¿Cómo es la campana de A?", "opciones": ["Más alta y angosta", "Más baja y ancha", "Igual, pero desplazada"], "correcta": 0, "porque": "Una σ pequeña significa que los datos se parecen mucho entre sí: la campana es alta y angosta." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Regla 68-95-99.7: área es probabilidad",
+      "idea": "El área total bajo la campana vale 1, y el área entre dos valores es la probabilidad de caer en ese rango.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "68%", "etiqueta": "dentro de μ ± 1σ", "barra": 68 },
+        { "valor": "95%", "etiqueta": "dentro de μ ± 2σ", "barra": 95 },
+        { "valor": "99.7%", "etiqueta": "dentro de μ ± 3σ", "barra": 99.7 }
+      ] },
+      "comprueba": { "pregunta": "Una variable normal tiene μ = 50 y σ = 10. ¿Cuál es la probabilidad aproximada de que caiga entre 40 y 60?", "opciones": ["0.95", "0.68", "0.50"], "correcta": 1, "porque": "40 y 60 son μ − 1σ y μ + 1σ, y ahí cae aproximadamente el 68% del área: probabilidad de 0.68." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "La puntuación z compara lo incomparable",
+      "idea": "z = (x − μ)/σ dice a cuántas desviaciones está un valor de la media y convierte cualquier normal en la estándar.",
+      "visual": { "tipo": "ejemplo", "titulo": "¿Qué tan excepcional es medir 184 cm?", "lineas": ["z = (x − μ)/σ, con μ = 170 y σ = 7", "z = (184 − 170)/7 = 14/7 = 2", "En una prueba con μ = 500 y σ = 100: z = (700 − 500)/100 = 2"], "resultado": "184 cm y 700 puntos son igual de excepcionales: dos desviaciones arriba de la media" },
+      "comprueba": { "pregunta": "En un examen con μ = 60 y σ = 8, ¿qué puntuación z tiene una calificación de 48?", "opciones": ["1.5", "−12", "−1.5"], "correcta": 2, "porque": "z = (48 − 60)/8 = −12/8 = −1.5: está una desviación y media por debajo de la media." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "La normal en México y el mundo",
+      "idea": "Salud, pruebas educativas y escalas de coeficiente intelectual usan la campana para saber qué tan común o raro es un valor.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Dónde se usa", "puntos": ["ENSANUT: estaturas y pesos de la población", "PLANEA y PISA: puntajes con media y desviación fijas", "Coeficiente intelectual: μ = 100 y σ = 15"] }
+      ] },
+      "comprueba": { "pregunta": "Con la escala de coeficiente intelectual (μ = 100, σ = 15), ¿entre qué valores está cerca del 95% de las personas?", "opciones": ["Entre 85 y 115", "Entre 70 y 130", "Entre 55 y 145"], "correcta": 1, "porque": "El 95% cae en μ ± 2σ: 100 − 30 = 70 y 100 + 30 = 130." }
+    }
+  ]
+}

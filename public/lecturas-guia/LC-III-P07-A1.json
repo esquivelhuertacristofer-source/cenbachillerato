@@ -1,0 +1,43 @@
+{
+  "codigo": "LC-III-P07-A1",
+  "conceptos": [
+    { "termino": "Coloquio", "idea": "Diálogo entre pocos conocedores que se preguntan y responden entre sí." },
+    { "termino": "Simposio", "idea": "Varios expertos exponen por separado y un moderador sintetiza al final." },
+    { "termino": "Foro", "idea": "El formato más abierto: la audiencia interviene directamente." },
+    { "termino": "Nominalización", "idea": "Convertir un verbo en sustantivo: investigar → la investigación." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3],
+      "titulo": "Coloquio, simposio y foro",
+      "idea": "Los tres formatos académicos se distinguen por quién habla y cuánto interactúan los participantes y la audiencia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Coloquio", "puntos": ["Grupo reducido: entre tres y ocho", "Preguntas y respuestas cruzadas", "No busca conclusiones unánimes"] },
+        { "titulo": "Simposio", "puntos": ["Expertos en distintos aspectos del tema", "Cada uno expone de forma independiente", "Un moderador sintetiza y abre preguntas"] },
+        { "titulo": "Foro", "puntos": ["El más abierto y participativo", "La audiencia pregunta y opina", "Expertos y audiencia se mezclan"] }
+      ] },
+      "comprueba": { "pregunta": "Cuatro especialistas presentan, uno tras otro, su análisis de la migración; al final la coordinadora resume y abre preguntas. ¿Qué formato es?", "opciones": ["Coloquio", "Foro", "Simposio"], "correcta": 2, "porque": "Exposiciones breves e independientes de expertos y una síntesis final del moderador: así funciona el simposio." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Estructura y lenguaje académico",
+      "idea": "Toda exposición formal va de la tesis a los argumentos con evidencia y a la conclusión, con lenguaje preciso y conectores.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Introducción", "texto": "Tema, contexto y tesis o posición central." },
+        { "titulo": "Desarrollo", "texto": "Argumentos con evidencia: datos, citas, ejemplos." },
+        { "titulo": "Conclusión", "texto": "Síntesis de lo argumentado y propuesta o llamado a la reflexión." }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estas frases suena a lenguaje académico oral?", "opciones": ["Cabe destacar que la investigación lo confirma", "Pues la neta yo digo que sí", "O sea, como que no sé"], "correcta": 0, "porque": "Usa un conector discursivo («cabe destacar que») y una nominalización («la investigación»), rasgos del lenguaje académico." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "Cuerpo y voz también comunican",
+      "idea": "Postura, mirada, dicción, volumen, pausas y gestos deben reforzar el mensaje, no distraer de él.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cuerpo", "puntos": ["Postura erguida", "Contacto visual con la audiencia", "Gestos que refuerzan el mensaje"] },
+        { "titulo": "Voz", "puntos": ["Dicción clara", "Volumen adecuado al espacio", "Pausas estratégicas"] }
+      ] },
+      "comprueba": { "pregunta": "¿Para qué sirven las pausas estratégicas al exponer?", "opciones": ["Para recordar lo que sigue", "Para dar tiempo al oyente de procesar", "Para alargar la exposición"], "correcta": 1, "porque": "La lectura dice que las pausas dan tiempo al oyente de procesar la información." }
+    }
+  ]
+}

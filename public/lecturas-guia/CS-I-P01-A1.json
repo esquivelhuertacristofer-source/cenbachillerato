@@ -1,0 +1,41 @@
+{
+  "codigo": "CS-I-P01-A1",
+  "conceptos": [
+    { "termino": "Estado", "idea": "La organización política que da a una sociedad normas comunes y decisiones colectivas." },
+    { "termino": "Elementos del Estado", "idea": "Territorio delimitado, población y gobierno con el monopolio legítimo de la fuerza." },
+    { "termino": "División de poderes", "idea": "Ejecutivo, Legislativo y Judicial: cada uno con sus funciones y se controlan mutuamente." },
+    { "termino": "Captura del Estado", "idea": "Cuando intereses particulares se apoderan de lo que el Estado debería hacer para todos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Qué es el Estado",
+      "idea": "El Estado se define por territorio, población y gobierno, pero también es una relación social que reparte poder y recursos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Los tres elementos del Estado", "puntos": ["Un territorio delimitado", "Una población que lo habita", "Un gobierno con el monopolio legítimo de la fuerza"] }
+      ] },
+      "comprueba": { "pregunta": "Un grupo tiene gobierno y población, pero ningún territorio delimitado. Según la teoría clásica, ¿qué le falta para ser Estado?", "opciones": ["Un territorio", "Una población", "Un gobierno"], "correcta": 0, "porque": "La teoría política clásica pide los tres elementos: territorio delimitado, población y gobierno. Aquí falta el territorio." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Los tres poderes en México",
+      "idea": "En México el poder se divide en Ejecutivo, Legislativo y Judicial, que deben vigilarse entre sí.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ejecutivo", "puntos": ["Presidente de la república", "Gobernadores", "Presidentes municipales"] },
+        { "titulo": "Legislativo", "puntos": ["Congreso de la Unión: Senado y Cámara de Diputados", "Congresos locales"] },
+        { "titulo": "Judicial", "puntos": ["Suprema Corte de Justicia", "Tribunales"] }
+      ] },
+      "comprueba": { "pregunta": "¿A qué poder pertenece el presidente municipal de tu localidad?", "opciones": ["Legislativo", "Judicial", "Ejecutivo"], "correcta": 2, "porque": "El texto ubica a los presidentes municipales, junto con gobernadores y el presidente de la república, en el Poder Ejecutivo." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Para qué sirve y qué nos debe",
+      "idea": "El Estado debe dar seguridad, justicia y servicios con equidad; con la ciudadanía tiene una relación de ida y vuelta que cambia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Funciones del Estado", "puntos": ["Garantizar la seguridad y administrar justicia", "Proveer servicios: educación, salud, agua, transporte", "Recaudar impuestos", "Representar al país en el exterior"] },
+        { "titulo": "Cuando no las cumple", "puntos": ["Fallas del Estado: no las cumple de manera equitativa", "Captura del Estado: lo dominan intereses particulares"] }
+      ] },
+      "comprueba": { "pregunta": "Una colonia lleva años sin agua mientras otras sí la reciben. ¿Cómo se llama esta situación según el texto?", "opciones": ["Una falla del Estado", "Una división de poderes", "Un monopolio de la fuerza"], "correcta": 0, "porque": "Proveer agua es función del Estado; cuando no la cumple de manera equitativa se habla de «fallas del Estado»." }
+    }
+  ]
+}

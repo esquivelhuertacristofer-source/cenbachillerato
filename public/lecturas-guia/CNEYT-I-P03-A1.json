@@ -1,0 +1,35 @@
+{
+  "codigo": "CNEYT-I-P03-A1",
+  "conceptos": [
+    { "termino": "Átomo", "idea": "La partícula más pequeña de un elemento que conserva sus propiedades químicas." },
+    { "termino": "Número atómico (Z)", "idea": "Cantidad de protones en el núcleo; define de qué elemento se trata." },
+    { "termino": "Isótopos", "idea": "Átomos del mismo elemento con distinto número de neutrones." },
+    { "termino": "Electrones de valencia", "idea": "Los de la capa exterior; deciden cómo reacciona el elemento." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Dentro del átomo: núcleo y electrones",
+      "idea": "El átomo no es indivisible: tiene un núcleo de protones y neutrones, y electrones en capas alrededor.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Protón", "puntos": ["En el núcleo", "Carga positiva"] },
+        { "titulo": "Neutrón", "puntos": ["En el núcleo", "Sin carga"] },
+        { "titulo": "Electrón", "puntos": ["En niveles de energía o capas", "Carga negativa"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué partícula del átomo no tiene carga?", "opciones": ["El electrón", "El protón", "El neutrón"], "correcta": 2, "porque": "Según el modelo de Bohr-Rutherford, el neutrón está en el núcleo y no tiene carga." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "El número atómico define el elemento",
+      "idea": "Los protones dicen qué elemento es, y los electrones de la capa exterior deciden cómo reacciona.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "1", "etiqueta": "protón: hidrógeno" },
+        { "valor": "6", "etiqueta": "protones: carbono" },
+        { "valor": "8", "etiqueta": "protones: oxígeno" },
+        { "valor": "26", "etiqueta": "protones: hierro" },
+        { "valor": "79", "etiqueta": "protones: oro" }
+      ] },
+      "comprueba": { "pregunta": "Dos átomos tienen 6 protones, pero uno tiene más neutrones que el otro. ¿Qué son?", "opciones": ["Elementos distintos", "Isótopos del carbono", "Iones del oxígeno"], "correcta": 1, "porque": "Mismo número de protones es el mismo elemento (Z = 6, carbono); si difieren en neutrones, son isótopos." }
+    }
+  ]
+}

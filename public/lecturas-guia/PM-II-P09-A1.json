@@ -1,0 +1,33 @@
+{
+  "codigo": "PM-II-P09-A1",
+  "conceptos": [
+    { "termino": "Igualdad", "idea": "Afirma que dos expresiones valen lo mismo: 4 + 3 = 7." },
+    { "termino": "Identidad", "idea": "Igualdad verdadera para cualquier valor de las letras." },
+    { "termino": "Ecuación", "idea": "Igualdad verdadera solo para ciertos valores de la incógnita." },
+    { "termino": "Uniformidad", "idea": "Lo que haces de un lado lo haces del otro y la igualdad se conserva." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Identidad o ecuación",
+      "idea": "Una identidad se cumple siempre; una ecuación solo con ciertos valores, y resolverla es encontrarlos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Identidad", "puntos": ["Verdadera para cualquier valor", "(a + b)² = a² + 2ab + b²", "Expresa reglas siempre válidas"] },
+        { "titulo": "Ecuación", "puntos": ["Verdadera solo para ciertos valores", "x + 2 = 5 solo si x = 3", "Resolverla es hallar esos valores"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué es 2(x + 1) = 2x + 2?", "opciones": ["Una ecuación con una sola solución", "Una identidad", "Una igualdad siempre falsa"], "correcta": 1, "porque": "Se cumple con cualquier valor de x, porque es la propiedad distributiva. Por eso es una identidad." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Las cuatro propiedades de la igualdad",
+      "idea": "La uniformidad es la clave para resolver ecuaciones: haces la misma operación en ambos lados para despejar la incógnita.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Reflexiva", "expr": "a = a" },
+        { "nombre": "Simétrica", "expr": "si a = b → b = a" },
+        { "nombre": "Transitiva", "expr": "si a = b y b = c → a = c" },
+        { "nombre": "Uniformidad", "expr": "si a = b → a + c = b + c", "leyenda": "También vale restar, multiplicar o dividir (entre un número distinto de cero)" }
+      ] },
+      "comprueba": { "pregunta": "Para resolver x − 4 = 10 sumas 4 en ambos lados. ¿Qué propiedad usas?", "opciones": ["Reflexiva", "Transitiva", "Uniformidad"], "correcta": 2, "porque": "Hacer la misma operación en los dos lados conserva la igualdad: eso es la uniformidad. Así queda x = 14." }
+    }
+  ]
+}

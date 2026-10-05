@@ -1,0 +1,90 @@
+{
+  "codigo": "LC-I-P06-A1",
+  "conceptos": [
+    {
+      "termino": "Concordancia",
+      "idea": "Acuerdo entre las palabras de la oración en género, número y persona."
+    },
+    {
+      "termino": "Conectores",
+      "idea": "Puentes que unen ideas dentro de una oración o entre párrafos."
+    },
+    {
+      "termino": "Claridad comunicativa",
+      "idea": "Que el lector siga tu razonamiento sin esfuerzo adicional."
+    }
+  ],
+  "partes": [
+    {
+      "parrafos": [
+        0
+      ],
+      "titulo": "Concordancia: que las palabras coincidan",
+      "idea": "Sustantivo y adjetivo concuerdan en género y número; sujeto y verbo, en número y persona.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Incorrecto",
+            "puntos": [
+              "Los niños fue al parque"
+            ]
+          },
+          {
+            "titulo": "Correcto",
+            "puntos": [
+              "Los niños fueron al parque"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "¿Cuál oración tiene concordancia correcta?",
+        "opciones": [
+          "Las casas blanca son grandes",
+          "Las casas blancas es grande",
+          "Las casas blancas son grandes"
+        ],
+        "correcta": 2,
+        "porque": "Sustantivo y adjetivo concuerdan en género y número (casas blancas) y sujeto y verbo en número (casas son)."
+      }
+    },
+    {
+      "parrafos": [
+        1,
+        2
+      ],
+      "titulo": "Conectores y claridad",
+      "idea": "Sin conectores el texto parece una lista suelta; con ellos y con buena concordancia, el lector te sigue sin esfuerzo.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Sin conectores",
+            "puntos": [
+              "Lista de ideas desconectadas",
+              "El lector se pierde"
+            ]
+          },
+          {
+            "titulo": "Con conectores",
+            "puntos": [
+              "El texto fluye de forma lógica",
+              "El lector sigue tu razonamiento"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "¿Qué recomienda el texto para internalizar el buen uso de conectores y concordancia?",
+        "opciones": [
+          "Memorizar listas de reglas",
+          "Analizar textos que admiras e imitarlos creativamente",
+          "Evitar escribir oraciones largas"
+        ],
+        "correcta": 1,
+        "porque": "Observar cómo otros escritores logran textos claros e imitarlos creativamente es la estrategia que propone el texto."
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "codigo": "IN-I-P07-A1",
+  "conceptos": [
+    { "termino": "Verbo «to like»", "idea": "Gustar: va con un sustantivo o con un verbo en -ing." },
+    { "termino": "Grados de gusto", "idea": "De «I love» (me encanta) a «I hate» (odio)." },
+    { "termino": "Dar razones", "idea": "Con «because it is…» explicas por qué algo te gusta o no." },
+    { "termino": "Empatía", "idea": "Respetar que los demás tengan gustos diferentes." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Decir qué te gusta con «like»",
+      "idea": "Afirmas con «I like», niegas con «I don't like» y preguntas con «Do you like…?».",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Afirmar y negar", "puntos": ["I like music.", "I like playing soccer.", "I don't like coffee."] },
+        { "titulo": "Preguntar y responder", "puntos": ["Do you like pizza?", "Yes, I do.", "No, I don't."] }
+      ] },
+      "comprueba": { "pregunta": "Te preguntan «Do you like pizza?» y sí te gusta. ¿Qué respondes?", "opciones": ["Yes, I like.", "Yes, I do.", "Yes, I am."], "correcta": 1, "porque": "La respuesta corta a «Do you like…?» es «Yes, I do» o «No, I don't»." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cuánto te gusta algo",
+      "idea": "Hay una escala de expresiones para decir con más precisión cuánto te gusta algo.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "I love...", "texto": "Me encanta" },
+        { "titulo": "I really like... / I like...", "texto": "Me gusta mucho / Me gusta" },
+        { "titulo": "I don't mind...", "texto": "No me molesta" },
+        { "titulo": "I don't like...", "texto": "No me gusta" },
+        { "titulo": "I hate...", "texto": "Odio" }
+      ] },
+      "comprueba": { "pregunta": "Lavar los platos no te encanta, pero tampoco te molesta. ¿Qué dices?", "opciones": ["I don't mind washing the dishes.", "I love washing the dishes.", "I hate washing the dishes."], "correcta": 0, "porque": "«I don't mind» significa «No me molesta»: está en medio de la escala." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Explica por qué y respeta",
+      "idea": "Justifica tus gustos con «because it is…» y respeta que los demás prefieran otras cosas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "I like it because it is…", "puntos": ["fun (divertido)", "interesting (interesante)", "delicious (delicioso)", "easy (fácil)"] },
+        { "titulo": "I don't like it because it is…", "puntos": ["boring (aburrido)", "difficult (difícil)", "expensive (caro)"] }
+      ] },
+      "comprueba": { "pregunta": "A tu amiga no le gusta el futbol que a ti te encanta. ¿Qué respuesta es empática?", "opciones": ["You are wrong.", "I don't like you.", "That's fine, everyone is different."], "correcta": 2, "porque": "Ser empático es respetar que los demás tengan preferencias diferentes: «That's fine, everyone is different»." }
+    }
+  ]
+}

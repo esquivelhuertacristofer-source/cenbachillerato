@@ -1,0 +1,32 @@
+{
+  "codigo": "CNEYT-I-P09-A1",
+  "conceptos": [
+    { "termino": "Enfoque interdisciplinario", "idea": "Mirar un problema usando varias ciencias a la vez." },
+    { "termino": "Ciencia básica", "idea": "Busca entender cómo funciona el mundo." },
+    { "termino": "Ciencia aplicada", "idea": "Usa el conocimiento para resolver problemas concretos." },
+    { "termino": "Tecnología", "idea": "Une el conocimiento científico con la solución de necesidades humanas." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Física, química y biología entrelazadas",
+      "idea": "En la naturaleza los fenómenos no vienen por materias: la fotosíntesis o tu latido necesitan las tres ciencias.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Física", "puntos": ["Materia, energía y movimiento", "Fotosíntesis: capta la luz", "Corazón: impulsos eléctricos"] },
+        { "titulo": "Química", "puntos": ["De qué está hecha la materia y cómo se transforma", "Fotosíntesis: agua + CO₂ → glucosa + oxígeno", "Corazón: reacciones en las células"] },
+        { "titulo": "Biología", "puntos": ["Los seres vivos", "Fotosíntesis: ocurre en células vivas", "Corazón: un órgano vivo que late"] }
+      ] },
+      "comprueba": { "pregunta": "Al estudiar cómo late el corazón, ¿qué parte le toca a la física?", "opciones": ["Las reacciones químicas en las células", "Los impulsos eléctricos", "Que es un órgano vivo"], "correcta": 1, "porque": "La física estudia la energía y la electricidad: en el latido le corresponden los impulsos eléctricos." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Interdisciplina, ciencia y tecnología",
+      "idea": "Unir ciencias permite entender problemas reales, y aplicar ese conocimiento a necesidades humanas da origen a la tecnología.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ciencia básica", "puntos": ["Busca entender el mundo"] },
+        { "titulo": "Ciencia aplicada y tecnología", "puntos": ["Resuelve problemas concretos", "Paneles solares, vacunas, potabilizadoras, celulares"] }
+      ] },
+      "comprueba": { "pregunta": "Un equipo diseña una potabilizadora para que una comunidad tenga agua limpia. ¿Qué está haciendo?", "opciones": ["Ciencia aplicada y tecnología", "Solo ciencia básica", "Nada relacionado con la ciencia"], "correcta": 0, "porque": "Usa conocimiento científico para resolver una necesidad concreta: eso es ciencia aplicada y tecnología." }
+    }
+  ]
+}

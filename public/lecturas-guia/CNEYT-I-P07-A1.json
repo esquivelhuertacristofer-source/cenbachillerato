@@ -1,0 +1,30 @@
+{
+  "codigo": "CNEYT-I-P07-A1",
+  "conceptos": [
+    { "termino": "Invisibilización", "idea": "Borrar del relato las aportaciones de ciertas personas o grupos." },
+    { "termino": "Foto 51", "idea": "Imagen de rayos X del ADN tomada por Rosalind Franklin." },
+    { "termino": "Sesgos sociales", "idea": "Prejuicios de género, raza o clase que afectan quién recibe reconocimiento." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Científicas que la historia borró",
+      "idea": "El relato escolar suele mostrar solo a hombres de élite y deja fuera aportaciones clave de mujeres.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Rosalind Franklin", "puntos": ["Tomó la Foto 51 del ADN", "Watson y Crick la usaron sin su permiso", "El reconocimiento fue para ellos"] },
+        { "titulo": "Lise Meitner", "puntos": ["Descubrió la fisión nuclear", "Excluida del Nobel que recibió Otto Hahn"] },
+        { "titulo": "Hedy Lamarr", "puntos": ["Actriz de Hollywood", "Inventó la comunicación por espectro disperso", "Base del WiFi y Bluetooth"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué científica fue excluida del Premio Nobel por el descubrimiento de la fisión nuclear?", "opciones": ["Rosalind Franklin", "Hedy Lamarr", "Lise Meitner"], "correcta": 2, "porque": "Lise Meitner descubrió la fisión nuclear, pero el Nobel lo recibió su colega Otto Hahn." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "En México y por qué importa",
+      "idea": "Reconocer estas historias es justicia y también entender cómo los sesgos afectan quién hace ciencia y quién recibe crédito.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Aportaciones invisibilizadas en México", "puntos": ["Médicas indígenas cuyo saber botánico adoptó la medicina española", "Mujeres que sostuvieron laboratorios y expediciones sin crédito"] }
+      ] },
+      "comprueba": { "pregunta": "Según el texto, ¿por qué vale la pena reconocer estas historias además de por justicia?", "opciones": ["Para memorizar más nombres", "Para entender cómo los sesgos afectan la producción del conocimiento", "Para demostrar que la ciencia no sirve"], "correcta": 1, "porque": "El texto dice que ayudan a entender quién puede hacer ciencia y cómo los sesgos de género, raza y clase afectan el reconocimiento." }
+    }
+  ]
+}

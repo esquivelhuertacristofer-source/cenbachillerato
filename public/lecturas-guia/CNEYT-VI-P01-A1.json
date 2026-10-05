@@ -1,0 +1,42 @@
+{
+  "codigo": "CNEYT-VI-P01-A1",
+  "conceptos": [
+    { "termino": "Hipótesis abiótica", "idea": "La vida surgió de compuestos inorgánicos, sin necesidad de otros seres vivos." },
+    { "termino": "Caldo primordial", "idea": "Gases y energía de rayos y volcanes formaron moléculas orgánicas en los océanos." },
+    { "termino": "Mundo ARN", "idea": "El ARN fue la primera molécula de la vida: guardaba información y catalizaba." },
+    { "termino": "Panspermia", "idea": "Las moléculas o microbios de la vida llegaron del espacio en meteoritos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El caldo primordial y Miller-Urey",
+      "idea": "Oparin y Haldane propusieron que la vida se formó en un caldo primordial; Miller y Urey lo probaron en el laboratorio.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Atmósfera primitiva", "texto": "CH₄, NH₃, H₂O y H₂." },
+        { "titulo": "Energía", "texto": "Rayos y volcanes aportan la energía." },
+        { "titulo": "Síntesis en los océanos", "texto": "Se forman moléculas orgánicas (Oparin y Haldane, década de 1920)." },
+        { "titulo": "Prueba en 1953", "texto": "Miller y Urey simulan esas condiciones y obtienen aminoácidos." }
+      ] },
+      "comprueba": { "pregunta": "¿Qué demostró el experimento de Miller y Urey?", "opciones": ["Que los aminoácidos pueden formarse sin seres vivos", "Que la vida llegó en un meteorito", "Que el ARN fue la primera molécula"], "correcta": 0, "porque": "Al simular la Tierra primitiva obtuvieron aminoácidos: los bloques de la vida pueden formarse abióticamente." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Chimeneas submarinas y el mundo ARN",
+      "idea": "La vida pudo surgir en chimeneas hidrotermales, y el ARN pudo ser su primera molécula.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ventiladeros hidrotermales", "puntos": ["Chimeneas submarinas ricas en minerales", "Gradientes de temperatura y pH", "No requiere atmósfera reductora"] },
+        { "titulo": "Mundo ARN", "puntos": ["El ARN almacena información genética", "También cataliza reacciones (ribozimas)", "Resuelve el dilema del huevo y la gallina"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué doble capacidad del ARN apoya la hipótesis del mundo ARN?", "opciones": ["Formar membranas y producir oxígeno", "Almacenar información y catalizar reacciones", "Viajar en meteoritos y resistir el calor"], "correcta": 1, "porque": "El ARN puede guardar información genética como el ADN y catalizar reacciones como las proteínas, gracias a las ribozimas." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Panspermia: ¿vida desde el espacio?",
+      "idea": "La panspermia propone un origen extraterrestre, pero solo traslada la pregunta de cómo surgió la vida.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "1969", "etiqueta": "cae el meteorito de Murchison, con aminoácidos extraterrestres" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es la principal debilidad de la panspermia?", "opciones": ["Que nunca se han hallado aminoácidos en meteoritos", "Que no explica cómo surgió la vida en su origen externo", "Que requiere una atmósfera reductora"], "correcta": 1, "porque": "Aunque la vida llegara del espacio, seguiría sin responderse cómo surgió en ese otro lugar." }
+    }
+  ]
+}

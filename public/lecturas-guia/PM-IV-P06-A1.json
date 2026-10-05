@@ -1,0 +1,49 @@
+{
+  "codigo": "PM-IV-P06-A1",
+  "conceptos": [
+    { "termino": "Geometría analítica", "idea": "Describir figuras con ecuaciones y coordenadas en el plano cartesiano." },
+    { "termino": "Distancia entre puntos", "idea": "Qué tan lejos están dos puntos; es Pitágoras en el plano." },
+    { "termino": "Punto medio", "idea": "El punto justo a la mitad: el promedio de las coordenadas." },
+    { "termino": "Pendiente", "idea": "Qué tan inclinada está una recta: cuánto sube o baja por cada paso." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Del GPS al plano de Descartes",
+      "idea": "La geometría analítica une álgebra y geometría: las figuras se vuelven ecuaciones, y así funciona hasta tu GPS.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Medir", "texto": "El GPS mide distancias entre tu dispositivo y satélites en órbita." },
+        { "titulo": "Calcular", "texto": "Con fórmulas de geometría analítica obtiene tu posición exacta." },
+        { "titulo": "Ubicar", "texto": "Google Maps o el repartidor te encuentran en el mapa." }
+      ] },
+      "comprueba": { "pregunta": "¿Qué hace la geometría analítica con una figura geométrica?", "opciones": ["La mide solo con regla y compás", "La representa con ecuaciones y coordenadas", "La convierte en una tabla de datos"], "correcta": 1, "porque": "Fundada por Descartes, representa figuras con ecuaciones y coordenadas en el plano cartesiano: es el puente entre álgebra y geometría." }
+    },
+    {
+      "parrafos": [2, 3, 4],
+      "titulo": "Distancia y punto medio",
+      "idea": "La distancia es Pitágoras con coordenadas y el punto medio es el promedio de las coordenadas de los extremos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Distancia", "expr": "d = √((x₂ − x₁)² + (y₂ − y₁)²)", "leyenda": "El Teorema de Pitágoras en el plano" },
+        { "nombre": "Punto medio", "expr": "M = ((x₁ + x₂)/2, (y₁ + y₂)/2)", "leyenda": "Promedio de las x y promedio de las y" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es la distancia entre A(0, 0) y B(3, 4)?", "opciones": ["7", "5", "25"], "correcta": 1, "porque": "d = √((3 − 0)² + (4 − 0)²) = √(9 + 16) = √25 = 5." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "La pendiente: qué tan inclinada",
+      "idea": "La pendiente dice si una recta sube, baja, es horizontal o vertical, y compara rectas paralelas y perpendiculares.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Pendiente", "expr": "m = (y₂ − y₁) ÷ (x₂ − x₁)", "leyenda": "Positiva sube, negativa baja, cero horizontal, indefinida vertical" },
+        { "nombre": "Paralelas", "expr": "m₁ = m₂", "leyenda": "Misma pendiente" },
+        { "nombre": "Perpendiculares", "expr": "m₁ × m₂ = −1", "leyenda": "Pendientes recíprocas negativas" }
+      ] },
+      "comprueba": { "pregunta": "Una recta pasa por A(1, 2) y B(3, 6). ¿Cuál es su pendiente?", "opciones": ["2", "1/2", "−2"], "correcta": 0, "porque": "m = (6 − 2) ÷ (3 − 1) = 4 ÷ 2 = 2. Es positiva, así que la recta sube." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "Geometría analítica en la CDMX",
+      "idea": "Cruces de avenidas como Insurgentes y Reforma, y el trazo de la Línea 12, se diseñaron con coordenadas y fórmulas de distancia.",
+      "comprueba": { "pregunta": "Dos calles se trazan con pendientes 2 y −1/2. ¿Cómo se cruzan?", "opciones": ["Son paralelas", "No se puede saber", "Se cruzan en ángulo recto"], "correcta": 2, "porque": "2 × (−1/2) = −1: las pendientes son recíprocas negativas, así que las rectas son perpendiculares." }
+    }
+  ]
+}

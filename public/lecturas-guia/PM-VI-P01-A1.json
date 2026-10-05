@@ -1,0 +1,62 @@
+{
+  "codigo": "PM-VI-P01-A1",
+  "conceptos": [
+    { "termino": "Estadística descriptiva", "idea": "Resume y presenta los datos que tienes, sin ir más allá de ellos." },
+    { "termino": "Estadística inferencial", "idea": "Usa una muestra para sacar conclusiones sobre una población más grande." },
+    { "termino": "Población y muestra", "idea": "La población es el total; la muestra, una parte representativa de ese total." },
+    { "termino": "Variable", "idea": "Lo que se mide: categorías (cualitativa) o cantidades (cuantitativa)." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Una ciencia nacida para decidir",
+      "idea": "La estadística surgió de necesidades del Estado, como contar muertes, y hoy sostiene la medicina, la economía y las políticas públicas.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "1662, John Graunt", "texto": "Analiza las listas de mortalidad de Londres: patrones por causas y estaciones." },
+        { "titulo": "1858, Florence Nightingale", "texto": "Con gráficas muestra que las condiciones sanitarias, no las batallas, mataban más soldados en Crimea." },
+        { "titulo": "Hoy", "texto": "Base de la medicina basada en evidencia, la economía, la educación y las políticas públicas." }
+      ] },
+      "comprueba": { "pregunta": "¿De qué convenció Florence Nightingale al Parlamento británico?", "opciones": ["De que las batallas causaban casi todas las muertes", "De que las condiciones sanitarias eran la principal causa de muerte", "De que había que contar a toda la población"], "correcta": 1, "porque": "Sus gráficas de causas de muerte en la guerra de Crimea mostraron que las condiciones sanitarias, y no las batallas, mataban a más soldados." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Describir o inferir",
+      "idea": "La descriptiva resume los datos que tienes; la inferencial usa una muestra representativa para concluir sobre millones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Descriptiva", "puntos": ["Resume, organiza y presenta datos", "Promedios, tablas y gráficas", "No va más allá de los datos en mano"] },
+        { "titulo": "Inferencial", "puntos": ["De una muestra a una población", "Una encuesta a 1,200 personas puede hablar de millones", "Exige una muestra representativa"] }
+      ] },
+      "comprueba": { "pregunta": "Una maestra calcula el promedio de su grupo y hace una gráfica, sin concluir nada sobre otros grupos. ¿Qué rama usa?", "opciones": ["Inferencial", "Ninguna de las dos", "Descriptiva"], "correcta": 2, "porque": "Solo resume y presenta los datos que tiene en mano; no los usa para concluir sobre una población más grande." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Tipos de variables",
+      "idea": "Las variables cualitativas son categorías, nominales u ordinales; las cuantitativas son números, discretos o continuos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cualitativas", "puntos": ["Nominales, sin orden: color de ojos, municipio, partido", "Ordinales, con orden: nivel educativo, grado de satisfacción"] },
+        { "titulo": "Cuantitativas", "puntos": ["Discretas, se cuentan: número de hijos, materias reprobadas", "Continuas, cualquier valor: estatura, temperatura, tiempo"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué tipo de variable es el número de hermanos de un estudiante?", "opciones": ["Cuantitativa discreta", "Cuantitativa continua", "Cualitativa ordinal"], "correcta": 0, "porque": "Es una cantidad que se cuenta en valores enteros: no puedes tener 2.5 hermanos." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Fuentes de datos: población y muestra",
+      "idea": "INEGI, CONEVAL, CONAPO y el sector salud generan datos; el Censo mide a toda la población y las encuestas usan muestras.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Población", "puntos": ["El conjunto completo de interés", "El Censo del INEGI intenta medirla cada diez años"] },
+        { "titulo": "Muestra", "puntos": ["Un subconjunto representativo", "La ENIGH usa miles de hogares para estimar millones"] }
+      ] },
+      "comprueba": { "pregunta": "Para conocer cuánto gastan las familias, se entrevista a miles de hogares elegidos de forma representativa. Esos hogares son…", "opciones": ["la población", "una muestra", "un censo"], "correcta": 1, "porque": "Son un subconjunto seleccionado para inferir las condiciones de millones de hogares: eso es una muestra, como en la ENIGH." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Ética: privacidad y sesgos",
+      "idea": "Los datos deben proteger la privacidad y contar a todos: si los grupos marginados quedan fuera, las políticas salen sesgadas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Privacidad", "puntos": ["Los microdatos del INEGI están anonimizados", "Nadie debe poder identificar a personas concretas"] },
+        { "titulo": "Sesgo de representación", "puntos": ["Comunidades indígenas aisladas, personas en situación de calle, migrantes irregulares", "Quedan subcontados y las políticas se sesgan"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué es grave que algunos grupos queden subcontados en los datos oficiales?", "opciones": ["Porque las políticas diseñadas con esos datos quedan sesgadas", "Porque los datos dejan de estar anonimizados", "Porque el Censo ya no se puede hacer cada diez años"], "correcta": 0, "porque": "Si un grupo casi no aparece en los datos, las políticas públicas basadas en ellos no atienden sus necesidades reales." }
+    }
+  ]
+}

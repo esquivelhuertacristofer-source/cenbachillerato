@@ -1,0 +1,51 @@
+{
+  "codigo": "CNEYT-V-P08-A1",
+  "conceptos": [
+    { "termino": "Neutralidad de la ciencia", "idea": "La pregunta de si el conocimiento existe aparte de sus usos y consecuencias." },
+    { "termino": "Fisión nuclear", "idea": "Un núcleo pesado se divide, libera mucha energía y más neutrones." },
+    { "termino": "Principio de precaución", "idea": "Ante la duda, quien crea una tecnología debe probar que es segura." },
+    { "termino": "Responsabilidad del científico", "idea": "Responder por los usos que se dan a lo que uno descubre." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La misma física, dos usos",
+      "idea": "La fisión nuclear alimenta tanto bombas atómicas como plantas eléctricas: la física no decide su uso, la sociedad sí.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Bomba atómica", "puntos": ["Reacción en cadena sin control", "Hiroshima y Nagasaki, 1945: más de 200,000 muertes"] },
+        { "titulo": "Planta nuclear", "puntos": ["Reacción controlada cuidadosamente", "Produce calor que mueve turbinas"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué tienen en común una bomba atómica y una planta nuclear?", "opciones": ["Usan el mismo proceso físico: la fisión", "Ambas emiten mucho CO₂", "Ninguna usa uranio"], "correcta": 0, "porque": "Las dos se basan en la fisión de núcleos pesados; la diferencia es si la reacción en cadena se controla." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Laguna Verde: ventajas y deudas",
+      "idea": "La planta de Veracruz genera sin emitir CO₂, pero sus residuos siguen siendo peligrosos miles de años.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "A favor", "puntos": ["≈ 3.5% de la electricidad nacional (CFE 2023)", "No emite CO₂ al generar", "Relevante para la transición energética"] },
+        { "titulo": "En contra", "puntos": ["Residuos peligrosos por miles de años", "Ningún país tiene un repositorio geológico permanente operando"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es el problema de la energía nuclear que, según el texto, sigue sin resolverse en el mundo?", "opciones": ["Sus emisiones de CO₂", "Dónde guardar de forma permanente los residuos radiactivos", "Que no produce electricidad"], "correcta": 1, "porque": "No existe todavía un repositorio geológico permanente y operativo para los residuos de alta actividad en ningún país." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Telecomunicaciones y el principio de precaución",
+      "idea": "Las ondas que conectan al país también permiten vigilar; ante la duda, quien desarrolla debe probar que es seguro.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lo que permiten", "puntos": ["Comunicación global", "Acceso al conocimiento", "Medicina telemática en zonas rurales"] },
+        { "titulo": "El riesgo", "puntos": ["Reconocimiento facial", "Seguimiento de celulares", "Datos recopilados sin consentimiento"] }
+      ] },
+      "comprueba": { "pregunta": "Una empresa lanza una tecnología con riesgos inciertos. Según el principio de precaución, ¿quién debe probar que es segura?", "opciones": ["Los usuarios, después de usarla", "Nadie, mientras no haya daños", "La empresa que la desarrolla, antes de adoptarla masivamente"], "correcta": 2, "porque": "El principio de precaución pone la carga de la prueba en quienes desarrollan la tecnología, antes de su adopción masiva." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "El arrepentimiento del Proyecto Manhattan",
+      "idea": "Muchos físicos de la bomba se arrepintieron al ver sus consecuencias: el científico responde por lo que crea.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Robert Oppenheimer", "puntos": ["Participó en el Proyecto Manhattan", "Expresó públicamente su arrepentimiento"] },
+        { "titulo": "Albert Einstein", "puntos": ["No participó en el proyecto", "Firmó en 1939 la carta a Roosevelt", "También se arrepintió"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál fue el papel de Einstein en la bomba atómica, según el texto?", "opciones": ["Firmó la carta de 1939 que alertó a Roosevelt", "Dirigió el Proyecto Manhattan", "Diseñó la bomba de Hiroshima"], "correcta": 0, "porque": "Einstein no participó en el Proyecto Manhattan: solo firmó en 1939 la carta que alertó sobre la posibilidad del arma." }
+    }
+  ]
+}

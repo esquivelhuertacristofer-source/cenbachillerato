@@ -1,0 +1,48 @@
+{
+  "codigo": "PM-III-P01-A1",
+  "conceptos": [
+    { "termino": "Teorema de Pitágoras", "idea": "En todo triángulo rectángulo: a² + b² = c²." },
+    { "termino": "Hipotenusa", "idea": "El lado c, opuesto al ángulo recto." },
+    { "termino": "Catetos", "idea": "Los lados a y b, los que forman el ángulo recto." },
+    { "termino": "Triple pitagórico", "idea": "Tres enteros positivos que cumplen a² + b² = c², como 3-4-5." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Lo que dice el teorema",
+      "idea": "En un triángulo rectángulo, los cuadrados de los catetos suman el cuadrado de la hipotenusa.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Teorema de Pitágoras", "expr": "a² + b² = c²", "leyenda": "c es la hipotenusa, el lado opuesto al ángulo recto" }
+      ] },
+      "comprueba": { "pregunta": "Un triángulo rectángulo tiene catetos de 6 y 8. ¿Cuánto mide la hipotenusa?", "opciones": ["10", "14", "48"], "correcta": 0, "porque": "6² + 8² = 36 + 64 = 100, y √100 = 10. Los catetos no se suman directamente." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Demostración con cuatro triángulos",
+      "idea": "El área de un mismo cuadrado calculada de dos maneras demuestra el teorema.",
+      "visual": { "tipo": "ejemplo", "titulo": "Cuatro triángulos iguales en un cuadrado de lado (a + b)", "lineas": ["Forma 1: (a + b)² = a² + 2ab + b²", "Forma 2: c² + 4 × ab/2 = c² + 2ab", "Igualas: a² + 2ab + b² = c² + 2ab"], "resultado": "Al quitar 2ab de ambos lados: a² + b² = c²" },
+      "comprueba": { "pregunta": "En la demostración, ¿cuánto suman las áreas de los cuatro triángulos?", "opciones": ["4ab", "ab", "2ab"], "correcta": 2, "porque": "Cada triángulo mide ab/2; los cuatro juntos: 4 × ab/2 = 2ab." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Triples pitagóricos",
+      "idea": "Hay ternas de enteros que cumplen el teorema, y cualquier múltiplo de una de ellas también lo cumple.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "3-4-5", "etiqueta": "9 + 16 = 25" },
+        { "valor": "5-12-13", "etiqueta": "25 + 144 = 169" },
+        { "valor": "8-15-17", "etiqueta": "64 + 225 = 289" },
+        { "valor": "6-8-10", "etiqueta": "múltiplo de 3-4-5" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estos también es un triple pitagórico?", "opciones": ["4-5-6", "10-24-26", "7-8-9"], "correcta": 1, "porque": "10-24-26 es el doble de 5-12-13, y todo múltiplo de un triple pitagórico también lo es: 100 + 576 = 676 = 26²." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Dónde se usa el teorema",
+      "idea": "Pitágoras sirve para verificar ángulos rectos y para calcular distancias y alturas sin medirlas directamente.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Aplicaciones", "puntos": ["Construcción: cuerda con nudos 3-4-5 para ángulos rectos", "Navegación y GPS: distancia entre dos puntos", "Topografía: altura de montañas o edificios", "Arquitectura e ingeniería: ángulos rectos y diagonales"] }
+      ] },
+      "comprueba": { "pregunta": "Un albañil marca 3 m y 4 m sobre dos muros desde una esquina. Si la esquina es recta, ¿cuánto mide la diagonal entre las marcas?", "opciones": ["5 m", "7 m", "6 m"], "correcta": 0, "porque": "3² + 4² = 9 + 16 = 25 y √25 = 5. Es el triple 3-4-5 que usan los albañiles." }
+    }
+  ]
+}

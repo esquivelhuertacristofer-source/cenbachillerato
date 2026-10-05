@@ -1,0 +1,31 @@
+{
+  "codigo": "PFH-II-P02-A1",
+  "conceptos": [
+    { "termino": "Deontología", "idea": "La moral se basa en deberes y principios universales, no en resultados." },
+    { "termino": "Utilitarismo", "idea": "Lo correcto es lo que da más felicidad al mayor número." },
+    { "termino": "Eudaimonía", "idea": "La vida buena y floreciente que busca la ética de la virtud." },
+    { "termino": "Ética del cuidado", "idea": "La moral nace de relaciones concretas de cuidado, sobre todo hacia los vulnerables." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Deber contra consecuencias",
+      "idea": "Kant juzga una acción por el deber y si puede ser ley universal; Mill, por la felicidad que produce.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Deontología (Kant)", "puntos": ["Deberes y principios racionales universales", "¿Puede volverse ley universal?", "El resultado no importa"] },
+        { "titulo": "Utilitarismo (Mill)", "puntos": ["Evalúa por las consecuencias", "Mayor felicidad para el mayor número", "Fines y resultados son lo que cuenta"] }
+      ] },
+      "comprueba": { "pregunta": "Alguien dice: «No miento nunca, aunque mentir evitara un problema, porque si todos mintieran nadie confiaría en nadie». ¿Qué corriente sigue?", "opciones": ["Utilitarismo", "Ética del cuidado", "Deontología"], "correcta": 2, "porque": "Pregunta si su regla puede volverse ley universal y no mira el resultado: es la ética de Kant." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Virtud y cuidado",
+      "idea": "La ética de la virtud mira el carácter de la persona; la del cuidado, las relaciones concretas de responsabilidad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ética de la virtud (Aristóteles)", "puntos": ["Se centra en el carácter", "Hábitos: valentía, justicia, prudencia", "Meta: la eudaimonía"] },
+        { "titulo": "Ética del cuidado (Gilligan, Noddings)", "puntos": ["Critica los principios abstractos", "Relaciones concretas de cuidado", "Responsabilidad hacia los vulnerables"] }
+      ] },
+      "comprueba": { "pregunta": "Lucía decide cómo actuar pensando en lo que necesita su abuela enferma, más que en una regla general. ¿Qué ética refleja?", "opciones": ["Ética de la virtud", "Ética del cuidado", "Utilitarismo"], "correcta": 1, "porque": "Funda su decisión en una relación concreta de cuidado hacia alguien vulnerable, no en principios abstractos." }
+    }
+  ]
+}

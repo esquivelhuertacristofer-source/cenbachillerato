@@ -1,0 +1,42 @@
+{
+  "codigo": "CNEYT-VI-P06-A1",
+  "conceptos": [
+    { "termino": "Mutación", "idea": "Cualquier cambio en la secuencia del ADN." },
+    { "termino": "Mutágeno", "idea": "Agente físico, químico o biológico que aumenta la tasa de mutación." },
+    { "termino": "Mutación germinal", "idea": "Ocurre en células reproductoras y puede pasar a los hijos." },
+    { "termino": "Mutación somática", "idea": "Ocurre en células del cuerpo; no se hereda, pero puede originar cáncer." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Tipos de mutación",
+      "idea": "Las mutaciones génicas cambian uno o pocos nucleótidos; las cromosómicas, la estructura o el número de cromosomas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Génicas", "puntos": ["Sustitución: un nucleótido por otro", "Inserción o deleción: desplazan el marco de lectura"] },
+        { "titulo": "Cromosómicas", "puntos": ["Deleción, duplicación", "Inversión, translocación", "Aneuploidía: trisomía 21 (síndrome de Down)"] }
+      ] },
+      "comprueba": { "pregunta": "Una persona tiene tres copias del cromosoma 21. ¿Qué tipo de mutación es?", "opciones": ["Sustitución génica", "Aneuploidía cromosómica", "Inserción de un nucleótido"], "correcta": 1, "porque": "La trisomía 21 cambia el número de cromosomas: es una aneuploidía, un tipo de mutación cromosómica." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Qué causa las mutaciones",
+      "idea": "Los mutágenos pueden ser físicos, químicos o biológicos, y todos aumentan la tasa de mutación.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Físicos", "puntos": ["Radiación ionizante (rayos X, gamma)", "Radiación UV: dímeros de timina"] },
+        { "titulo": "Químicos", "puntos": ["Humo de tabaco", "Formaldehído", "Alquilantes"] },
+        { "titulo": "Biológicos", "puntos": ["Ciertos virus (VPH)", "Transposones"] }
+      ] },
+      "comprueba": { "pregunta": "Pasas horas al sol sin protección. ¿Qué tipo de mutágeno te afecta?", "opciones": ["Químico", "Biológico", "Físico"], "correcta": 2, "porque": "La radiación UV es un mutágeno físico: forma dímeros de timina en el ADN." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Consecuencias: del cáncer a la evolución",
+      "idea": "Según dónde ocurren, las mutaciones pueden causar cáncer o pasar a los hijos; algunas incluso son ventajosas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Somáticas", "puntos": ["En células del cuerpo", "No se heredan", "Pueden originar cáncer"] },
+        { "titulo": "Germinales", "puntos": ["En células reproductoras", "Pasan a la siguiente generación", "Fuente de variabilidad genética"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué el rasgo falciforme (HbAS) es ventajoso en zonas con malaria?", "opciones": ["Porque da resistencia a la malaria", "Porque evita todas las mutaciones", "Porque no se hereda"], "correcta": 0, "porque": "Esa mutación confiere resistencia a la malaria a sus portadores: un ejemplo de mutación beneficiosa." }
+    }
+  ]
+}

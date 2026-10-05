@@ -1,0 +1,33 @@
+{
+  "codigo": "PM-I-P03-A1",
+  "conceptos": [
+    { "termino": "Proposición", "idea": "Afirmación que es verdadera o falsa, pero no ambas." },
+    { "termino": "Conectivo lógico", "idea": "Palabra que une proposiciones: Y, O, NO, si… entonces." },
+    { "termino": "Tabla de verdad", "idea": "Revisa todos los casos posibles de una proposición compuesta." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Proposiciones y conectivos",
+      "idea": "Una proposición es verdadera o falsa; con conectivos formas proposiciones compuestas con reglas propias.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Conjunción", "expr": "p Y q", "leyenda": "Verdadera solo si ambas son verdaderas" },
+        { "nombre": "Disyunción", "expr": "p O q", "leyenda": "Falsa solo si ambas son falsas" },
+        { "nombre": "Negación", "expr": "NO p", "leyenda": "Invierte el valor de verdad" },
+        { "nombre": "Implicación y bicondicional", "expr": "Si p, entonces q · p si y solo si q" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estas es una proposición?", "opciones": ["¡Cierra la puerta!", "¿Ya comiste?", "El agua hierve a 100 °C al nivel del mar"], "correcta": 2, "porque": "Es una afirmación que puede ser verdadera o falsa; una orden o una pregunta no lo son." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Tablas de verdad y vida cotidiana",
+      "idea": "Con dos proposiciones hay 4 combinaciones; revisarlas todas te ayuda a analizar argumentos y decisiones.",
+      "visual": { "tipo": "ejemplo", "titulo": "«Si tengo dinero Y hay descuento, compro»", "lineas": [
+        "p = tengo dinero, q = hay descuento",
+        "Casos posibles: VV, VF, FV, FF",
+        "p Y q es verdadera solo en VV"
+      ], "resultado": "Compro solo cuando se cumplen las dos condiciones." },
+      "comprueba": { "pregunta": "«Llueve O hace frío» es falsa cuando…", "opciones": ["no llueve y no hace frío", "llueve pero no hace frío", "llueve y hace frío"], "correcta": 0, "porque": "La disyunción solo es falsa si ambas proposiciones son falsas." }
+    }
+  ]
+}

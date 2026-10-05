@@ -1,0 +1,44 @@
+{
+  "codigo": "LC-III-P05-A1",
+  "conceptos": [
+    { "termino": "Verso y estrofa", "idea": "El verso es cada línea del poema; la estrofa, un grupo de versos." },
+    { "termino": "Rima consonante", "idea": "Coinciden todos los sonidos desde la última vocal acentuada." },
+    { "termino": "Rima asonante", "idea": "Solo coinciden las vocales desde la última vocal acentuada." },
+    { "termino": "Figura retórica", "idea": "Recurso que transforma el significado ordinario para lograr un efecto." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Cómo está hecho un poema",
+      "idea": "El poema organiza la experiencia subjetiva y trabaja el lenguaje como sonido y ritmo, no solo como significado.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Elementos formales", "puntos": ["Verso: cada línea", "Estrofa: grupo de versos", "Ritmo: distribución de los acentos", "Métrica: número de sílabas del verso"] },
+        { "titulo": "Tipos de rima", "puntos": ["Consonante: coinciden todos los sonidos desde la última vocal acentuada", "Asonante: solo coinciden las vocales"] }
+      ] },
+      "comprueba": { "pregunta": "Dos versos terminan en «canción» y «corazón». ¿Qué tipo de rima tienen?", "opciones": ["Asonante", "Consonante", "No riman"], "correcta": 1, "porque": "Desde la última vocal acentuada coinciden todos los sonidos (-ón): es rima consonante." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cinco figuras retóricas",
+      "idea": "Metáfora, símil, personificación, hipérbole y anáfora transforman el significado para emocionar o hacer pensar.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Identificar y comparar", "puntos": ["Metáfora: «El tiempo es oro»", "Símil: «Sus ojos brillaban como estrellas»"] },
+        { "titulo": "Dar vida y exagerar", "puntos": ["Personificación: «El viento susurra secretos entre los árboles»", "Hipérbole: «Te lo he dicho mil veces»"] },
+        { "titulo": "Repetir", "puntos": ["Anáfora: la misma palabra al inicio de versos seguidos"] }
+      ] },
+      "comprueba": { "pregunta": "«Tu risa es como una campana.» ¿Qué figura es?", "opciones": ["Metáfora", "Hipérbole", "Símil"], "correcta": 2, "porque": "Compara dos cosas con un conector explícito («como»): eso es un símil, no una metáfora." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Poesía mexicana y lectura en voz alta",
+      "idea": "Los poetas mexicanos usan magistralmente estos recursos, y en voz alta el poema se vuelve un evento sonoro.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sor Juana Inés de la Cruz", "puntos": ["Siglo XVII", "Sonetos con metáforas filosóficas"] },
+        { "titulo": "Ramón López Velarde", "puntos": ["Símbolo y sinestesia", "Evoca la provincia mexicana"] },
+        { "titulo": "Rosario Castellanos", "puntos": ["Ironía y personificación", "Explora la condición femenina"] },
+        { "titulo": "Efraín Huerta", "puntos": ["Canta la Ciudad de México", "Imágenes urbanas y ritmo popular"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué conviene leer poesía en voz alta?", "opciones": ["Porque el ritmo se percibe con el cuerpo y la rima se escucha", "Porque así se lee más rápido", "Porque en silencio no tiene significado"], "correcta": 0, "porque": "La lectura en voz alta permite experimentar la dimensión física del poema: ritmo, rima y pausas significativas." }
+    }
+  ]
+}

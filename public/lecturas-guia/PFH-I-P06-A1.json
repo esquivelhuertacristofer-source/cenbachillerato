@@ -1,0 +1,31 @@
+{
+  "codigo": "PFH-I-P06-A1",
+  "conceptos": [
+    { "termino": "Epistemología", "idea": "La teoría del conocimiento: qué, cómo y con qué seguridad conocemos." },
+    { "termino": "Percepción y razón", "idea": "Las dos fuentes clásicas del conocimiento: los sentidos y el pensamiento." },
+    { "termino": "Posverdad", "idea": "Cuando emociones y creencias pesan más que los hechos al opinar." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "¿Cómo conocemos el mundo?",
+      "idea": "La epistemología estudia cómo conocemos; percepción y razón se complementan, y ciencia y humanidades aportan cosas distintas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Percepción", "puntos": ["Lo que captamos por los sentidos", "Experiencia sensible"] },
+        { "titulo": "Razón", "puntos": ["Lo que comprendemos con el pensamiento"] },
+        { "titulo": "Ciencia y humanidades", "puntos": ["Ciencia: métodos, evidencia, revisión entre pares", "Humanidades: sentido, valores, interpretación"] }
+      ] },
+      "comprueba": { "pregunta": "Sabes que el café está caliente porque lo tocaste. ¿Qué fuente de conocimiento usaste?", "opciones": ["La razón", "La percepción", "La revisión entre pares"], "correcta": 1, "porque": "Lo captaste con los sentidos (el tacto), y eso es la percepción." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "La verdad y la posverdad",
+      "idea": "Hay varias ideas de qué hace verdadera una afirmación; ante la posverdad, revisa quién lo dice, con qué pruebas e intención.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "¿Qué hace verdadera una afirmación?", "puntos": ["Que corresponda a los hechos", "Que sea coherente con lo que sabemos", "Que resulte útil"] },
+        { "titulo": "Ante la información", "puntos": ["¿Quién lo dice?", "¿Con qué pruebas?", "¿Con qué intención?"] }
+      ] },
+      "comprueba": { "pregunta": "Compartes una noticia sin pruebas solo porque confirma lo que ya creías. ¿Qué fenómeno es?", "opciones": ["Posverdad", "Revisión entre pares", "Percepción"], "correcta": 0, "porque": "En la posverdad las emociones y creencias personales pesan más que los hechos al formar opiniones." }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "codigo": "PM-V-P04-A1",
+  "conceptos": [
+    { "termino": "Regla de la potencia", "idea": "Bajas el exponente al frente y le restas uno." },
+    { "termino": "Regla del producto", "idea": "Derivada de un producto: dos términos, nunca solo f' por g'." },
+    { "termino": "Regla del cociente", "idea": "(f'g − fg') entre g al cuadrado." },
+    { "termino": "Regla de la cadena", "idea": "Derivas la función de afuera y multiplicas por la derivada de adentro." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3, 4],
+      "titulo": "Regla de la potencia",
+      "idea": "Las reglas ahorran usar la definición; la primera: la derivada de xⁿ es n·xⁿ⁻¹, y la de una constante es cero.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Potencia", "expr": "d/dx [xⁿ] = n·xⁿ⁻¹", "leyenda": "x⁵ → 5x⁴ · x⁻² → −2/x³ · √x → 1/(2√x)" },
+        { "nombre": "Constante", "expr": "d/dx [c] = 0", "leyenda": "Lo que no cambia tiene derivada cero" },
+        { "nombre": "Linealidad", "expr": "d/dx [af(x) + bg(x)] = af'(x) + bg'(x)" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es la derivada de 3x⁴ + 5?", "opciones": ["12x³ + 5", "12x³", "3x³"], "correcta": 1, "porque": "3 × 4x³ = 12x³, y la constante 5 se deriva a 0." }
+    },
+    {
+      "parrafos": [5, 6, 7, 8],
+      "titulo": "Regla del producto: dos términos",
+      "idea": "Para derivar f·g sumas f'·g más f·g'; multiplicar solo las derivadas es el error más común.",
+      "visual": { "tipo": "ejemplo", "titulo": "h(x) = (x² + 1)(3x − 2)", "lineas": ["f = x² + 1, f' = 2x;  g = 3x − 2, g' = 3", "h' = 2x·(3x − 2) + (x² + 1)·3", "= 6x² − 4x + 3x² + 3"], "resultado": "h'(x) = 9x² − 4x + 3" },
+      "comprueba": { "pregunta": "¿Cuál es la derivada de x·(x + 1) usando la regla del producto?", "opciones": ["1", "x + 1", "2x + 1"], "correcta": 2, "porque": "f' · g + f · g' = 1·(x + 1) + x·1 = 2x + 1. La respuesta 1 sale del error de multiplicar f'·g'." }
+    },
+    {
+      "parrafos": [9, 10, 11, 12],
+      "titulo": "Regla del cociente",
+      "idea": "Numerador derivado por denominador, menos numerador por denominador derivado, todo sobre el denominador al cuadrado.",
+      "visual": { "tipo": "ejemplo", "titulo": "h(x) = (x² + 1)/(x − 1)", "lineas": ["f = x² + 1, f' = 2x;  g = x − 1, g' = 1", "h' = [2x·(x − 1) − (x² + 1)·1] / (x − 1)²", "= [2x² − 2x − x² − 1] / (x − 1)²"], "resultado": "h'(x) = (x² − 2x − 1)/(x − 1)²" },
+      "comprueba": { "pregunta": "¿Cuál es la derivada de 1/x con la regla del cociente?", "opciones": ["−1/x²", "1/x²", "0"], "correcta": 0, "porque": "(0·x − 1·1)/x² = −1/x². Coincide con la regla de la potencia: x⁻¹ → −x⁻²." }
+    },
+    {
+      "parrafos": [13, 14, 15, 16],
+      "titulo": "Regla de la cadena: afuera y adentro",
+      "idea": "Para una composición f(g(x)) derivas la función exterior evaluada en la interior y multiplicas por la derivada de la interior.",
+      "visual": { "tipo": "ejemplo", "titulo": "k(x) = (2x³ + 1)⁴", "lineas": ["Exterior: u⁴ → 4u³", "Interior: u = 2x³ + 1 → 6x²", "k'(x) = 4(2x³ + 1)³ · 6x²"], "resultado": "k'(x) = 24x²(2x³ + 1)³" },
+      "comprueba": { "pregunta": "¿Cuál es la derivada de (x² + 3)⁵?", "opciones": ["5(x² + 3)⁴", "10x(x² + 3)⁴", "10x(x² + 3)⁵"], "correcta": 1, "porque": "Exterior: 5(x² + 3)⁴; interior: 2x. Multiplicando: 5 · 2x · (x² + 3)⁴ = 10x(x² + 3)⁴." }
+    },
+    {
+      "parrafos": [17, 18, 19],
+      "titulo": "Resumen: cuatro reglas bastan",
+      "idea": "Potencia, producto, cociente y cadena derivan cualquier función algebraica; las trascendentes suman sus fórmulas base, siempre con la cadena.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Funciones algebraicas", "puntos": ["Bastan potencia, producto, cociente y cadena"] },
+        { "titulo": "Funciones trascendentes", "puntos": ["Trigonométricas, exponenciales, logarítmicas", "Tienen sus propias fórmulas base", "La cadena sirve para componerlas"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué regla usas primero para derivar f(x) = (x³ + 2)/(x² + 1)?", "opciones": ["Cadena", "Producto", "Cociente"], "correcta": 2, "porque": "La función es una división de dos funciones, f/g, así que se deriva con la regla del cociente." }
+    }
+  ]
+}

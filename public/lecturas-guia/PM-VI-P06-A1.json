@@ -1,0 +1,49 @@
+{
+  "codigo": "PM-VI-P06-A1",
+  "conceptos": [
+    { "termino": "Probabilidad condicional", "idea": "P(A|B): la probabilidad de A sabiendo que B ya ocurrió." },
+    { "termino": "Eventos independientes", "idea": "Saber que uno ocurrió no cambia la probabilidad del otro." },
+    { "termino": "Teorema de Bayes", "idea": "Actualiza la probabilidad de una hipótesis con nueva evidencia." },
+    { "termino": "Valor predictivo positivo", "idea": "La probabilidad de estar enfermo si la prueba salió positiva." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Saber algo reduce el espacio muestral",
+      "idea": "Si ya sabes que B ocurrió, solo cuentas los resultados compatibles con B: P(A|B) = P(A ∩ B) ÷ P(B).",
+      "visual": { "tipo": "ejemplo", "titulo": "100 personas: 40 hombres, de ellos 10 fuman", "lineas": ["P(A|B) = P(A ∩ B) ÷ P(B), con P(B) > 0", "Sabemos que es hombre: el espacio pasa de 100 a 40", "P(fuma | hombre) = 10/40"], "resultado": "P(fuma | hombre) = 0.25" },
+      "comprueba": { "pregunta": "En el mismo grupo hay 60 mujeres. Supón que 12 de ellas fuman. ¿Cuánto vale P(fuma | mujer)?", "opciones": ["0.12", "0.20", "0.60"], "correcta": 1, "porque": "Sabiendo que es mujer, el espacio se reduce a 60: P(fuma | mujer) = 12/60 = 0.20." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Independencia y regla del producto",
+      "idea": "Si los eventos son independientes, multiplicas sus probabilidades; si dependen, multiplicas por la probabilidad condicional.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Independientes", "expr": "P(A|B) = P(A)", "leyenda": "Conocer B no cambia a A" },
+        { "nombre": "Producto, independientes", "expr": "P(A ∩ B) = P(A) × P(B)" },
+        { "nombre": "Producto, dependientes", "expr": "P(A ∩ B) = P(A) × P(B|A)" }
+      ] },
+      "comprueba": { "pregunta": "Lanzas una moneda dos veces; los lanzamientos son independientes. ¿Cuál es la probabilidad de sacar águila las dos veces?", "opciones": ["1", "0.5", "0.25"], "correcta": 2, "porque": "Al ser independientes, P(A ∩ B) = P(A) × P(B) = 0.5 × 0.5 = 0.25." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Bayes: actualizar con evidencia",
+      "idea": "Bayes calcula qué tan probable es una hipótesis, como una enfermedad, después de ver evidencia, como una prueba positiva.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Teorema de Bayes", "expr": "P(B|A) = P(A|B) × P(B) ÷ P(A)", "leyenda": "Usa la probabilidad previa (prevalencia) y las características de la prueba" }
+      ] },
+      "comprueba": { "pregunta": "Si P(A|B) = 0.5, P(B) = 0.2 y P(A) = 0.4, ¿cuánto vale P(B|A)?", "opciones": ["0.25", "0.1", "0.4"], "correcta": 0, "porque": "P(B|A) = 0.5 × 0.2 ÷ 0.4 = 0.1 ÷ 0.4 = 0.25." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Un positivo no es una sentencia",
+      "idea": "Sensibilidad y especificidad describen la prueba; la probabilidad real de estar enfermo tras un positivo depende de la prevalencia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sensibilidad", "puntos": ["P(positivo | enfermo)", "Qué tan bien detecta a los enfermos"] },
+        { "titulo": "Especificidad", "puntos": ["P(negativo | sano)", "Qué tan bien descarta a los sanos"] },
+        { "titulo": "VPP", "puntos": ["P(enfermo | positivo)", "Puede ser bajo si la enfermedad es muy rara"] }
+      ] },
+      "comprueba": { "pregunta": "Una prueba muy buena para una enfermedad muy rara sale positiva. ¿Qué es lo más correcto?", "opciones": ["La persona seguro está enferma", "La prueba seguro falló", "Hay que confirmar: por la baja prevalencia, puede ser un falso positivo"], "correcta": 2, "porque": "Si la enfermedad es rara, los falsos positivos entre tantas personas sanas son numerosos y el VPP baja; por eso se confirma con más pruebas." }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "codigo": "CD-I-P06-A1",
+  "conceptos": [
+    { "termino": "Phishing", "idea": "Página, correo o mensaje falso que imita a un banco o empresa para robar tus datos." },
+    { "termino": "Desinformación", "idea": "Información falsa o engañosa que se difunde, a veces a propósito y a veces no." },
+    { "termino": "Vigilancia digital", "idea": "Empresas, gobiernos o hackers que monitorean lo que haces en línea." },
+    { "termino": "2FA", "idea": "Autenticación de dos factores: un segundo candado además de tu contraseña." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Phishing: el engaño que imita",
+      "idea": "El phishing imita a un banco, gobierno o empresa para sacarte tus datos; aprende a reconocer sus señales.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Señales de alerta", "puntos": ["URL con errores de ortografía", "Mensaje urgente que pide tu contraseña", "Remitente desconocido"] }
+      ] },
+      "comprueba": { "pregunta": "Te llega un mensaje: «Tu cuenta será bloqueada hoy, entra a bancco-seguro.com y escribe tu contraseña». ¿Qué es?", "opciones": ["Un aviso legítimo de tu banco", "Un intento de phishing", "Desinformación"], "correcta": 1, "porque": "Tiene las señales de phishing: urgencia, petición de contraseña y una URL con error de ortografía." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Desinformación: verifica antes de creer",
+      "idea": "Ante una noticia dudosa, revisa la fuente, compárala en varios medios y usa verificadores de hechos.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Verifica la fuente", "texto": "¿Quién publicó el contenido?" },
+        { "titulo": "Compara", "texto": "Busca lo mismo en varios medios confiables." },
+        { "titulo": "Revisa imágenes y videos", "texto": "¿Fueron manipulados?" },
+        { "titulo": "Usa verificadores", "texto": "Verificado, Animal Político." }
+      ] },
+      "comprueba": { "pregunta": "Ves un video impactante que solo aparece en una cuenta anónima. ¿Qué paso de verificación sigue?", "opciones": ["Compartirlo para que otros opinen", "Creerlo porque es un video", "Buscar la misma información en varios medios confiables"], "correcta": 2, "porque": "Para detectar desinformación hay que buscar la misma información en varios medios confiables y verificar la fuente." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Vigilancia: tu higiene digital",
+      "idea": "Contra la vigilancia, protege tus cuentas y tu dispositivo: no es paranoia, es higiene básica.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cómo protegerte", "puntos": ["Contraseñas fuertes y distintas por cuenta", "Activa la 2FA", "VPN en redes públicas", "Revisa permisos de las apps", "Sistema operativo actualizado"] }
+      ] },
+      "comprueba": { "pregunta": "Usas la misma contraseña en todas tus cuentas. ¿Qué recomienda la lectura?", "opciones": ["Usar contraseñas fuertes y diferentes para cada cuenta", "Mantenerla si es fácil de recordar", "Cambiarla solo una vez al año"], "correcta": 0, "porque": "La lectura recomienda contraseñas fuertes y diferentes para cada cuenta, además de activar la 2FA." }
+    }
+  ]
+}

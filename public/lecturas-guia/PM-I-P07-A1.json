@@ -1,0 +1,29 @@
+{
+  "codigo": "PM-I-P07-A1",
+  "conceptos": [
+    { "termino": "Estimar", "idea": "Calcular un valor aproximado con razonamiento, no adivinar al azar." },
+    { "termino": "Redondeo", "idea": "Aproximar a decenas, centenas o números cómodos para calcular rápido." },
+    { "termino": "Razonabilidad", "idea": "Preguntarte si el resultado tiene sentido antes de aceptarlo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Estimar no es adivinar",
+      "idea": "Estimar es razonar una aproximación rápida, con estrategias como redondear, comparar o usar porcentajes fáciles.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Estrategias", "puntos": ["Redondeo a decenas, centenas o múltiplos cómodos", "Comparar con referencias conocidas", "Porcentajes aproximados: el 10% es fácil"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber rápido el 10% de una cuenta de $198. ¿Qué estrategia usarías?", "opciones": ["Adivinar un número al azar", "Redondear a $200 y tomar el 10%", "Hacer la división exacta con decimales"], "correcta": 1, "porque": "Redondear a $200 y sacar el 10% (que es fácil mentalmente) da una aproximación razonable en poco tiempo." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "¿Tiene sentido el resultado?",
+      "idea": "Antes de aceptar una respuesta, revisa si es razonable: así detectas errores, incluso de calculadoras.",
+      "visual": { "tipo": "ejemplo", "titulo": "480 personas en autobuses de 40 asientos", "lineas": [
+        "480 ÷ 40 = 12 autobuses",
+        "Si te sale 1,200 autobuses, algo está mal"
+      ], "resultado": "12: un número entero y razonable." },
+      "comprueba": { "pregunta": "Calculas el precio por kilo de tortillas y te da $0.002. ¿Qué haces?", "opciones": ["Lo aceptas porque lo dio la calculadora", "Lo redondeas a $0", "Revisas el cálculo: probablemente hay un error"], "correcta": 2, "porque": "Un precio así no es razonable; la máquina no siempre avisa y te toca reconocer que algo falla." }
+    }
+  ]
+}

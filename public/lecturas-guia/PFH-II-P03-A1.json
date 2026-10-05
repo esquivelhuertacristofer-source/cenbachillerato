@@ -1,0 +1,41 @@
+{
+  "codigo": "PFH-II-P03-A1",
+  "conceptos": [
+    { "termino": "Bioética", "idea": "Estudia las implicaciones morales de los avances en biología y medicina." },
+    { "termino": "Autonomía", "idea": "Tu derecho a decidir informado sobre tu salud y tu cuerpo, sin coacción." },
+    { "termino": "No maleficencia", "idea": "«Primero no dañar»: ninguna intervención debe causar más daño que beneficio." },
+    { "termino": "Legal no es ético", "idea": "Algo puede estar permitido por la ley y aun así ser moralmente inaceptable." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Qué es la bioética y sus principios",
+      "idea": "La bioética une ciencias de la vida y valores, y se guía por cuatro principios: autonomía, beneficencia, no maleficencia y justicia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Principios (Beauchamp y Childress, 1979)", "puntos": ["Autonomía: decidir informado y sin coacción", "Beneficencia: actuar en beneficio del paciente", "No maleficencia: primero no dañar", "Justicia: repartir recursos con equidad"] }
+      ] },
+      "comprueba": { "pregunta": "Un hospital reparte un medicamento escaso de forma equitativa entre los pacientes. ¿Qué principio aplica?", "opciones": ["Justicia", "Autonomía", "Beneficencia"], "correcta": 0, "porque": "El principio de justicia exige que los recursos y tratamientos médicos se distribuyan de manera equitativa." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Dilemas actuales: aborto, eutanasia, CRISPR",
+      "idea": "Los principios chocan en dilemas reales como el aborto, la eutanasia y la edición genética de embriones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Aborto", "puntos": ["Despenalizado en la CDMX desde 2007", "Hacia 2024, en doce estados", "Autonomía vs. inicio de la vida"] },
+        { "titulo": "Eutanasia", "puntos": ["Aliviar el sufrimiento de un enfermo terminal", "No legalizada en México", "El debate legislativo continúa"] },
+        { "titulo": "CRISPR-Cas9", "puntos": ["Podría eliminar enfermedades hereditarias", "¿Modificar embriones? ¿Elegir características?", "La analizan comités del IMSS y el ISSSTE"] }
+      ] },
+      "comprueba": { "pregunta": "Unos padres quieren editar el genoma de su embrión solo para elegir el color de ojos. ¿Qué tema bioético plantea?", "opciones": ["La eutanasia", "Los límites de la edición genética", "La despenalización del aborto"], "correcta": 1, "porque": "La lectura plantea si se puede modificar un embrión para elegir características: es el debate sobre los límites de CRISPR." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Lo legal no siempre es ético",
+      "idea": "La ley y la ética no coinciden siempre: Tuskegee fue legal pero antiético, y hoy rige la Declaración de Helsinki.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "1932–1972: Caso Tuskegee", "texto": "Observaron la sífilis en hombres afroamericanos sin tratarlos: legal pero antiético." },
+        { "titulo": "1964: Declaración de Helsinki", "texto": "Principios éticos para investigar en seres humanos; revisada múltiples veces." }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué el Caso Tuskegee sirve de ejemplo en bioética?", "opciones": ["Porque era ilegal pero ético", "Porque creó la Declaración de Helsinki en 1932", "Porque era legal pero profundamente antiético"], "correcta": 2, "porque": "Muestra que algo puede ser legal sin ser ético: negar tratamiento a los pacientes era legal entonces, pero antiético." }
+    }
+  ]
+}

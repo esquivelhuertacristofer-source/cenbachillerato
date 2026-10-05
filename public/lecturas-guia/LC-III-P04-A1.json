@@ -1,0 +1,41 @@
+{
+  "codigo": "LC-III-P04-A1",
+  "conceptos": [
+    { "termino": "Subgénero narrativo", "idea": "Especialización con sus propias reglas de trama, personajes y atmósfera." },
+    { "termino": "Cliffhanger", "idea": "Corte en el momento de mayor tensión que te deja con la duda." },
+    { "termino": "Autoficción", "idea": "El autor escribe sobre sí mismo, pero altera o inventa hechos." },
+    { "termino": "Antropoceno", "idea": "Narrativas que ponen la crisis ecológica en el centro de la historia." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Suspenso y terror",
+      "idea": "El suspenso te mantiene en tensión con la incertidumbre; el terror busca miedo, incomodidad o repulsión.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Suspenso", "puntos": ["Tensión por la incertidumbre", "Cliffhanger", "Información incompleta", "Cuenta regresiva"] },
+        { "titulo": "Terror", "puntos": ["Busca miedo, incomodidad o repulsión", "Sobrenatural: monstruos, fantasmas", "Psicológico: una mente perturbada o la propia realidad"] }
+      ] },
+      "comprueba": { "pregunta": "En un relato, la amenaza no es un fantasma sino los pensamientos obsesivos del protagonista. ¿Qué tipo de terror es?", "opciones": ["Sobrenatural", "Psicológico", "Ciencia ficción"], "correcta": 1, "porque": "En el terror psicológico la amenaza viene de una mente perturbada o de la propia realidad." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Ciencia ficción y autoficción",
+      "idea": "La ciencia ficción piensa el presente proyectándolo al futuro; la autoficción borra la frontera entre lo vivido y lo inventado.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ciencia ficción", "puntos": ["Futuros posibles y tecnologías imaginadas", "Sociedades alternativas", "Reflexiona sobre el presente"] },
+        { "titulo": "Autoficción", "puntos": ["Autobiografía mezclada con invención", "Altera, exagera o inventa eventos", "Frontera deliberadamente borrosa"] }
+      ] },
+      "comprueba": { "pregunta": "Una escritora narra su infancia con su nombre real, pero agrega un hermano que nunca tuvo. ¿Qué subgénero es?", "opciones": ["Autoficción", "Neorrealismo urbano", "Suspenso"], "correcta": 0, "porque": "La autoficción mezcla autobiografía e invención: el autor escribe sobre sí mismo alterando o inventando eventos." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "La ciudad y el planeta en crisis",
+      "idea": "El neorrealismo urbano retrata sin romantizar la ciudad; las literaturas del Antropoceno narran la crisis ecológica.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Neorrealismo urbano", "puntos": ["Ciudades contemporáneas", "Violencia, marginalidad y diversidad cultural", "Crudo y directo"] },
+        { "titulo": "Literaturas del Antropoceno", "puntos": ["Tendencia reciente", "Crisis ecológica y cambio climático al centro", "¿Cómo vivir en un planeta en colapso?"] }
+      ] },
+      "comprueba": { "pregunta": "Una novela sigue a una familia que migra porque la sequía secó su pueblo. ¿A qué tendencia se acerca más?", "opciones": ["Terror sobrenatural", "Literaturas del Antropoceno", "Autoficción"], "correcta": 1, "porque": "Las literaturas del Antropoceno sitúan la crisis ecológica y el cambio climático en el centro de la narración." }
+    }
+  ]
+}

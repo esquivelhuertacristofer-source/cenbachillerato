@@ -1,0 +1,29 @@
+{
+  "codigo": "PFH-I-P04-A1",
+  "conceptos": [
+    { "termino": "Diálogo filosófico", "idea": "Conversar para pensar mejor juntos, no para ganar." },
+    { "termino": "Debate", "idea": "Discusión cuyo objetivo es ganar y convencer al otro." },
+    { "termino": "Autoconocimiento", "idea": "Descubrir los límites de tus propias ideas al explicarlas y escuchar objeciones." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Sócrates: pensar juntos, no ganar",
+      "idea": "Para Sócrates el conocimiento surge de pensar juntos; por eso el diálogo busca comprender mejor, no vencer al otro.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Debate", "puntos": ["El objetivo es ganar", "Convencer al otro de que uno tiene razón"] },
+        { "titulo": "Diálogo filosófico", "puntos": ["El objetivo es pensar mejor juntos", "Llegar a comprensiones más profundas", "Escuchar con apertura real"] }
+      ] },
+      "comprueba": { "pregunta": "Dos compañeros discuten y uno solo espera su turno para responder sin escuchar. ¿Qué le falta para que sea diálogo filosófico?", "opciones": ["Hablar más fuerte", "Tener más datos", "Escuchar con apertura real"], "correcta": 2, "porque": "El diálogo filosófico exige escuchar con apertura real, no solo esperar turno para hablar." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Reglas del diálogo y autoconocimiento",
+      "idea": "Dialogar bien tiene reglas, y al explicar tus ideas y oír objeciones descubres sus límites.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Reglas del diálogo", "puntos": ["Preguntar en lugar de afirmar", "Reconocer el buen punto del otro", "Atacar ideas, no personas", "Cambiar de opinión ante buenos argumentos"] }
+      ] },
+      "comprueba": { "pregunta": "En una discusión, alguien responde «tú qué sabes, si reprobaste». ¿Qué regla rompe?", "opciones": ["Distinguir entre atacar una idea y atacar a la persona", "Formular preguntas en lugar de afirmaciones", "Reconocer el buen punto del otro"], "correcta": 0, "porque": "Ataca a la persona en vez de discutir su idea, y la regla pide distinguir entre ambas cosas." }
+    }
+  ]
+}

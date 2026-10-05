@@ -1,0 +1,55 @@
+{
+  "codigo": "CNEYT-III-P06-A1",
+  "conceptos": [
+    { "termino": "Deterioro ambiental", "idea": "Contaminación, deforestación y cambio climático: tres problemas conectados que se agravan entre sí." },
+    { "termino": "PM2.5", "idea": "Partículas finas del aire ligadas a enfermedades respiratorias, cardiovasculares y cáncer." },
+    { "termino": "Deforestación", "idea": "Pérdida de bosque y selva que reduce agua, carbono fijado y biodiversidad." },
+    { "termino": "Trampa de las sinergias", "idea": "Ciclo vicioso donde un problema ambiental agrava al otro y viceversa." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Contaminación de aire, agua y suelo",
+      "idea": "El deterioro ambiental ya afecta a millones; en México hay contaminación grave del aire, de ríos como el Atoyac y del suelo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Aire", "puntos": ["CDMX y Guadalajara superan normas de la OMS en PM2.5", "Enfermedades respiratorias, cardiovasculares y cáncer"] },
+        { "titulo": "Agua", "puntos": ["Río Atoyac (Puebla y Tlaxcala)", "Descargas industriales y aguas residuales sin tratar"] },
+        { "titulo": "Suelo", "puntos": ["Minería a cielo abierto en Sonora y Zacatecas", "Contamina acuíferos por décadas"] }
+      ] },
+      "comprueba": { "pregunta": "Una fábrica vierte sus desechos sin tratar a un río. ¿Qué tipo de contaminación describe el texto con un caso así?", "opciones": ["Del aire", "Del agua", "Del suelo"], "correcta": 1, "porque": "El río Atoyac es el ejemplo del texto: se contamina por descargas industriales y aguas residuales sin tratar." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Deforestación: causas y regiones",
+      "idea": "México pierde unas 92,000 hectáreas de bosque y selva al año, sobre todo por la ganadería extensiva.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "55%", "etiqueta": "Ganadería extensiva", "barra": 55 },
+        { "valor": "28%", "etiqueta": "Agricultura de roza-tumba-quema", "barra": 28 },
+        { "valor": "17%", "etiqueta": "Tala ilegal", "barra": 17 },
+        { "valor": "92,000 ha", "etiqueta": "Bosque y selva perdidos cada año" }
+      ], "fuente": "CONAFOR (2023)" },
+      "comprueba": { "pregunta": "Según el texto, ¿cuál es la causa principal de la deforestación en México?", "opciones": ["La tala ilegal", "La agricultura de roza-tumba-quema", "La ganadería extensiva"], "correcta": 2, "porque": "La ganadería extensiva explica el 55% de la deforestación, más que la agricultura (28%) y la tala ilegal (17%)." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Cambio climático y ciclo vicioso",
+      "idea": "El cambio climático golpea a México con sequías, huracanes y deshielo, y se alimenta de la deforestación en un ciclo vicioso.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Deforestación", "texto": "Se absorbe menos CO₂." },
+        { "titulo": "Calentamiento", "texto": "Aumenta el calentamiento global." },
+        { "titulo": "Incendios", "texto": "Crecen la frecuencia y la intensidad de los incendios forestales." },
+        { "titulo": "Más deforestación", "texto": "Los incendios destruyen más bosque y el ciclo vuelve a empezar." }
+      ] },
+      "comprueba": { "pregunta": "Según el texto, ¿cómo se puede romper el ciclo vicioso deforestación-calentamiento-incendios?", "opciones": ["Atacando solo los incendios", "Con intervenciones simultáneas en varios frentes", "Esperando a que el clima se estabilice"], "correcta": 1, "porque": "El texto afirma que este ciclo solo se rompe con intervenciones simultáneas en múltiples frentes." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Soluciones locales con política pública",
+      "idea": "Las soluciones locales funcionan cuando se articulan con políticas públicas y con la participación de las comunidades.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Soluciones que menciona el texto", "puntos": ["Reforestación comunitaria (brigadas del CONAFOR)", "Corredores biológicos que reconectan ecosistemas", "Agricultura agroecológica sin desmonte", "Comunidades indígenas manejando sus territorios"] }
+      ] },
+      "comprueba": { "pregunta": "Dos bosques quedaron separados por carreteras y cultivos. ¿Qué solución del texto ayuda a reconectarlos?", "opciones": ["Un corredor biológico", "Más minería a cielo abierto", "Agricultura de roza-tumba-quema"], "correcta": 0, "porque": "Los corredores biológicos se diseñan para reconectar ecosistemas fragmentados." }
+    }
+  ]
+}

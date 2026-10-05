@@ -1,0 +1,31 @@
+{
+  "codigo": "LC-II-P01-A1",
+  "conceptos": [
+    { "termino": "Narrativa de vida", "idea": "Texto en el que cuentas episodios de tu propia historia." },
+    { "termino": "Huella", "idea": "Un cambio en cómo piensas, sientes o actúas que deja una experiencia." },
+    { "termino": "Acto comunitario", "idea": "Contar tu historia también construye la identidad de tu familia o comunidad." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Contar tu historia para entenderla",
+      "idea": "Narrar tu vida no es contarlo todo: es elegir los momentos que dejaron huella y darles forma con palabras.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Episodios que se narran", "puntos": ["Un momento decisivo", "Una pérdida importante", "Un aprendizaje profundo", "Una primera vez"] },
+        { "titulo": "Qué los hace valiosos", "puntos": ["Dejaron una huella", "Cambiaron cómo piensas, sientes o actúas"] }
+      ] },
+      "comprueba": { "pregunta": "Vas a escribir tu narrativa de vida. ¿Qué episodio encaja mejor?", "opciones": ["Todo lo que hiciste el lunes pasado", "El día que cambiaste de escuela y cómo te transformó", "La lista de tus materias del semestre"], "correcta": 1, "porque": "No se trata de contar todo, sino de seleccionar situaciones que dejaron una huella en cómo piensas, sientes o actúas." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Contar en comunidad",
+      "idea": "En muchas culturas, contar la historia propia transmite sabiduría y construye identidad compartida.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Personas mayores", "puntos": ["Transmiten su sabiduría con relatos"] },
+        { "titulo": "Familias", "puntos": ["Construyen su identidad con anécdotas"] },
+        { "titulo": "Escritores", "puntos": ["Muestran cómo sus experiencias los transformaron"] }
+      ] },
+      "comprueba": { "pregunta": "En cada reunión, tu familia cuenta la anécdota de cómo llegaron tus abuelos a la ciudad. ¿Qué está haciendo?", "opciones": ["Construir su identidad compartiendo anécdotas", "Corregir un texto", "Escribir una noticia"], "correcta": 0, "porque": "Las familias construyen su identidad compartiendo anécdotas: contar la historia propia es un acto comunitario." }
+    }
+  ]
+}

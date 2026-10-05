@@ -1,0 +1,30 @@
+{
+  "codigo": "PFH-I-P02-A1",
+  "conceptos": [
+    { "termino": "Pregunta cotidiana", "idea": "Tiene respuesta inmediata y práctica, como «¿Qué hora es?»." },
+    { "termino": "Pregunta científica", "idea": "Se responde con observación, experimentos y evidencia verificable." },
+    { "termino": "Pregunta filosófica", "idea": "No se resuelve solo con datos: pide reflexión conceptual y analizar supuestos." },
+    { "termino": "Epistemología", "idea": "Área de la filosofía que pregunta cómo sabemos lo que sabemos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Preguntas cotidianas y científicas",
+      "idea": "Las cotidianas buscan una respuesta práctica inmediata; las científicas, explicaciones verificables con evidencia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cotidianas", "puntos": ["Respuesta inmediata y práctica", "«¿Dónde está el baño?»", "No piden reflexión profunda"] },
+        { "titulo": "Científicas", "puntos": ["Observación, experimentación y evidencia", "«¿Cómo se forman las estrellas?»", "Respuestas provisionales pero verificables"] }
+      ] },
+      "comprueba": { "pregunta": "«¿Por qué las plantas crecen hacia la luz?» ¿Qué tipo de pregunta es?", "opciones": ["Cotidiana", "Científica", "Filosófica"], "correcta": 1, "porque": "Busca explicar un fenómeno natural y se puede responder con observación y experimentos." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Preguntas filosóficas y sus áreas",
+      "idea": "Las preguntas filosóficas exigen reflexión conceptual y se reparten en áreas; una pregunta cotidiana puede volverse filosófica.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Áreas de la filosofía", "puntos": ["Ontología: ¿Qué existe realmente?", "Epistemología: ¿Cómo sabemos lo que sabemos?", "Ética: ¿Qué debemos hacer?", "Estética: ¿Qué es lo bello?", "Filosofía política: ¿Qué hace legítimo a un gobierno?"] }
+      ] },
+      "comprueba": { "pregunta": "«¿Es correcto mentir para proteger a un amigo?» ¿A qué área pertenece?", "opciones": ["Estética", "Ontología", "Ética"], "correcta": 2, "porque": "Pregunta por el bien y lo correcto, que es lo que estudia la ética." }
+    }
+  ]
+}

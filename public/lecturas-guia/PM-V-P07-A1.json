@@ -1,0 +1,49 @@
+{
+  "codigo": "PM-V-P07-A1",
+  "conceptos": [
+    { "termino": "Optimización", "idea": "Encontrar el valor máximo o mínimo de una función en un problema real." },
+    { "termino": "Función objetivo", "idea": "Lo que quieres maximizar o minimizar: volumen, ganancia, material." },
+    { "termino": "Punto crítico", "idea": "Donde la derivada vale cero: candidato a máximo o mínimo." },
+    { "termino": "Ingreso y costo marginal", "idea": "Las derivadas del ingreso y del costo; la ganancia es máxima cuando coinciden." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "El método para optimizar",
+      "idea": "Optimizar es encontrar el mejor valor posible con la derivada, siguiendo seis pasos ordenados.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Función objetivo", "texto": "¿Qué se quiere maximizar o minimizar?" },
+        { "titulo": "Una sola variable", "texto": "Usa las restricciones para dejarla en términos de una variable." },
+        { "titulo": "Derivar e igualar a cero", "texto": "Así encuentras los puntos críticos." },
+        { "titulo": "Verificar", "texto": "¿Máximo o mínimo? Segunda derivada o criterio de la primera." },
+        { "titulo": "Extremos del dominio", "texto": "Evalúalos también si el intervalo es cerrado." },
+        { "titulo": "Interpretar", "texto": "Explica el resultado en el contexto, con unidades." }
+      ] },
+      "comprueba": { "pregunta": "Ya tienes la función objetivo en una sola variable. ¿Cuál es el siguiente paso?", "opciones": ["Interpretar el resultado con unidades", "Derivarla e igualar a cero", "Evaluar los extremos del dominio"], "correcta": 1, "porque": "El tercer paso es derivar e igualar a cero para hallar los puntos críticos; después se verifican y se interpretan." }
+    },
+    {
+      "parrafos": [3, 4, 5, 6, 7, 8],
+      "titulo": "La caja de máximo volumen",
+      "idea": "Con 300 cm² de cartón, la caja abierta de base cuadrada con mayor volumen mide 10 cm de lado y 5 cm de alto.",
+      "visual": { "tipo": "ejemplo", "titulo": "Caja sin tapa con 300 cm² de cartón", "lineas": ["Restricción: x² + 4xh = 300  →  h = (300 − x²)/(4x)", "V(x) = x² · h = 75x − x³/4", "V'(x) = 75 − 3x²/4 = 0  →  x² = 100  →  x = 10 cm", "h = 200/40 = 5 cm;  V''(x) = −6x/4 < 0: es máximo"], "resultado": "V máx = 10² · 5 = 500 cm³" },
+      "comprueba": { "pregunta": "En un punto crítico la segunda derivada es negativa. ¿Qué tienes ahí?", "opciones": ["Un mínimo", "Un punto donde la función no existe", "Un máximo"], "correcta": 2, "porque": "Como en la caja, V''(x) < 0 confirma que el punto crítico es un máximo." }
+    },
+    {
+      "parrafos": [9, 10, 11],
+      "titulo": "Maximizar la ganancia de una empresa",
+      "idea": "La ganancia es máxima donde su derivada vale cero, que es lo mismo que ingreso marginal igual a costo marginal.",
+      "visual": { "tipo": "ejemplo", "titulo": "I(q) = 50q − 0.5q²  y  C(q) = 10q + 200", "lineas": ["G(q) = I(q) − C(q) = 40q − 0.5q² − 200", "G'(q) = 40 − q = 0", "Equivale a: I'(q) = 50 − q igual a C'(q) = 10"], "resultado": "q* = 40 unidades" },
+      "comprueba": { "pregunta": "Con el mismo ingreso I(q) = 50q − 0.5q², si el costo marginal fuera 20, ¿cuántas unidades maximizan la ganancia?", "opciones": ["30", "40", "70"], "correcta": 0, "porque": "Ingreso marginal igual a costo marginal: 50 − q = 20, así que q = 30 unidades." }
+    },
+    {
+      "parrafos": [12, 13, 14],
+      "titulo": "Empaques mexicanos óptimos",
+      "idea": "Gruma y Bimbo diseñan empaques que contienen un volumen fijo con el menor material: centavos por caja que suman millones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Se queda fijo", "puntos": ["El volumen de producto: un kilo de harina, un pan de caja"] },
+        { "titulo": "Se minimiza", "puntos": ["El material de empaque: plástico o cartón", "El costo por unidad"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué busca un ingeniero de empaques al diseñar la caja de un pan?", "opciones": ["Maximizar el material para que sea resistente", "Usar el mínimo material con el mismo volumen de producto", "Reducir el volumen de pan por caja"], "correcta": 1, "porque": "El volumen de producto es fijo y se minimiza el material de empaque, que a escala de millones de cajas ahorra mucho dinero." }
+    }
+  ]
+}

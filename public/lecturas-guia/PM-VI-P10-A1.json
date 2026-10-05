@@ -1,0 +1,54 @@
+{
+  "codigo": "PM-VI-P10-A1",
+  "conceptos": [
+    { "termino": "Conjunto", "idea": "Colección bien definida: siempre sabes si algo pertenece o no." },
+    { "termino": "Subconjunto", "idea": "B ⊆ A si todos los elementos de B también están en A." },
+    { "termino": "Unión e intersección", "idea": "Unión: está en A o en B. Intersección: está en ambos." },
+    { "termino": "Diagrama de Venn", "idea": "Óvalos dentro de un rectángulo para ver conjuntos y sus traslapes." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Conjuntos, elementos y subconjuntos",
+      "idea": "Un conjunto se define por extensión o por comprensión; dos son iguales si tienen los mismos elementos, sin importar orden ni repeticiones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cómo se escriben", "puntos": ["Extensión: A = {1, 2, 3, 4, 5}", "Comprensión: A = {x | x es un natural del 1 al 5}", "3 ∈ A;  7 ∉ A"] },
+        { "titulo": "Cómo se relacionan", "puntos": ["Iguales: {1,2,3} = {3,2,1}", "Subconjunto: {1,2} ⊆ {1,2,3,4,5}", "∅ es subconjunto de cualquier conjunto", "U: el universal del problema"] }
+      ] },
+      "comprueba": { "pregunta": "Si A = {1, 2, 3, 4, 5}, ¿cuál afirmación es verdadera?", "opciones": ["{2, 6} ⊆ A", "{5, 1} ⊆ A", "6 ∈ A"], "correcta": 1, "porque": "5 y 1 están en A, así que {5, 1} ⊆ A; el orden no importa. El 6 no pertenece a A." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Unir, cruzar, completar y restar",
+      "idea": "Unión, intersección, complemento y diferencia sirven para combinar y filtrar colecciones.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Unión «o»", "expr": "A ∪ B", "leyenda": "Lo que está en A, en B o en ambos" },
+        { "nombre": "Intersección «y»", "expr": "A ∩ B", "leyenda": "Lo que está en A y en B a la vez; disjuntos si A ∩ B = ∅" },
+        { "nombre": "Complemento", "expr": "Aᶜ", "leyenda": "Lo del universal que no está en A" },
+        { "nombre": "Diferencia", "expr": "A − B", "leyenda": "Lo de A que no está en B" }
+      ] },
+      "comprueba": { "pregunta": "Si A = {1, 2, 3, 4} y B = {3, 4, 5}, ¿cuánto es A − B?", "opciones": ["{1, 2}", "{5}", "{3, 4}"], "correcta": 0, "porque": "A − B son los elementos de A que no están en B: se quitan el 3 y el 4, y quedan 1 y 2." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Diagramas de Venn para encuestas",
+      "idea": "En un diagrama de Venn se llena primero la intersección y luego las demás zonas, para resolver problemas de encuestas.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Dibujar", "texto": "Un rectángulo para U y un óvalo por conjunto." },
+        { "titulo": "Intersección primero", "texto": "Coloca cuántos están en ambos conjuntos." },
+        { "titulo": "Completar", "texto": "Resta para hallar «solo A», «solo B» y «ninguno»." }
+      ] },
+      "comprueba": { "pregunta": "En un grupo, 20 juegan fútbol, 15 básquetbol y 5 practican ambos. ¿Cuántos juegan solo fútbol?", "opciones": ["20", "25", "15"], "correcta": 2, "porque": "Primero pones los 5 de la intersección; en el óvalo de fútbol quedan 20 − 5 = 15 que juegan solo fútbol." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Las leyes de De Morgan",
+      "idea": "Negar una unión da la intersección de las negaciones, y negar una intersección da la unión de las negaciones.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Primera ley", "expr": "(A ∪ B)ᶜ = Aᶜ ∩ Bᶜ", "leyenda": "«no (A o B)» = «no A y no B»" },
+        { "nombre": "Segunda ley", "expr": "(A ∩ B)ᶜ = Aᶜ ∪ Bᶜ", "leyenda": "«no (A y B)» = «no A o no B»" }
+      ] },
+      "comprueba": { "pregunta": "¿Qué equivale a «no es cierto que (llueva o haga frío)»?", "opciones": ["No llueve o no hace frío", "No llueve y no hace frío", "Llueve y hace frío"], "correcta": 1, "porque": "Por la primera ley de De Morgan, «no (A o B)» equivale a «no A y no B»." }
+    }
+  ]
+}

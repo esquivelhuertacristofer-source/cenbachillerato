@@ -1,0 +1,51 @@
+{
+  "codigo": "PM-V-P10-A1",
+  "conceptos": [
+    { "termino": "Integral definida", "idea": "El área entre la curva y el eje X: el total acumulado." },
+    { "termino": "Suma de Riemann", "idea": "Aproximar un área sumando rectángulos cada vez más delgados." },
+    { "termino": "Antiderivada", "idea": "Una función F cuya derivada es f." },
+    { "termino": "Teorema Fundamental", "idea": "Derivar e integrar son operaciones inversas." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Integrar: sumar el cambio",
+      "idea": "Derivar mide el ritmo del cambio; integrar suma ese ritmo para obtener un total, que es el área bajo la curva.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Derivar", "puntos": ["Mide qué tan rápido cambia", "Es una pendiente"] },
+        { "titulo": "Integrar", "puntos": ["Suma el cambio: total acumulado", "Es un área: ∫ₐᵇ f(x) dx", "Velocidad → distancia; caudal → volumen; potencia → energía"] }
+      ] },
+      "comprueba": { "pregunta": "En una gráfica de caudal de agua contra tiempo, ¿qué representa el área bajo la curva?", "opciones": ["El volumen de agua total", "La velocidad del agua", "El momento de mayor caudal"], "correcta": 0, "porque": "El área bajo un ritmo es su total acumulado; bajo un caudal, el área es el volumen." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Sumas de Riemann: área con rectángulos",
+      "idea": "Se aproxima el área con rectángulos; al usar cada vez más y más delgados, el límite de la suma es la integral.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Partir", "texto": "Divide [a, b] en n pedazos de ancho (b − a)/n." },
+        { "titulo": "Levantar", "texto": "Sobre cada pedazo, un rectángulo con altura igual al valor de la función." },
+        { "titulo": "Sumar", "texto": "Suma sus áreas: con pocos rectángulos sobra o falta área." },
+        { "titulo": "Afinar", "texto": "Cuando n tiende a infinito, el límite de las sumas es el área exacta." }
+      ] },
+      "comprueba": { "pregunta": "Partes el intervalo [0, 6] en n = 3 pedazos iguales. ¿Qué ancho tiene cada rectángulo?", "opciones": ["3", "2", "18"], "correcta": 1, "porque": "El ancho es (b − a)/n = (6 − 0)/3 = 2." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "La antiderivada y el teorema",
+      "idea": "Derivar la función de acumulación devuelve f, así que un área exacta se calcula restando una antiderivada en los extremos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Antiderivada", "expr": "F′(x) = f(x)", "leyenda": "Ejemplo: F(x) = x² es antiderivada de 2x" },
+        { "nombre": "TFC parte 1", "expr": "F(x) = ∫ₐˣ f(t) dt  →  F′(x) = f(x)", "leyenda": "Derivar la acumulación deshace la integral" },
+        { "nombre": "TFC parte 2", "expr": "∫ₐᵇ f(x) dx = F(b) − F(a)", "leyenda": "Sin sumar rectángulos" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto vale ∫₁³ 2x dx?", "opciones": ["4", "9", "8"], "correcta": 2, "porque": "Una antiderivada de 2x es x², así que F(3) − F(1) = 9 − 1 = 8." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Un ejemplo que lo reúne todo",
+      "idea": "La distancia de un objeto sale igual con el área del triángulo y con el TFC, y derivarla devuelve la velocidad.",
+      "visual": { "tipo": "ejemplo", "titulo": "v(t) = 2t m/s, de t = 0 a t = 4 s", "lineas": ["Área: triángulo de base 4 y altura v(4) = 8 → ½·4·8 = 16 m", "TFC: ∫₀⁴ 2t dt = [t²]₀⁴ = 16 − 0 = 16 m", "d(t) = t² cumple d′(t) = 2t = v(t)"], "resultado": "16 m por los dos caminos: integrar y derivar son inversas" },
+      "comprueba": { "pregunta": "Con la misma velocidad v(t) = 2t, ¿qué distancia recorre el objeto entre t = 0 y t = 3 s?", "opciones": ["6 m", "9 m", "12 m"], "correcta": 1, "porque": "∫₀³ 2t dt = [t²]₀³ = 9 − 0 = 9 m. También es el triángulo ½·3·6 = 9." }
+    }
+  ]
+}

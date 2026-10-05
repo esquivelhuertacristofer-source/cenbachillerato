@@ -1,0 +1,39 @@
+{
+  "codigo": "PM-II-P07-A1",
+  "conceptos": [
+    { "termino": "Monomio y binomio", "idea": "Un monomio tiene un solo término (3x); un binomio, dos (2x + 3)." },
+    { "termino": "Términos semejantes", "idea": "Misma variable con el mismo exponente; solo esos se suman o restan." },
+    { "termino": "Ley de los exponentes", "idea": "Misma base: al multiplicar se suman los exponentes y al dividir se restan." },
+    { "termino": "Factor común", "idea": "Lo que comparten varios términos y se saca como multiplicador." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Sumar y restar solo semejantes",
+      "idea": "Se suman o restan los coeficientes de términos semejantes y la parte literal se conserva igual.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sí se reduce", "puntos": ["3x + 5x = 8x", "7x² − 2x² = 5x²"] },
+        { "titulo": "No se reduce", "puntos": ["3x + 5x²", "Distinto exponente: no son semejantes"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto es 9x² − 4x²?", "opciones": ["5", "5x⁴", "5x²"], "correcta": 2, "porque": "Son semejantes: se restan los coeficientes (9 − 4 = 5) y se conserva la parte literal x²." }
+    },
+    {
+      "parrafos": [2, 3, 4],
+      "titulo": "Multiplicar, dividir y los signos",
+      "idea": "Con la misma base, multiplicar suma exponentes y dividir los resta; los coeficientes se operan con la regla de los signos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Multiplicar", "expr": "aᵐ · aⁿ = aᵐ⁺ⁿ", "leyenda": "(3x²)(4x³) = 12x⁵" },
+        { "nombre": "Dividir", "expr": "aᵐ ÷ aⁿ = aᵐ⁻ⁿ", "leyenda": "12x⁵ ÷ 4x² = 3x³" },
+        { "nombre": "Signos", "expr": "(+)(+) = +   ·   (+)(−) = −   ·   (−)(−) = +", "leyenda": "Igual para multiplicar y dividir" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto es (−2x³)(5x⁴)?", "opciones": ["−10x⁷", "10x¹²", "−10x¹²"], "correcta": 0, "porque": "Signos distintos dan menos: −2 × 5 = −10. Con la misma base se suman los exponentes: 3 + 4 = 7." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Factor común: la operación de regreso",
+      "idea": "Factorizar es escribir la expresión como producto; se comprueba distribuyendo de nuevo.",
+      "visual": { "tipo": "ejemplo", "titulo": "Factorizar 6x² + 9x", "lineas": ["Factor común: 3x", "Comprueba: 3x · 2x = 6x² y 3x · 3 = 9x"], "resultado": "6x² + 9x = 3x(2x + 3)" },
+      "comprueba": { "pregunta": "¿Cuál es la factorización de 4x² + 8x?", "opciones": ["2(2x² + 8x)", "4x(x + 2)", "4x(x + 8)"], "correcta": 1, "porque": "4x es el factor común: 4x · x = 4x² y 4x · 2 = 8x. Las otras, al distribuir, no dan la expresión original." }
+    }
+  ]
+}

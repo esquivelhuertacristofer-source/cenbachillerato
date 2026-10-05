@@ -1,0 +1,37 @@
+{
+  "codigo": "CNEYT-III-P02-A1",
+  "conceptos": [
+    { "termino": "Productores (autótrofos)", "idea": "Fabrican su propio alimento con la energía del Sol por fotosíntesis." },
+    { "termino": "Red trófica", "idea": "La trama de quién come a quién en un ecosistema." },
+    { "termino": "Descomponedores", "idea": "Hongos y bacterias que degradan materia muerta y devuelven nutrientes al suelo." },
+    { "termino": "Regla del 10%", "idea": "Solo pasa cerca del 10% de la energía de un nivel al siguiente." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Del Sol a la red trófica",
+      "idea": "Los productores capturan la energía del Sol y, a partir de ellos, los consumidores y descomponedores forman la red de quién come a quién.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Productores", "texto": "Plantas, algas y algunas bacterias: hacen fotosíntesis." },
+        { "titulo": "Consumidores primarios", "texto": "Herbívoros que comen plantas." },
+        { "titulo": "Consumidores secundarios", "texto": "Carnívoros que comen herbívoros." },
+        { "titulo": "Terciarios o cuaternarios", "texto": "Depredadores que comen otros carnívoros." },
+        { "titulo": "Descomponedores", "texto": "Hongos y bacterias que devuelven nutrientes al suelo." }
+      ] },
+      "comprueba": { "pregunta": "Una lechuza come ratones, y los ratones comen semillas. ¿Qué es la lechuza?", "opciones": ["Consumidor primario", "Consumidor secundario", "Productor"], "correcta": 1, "porque": "Come a un herbívoro (el ratón), así que es un carnívoro de primer orden: consumidor secundario." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "La energía se pierde en cada nivel",
+      "idea": "Solo entre 5% y 20% de la energía pasa al siguiente nivel; el resto se pierde como calor, movimiento y heces.",
+      "visual": { "tipo": "ejemplo", "titulo": "Regla del 10% a partir de 10,000 kcal", "lineas": ["Productores: 10,000 kcal", "Consumidores primarios: ~1,000 kcal", "Consumidores secundarios: ~100 kcal", "Consumidores terciarios: ~10 kcal"], "resultado": "En cada nivel se pierde cerca del 90% de la energía." },
+      "comprueba": { "pregunta": "Con la regla del 10%, si los herbívoros de un pastizal disponen de 500 kcal, ¿cuánta energía llega a los carnívoros que los comen?", "opciones": ["50 kcal", "450 kcal", "5,000 kcal"], "correcta": 0, "porque": "Al siguiente nivel pasa cerca del 10%: el 10% de 500 kcal es 50 kcal." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Pirámides y dietas eficientes",
+      "idea": "Por la pérdida de energía, hay muchos más herbívoros que carnívoros, y comer del primer nivel trófico desperdicia menos energía.",
+      "comprueba": { "pregunta": "¿Por qué una dieta basada en plantas es más eficiente para el planeta?", "opciones": ["Porque las plantas tienen más calorías que la carne", "Porque come del primer nivel trófico y reduce pérdidas de energía", "Porque las plantas no hacen respiración celular"], "correcta": 1, "porque": "Cada salto de nivel pierde energía; comer directamente a los productores evita esas pérdidas." }
+    }
+  ]
+}

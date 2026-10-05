@@ -1,0 +1,35 @@
+{
+  "codigo": "LC-II-P03-A1",
+  "conceptos": [
+    { "termino": "Narrativa popular", "idea": "Relato que nace de la imaginación colectiva y circula en la cultura cotidiana." },
+    { "termino": "Fórmulas de inicio", "idea": "Frases como «Cuentan que…» o «Se dice que…» que abren el relato." },
+    { "termino": "Recursos expresivos", "idea": "Hipérbole, personificación y suspenso para atrapar a quien escucha." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Relatos de la imaginación colectiva",
+      "idea": "Leyendas, mitos, cuentos orales y creepypastas dan sentido a lo que no se explica fácilmente.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Formas de narrativa popular", "puntos": ["Leyendas sobre lugares misteriosos", "Mitos de origen", "Cuentos transmitidos oralmente", "Creepypastas en internet"] }
+      ] },
+      "comprueba": { "pregunta": "Una historia de terror sobre un videojuego maldito circula en foros de internet. ¿Es narrativa popular?", "opciones": ["No, solo cuentan las leyendas antiguas", "Sí, es una creepypasta contemporánea", "No, porque no está en un libro"], "correcta": 1, "porque": "Las creepypastas contemporáneas en internet también son narrativas populares: nacen de la imaginación colectiva." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Cómo suenan estas historias",
+      "idea": "Usan vocabulario accesible, oraciones simples, tiempo pasado mezclado con presente, fórmulas de inicio y suspenso.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lenguaje", "puntos": ["Vocabulario accesible, regional o coloquial", "Estructuras sintácticas simples pero efectivas", "Pasado, mezclado con presente para crear tensión"] },
+        { "titulo": "Recursos", "puntos": ["«Cuentan que…», «Se dice que…»", "Hipérbole", "Personificación", "Suspenso"] }
+      ] },
+      "comprueba": { "pregunta": "«Se dice que el río llora cada noche.» ¿Qué recursos aparecen?", "opciones": ["Fórmula de inicio y personificación", "Hipérbole y tiempo futuro", "Solo vocabulario técnico"], "correcta": 0, "porque": "«Se dice que» es una fórmula de inicio, y un río que llora es una personificación." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Por qué estudiarlas",
+      "idea": "Estas narrativas muestran la identidad, los miedos y los valores de una comunidad, y te dan recursos para escribir.",
+      "comprueba": { "pregunta": "¿Qué te permite entender una leyenda de tu pueblo, según el texto?", "opciones": ["Solo datos históricos exactos", "Cómo la comunidad construye su identidad, sus miedos y sus valores", "Las reglas de ortografía"], "correcta": 1, "porque": "Estudiar las narrativas populares permite entender cómo una comunidad construye identidad, miedos y valores con el lenguaje." }
+    }
+  ]
+}

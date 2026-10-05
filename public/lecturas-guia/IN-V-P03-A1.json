@@ -1,0 +1,48 @@
+{
+  "codigo": "IN-V-P03-A1",
+  "conceptos": [
+    { "termino": "Process questions", "idea": "Preguntas con How, What, Why o Can you explain para entender un procedimiento." },
+    { "termino": "Passive voice", "idea": "Destaca la acción y no quién la hace: water is collected." },
+    { "termino": "Procedure connectors", "idea": "First, Then, After that, Finally, As a result: ordenan los pasos." },
+    { "termino": "Activated charcoal", "idea": "Carbón activado: absorbe químicos como pesticidas y metales pesados." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3, 4, 5],
+      "titulo": "Cómo preguntar sobre un proceso",
+      "idea": "Elige la pregunta según lo que quieras saber: How para el cómo, What para pasos y propósito, Why para el porqué.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "HOW", "puntos": ["How does [process] work?", "How is [product] made?"] },
+        { "titulo": "WHAT", "puntos": ["What are the steps to [procedure]?", "What is the purpose of [element]?", "What happens when [condition]?"] },
+        { "titulo": "WHY", "puntos": ["Why is [concept] important in your field?", "Why do we need to [action]?"] },
+        { "titulo": "CAN YOU EXPLAIN", "puntos": ["Can you explain the process of [procedure]?", "Can you explain why [concept] is used?"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber para qué sirve una pieza de una máquina. ¿Qué preguntas?", "opciones": ["What is the purpose of this part?", "How is this part made?", "What happens when it rains?"], "correcta": 0, "porque": "«Para qué sirve» es el propósito: What is the purpose of [element]?" }
+    },
+    {
+      "parrafos": [6, 7],
+      "titulo": "Voz pasiva y conectores de procedimiento",
+      "idea": "Los procesos se describen con voz pasiva (is used, is made) y conectores como First, Then y As a result.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "First", "texto": "The water is collected from the river." },
+        { "titulo": "Then", "texto": "Large particles are removed with a screen." },
+        { "titulo": "After that", "texto": "The water passes through a sand filter." },
+        { "titulo": "Finally", "texto": "Chlorine is added to kill any remaining bacteria." },
+        { "titulo": "As a result", "texto": "The water is safe for drinking." }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál oración está en voz pasiva?", "opciones": ["The engineer filters the water.", "Chlorine is added to the water.", "We drink clean water."], "correcta": 1, "porque": "Is added sigue el patrón is + participio y no dice quién hace la acción: es voz pasiva." }
+    },
+    {
+      "parrafos": [8, 9, 10, 11, 12, 13, 14],
+      "titulo": "Entrevista: agua limpia en comunidades rurales",
+      "idea": "Un experto explica los pasos para purificar agua, por qué sirve el carbón activado y por qué el agua limpia es salud pública.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Recolectar", "texto": "Se toma agua de una fuente natural, como un río o un pozo." },
+        { "titulo": "Filtro básico", "texto": "Se quitan partículas grandes, como arena y hojas." },
+        { "titulo": "Carbón activado", "texto": "Absorbe impurezas químicas, como pesticidas y metales pesados." },
+        { "titulo": "Cloro", "texto": "Elimina bacterias y virus: el agua queda segura para beber." }
+      ] },
+      "comprueba": { "pregunta": "Según el experto, ¿por qué se usa carbón activado?", "opciones": ["Porque mata bacterias y virus", "Porque quita la arena y las hojas", "Porque tiene una gran superficie y absorbe químicos"], "correcta": 2, "porque": "Su gran superficie le permite absorber químicos como pesticidas y metales pesados; el cloro es el que elimina bacterias." }
+    }
+  ]
+}

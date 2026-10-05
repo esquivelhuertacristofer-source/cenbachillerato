@@ -1,0 +1,32 @@
+{
+  "codigo": "CNEYT-I-P08-A1",
+  "conceptos": [
+    { "termino": "Conservación de la materia", "idea": "La materia no se crea ni se destruye: se transforma." },
+    { "termino": "Cambio físico", "idea": "Cambia el estado o se mezcla, sin formar sustancias nuevas." },
+    { "termino": "Cambio químico", "idea": "Una reacción que produce sustancias nuevas, como la combustión." },
+    { "termino": "Microplásticos", "idea": "Fragmentos de plástico que llegan a suelos, ríos, océanos y alimentos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Nada desaparece: la ley de Lavoisier",
+      "idea": "En toda reacción la masa se conserva; por eso el CO₂ de los motores y el plástico tirado siguen existiendo.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Ley de Conservación de la Materia", "expr": "masa de reactivos = masa de productos", "leyenda": "Antoine Lavoisier, siglo XVIII" },
+        { "nombre": "Combustión en un motor", "expr": "carbono del combustible → CO₂ en la atmósfera" },
+        { "nombre": "Plástico en el suelo", "expr": "plástico → microplásticos → cadena alimentaria" }
+      ] },
+      "comprueba": { "pregunta": "Quemas un trozo de papel y solo queda un poco de ceniza. ¿Qué pasó con el resto de la masa?", "opciones": ["Se destruyó con el fuego", "Se transformó en gases que se fueron al aire", "Nunca tuvo masa"], "correcta": 1, "porque": "La materia no se destruye: en la combustión se transforma en otras sustancias, como el CO₂ que se libera." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Transformaciones y problemas ambientales",
+      "idea": "Cambios físicos y químicos conservan la materia, y entenderlos ayuda a explicar el cambio climático y la contaminación.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cambios físicos", "puntos": ["Cambios de estado", "Mezclas"] },
+        { "titulo": "Cambios químicos", "puntos": ["Combustión", "Corrosión", "Fotosíntesis", "Descomposición"] }
+      ] },
+      "comprueba": { "pregunta": "Una cáscara de plátano se pudre en la composta. ¿Qué tipo de cambio es?", "opciones": ["Químico: descomposición", "Físico: cambio de estado", "Físico: mezcla"], "correcta": 0, "porque": "La descomposición produce sustancias nuevas, por eso el texto la pone entre los cambios químicos." }
+    }
+  ]
+}

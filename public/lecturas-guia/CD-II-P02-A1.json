@@ -1,0 +1,45 @@
+{
+  "codigo": "CD-II-P02-A1",
+  "conceptos": [
+    { "termino": "La nube", "idea": "Servidores remotos a los que entras por internet para guardar, ejecutar y sincronizar." },
+    { "termino": "Edición simultánea", "idea": "Varias personas editan el mismo archivo a la vez y ven los cambios al instante." },
+    { "termino": "Historial de versiones", "idea": "Permite recuperar una versión anterior del documento si alguien se equivoca." },
+    { "termino": "Tablero kanban", "idea": "Columnas por etapa: por hacer, en proceso, terminado." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Qué es trabajar en la nube",
+      "idea": "La nube son servidores remotos en internet; trabajar ahí permite que varias personas editen lo mismo desde distintos lugares.",
+      "comprueba": { "pregunta": "Tu equipo edita la misma presentación, cada quien desde su casa y al mismo tiempo. ¿Qué lo hace posible?", "opciones": ["Que cada uno tenga una copia en USB", "Que el archivo está en la nube", "Que todos usan el mismo modelo de computadora"], "correcta": 1, "porque": "Trabajar en la nube significa que varias personas acceden y editan los mismos archivos desde distintos lugares al mismo tiempo." }
+    },
+    {
+      "parrafos": [1, 2],
+      "titulo": "Las dos grandes suites",
+      "idea": "Google Workspace y Microsoft 365 ofrecen herramientas equivalentes para escribir, presentar y calcular en equipo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Google Workspace", "puntos": ["Docs, Slides, Sheets", "Edición en tiempo real", "Historial de versiones y comentarios"] },
+        { "titulo": "Microsoft 365", "puntos": ["Word, PowerPoint, Excel en línea", "Teams para comunicarse", "OneDrive para almacenar"] }
+      ] },
+      "comprueba": { "pregunta": "Un compañero borró por error medio documento compartido. ¿Qué función te ayuda?", "opciones": ["El historial de versiones", "Los comentarios", "La edición simultánea"], "correcta": 0, "porque": "El historial de versiones permite recuperar cualquier versión anterior si alguien comete un error." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Herramientas especializadas",
+      "idea": "Hay herramientas para cada tarea de equipo: lluvias de ideas, tableros compartidos, proyectos y seguimiento de tareas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Para qué sirve cada una", "puntos": ["Miro: pizarrón para lluvias de ideas y mapas mentales", "Padlet: tablero de notas, imágenes y enlaces", "Notion: notas, bases de datos y proyectos", "Trello: tareas en tableros kanban"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres ver qué tareas están «por hacer», «en proceso» y «terminadas». ¿Qué herramienta usarías?", "opciones": ["Padlet", "Miro", "Trello"], "correcta": 2, "porque": "Trello organiza tareas en tableros kanban con columnas por etapa: por hacer, en proceso, terminado." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Buenas prácticas y futuro laboral",
+      "idea": "Roles claros, nombres de archivo ordenados y comentarios en vez de editar evitan conflictos; además, estas competencias son cada vez más demandadas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Buenas prácticas", "puntos": ["Definir roles: quién redacta, revisa y presenta", "Nombrar archivos con convención: Proyecto_Final_v3_Equipo2", "Sugerir con comentarios, no editar el texto de otro"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué nombre de archivo sigue una buena convención?", "opciones": ["último definitivo real", "Proyecto_Final_v3_Equipo2", "trabajo nuevo (2)"], "correcta": 1, "porque": "Una convención de nomenclatura indica proyecto, versión y equipo, y evita archivos confusos como «último definitivo real»." }
+    }
+  ]
+}

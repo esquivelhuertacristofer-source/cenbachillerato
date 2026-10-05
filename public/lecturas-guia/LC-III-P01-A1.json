@@ -1,0 +1,40 @@
+{
+  "codigo": "LC-III-P01-A1",
+  "conceptos": [
+    { "termino": "Lectura crítica", "idea": "Comprometerte activamente con el texto: cuestionar, interpretar y evaluar." },
+    { "termino": "Paráfrasis", "idea": "Decir lo mismo que el texto con tus palabras, sin agregar ni quitar." },
+    { "termino": "Postura del autor", "idea": "El punto de vista, valores y supuestos desde donde escribe." },
+    { "termino": "Sentido global", "idea": "El propósito del texto, a quién va dirigido y qué efecto busca." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Leer críticamente y parafrasear",
+      "idea": "Leer críticamente no es buscar defectos; el primer nivel es parafrasear para comprobar que entendiste.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Nivel 1: paráfrasis", "texto": "Reformula con tus palabras, sin agregar ni quitar." },
+        { "titulo": "Nivel 2: postura del autor", "texto": "Qué defiende, desde qué valores y qué omite." },
+        { "titulo": "Nivel 3: sentido global", "texto": "Propósito, lector y efecto que busca." }
+      ] },
+      "comprueba": { "pregunta": "Intentas decir con tus palabras lo que leíste y no puedes. ¿Qué indica eso?", "opciones": ["Que el texto es neutral", "Que probablemente no lo comprendiste", "Que ya identificaste la postura del autor"], "correcta": 1, "porque": "Parafrasear verifica la comprensión: si no puedes parafrasear, probablemente no has comprendido." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Nadie escribe desde ningún lugar",
+      "idea": "Todo autor selecciona, enfatiza y omite desde una posición; leer críticamente es descubrir cuál.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Preguntas para descubrir la postura", "puntos": ["¿Qué punto de vista defiende?", "¿Qué valores o supuestos hay detrás?", "¿Qué voces o perspectivas no aparecen?"] }
+      ] },
+      "comprueba": { "pregunta": "Un artículo sobre una nueva carretera solo cita a los constructores y nunca a los vecinos. ¿Qué nivel de lectura te ayuda a notarlo?", "opciones": ["La paráfrasis", "Identificar la postura del autor", "Contar las palabras del texto"], "correcta": 1, "porque": "Identificar la postura incluye preguntarse qué voces o perspectivas no aparecen en el texto." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "El propósito del texto",
+      "idea": "Saber para qué y para quién se escribió un texto te permite evaluar si cumple su intención.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Preguntas del sentido global", "puntos": ["¿Cuál es su propósito comunicativo?", "¿A qué lector está dirigido?", "¿Qué efecto busca producir?"] }
+      ] },
+      "comprueba": { "pregunta": "Un folleto busca que los jóvenes se vacunen. ¿Qué te permite evaluar el sentido global?", "opciones": ["Si el folleto cumple o no su intención", "Cuántas veces aparece la palabra «vacuna»", "Si el autor es famoso"], "correcta": 0, "porque": "Distinguir el propósito comunicativo permite evaluar si el texto cumple o no su intención." }
+    }
+  ]
+}

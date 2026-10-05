@@ -1,0 +1,35 @@
+{
+  "codigo": "PFH-I-P03-A1",
+  "conceptos": [
+    { "termino": "Identidad", "idea": "El problema de quiénes somos y si seguimos siendo el mismo «yo»." },
+    { "termino": "Libertad", "idea": "Si de verdad elegimos o estamos determinados por genes, cultura o economía." },
+    { "termino": "Justicia", "idea": "Los criterios correctos para repartir beneficios y cargas de la vida en común." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Identidad: ¿quiénes somos?",
+      "idea": "La identidad pregunta si somos una esencia fija o algo que construimos con nuestras elecciones y relaciones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Identidad fija", "puntos": ["Una esencia que no cambia"] },
+        { "titulo": "Identidad construida", "puntos": ["Se hace con elecciones y relaciones", "Puede abarcar varios grupos sin contradecirse"] }
+      ] },
+      "comprueba": { "pregunta": "«¿Sigo siendo la misma persona que en la primaria?» ¿Qué problema filosófico es?", "opciones": ["Identidad", "Justicia", "Libertad"], "correcta": 0, "porque": "Pregunta si somos el mismo «yo» a pesar de que el cuerpo y los pensamientos cambian: es el problema de la identidad." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Libertad y justicia",
+      "idea": "La libertad pregunta si de verdad elegimos; la justicia, cómo repartir con criterios correctos los beneficios y las cargas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Libertad", "puntos": ["¿Elegimos o nos determinan genes, cultura, algoritmos?", "¿Se es libre con normas impuestas?", "¿Es real sin condiciones materiales?"] },
+        { "titulo": "Justicia", "puntos": ["¿Qué hace algo justo o injusto?", "¿Es justo nacer rico o pobre sin elegirlo?", "¿Qué debemos a quien más necesita?"] }
+      ] },
+      "comprueba": { "pregunta": "«¿Elegí mi carrera o me la marcaron las expectativas de mi familia?» ¿Qué problema es?", "opciones": ["Justicia", "Libertad", "Identidad"], "correcta": 1, "porque": "Pregunta si realmente elegimos o estamos determinados por la cultura y las expectativas: es el problema de la libertad." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Problemas de la vida real",
+      "idea": "Identidad, libertad y justicia aparecen en noticias, familias y políticas públicas; filosofarlas es pensarlas con más rigor y apertura."
+    }
+  ]
+}

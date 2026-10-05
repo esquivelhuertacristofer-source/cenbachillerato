@@ -1,0 +1,34 @@
+{
+  "codigo": "CS-II-P03-A1",
+  "conceptos": [
+    { "termino": "Economía informal", "idea": "Trabajo sin seguridad social, sin contrato, sin crédito bancario ni pensión." },
+    { "termino": "Trabajo no remunerado", "idea": "Labores domésticas y de cuidados que no tienen salario pero sostienen la vida." },
+    { "termino": "Cadena productiva", "idea": "El camino de un producto: producción, distribución y consumo." },
+    { "termino": "Eslabón", "idea": "Cada paso de la cadena, con sus propios actores económicos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La economía que no se ve",
+      "idea": "Gran parte del trabajo en México es informal o no se paga, y por eso no aparece en las estadísticas oficiales.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "≈55%", "etiqueta": "del empleo total en México es informal", "barra": 55 },
+        { "valor": "3 veces", "etiqueta": "más trabajo no remunerado hacen las mujeres que los hombres" }
+      ] },
+      "comprueba": { "pregunta": "Un señor vende tamales en la esquina, sin contrato ni seguro social. ¿En qué economía trabaja?", "opciones": ["Formal", "Informal", "No remunerada"], "correcta": 1, "porque": "Trabaja sin contrato formal ni seguridad social: eso define a la economía informal. Sí cobra, así que no es trabajo no remunerado." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Del campo a tu mesa",
+      "idea": "Seguir la cadena productiva muestra quién se beneficia en cada paso y quién queda más vulnerable.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Producción", "texto": "Un tomate se cultiva en Sinaloa." },
+        { "titulo": "Intermediarios", "texto": "La cosecha pasa por sus manos." },
+        { "titulo": "Transporte", "texto": "Los transportistas lo llevan a las ciudades." },
+        { "titulo": "Venta", "texto": "Mercados y supermercados lo ofrecen." },
+        { "titulo": "Consumo", "texto": "Llega a la mesa." }
+      ] },
+      "comprueba": { "pregunta": "¿Para qué sirve analizar la cadena productiva de un producto, según el texto?", "opciones": ["Para ver quiénes se benefician y quiénes son más vulnerables", "Para calcular el precio exacto del tomate", "Para eliminar a los intermediarios"], "correcta": 0, "porque": "El texto dice que entender la cadena permite ver quiénes se benefician de cada paso y quiénes son los más vulnerables." }
+    }
+  ]
+}

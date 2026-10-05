@@ -1,0 +1,52 @@
+{
+  "codigo": "CNEYT-V-P09-A1",
+  "conceptos": [
+    { "termino": "Fluido", "idea": "Líquido o gas: fluye y toma la forma de su recipiente." },
+    { "termino": "Densidad", "idea": "Masa entre volumen; decide si algo flota o se hunde." },
+    { "termino": "Presión", "idea": "Fuerza por unidad de área, en pascales; en un fluido crece con la profundidad." },
+    { "termino": "Bernoulli", "idea": "Donde un fluido va más rápido, su presión es menor." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Arquímedes: por qué flota un barco",
+      "idea": "Un cuerpo flota si su densidad media es menor que la del fluido, porque el empuje supera su peso.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Empuje", "expr": "E = ρ_fluido · V_sumergido · g", "leyenda": "Igual al peso del fluido desalojado" },
+        { "nombre": "Densidad", "expr": "ρ = masa ÷ volumen", "leyenda": "Flota si su densidad media es menor que la del fluido" }
+      ] },
+      "comprueba": { "pregunta": "Un barco de acero flota aunque el acero es más denso que el agua. ¿Por qué?", "opciones": ["Porque el acero se vuelve ligero en el agua", "Porque su casco hueco con aire baja su densidad media", "Porque el agua salada no deja hundirse nada"], "correcta": 1, "porque": "El casco encierra aire, así que la densidad media de acero más aire es menor que la del agua." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Pascal: la presión se transmite",
+      "idea": "La presión crece con la profundidad y, en un fluido encerrado, se transmite íntegra a todos sus puntos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Presión", "expr": "P = F ÷ A", "leyenda": "En pascales: 1 Pa = 1 N/m²" },
+        { "nombre": "Presión hidrostática", "expr": "P = P₀ + ρ·g·h", "leyenda": "Aumenta con la profundidad h" }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo levanta un gato hidráulico un coche con poca fuerza?", "opciones": ["La presión del pistón chico pasa íntegra al pistón grande", "El aceite pesa más que el coche", "El fluido pierde presión en el camino"], "correcta": 0, "porque": "Por el principio de Pascal la presión se transmite íntegra; en el pistón grande, la misma presión sobre más área da más fuerza." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Fluidos en movimiento: continuidad y Bernoulli",
+      "idea": "Si el tubo se estrecha, el fluido acelera; y donde va más rápido, su presión baja.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Continuidad", "expr": "A₁·v₁ = A₂·v₂", "leyenda": "El caudal se conserva" },
+        { "nombre": "Bernoulli", "expr": "P + ½ρv² + ρgh = constante", "leyenda": "Más velocidad → menos presión" }
+      ] },
+      "comprueba": { "pregunta": "Tapas con el dedo la mitad de la boca de una manguera. ¿Qué pasa con el agua?", "opciones": ["Sale más lenta", "Sale igual", "Sale más rápido"], "correcta": 2, "porque": "Por la ecuación de continuidad, si el área disminuye, la velocidad debe aumentar para conservar el caudal." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Tensión superficial, capilaridad y viscosidad",
+      "idea": "Otras tres propiedades de los fluidos explican desde un insecto sobre el agua hasta la savia de las plantas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Tensión superficial", "puntos": ["La superficie actúa como membrana", "Un insecto camina sobre el agua"] },
+        { "titulo": "Capilaridad", "puntos": ["El agua sube sola por tubos finos", "Así asciende la savia"] },
+        { "titulo": "Viscosidad", "puntos": ["Resistencia interna a fluir", "Miel y glicerina: muy viscosas"] }
+      ] },
+      "comprueba": { "pregunta": "La miel tarda mucho más en salir del frasco que el agua. ¿Qué propiedad lo explica?", "opciones": ["La capilaridad", "La viscosidad", "La tensión superficial"], "correcta": 1, "porque": "La viscosidad mide la resistencia interna a fluir, y la miel es muy viscosa." }
+    }
+  ]
+}

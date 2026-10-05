@@ -1,0 +1,30 @@
+{
+  "codigo": "PFH-I-P01-A1",
+  "conceptos": [
+    { "termino": "Filosofar", "idea": "Preguntarse en serio, sin dar por sentado lo que parece obvio." },
+    { "termino": "Thaumazein", "idea": "El asombro, en griego: el punto de partida de la filosofía." },
+    { "termino": "Opinar", "idea": "Dar una respuesta rápida sin sostener la pregunta ni revisar las propias ideas." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Filosofar empieza con asombro",
+      "idea": "Filosofar no es memorizar a los filósofos: es preguntarse ante algo que de pronto se vuelve misterioso.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Saber filosofía", "puntos": ["Memorizar ideas de Platón, Descartes o Kant", "Se puede hacer sin haber filosofado nunca"] },
+        { "titulo": "Filosofar", "puntos": ["¿Por qué?", "¿Qué es realmente esto?", "¿Podría ser de otra manera?"] }
+      ] },
+      "comprueba": { "pregunta": "Según Aristóteles, ¿qué movió a los seres humanos a filosofar?", "opciones": ["La comodidad", "La admiración", "La obligación"], "correcta": 1, "porque": "Aristóteles decía que comenzaron a filosofar movidos por la admiración: el asombro ante lo que se vuelve misterioso." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Habitar las preguntas",
+      "idea": "Cualquiera puede filosofar; lo que lo distingue de opinar es sostener la pregunta y revisar las propias ideas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Opinar", "puntos": ["Se conforma con respuestas fáciles", "No revisa sus ideas"] },
+        { "titulo": "Filosofar", "puntos": ["Sostiene la pregunta", "Considera múltiples posibilidades", "Revisa constantemente sus ideas"] }
+      ] },
+      "comprueba": { "pregunta": "Ana duda de algo que todos en su casa dan por hecho y revisa varias posibles respuestas. ¿Qué está haciendo?", "opciones": ["Filosofando", "Opinando", "Memorizando filosofía"], "correcta": 0, "porque": "Dudar de lo que todos dan por hecho y considerar varias posibilidades es filosofar, aunque no use libros ni vocabulario técnico." }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "codigo": "IN-V-P06-A1",
+  "conceptos": [
+    { "termino": "Formal email", "idea": "Correo con asunto, saludo, propósito, desarrollo, cierre, despedida y firma." },
+    { "termino": "Register", "idea": "El tono del texto: formal (Could you please...) o informal (Can you...?)." },
+    { "termino": "Sign-off", "idea": "La despedida: Sincerely, Best regards o Yours faithfully, según el caso." },
+    { "termino": "Proposal", "idea": "Texto breve con propósito, objetivo, acciones y resultados esperados." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3, 4],
+      "titulo": "El correo formal: cómo empieza",
+      "idea": "Un correo formal abre con un asunto claro, un saludo adecuado y un primer párrafo que dice por qué escribes.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Subject", "texto": "Breve y claro: indica el propósito. Inquiry About Environmental Science Program." },
+        { "titulo": "Salutation", "texto": "Dear Mr. / Ms. / Dr. [Apellido], o Dear Sir/Madam, si no sabes el nombre." },
+        { "titulo": "Purpose", "texto": "Directo y claro: I am writing to request information about..." }
+      ] },
+      "comprueba": { "pregunta": "Escribes a una oficina y no sabes el nombre de quien te leerá. ¿Qué saludo usas?", "opciones": ["Dear Sir/Madam,", "Hey there,", "Dear Mr. [Apellido],"], "correcta": 0, "porque": "Dear Sir/Madam, es el saludo formal para cuando no conoces el nombre del destinatario." }
+    },
+    {
+      "parrafos": [5, 6, 7, 8, 9],
+      "titulo": "Desarrollo, cierre, firma y registro",
+      "idea": "Desarrolla con detalles, agradece, despídete según a quién escribes y firma; cuida que todo el correo suene formal.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Formal", "puntos": ["I am writing to request...", "Could you please...", "I would appreciate...", "I look forward to...", "Sincerely,"] },
+        { "titulo": "Informal", "puntos": ["Hey, I wanted to ask...", "Can you...?", "I'd love it if...", "Can't wait to...", "Best, / See you,"] }
+      ] },
+      "comprueba": { "pregunta": "Empezaste tu correo con «Dear Sir/Madam,». ¿Qué despedida corresponde?", "opciones": ["Best regards,", "Yours faithfully,", "See you,"], "correcta": 1, "porque": "Yours faithfully, es la despedida muy formal que acompaña a Dear Sir/Madam." }
+    },
+    {
+      "parrafos": [10, 11, 12, 13, 14, 15, 16, 17],
+      "titulo": "Ejemplo: Andrea pide informes",
+      "idea": "Andrea escribe a la universidad siguiendo el orden: asunto, saludo, propósito, detalles, agradecimiento y despedida.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Subject", "texto": "Inquiry About Admission Requirements — Biology Program" },
+        { "titulo": "Salutation", "texto": "Dear Dr. Fuentes," },
+        { "titulo": "Purpose", "texto": "Pide los requisitos de admisión a Biología en la Universidad Autónoma de Baja California." },
+        { "titulo": "Body", "texto": "Quiere estudiar biología marina y pregunta por el examen de admisión y las becas." },
+        { "titulo": "Closing y sign-off", "texto": "Thank you very much for your time... Sincerely, Andrea Salinas." }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué Andrea cierra con «Sincerely,» y no con «Yours faithfully,»?", "opciones": ["Porque el correo es informal", "Porque no sabe a quién escribe", "Porque conoce el nombre de quien lo recibe"], "correcta": 2, "porque": "Sincerely, se usa cuando conoces el nombre del destinatario; ella escribe a Dr. Fuentes." }
+    },
+    {
+      "parrafos": [18, 19, 20, 21, 22, 23],
+      "titulo": "Ejemplo: la propuesta Green COBACH",
+      "idea": "Una propuesta breve dice su propósito, un objetivo concreto, las acciones a realizar y los resultados que espera.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Purpose", "texto": "Crear un programa de reciclaje para toda la escuela." },
+        { "titulo": "Objective", "texto": "Instalar tres estaciones de reciclaje (papel, plástico y orgánicos) antes de fin de semestre." },
+        { "titulo": "Actions", "texto": "Dar una presentación, diseñar las estaciones con material reciclado y medir los residuos cada mes." },
+        { "titulo": "Expected results", "texto": "Reducir los residuos de la escuela al menos 30% e inspirar a reciclar en casa." }
+      ] },
+      "comprueba": { "pregunta": "«To install three recycling stations by the end of the semester.» ¿A qué sección pertenece?", "opciones": ["Purpose", "Objective", "Expected results"], "correcta": 1, "porque": "Es una meta concreta, medible y con plazo: eso es el objetivo de la propuesta." }
+    },
+    {
+      "parrafos": [24, 25],
+      "titulo": "Vocabulario de cortesía",
+      "idea": "Frases como I would like to, Could you please o I look forward to hearing from you hacen tu texto educado y profesional.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Frases de cortesía", "puntos": ["I would like to... (Me gustaría...)", "Could you please... (¿Podría por favor...?)", "I would appreciate... (Agradecería...)", "I look forward to hearing from you.", "Please do not hesitate to contact me if you have any questions."] }
+      ] },
+      "comprueba": { "pregunta": "Quieres pedir formalmente que te envíen un folleto. ¿Qué frase usas?", "opciones": ["Could you please send me a brochure?", "Send me a brochure.", "Can't wait to get a brochure!"], "correcta": 0, "porque": "Could you please... es la forma de hacer una solicitud formal y cortés." }
+    }
+  ]
+}

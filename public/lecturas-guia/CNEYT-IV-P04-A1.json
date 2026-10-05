@@ -1,0 +1,51 @@
+{
+  "codigo": "CNEYT-IV-P04-A1",
+  "conceptos": [
+    { "termino": "Química orgánica", "idea": "Estudia los compuestos del carbono." },
+    { "termino": "Hidrocarburo", "idea": "Compuesto hecho solo de carbono e hidrógeno, como los alcanos." },
+    { "termino": "Grupo funcional", "idea": "Parte de la molécula que define su familia: –OH en alcoholes, –COOH en ácidos." },
+    { "termino": "Doble enlace C=C", "idea": "Marca a los alquenos y los hace mucho más reactivos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Por qué el carbono es especial",
+      "idea": "El carbono forma cuatro enlaces y se une consigo mismo en cadenas, ramas y anillos: por eso hay millones de compuestos orgánicos.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "20 millones+", "etiqueta": "Compuestos orgánicos conocidos" },
+        { "valor": "~500,000", "etiqueta": "Compuestos inorgánicos conocidos" }
+      ] },
+      "comprueba": { "pregunta": "¿Qué propiedad del carbono explica la enorme variedad de compuestos orgánicos?", "opciones": ["Que es un metal muy reactivo", "Que forma cuatro enlaces y se une consigo mismo", "Que solo forma enlaces dobles"], "correcta": 1, "porque": "Sus cuatro enlaces covalentes le permiten formar cadenas, ramificaciones y anillos de cualquier longitud." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Alcanos: los combustibles de casa",
+      "idea": "Los alcanos solo tienen enlaces simples C–C, son poco reactivos y su reacción principal es la combustión.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Metano (CH₄)", "puntos": ["Principal componente del gas natural"] },
+        { "titulo": "Propano (C₃H₈) y butano (C₄H₁₀)", "puntos": ["Forman el gas LP", "Para cocinar y calentar agua"] }
+      ] },
+      "comprueba": { "pregunta": "El tanque de gas LP de tu casa contiene principalmente…", "opciones": ["metano y etileno", "etanol y metanol", "propano y butano"], "correcta": 2, "porque": "El texto indica que el gas LP está formado por propano (C₃H₈) y butano (C₄H₁₀)." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Alquenos: el doble enlace del etileno",
+      "idea": "Los alquenos tienen un doble enlace C=C; el etileno es materia prima de plásticos y además madura las frutas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Etileno en la industria", "puntos": ["El orgánico más producido del mundo", "Materia prima del polietileno y del PVC"] },
+        { "titulo": "Etileno en el campo", "puntos": ["Hormona vegetal", "Madura plátanos, aguacates y jitomates"] }
+      ] },
+      "comprueba": { "pregunta": "Un distribuidor quiere que unos plátanos verdes maduren más rápido. ¿Qué compuesto controla?", "opciones": ["Etileno", "Metano", "Ácido acético"], "correcta": 0, "porque": "El etileno es una hormona vegetal que estimula la maduración de las frutas." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Alcoholes y ácidos carboxílicos",
+      "idea": "Los alcoholes llevan el grupo –OH y los ácidos carboxílicos el –COOH; el etanol se bebe, pero el metanol es muy tóxico.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Alcoholes (–OH)", "puntos": ["Etanol C₂H₅OH: bebidas y aditivo de gasolinas", "Metanol CH₃OH: altamente tóxico"] },
+        { "titulo": "Ácidos carboxílicos (–COOH)", "puntos": ["Ácido acético: el vinagre (5-8%)", "Ácido cítrico: sabor del limón", "Ácido acetilsalicílico: la aspirina"] }
+      ] },
+      "comprueba": { "pregunta": "Una molécula tiene el grupo –COOH. ¿A qué familia pertenece?", "opciones": ["Alcoholes", "Ácidos carboxílicos", "Alcanos"], "correcta": 1, "porque": "El grupo –COOH caracteriza a los ácidos carboxílicos; los alcoholes llevan –OH." }
+    }
+  ]
+}

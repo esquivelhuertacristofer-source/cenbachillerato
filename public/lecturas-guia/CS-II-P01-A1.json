@@ -1,0 +1,42 @@
+{
+  "codigo": "CS-II-P01-A1",
+  "conceptos": [
+    { "termino": "Bienestar social", "idea": "Las condiciones que permiten a las personas vivir una vida digna y plena." },
+    { "termino": "IDH", "idea": "Índice del PNUD que mide esperanza de vida, educación y nivel de vida." },
+    { "termino": "Coeficiente de GINI", "idea": "Mide la desigualdad del ingreso: 0 es igualdad perfecta, 1 desigualdad total." },
+    { "termino": "Desigualdad múltiple", "idea": "No solo es económica: también espacial, de género y étnica." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Cómo se mide el bienestar: el IDH",
+      "idea": "El IDH del PNUD resume el bienestar en tres dimensiones: vivir mucho, aprender y tener ingreso.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Las tres dimensiones del IDH (PNUD)", "puntos": ["Esperanza de vida", "Educación", "Nivel de vida (ingreso per cápita)"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estos datos NO es una de las tres dimensiones del IDH?", "opciones": ["Esperanza de vida", "Número de habitantes", "Ingreso per cápita"], "correcta": 1, "porque": "El IDH mide esperanza de vida, educación y nivel de vida (ingreso per cápita); el número de habitantes no forma parte." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "El GINI: cómo se reparte el ingreso",
+      "idea": "Mientras más cerca de 1 está el GINI, más desigual es el país; México tiene un GINI alto, cerca de 0.42.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "0", "etiqueta": "igualdad perfecta: todos tienen lo mismo", "barra": 0 },
+        { "valor": "~0.42", "etiqueta": "México: desigualdades importantes", "barra": 42 },
+        { "valor": "1", "etiqueta": "desigualdad total: una persona tiene todo", "barra": 100 }
+      ] },
+      "comprueba": { "pregunta": "El país A tiene GINI de 0.30 y el país B de 0.50. ¿Cuál reparte el ingreso de forma más desigual?", "opciones": ["El país A", "Los dos igual", "El país B"], "correcta": 2, "porque": "Mientras más se acerca el GINI a 1, mayor es la desigualdad; 0.50 está más cerca de 1 que 0.30." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Desigualdades más allá del dinero",
+      "idea": "En México la desigualdad también depende de dónde vives, tu género y tu origen étnico.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Espacial", "puntos": ["Regiones rurales del sur con menor bienestar", "Que las zonas metropolitanas del norte"] },
+        { "titulo": "De género", "puntos": ["Brechas salariales para las mujeres", "Mayor carga de trabajo no remunerado"] },
+        { "titulo": "Étnica", "puntos": ["Poblaciones indígenas con bienestar inferior al promedio nacional"] }
+      ] },
+      "comprueba": { "pregunta": "Una mujer gana menos que su compañero por el mismo puesto. ¿Qué tipo de desigualdad es?", "opciones": ["De género", "Espacial", "Étnica"], "correcta": 0, "porque": "Las brechas salariales que enfrentan las mujeres son un ejemplo de desigualdad de género." }
+    }
+  ]
+}

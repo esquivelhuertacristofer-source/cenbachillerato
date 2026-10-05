@@ -1,0 +1,35 @@
+{
+  "codigo": "CD-I-P02-A1",
+  "conceptos": [
+    { "termino": "Licencia", "idea": "Contrato legal que dice qué puedes y qué no hacer con un software o contenido." },
+    { "termino": "Software propietario", "idea": "Pertenece a una empresa, su código es secreto y no puedes modificarlo." },
+    { "termino": "Software libre", "idea": "Puedes usarlo, estudiarlo, modificarlo y redistribuirlo; no siempre es gratis." },
+    { "termino": "Creative Commons", "idea": "Licencias para textos, imágenes, música y videos con distintos niveles de permiso." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Propietario contra libre",
+      "idea": "Cada vez que instalas algo aceptas una licencia; el software propietario te limita y el libre te deja modificar y compartir.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Propietario (privativo)", "puntos": ["Código fuente secreto", "No puedes modificarlo ni distribuirlo libremente", "Windows, Microsoft Office, Adobe Photoshop"] },
+        { "titulo": "Libre (código abierto)", "puntos": ["Puedes usar, estudiar, modificar y redistribuir", "No significa gratis, aunque muchas veces lo es", "Linux, LibreOffice, Firefox"] }
+      ] },
+      "comprueba": { "pregunta": "Un programa te deja ver y cambiar su código, pero cobra por descargarlo. ¿Puede ser software libre?", "opciones": ["No, el software libre siempre es gratis", "Sí, libre no significa gratis", "No, porque cobra y entonces es propietario"], "correcta": 1, "porque": "El software libre permite usar, estudiar, modificar y redistribuir; la lectura aclara que no significa que sea gratis." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Creative Commons: niveles de permiso",
+      "idea": "Las licencias CC indican cómo puedes usar un contenido creativo: desde solo dar crédito hasta no modificarlo ni venderlo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Tipos de licencia CC", "puntos": ["CC BY: úsalo si das crédito", "CC BY-SA: da crédito y comparte igual", "CC BY-NC: solo uso no comercial", "CC BY-NC-ND: la más restrictiva, compartir tal cual"] }
+      ] },
+      "comprueba": { "pregunta": "Una foto tiene licencia CC BY-NC. ¿Puedes usarla en la publicidad de tu negocio?", "opciones": ["Sí, si das crédito", "Sí, si no la modificas", "No, solo permite uso no comercial"], "correcta": 2, "porque": "NC significa uso no comercial: anunciar un negocio es un uso comercial." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Por qué conocer las licencias",
+      "idea": "Saber de licencias te protege legalmente y te ayuda a decidir con ética como usuario y como creador."
+    }
+  ]
+}

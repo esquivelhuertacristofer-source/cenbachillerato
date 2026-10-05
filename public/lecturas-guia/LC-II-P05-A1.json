@@ -1,0 +1,32 @@
+{
+  "codigo": "LC-II-P05-A1",
+  "conceptos": [
+    { "termino": "Tema", "idea": "La idea central que el autor explora o comunica con su historia." },
+    { "termino": "Tema implícito", "idea": "No se dice directamente: lo deduces por cómo avanza la historia." },
+    { "termino": "Ideas centrales", "idea": "Sin ellas el texto pierde su sentido principal." },
+    { "termino": "Ideas secundarias", "idea": "Enriquecen o apoyan, pero podrían quitarse sin destruir el sentido." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "El tema: de qué trata la historia",
+      "idea": "El tema es la idea central del relato y puede decirse directamente o deducirse de la historia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Explícito", "puntos": ["Se menciona directamente"] },
+        { "titulo": "Implícito", "puntos": ["Se deduce del desarrollo de la historia"] },
+        { "titulo": "Temas comunes", "puntos": ["El bien contra el mal", "La importancia de la comunidad", "El peligro de la ambición desmedida", "La fuerza del amor"] }
+      ] },
+      "comprueba": { "pregunta": "En una leyenda, un hombre vende su alma por oro y lo pierde todo; nadie dice la moraleja. ¿Qué tipo de tema es?", "opciones": ["Explícito: la fuerza del amor", "Implícito: el peligro de la ambición desmedida", "Explícito: la importancia de la comunidad"], "correcta": 1, "porque": "El tema no se menciona, se deduce de lo que ocurre: es implícito, y trata sobre la ambición desmedida." }
+    },
+    {
+      "parrafos": [1, 2],
+      "titulo": "Ideas centrales y secundarias",
+      "idea": "Las ideas centrales sostienen el sentido del texto; las secundarias lo enriquecen, y distinguirlas te ayuda también a escribir.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ideas centrales", "puntos": ["Las más importantes", "Sin ellas, el texto pierde su sentido"] },
+        { "titulo": "Ideas secundarias", "puntos": ["Enriquecen, contextualizan o apoyan", "Pueden eliminarse sin destruir el sentido"] }
+      ] },
+      "comprueba": { "pregunta": "En la leyenda de La Llorona, quitas la descripción del color de su vestido y la historia se entiende igual. ¿Qué tipo de idea era?", "opciones": ["Secundaria", "Central", "El tema"], "correcta": 0, "porque": "Una idea secundaria enriquece el texto, pero puede eliminarse sin destruir su sentido principal." }
+    }
+  ]
+}

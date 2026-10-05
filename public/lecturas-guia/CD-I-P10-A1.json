@@ -1,0 +1,40 @@
+{
+  "codigo": "CD-I-P10-A1",
+  "conceptos": [
+    { "termino": "Uso crítico de IA", "idea": "Verificar lo que produce, reconocer cuándo la usaste y respetar la autoría." },
+    { "termino": "Copyleft", "idea": "Permite copiar y modificar si las versiones derivadas conservan las mismas libertades." },
+    { "termino": "Basura electrónica", "idea": "E-waste: los aparatos que desechamos." },
+    { "termino": "Huella digital ambiental", "idea": "Energía y recursos que consume cada búsqueda, video y dispositivo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Usar la IA con criterio",
+      "idea": "La IA te puede ayudar, pero puede equivocarse o inventar datos: verifica, reconoce su uso y respeta la autoría.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Uso responsable de la IA", "puntos": ["Verifica lo que produce", "Reconoce cuándo la usaste en tus trabajos", "Respeta los derechos de autoría de las fuentes"] }
+      ] },
+      "comprueba": { "pregunta": "Una IA te da una cifra para tu ensayo. ¿Qué es lo responsable?", "opciones": ["Copiarla, porque la IA no se equivoca", "Verificarla en otra fuente antes de usarla", "Usarla sin mencionar la IA"], "correcta": 1, "porque": "La IA puede equivocarse o inventar datos, así que hay que verificar la información que produce." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Copyleft: compartir sin cerrar",
+      "idea": "El copyleft invierte el copyright: deja copiar, modificar y redistribuir si las versiones derivadas conservan esas libertades.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Copyright tradicional", "puntos": ["Todos los derechos reservados"] },
+        { "titulo": "Copyleft", "puntos": ["Copiar, modificar y redistribuir", "Las derivadas conservan las mismas libertades", "Ejemplo: la GPL"] }
+      ] },
+      "comprueba": { "pregunta": "Modificas un programa con licencia copyleft y quieres publicarlo. ¿Qué condición debes cumplir?", "opciones": ["Cerrar el código de tu versión", "Cobrar por tu versión", "Que tu versión conserve las mismas libertades"], "correcta": 2, "porque": "El copyleft permite redistribuir versiones derivadas siempre que conserven las mismas libertades que la original." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Lo digital no es inmaterial",
+      "idea": "Cada búsqueda y dispositivo consume energía y recursos; usar la tecnología de forma sostenible es parte de la ciudadanía digital.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Contaminación digital", "puntos": ["Consumo eléctrico de los centros de datos", "Huella de carbono de internet", "Basura electrónica (e-waste)"] },
+        { "titulo": "Uso sostenible", "puntos": ["Alargar la vida de los dispositivos", "Reciclar", "Consumir con conciencia"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál acción reduce la basura electrónica?", "opciones": ["Reparar tu celular en vez de cambiarlo cada año", "Ver videos en mayor resolución", "Comprar el modelo más nuevo"], "correcta": 0, "porque": "Alargar la vida de los dispositivos evita desechar aparatos, que es lo que genera la basura electrónica." }
+    }
+  ]
+}

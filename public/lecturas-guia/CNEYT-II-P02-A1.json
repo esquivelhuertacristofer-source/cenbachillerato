@@ -1,0 +1,54 @@
+{
+  "codigo": "CNEYT-II-P02-A1",
+  "conceptos": [
+    { "termino": "Primer principio", "idea": "La energía no se crea ni se destruye; en un sistema cerrado el total no cambia." },
+    { "termino": "Energía química", "idea": "Guardada en los enlaces de las moléculas: alimentos, combustibles, baterías." },
+    { "termino": "Energía potencial elástica", "idea": "La de un objeto deformado que puede recuperar su forma, como un resorte." },
+    { "termino": "Eficiencia energética", "idea": "Porcentaje de la energía que entra y se vuelve energía útil." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Conservación y tipos de energía",
+      "idea": "La energía total de un sistema cerrado no cambia: solo pasa de una forma a otra.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Por movimiento o posición", "puntos": ["Cinética: objetos en movimiento", "Potencial gravitatoria: roca en lo alto", "Potencial elástica: resorte comprimido"] },
+        { "titulo": "Por partículas y cargas", "puntos": ["Térmica: movimiento de partículas", "Química: enlaces entre átomos", "Eléctrica: cargas en movimiento"] }
+      ] },
+      "comprueba": { "pregunta": "Estiras una liga y la sostienes tensa. ¿Qué energía tiene guardada?", "opciones": ["Química", "Potencial elástica", "Térmica"], "correcta": 1, "porque": "Un objeto deformado que puede recuperar su forma almacena energía potencial elástica, como un resorte comprimido." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Transformaciones en tu casa",
+      "idea": "Los aparatos que usas convierten una forma de energía en otra, y casi siempre se escapa algo de calor.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Pila con foco LED", "expr": "química → eléctrica → luz + un poco de calor" },
+        { "nombre": "Plancha", "expr": "eléctrica → térmica" },
+        { "nombre": "Ventilador", "expr": "eléctrica → cinética del aire" }
+      ] },
+      "comprueba": { "pregunta": "Una licuadora gira sus aspas al conectarla. ¿Qué transformación ocurre principalmente?", "opciones": ["Eléctrica → cinética", "Química → luminosa", "Térmica → eléctrica"], "correcta": 0, "porque": "Igual que el motor del ventilador, el motor de la licuadora convierte energía eléctrica en movimiento." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Eficiencia: cuánto se aprovecha",
+      "idea": "Un foco incandescente desperdicia casi toda la energía en calor; un LED aprovecha mucho más.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "5%", "etiqueta": "foco incandescente: energía que se vuelve luz", "barra": 5 },
+        { "valor": "95%", "etiqueta": "foco incandescente: energía que se vuelve calor", "barra": 95 },
+        { "valor": "25–30%", "etiqueta": "foco LED: energía que se vuelve luz", "barra": 30 }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué un foco LED consume menos electricidad para dar la misma luz?", "opciones": ["Porque produce más calor", "Porque convierte en luz un porcentaje mayor de la energía", "Porque no usa energía eléctrica"], "correcta": 1, "porque": "El LED tiene una eficiencia de 25-30% frente al 5% del incandescente: desperdicia menos energía como calor." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Energía limpia en México",
+      "idea": "México genera unos 324 TWh al año y desarrolla energía eólica, solar y geotérmica en distintas regiones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Eólica", "puntos": ["Istmo de Tehuantepec, Oaxaca"] },
+        { "titulo": "Solar", "puntos": ["Desierto de Sonora"] },
+        { "titulo": "Geotérmica", "puntos": ["Michoacán", "Calor interno de la tierra → electricidad"] }
+      ] },
+      "comprueba": { "pregunta": "Una planta usa el calor del interior de la tierra para producir electricidad. ¿Qué energía aprovecha?", "opciones": ["Eólica", "Solar", "Geotérmica"], "correcta": 2, "porque": "La energía geotérmica convierte el calor interno de la tierra en electricidad, como en Michoacán." }
+    }
+  ]
+}

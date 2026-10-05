@@ -1,0 +1,33 @@
+{
+  "codigo": "CNEYT-I-P04-A1",
+  "conceptos": [
+    { "termino": "Sustancia pura", "idea": "Composición definida y constante: un elemento o un compuesto." },
+    { "termino": "Mezcla homogénea", "idea": "Composición uniforme; no ves sus componentes por separado." },
+    { "termino": "Mezcla heterogénea", "idea": "Composición no uniforme; los componentes se ven o se separan." },
+    { "termino": "Métodos de separación", "idea": "Técnicas físicas que aprovechan diferencias en propiedades de los componentes." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Sustancias puras y mezclas",
+      "idea": "Una sustancia pura siempre tiene la misma composición; una mezcla puede variar y ser homogénea o heterogénea.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sustancias puras", "puntos": ["Elementos: hierro, oxígeno, oro", "Compuestos: agua, sal de mesa, glucosa"] },
+        { "titulo": "Mezclas homogéneas", "puntos": ["Composición uniforme", "Agua con sal, aire, vinagre"] },
+        { "titulo": "Mezclas heterogéneas", "puntos": ["Componentes visibles o separables", "Ensalada, granito, arena con agua"] }
+      ] },
+      "comprueba": { "pregunta": "Un vaso de agua con azúcar bien disuelta, donde no ves los granos, es…", "opciones": ["una mezcla heterogénea", "una sustancia pura", "una mezcla homogénea"], "correcta": 2, "porque": "Tiene composición uniforme y no se distinguen sus componentes: es una mezcla homogénea, como el agua con sal." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Cómo separar una mezcla",
+      "idea": "Cada método aprovecha una diferencia física: tamaño, densidad o punto de ebullición de los componentes.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sólido y líquido", "puntos": ["Filtración: con un filtro", "Evaporación: queda el sólido disuelto", "Cristalización: sólidos puros desde soluciones"] },
+        { "titulo": "Líquidos", "puntos": ["Decantación: distinta densidad", "Destilación: distinto punto de ebullición"] },
+        { "titulo": "Sólidos", "puntos": ["Tamizado: distinto tamaño, con una malla"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres separar piedritas de la arena fina. ¿Qué método usas?", "opciones": ["Destilación", "Tamizado", "Evaporación"], "correcta": 1, "porque": "El tamizado separa sólidos de diferente tamaño usando una malla." }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "codigo": "IN-IV-P02-A1",
+  "conceptos": [
+    { "termino": "Comparative", "idea": "Compara dos cosas: faster than, more expensive than." },
+    { "termino": "Superlative", "idea": "Destaca a uno sobre todo el grupo: the fastest, the most expensive." },
+    { "termino": "Irregular adjectives", "idea": "Good, bad y far cambian de forma: better, the best." },
+    { "termino": "Double comparative", "idea": "El error de sumar more a un comparativo: more faster." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Comparar dos o todo un grupo",
+      "idea": "El comparativo compara dos cosas; el superlativo compara una con todas las demás de un grupo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Adjetivo corto (1 sílaba)", "puntos": ["fast → faster than → the fastest", "big → bigger than → the biggest", "old → older than → the oldest"] },
+        { "titulo": "Adjetivo largo (2+ sílabas)", "puntos": ["interesting → more interesting than → the most interesting", "expensive → more expensive than → the most expensive"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «My city is ___ than my town.»", "opciones": ["more big", "bigger", "the biggest"], "correcta": 1, "porque": "Big es corto y compara dos cosas: bigger than. The biggest sería superlativo." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Irregulares y errores comunes",
+      "idea": "Good, bad y far son irregulares; evita el doble comparativo (more faster) y el doble superlativo (the most best).",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Irregulares", "puntos": ["good → better → the best", "bad → worse → the worst", "far → further (farther) → the furthest"] },
+        { "titulo": "Evita", "puntos": ["more faster: di solo faster", "more bigger: di solo bigger", "the most best: di solo the best"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál oración es correcta?", "opciones": ["This is the most best taco.", "This is the more best taco.", "This is the best taco."], "correcta": 2, "porque": "Best ya es el superlativo de good; agregarle most es un doble superlativo." }
+    },
+    {
+      "parrafos": [5, 6, 7],
+      "titulo": "Compara lo que conoces",
+      "idea": "Con ciudades, comida y transporte de México practicas comparativos y das preferencias con una razón (because).",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Comparar", "puntos": ["Mexico City is bigger than Guadalajara.", "The Metro in Mexico City is cheaper than the Metrobus.", "Tamales are the most traditional food for Christmas."] },
+        { "titulo": "Preferir con razones", "puntos": ["I prefer the metro because it is faster than the pesero.", "I think tacos are more practical than tamales because you can eat them on the go."] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué oración expresa una preferencia y la justifica?", "opciones": ["I prefer the bus because it is cheaper than a taxi.", "The bus is cheaper than a taxi.", "The bus is the cheapest option."], "correcta": 0, "porque": "Solo esa dice qué prefieres (I prefer) y da una razón con because." }
+    }
+  ]
+}

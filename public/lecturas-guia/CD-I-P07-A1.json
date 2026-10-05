@@ -1,0 +1,35 @@
+{
+  "codigo": "CD-I-P07-A1",
+  "conceptos": [
+    { "termino": "Ciberespacio", "idea": "Espacio social donde conviven millones de personas con identidades y culturas distintas." },
+    { "termino": "Ciberacoso", "idea": "Agresión en línea que el anonimato y la distancia facilitan." },
+    { "termino": "Identidad digital", "idea": "Cómo te presentas en cada plataforma; se construye con lo que decides mostrar." },
+    { "termino": "Empatía digital", "idea": "Ponerte en el lugar del otro también en entornos virtuales." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Diversidad y respeto en línea",
+      "idea": "La diversidad en internet es una riqueza, pero el anonimato puede facilitar el acoso; comunicarte con respeto lo evita.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Riesgos del anonimato", "puntos": ["Ciberacoso (cyberbullying)", "Discurso de odio", "Discriminación", "Violencia digital"] },
+        { "titulo": "Comunicación respetuosa", "puntos": ["Lenguaje que no discrimine", "Detrás de cada pantalla hay una persona", "No compartir lo que humille", "Preguntar si no estás seguro"] }
+      ] },
+      "comprueba": { "pregunta": "Te llega un meme que se burla de un compañero. ¿Qué es lo respetuoso?", "opciones": ["Reenviarlo solo a tus amigos", "No compartirlo", "Compartirlo sin poner tu nombre"], "correcta": 1, "porque": "La comunicación respetuosa implica no compartir contenido que humille o violente a otros." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Identidades que se construyen",
+      "idea": "Puedes tener una presencia distinta en cada plataforma; tú decides qué muestras y con quién interactúas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Una persona, varias presencias", "puntos": ["Instagram", "Foro de videojuegos", "WhatsApp familiar", "Plataformas académicas"] }
+      ] },
+      "comprueba": { "pregunta": "Andrea es formal en su plataforma escolar y bromista en un foro de videojuegos. Según la lectura, esto muestra que…", "opciones": ["tiene una identidad falsa", "solo una de sus cuentas es real", "las identidades digitales son múltiples y se construyen"], "correcta": 2, "porque": "La lectura explica que las identidades en el ciberespacio son múltiples y se construyen según lo que decidimos mostrar." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Empatía digital",
+      "idea": "Las palabras escritas también duelen y los silencios digitales también excluyen."
+    }
+  ]
+}

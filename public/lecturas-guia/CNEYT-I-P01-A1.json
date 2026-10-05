@@ -1,0 +1,33 @@
+{
+  "codigo": "CNEYT-I-P01-A1",
+  "conceptos": [
+    { "termino": "Práctica social", "idea": "La ciencia la hacen personas, con errores, debates y contextos culturales." },
+    { "termino": "Revisión entre pares", "idea": "Otros científicos critican y replican el trabajo antes de aceptarlo." },
+    { "termino": "Refutable", "idea": "Una hipótesis científica debe poder ponerse a prueba y resultar falsa." },
+    { "termino": "Dogma", "idea": "Afirmación que nadie puede refutar porque no está diseñada para eso." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La ciencia la hacen personas",
+      "idea": "La ciencia no es una lista de verdades fijas: es una práctica humana influida por las necesidades e intereses de su época.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Imagen de libro de texto", "puntos": ["Hechos establecidos", "Verdades definitivas"] },
+        { "titulo": "Lo que la ciencia es", "puntos": ["Práctica social, histórica y colectiva", "Con errores, debates y revisiones", "Influida por su época: física nuclear y guerra, farmacología e industria"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué se desarrolló tan rápido la física nuclear durante la Segunda Guerra Mundial?", "opciones": ["Por enormes inversiones militares", "Porque los científicos eran infalibles", "Por pura casualidad"], "correcta": 0, "porque": "El texto explica que las preguntas científicas responden a su época: la física nuclear avanzó gracias a enormes inversiones militares." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Por qué sí confiamos en la ciencia",
+      "idea": "No porque los científicos nunca se equivoquen, sino porque el método tiene mecanismos para detectar y corregir errores.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Revisión", "texto": "Otros examinan el trabajo." },
+        { "titulo": "Debate", "texto": "Las ideas se discuten." },
+        { "titulo": "Replicación", "texto": "Los experimentos se repiten." },
+        { "titulo": "Crítica entre pares", "texto": "Se detectan y corrigen errores." }
+      ] },
+      "comprueba": { "pregunta": "Alguien dice: «Mi teoría es cierta y ningún experimento podría demostrar lo contrario». ¿Qué es?", "opciones": ["Una hipótesis científica sólida", "Un dogma", "Una replicación"], "correcta": 1, "porque": "Una hipótesis que no puede refutarse no es científica: el texto la llama dogma." }
+    }
+  ]
+}

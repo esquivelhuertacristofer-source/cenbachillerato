@@ -1,0 +1,60 @@
+{
+  "codigo": "PM-V-P01-A1",
+  "conceptos": [
+    { "termino": "Límite", "idea": "El valor al que se acerca f(x) cuando x se acerca a un punto." },
+    { "termino": "Forma indeterminada 0/0", "idea": "Sustituir da 0/0, pero el límite aún puede existir." },
+    { "termino": "Límite notable", "idea": "sen(x)/x tiende a 1 cuando x tiende a 0." },
+    { "termino": "Asíntota horizontal", "idea": "La recta y = L a la que se pega la gráfica cuando x crece mucho." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "De velocidad promedio a instantánea",
+      "idea": "El límite pregunta a qué valor se acerca algo cuando el intervalo se hace infinitamente pequeño, como la velocidad del velocímetro.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Dos momentos", "texto": "Con dos posiciones calculas la velocidad promedio del intervalo." },
+        { "titulo": "Achicar el intervalo", "texto": "Tomas momentos cada vez más cercanos entre sí." },
+        { "titulo": "Al límite", "texto": "Cuando el intervalo tiende a cero obtienes la velocidad instantánea." }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo se obtiene la velocidad instantánea de un auto?", "opciones": ["Promediando la salida y la llegada del viaje", "Haciendo el intervalo de tiempo cada vez más pequeño", "Sumando todas las velocidades del trayecto"], "correcta": 1, "porque": "La velocidad instantánea es el límite de la velocidad promedio cuando el intervalo de tiempo se hace infinitamente pequeño." }
+    },
+    {
+      "parrafos": [2, 3, 4],
+      "titulo": "Definición: acercarse, no llegar",
+      "idea": "lim(x→a) f(x) = L significa que f(x) se acerca a L cuando x se acerca a a, aunque f no exista en a.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Límite", "expr": "lim(x→a) f(x) = L", "leyenda": "Por la izquierda o por la derecha; importa el acercamiento, no la llegada" }
+      ] },
+      "comprueba": { "pregunta": "Una función no está definida en x = 2. ¿Puede existir su límite cuando x → 2?", "opciones": ["No, nunca", "Solo si f(2) = 0", "Sí, porque importa a qué se acerca f(x)"], "correcta": 2, "porque": "El límite no depende de si f está definida en a, sino del valor al que se acercan los f(x)." }
+    },
+    {
+      "parrafos": [5, 6, 7, 8, 9],
+      "titulo": "Tres formas de calcular un límite",
+      "idea": "Primero sustituyes; si sale 0/0, factorizas y cancelas; y hay límites notables, como sen(x)/x → 1, que conviene reconocer.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Sustitución directa", "expr": "lim(x→3) (x² + 2x − 1) = 9 + 6 − 1 = 14" },
+        { "nombre": "Factorizar 0/0", "expr": "lim(x→2) (x² − 4)/(x − 2) = lim(x→2) (x + 2) = 4" },
+        { "nombre": "Límite notable", "expr": "lim(x→0) sen(x)/x = 1", "leyenda": "Por eso sen(x) ≈ x para ángulos pequeños en radianes" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto vale lim(x→3) (x² − 9)/(x − 3)?", "opciones": ["6", "No existe, da 0/0", "3"], "correcta": 0, "porque": "Factorizas: (x + 3)(x − 3)/(x − 3) = x + 3, y al sustituir x = 3 queda 6." }
+    },
+    {
+      "parrafos": [10, 11, 12, 13],
+      "titulo": "Límites al infinito y asíntotas",
+      "idea": "Cuando x crece sin cota, el límite dice a qué recta horizontal se acerca la gráfica: su asíntota horizontal.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Inverso", "expr": "lim(x→∞) 1/x = 0" },
+        { "nombre": "Mismo grado", "expr": "lim(x→∞) (3x² + 5)/(x² − 1) = 3", "leyenda": "Cociente de los coeficientes líderes" },
+        { "nombre": "Asíntota horizontal", "expr": "y = L  si  lim(x→±∞) f(x) = L" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto vale lim(x→∞) (2x² + 1)/(x² + 3)?", "opciones": ["0", "1/3", "2"], "correcta": 2, "porque": "Numerador y denominador tienen el mismo grado, así que el límite es el cociente de los coeficientes líderes: 2 ÷ 1 = 2." }
+    },
+    {
+      "parrafos": [14, 15],
+      "titulo": "Del límite a la derivada",
+      "idea": "El límite de la velocidad promedio cuando h → 0 da la velocidad instantánea: esa es la derivada, el corazón del cálculo.",
+      "visual": { "tipo": "ejemplo", "titulo": "Velocidad instantánea en t = 1 con s(t) = 3t² + 5t", "lineas": ["s(1) = 3 + 5 = 8", "s(1 + h) = 3(1 + 2h + h²) + 5 + 5h = 8 + 11h + 3h²", "[s(1 + h) − s(1)]/h = (11h + 3h²)/h = 11 + 3h", "Cuando h → 0, 11 + 3h → 11"], "resultado": "v(1) = 11 km/h: la derivada de s en t = 1" },
+      "comprueba": { "pregunta": "Con s(t) = 80t, ¿cuál es la velocidad promedio entre t = 1 y t = 3?", "opciones": ["160 km/h", "80 km/h", "240 km/h"], "correcta": 1, "porque": "s(3) − s(1) = 240 − 80 = 160 km en 2 horas: 80 km/h. Con s(t) = 80t la velocidad promedio siempre es 80 km/h." }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "codigo": "IN-III-P07-A1",
+  "conceptos": [
+    { "termino": "Irregular past verbs", "idea": "Pasados especiales que se memorizan: go → went, tell → told." },
+    { "termino": "Narrative connectors", "idea": "Palabras que ordenan una historia: first, then, later, finally." },
+    { "termino": "Suddenly", "idea": "De repente: introduce un evento inesperado." },
+    { "termino": "In the end", "idea": "Al final: marca la conclusión de la historia." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Verbos irregulares para contar historias",
+      "idea": "Para narrar en pasado necesitas los irregulares más comunes del nivel A2, como went, ate, saw o told.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ir, comer, ver…", "puntos": ["go → went", "eat → ate", "see → saw", "make → made", "tell → told"] },
+        { "titulo": "Venir, tomar, dar…", "puntos": ["come → came", "take → took", "give → gave", "write → wrote", "buy → bought"] },
+        { "titulo": "Pensar, encontrar…", "puntos": ["think → thought", "find → found", "say → said", "know → knew"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «Yesterday my friend ___ me a secret.» (tell)", "opciones": ["telled", "told", "tells"], "correcta": 1, "porque": "Tell es irregular: su pasado es told." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Conectores narrativos",
+      "idea": "Los conectores marcan cómo empieza la historia, qué sigue, qué pasa de repente y cómo termina.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "First / First of all", "texto": "El inicio (primero)." },
+        { "titulo": "Then / After that", "texto": "El siguiente evento (luego, después)." },
+        { "titulo": "Later", "texto": "Después de un tiempo (más tarde)." },
+        { "titulo": "Suddenly", "texto": "Un evento inesperado (de repente)." },
+        { "titulo": "In the end / Finally", "texto": "La conclusión (al final)." }
+      ] },
+      "comprueba": { "pregunta": "En tu historia, la luz se va sin aviso. ¿Qué conector usas?", "opciones": ["Finally", "First", "Suddenly"], "correcta": 2, "porque": "Suddenly introduce un evento inesperado." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Una historia completa: visita a la abuela",
+      "idea": "La historia une pasados irregulares y conectores para que los hechos fluyan de principio a fin.",
+      "visual": { "tipo": "ejemplo", "titulo": "Last Saturday, I went to visit my grandmother.", "lineas": [
+        "First, we ate tamales and drank atole.",
+        "Then she told me old stories about our town.",
+        "Suddenly, we saw our neighbors arriving with a guitar.",
+        "In the end, we all made music together until midnight."
+      ], "resultado": "Conectores + pasados irregulares = una historia que fluye." }
+    }
+  ]
+}

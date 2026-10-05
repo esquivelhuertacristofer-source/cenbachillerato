@@ -1,0 +1,57 @@
+{
+  "codigo": "IN-III-P04-A1",
+  "conceptos": [
+    { "termino": "Comparative", "idea": "Compara dos cosas: bigger, more interesting." },
+    { "termino": "Superlative", "idea": "Señala al que más destaca de un grupo: the biggest, the best." },
+    { "termino": "Like + verb-ing", "idea": "Dice lo que disfrutas hacer: I like reading." },
+    { "termino": "Frequency adverbs", "idea": "Dicen qué tan seguido haces algo: always, sometimes, never." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Comparativos y superlativos",
+      "idea": "Los adjetivos de una sílaba agregan -er/-est, los largos usan more/the most, y good y bad son irregulares.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Una sílaba", "puntos": ["big → bigger → the biggest"] },
+        { "titulo": "Dos o más sílabas", "puntos": ["interesting → more interesting → the most interesting"] },
+        { "titulo": "Irregulares", "puntos": ["good → better → the best", "bad → worse → the worst"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «This book is ___ than the movie.»", "opciones": ["more good", "better", "the best"], "correcta": 1, "porque": "Good es irregular: su comparativo es better. The best es el superlativo." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Like + verb-ing: lo que disfrutas",
+      "idea": "Para decir qué te gusta hacer, usa like seguido del verbo con -ing.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Afirmativa", "expr": "like + verb-ing", "leyenda": "I like reading historical novels." },
+        { "nombre": "Negativa", "expr": "don't / doesn't like + verb-ing", "leyenda": "She doesn't like getting up early." },
+        { "nombre": "Pregunta", "expr": "Do you like + verb-ing?", "leyenda": "Do you like cooking? Yes, I love it!" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál oración es correcta?", "opciones": ["I like swim.", "I likes swimming.", "I like swimming."], "correcta": 2, "porque": "Con I se usa like (sin -s) y el verbo que sigue lleva -ing: swimming." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Adverbios de frecuencia y su lugar",
+      "idea": "Dicen qué tan seguido haces algo y van antes del verbo principal, pero después de be.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "always", "etiqueta": "siempre", "barra": 100 },
+        { "valor": "usually", "etiqueta": "normalmente", "barra": 80 },
+        { "valor": "often", "etiqueta": "frecuentemente", "barra": 70 },
+        { "valor": "sometimes", "etiqueta": "a veces", "barra": 50 },
+        { "valor": "rarely", "etiqueta": "rara vez", "barra": 20 },
+        { "valor": "never", "etiqueta": "nunca", "barra": 0 }
+      ] },
+      "comprueba": { "pregunta": "¿En qué oración el adverbio está bien colocado?", "opciones": ["She is always happy.", "She always is happy.", "Always she is happy."], "correcta": 0, "porque": "Con el verbo be, el adverbio de frecuencia va después: is always." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "Combinar las tres estructuras",
+      "idea": "Juntas, estas estructuras te dejan hablar de hábitos, gustos y comparaciones en una sola oración.",
+      "visual": { "tipo": "ejemplo", "titulo": "I usually like cooking at home because it is cheaper than eating out.", "lineas": [
+        "usually → adverbio de frecuencia",
+        "like cooking → like + verb-ing",
+        "cheaper than → comparativo"
+      ], "resultado": "Un hábito, un gusto y una comparación en la misma oración." }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "codigo": "CNEYT-V-P07-A1",
+  "conceptos": [
+    { "termino": "Ley de Coulomb", "idea": "Cargas iguales se repelen y opuestas se atraen; la fuerza cae con r²." },
+    { "termino": "Ley de Ohm", "idea": "Voltaje, corriente y resistencia se relacionan: V = I · R." },
+    { "termino": "Inducción electromagnética", "idea": "Un campo magnético que cambia genera corriente: así funcionan los generadores." },
+    { "termino": "Transformador", "idea": "Sube o baja el voltaje de la corriente alterna con dos bobinas." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Un solo fenómeno y la ley de Coulomb",
+      "idea": "Electricidad y magnetismo son el mismo fenómeno; entre cargas actúa una fuerza mucho mayor que la gravedad.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Ley de Coulomb", "expr": "F = k · q₁ · q₂ ÷ r²", "leyenda": "k = 8.99 × 10⁹ N·m²/C²" },
+        { "nombre": "Comparación", "expr": "F_eléctrica ≈ 10³⁶ × F_gravitacional", "leyenda": "A la misma distancia" }
+      ] },
+      "comprueba": { "pregunta": "Acercas dos cargas negativas. ¿Qué pasa?", "opciones": ["Se atraen", "Se repelen", "No hay fuerza entre ellas"], "correcta": 1, "porque": "Las cargas del mismo signo se repelen; solo las de signo contrario se atraen." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Ley de Ohm y potencia en casa",
+      "idea": "V = I · R relaciona voltaje, corriente y resistencia; la potencia dice cuánta energía consume un aparato.",
+      "visual": { "tipo": "datos", "fuente": "Red CFE: 127 V / 60 Hz", "items": [
+        { "valor": "10 W", "etiqueta": "foco LED" },
+        { "valor": "150–400 W", "etiqueta": "refrigerador" },
+        { "valor": "1,000–1,200 W", "etiqueta": "horno de microondas" },
+        { "valor": "2,000 W", "etiqueta": "calentador de agua" }
+      ] },
+      "comprueba": { "pregunta": "Si mantienes el mismo voltaje y aumentas la resistencia de un circuito, la corriente…", "opciones": ["disminuye", "aumenta", "no cambia"], "correcta": 0, "porque": "Como I = V/R, con el mismo voltaje, una resistencia mayor deja pasar menos corriente." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Generadores y motores",
+      "idea": "El generador convierte movimiento en electricidad; el motor hace lo inverso, y con gran eficiencia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Generador", "puntos": ["Energía mecánica → eléctrica", "Base: inducción de Faraday (1831)", "Presa Chicoasén: 2,400 MW"] },
+        { "titulo": "Motor eléctrico", "puntos": ["Energía eléctrica → mecánica", "Base: fuerza de Lorentz F = qv × B", "Eficiencia 90–97% (combustión ~35%)"] }
+      ] },
+      "comprueba": { "pregunta": "En una hidroeléctrica, el agua hace girar turbinas que producen electricidad. ¿Qué aparato hace esa conversión?", "opciones": ["Un motor eléctrico", "Un transformador", "Un generador"], "correcta": 2, "porque": "El generador convierte energía mecánica (el giro) en eléctrica gracias a la inducción electromagnética." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Transformadores y alta tensión",
+      "idea": "La CFE transmite a alto voltaje para perder menos energía y luego lo baja para tu casa.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Razón de transformación", "expr": "V₂ ÷ V₁ = N₂ ÷ N₁", "leyenda": "N son las vueltas de cada bobina" },
+        { "nombre": "Pérdidas por calor", "expr": "P_pérdida = I²R", "leyenda": "A mayor voltaje, menor corriente y menos pérdidas" }
+      ] },
+      "comprueba": { "pregunta": "Un transformador tiene más vueltas en la bobina de salida que en la de entrada. ¿Qué hace con el voltaje?", "opciones": ["Lo baja", "Lo sube", "Lo deja igual"], "correcta": 1, "porque": "Como V₂/V₁ = N₂/N₁, si N₂ es mayor que N₁, el voltaje de salida es mayor." }
+    }
+  ]
+}

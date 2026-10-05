@@ -1,0 +1,52 @@
+{
+  "codigo": "CNEYT-VI-P09-A1",
+  "conceptos": [
+    { "termino": "Diploide (2n)", "idea": "Dos juegos de cromosomas, uno de mamá y otro de papá: 2n = 46 en humanos." },
+    { "termino": "Haploide (n)", "idea": "Un solo juego de cromosomas, como los gametos: n = 23." },
+    { "termino": "Mitosis", "idea": "Una división que da 2 células idénticas a la madre." },
+    { "termino": "Meiosis", "idea": "Dos divisiones que dan 4 células haploides, todas distintas." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Dividirse: dos caminos y la ploidía",
+      "idea": "Mitosis y meiosis empiezan duplicando el ADN, pero terminan distinto; la clave es cuántos juegos de cromosomas quedan.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "2n = 46", "etiqueta": "células del cuerpo (diploides): 23 pares de homólogos" },
+        { "valor": "n = 23", "etiqueta": "gametos (haploides): un solo juego" }
+      ] },
+      "comprueba": { "pregunta": "Un espermatozoide humano, ¿cuántos cromosomas tiene?", "opciones": ["23", "46", "92"], "correcta": 0, "porque": "Los gametos son haploides: tienen un solo juego de cromosomas, n = 23." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Mitosis: dos copias idénticas",
+      "idea": "La mitosis da dos células idénticas a la madre; sirve para crecer, reparar tejidos y reproducirse asexualmente.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Profase", "texto": "Los cromosomas se condensan en forma de X, con dos cromátidas hermanas." },
+        { "titulo": "Metafase", "texto": "Se alinean en una sola fila en el ecuador." },
+        { "titulo": "Anafase", "texto": "Las cromátidas hermanas se separan a polos opuestos." },
+        { "titulo": "Telofase y citocinesis", "texto": "Se divide el citoplasma: 2 células idénticas (2n → 2n)." }
+      ] },
+      "comprueba": { "pregunta": "Te cortas un dedo y la piel se regenera. ¿Qué división lo hace posible?", "opciones": ["Meiosis", "Mitosis", "Fecundación"], "correcta": 1, "porque": "La mitosis produce células idénticas y sirve para crecer, reparar tejidos y regenerar." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Meiosis: cuatro gametos únicos",
+      "idea": "Dos divisiones seguidas dan 4 células haploides distintas; el crossing over y el azar hacen único cada gameto.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Mitosis", "puntos": ["Una división", "2 células idénticas", "2n → 2n"] },
+        { "titulo": "Meiosis", "puntos": ["Dos divisiones sin volver a duplicar el ADN", "4 células distintas", "2n → n", "Crossing over en la Profase I"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué dos hermanos (no gemelos idénticos) no son iguales?", "opciones": ["Porque la mitosis copia mal el ADN", "Porque cada gameto es único por el crossing over y el reparto al azar", "Porque cada hijo tiene distinto número de cromosomas"], "correcta": 1, "porque": "El crossing over y la distribución independiente de los homólogos en la Metafase I hacen que cada gameto sea único." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Cuando la división falla",
+      "idea": "Si la mitosis se descontrola surge el cáncer; si la meiosis reparte mal, aparecen condiciones como la trisomía 21.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Falla en la mitosis", "puntos": ["Las células se dividen sin parar", "Cáncer"] },
+        { "titulo": "Falla en la meiosis", "puntos": ["No disyunción", "Gametos con cromosomas de más o de menos", "Trisomía 21"] }
+      ] }
+    }
+  ]
+}

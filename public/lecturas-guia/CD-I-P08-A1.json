@@ -1,0 +1,43 @@
+{
+  "codigo": "CD-I-P08-A1",
+  "conceptos": [
+    { "termino": "Herramientas de organización", "idea": "Apps de notas, calendarios y documentos para planear y guardar tu trabajo." },
+    { "termino": "Plataforma escolar", "idea": "Classroom, Moodle o Teams: donde se concentran las actividades de clase." },
+    { "termino": "Fuente primaria", "idea": "Origen directo de la información; Wikipedia sirve para empezar, pero no lo es." },
+    { "termino": "Plagio", "idea": "Usar trabajo ajeno sin citar la fuente." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Organizar tu información",
+      "idea": "Usar herramientas digitales con estrategia mejora tu rendimiento: notas, calendario y documentos colaborativos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Notas y tareas", "puntos": ["Google Keep", "Notion", "Evernote"] },
+        { "titulo": "Planear", "puntos": ["Google Calendar: tareas y exámenes"] },
+        { "titulo": "Documentos", "puntos": ["Google Docs", "LibreOffice Writer", "Colaborar en tiempo real"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres que no se te pase la fecha de un examen. ¿Qué tipo de herramienta te sirve más?", "opciones": ["Un procesador de texto", "Una app de calendario", "Un chat grupal"], "correcta": 1, "porque": "Las apps de calendario, como Google Calendar, ayudan a planificar tareas y exámenes." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Comunicarte en la escuela",
+      "idea": "Cada canal tiene su uso: correo para lo formal, plataformas para las actividades y chats para coordinarse.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Formal", "puntos": ["Correo electrónico"] },
+        { "titulo": "Actividades escolares", "puntos": ["Google Classroom", "Moodle", "Microsoft Teams"] },
+        { "titulo": "Coordinación informal", "puntos": ["WhatsApp, Telegram", "Con tono respetuoso"] }
+      ] },
+      "comprueba": { "pregunta": "Necesitas pedirle formalmente a tu director una constancia. ¿Qué canal es el adecuado?", "opciones": ["El correo electrónico", "El chat grupal del salón", "Un comentario en redes sociales"], "correcta": 0, "porque": "Según la lectura, el correo electrónico sigue siendo fundamental para las comunicaciones formales." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Buscar y usar con responsabilidad",
+      "idea": "Busca en fuentes académicas y verificadas, y usa lo que encuentres citando, sin plagiar y cuidando la privacidad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Dónde buscar", "puntos": ["Google Scholar: artículos académicos", "Wikipedia: punto de partida, no fuente primaria", "Bibliotecas digitales: libros y revistas verificados"] },
+        { "titulo": "Uso responsable", "puntos": ["Citar las fuentes", "No plagiar", "Proteger la privacidad de compañeros", "Separar ocio y estudio"] }
+      ] },
+      "comprueba": { "pregunta": "Para tu trabajo de investigación encontraste un dato en Wikipedia. ¿Qué conviene hacer?", "opciones": ["Copiarlo tal cual sin citar", "Usarlo como punto de partida y buscar fuentes académicas", "Descartarlo porque Wikipedia nunca sirve"], "correcta": 1, "porque": "Wikipedia es un buen punto de partida, pero no una fuente primaria; conviene completar con fuentes como Google Scholar." }
+    }
+  ]
+}

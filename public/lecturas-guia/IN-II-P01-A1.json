@@ -1,0 +1,45 @@
+{
+  "codigo": "IN-II-P01-A1",
+  "conceptos": [
+    { "termino": "Daily routine", "idea": "Las actividades que haces regularmente, día tras día." },
+    { "termino": "Present Simple", "idea": "El tiempo verbal para describir rutinas y hábitos." },
+    { "termino": "-s de tercera persona", "idea": "Con he, she o it el verbo lleva -s: she wakes up." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Rutinas parecidas, horarios distintos",
+      "idea": "Muchas rutinas se parecen entre países, pero cambia la hora en que se hacen las cosas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Mexico", "puntos": ["Lunch (comida) is the main meal", "Around 2:00 or 3:00 pm"] },
+        { "titulo": "Spain", "puntos": ["Dinner is often after 9:00 pm"] },
+        { "titulo": "Japan", "puntos": ["Many people take the train to work or school"] }
+      ] },
+      "comprueba": { "pregunta": "Según el texto, ¿cuál es la comida principal del día para muchas familias en México?", "opciones": ["Breakfast", "Lunch (comida)", "Dinner after 9:00 pm"], "correcta": 1, "porque": "El texto dice que en México muchas familias hacen del lunch (comida) la comida principal, alrededor de las 2:00 o 3:00 pm." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Un día de una estudiante mexicana",
+      "idea": "La rutina se cuenta en orden, con horas y verbos en tercera persona.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "6:30 am", "texto": "She wakes up, showers and gets dressed." },
+        { "titulo": "Breakfast", "texto": "She eats breakfast with her family." },
+        { "titulo": "7:15 am", "texto": "She takes the bus to school." },
+        { "titulo": "8:00 am – 2:00 pm", "texto": "She has classes." },
+        { "titulo": "Afternoon", "texto": "She eats lunch at home and does her homework." },
+        { "titulo": "Night", "texto": "She watches a show with her family and goes to bed at 10:00 pm." }
+      ] },
+      "comprueba": { "pregunta": "¿A qué hora toma el autobús a la escuela?", "opciones": ["At 6:30 am", "At 8:00 am", "At 7:15 am"], "correcta": 2, "porque": "El texto dice: «She takes the bus to school at 7:15 am»." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Present Simple y la -s",
+      "idea": "Las rutinas se dicen en Present Simple; con he, she e it el verbo lleva -s.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "I / you / we / they", "puntos": ["I wake up", "you eat", "they go"] },
+        { "titulo": "he / she / it (+ -s)", "puntos": ["she wakes up", "he eats", "it starts"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «My brother ___ breakfast at 7:00 am.»", "opciones": ["eats", "eat", "eating"], "correcta": 0, "porque": "«My brother» equivale a «he», tercera persona singular: el verbo lleva -s → eats." }
+    }
+  ]
+}

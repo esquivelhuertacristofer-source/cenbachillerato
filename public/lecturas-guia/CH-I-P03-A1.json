@@ -1,0 +1,39 @@
+{
+  "codigo": "CH-I-P03-A1",
+  "conceptos": [
+    { "termino": "Multicausalidad", "idea": "Un hecho histórico surge de muchas causas que actúan a la vez y con distinto peso." },
+    { "termino": "Causa inmediata", "idea": "La que detona el evento justo antes; parece la causa obvia." },
+    { "termino": "Causa estructural", "idea": "Condición de largo plazo que prepara el terreno para que el evento ocurra." },
+    { "termino": "Monocausalismo", "idea": "Error de explicar un hecho con una sola causa." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Causas inmediatas y estructurales",
+      "idea": "Los hechos históricos tienen muchas causas: unas los detonan de inmediato y otras se acumulan durante años.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Causas inmediatas", "puntos": ["Detonan el evento directamente", "Ocurren justo antes", "Parecen la causa obvia"] },
+        { "titulo": "Causas estructurales", "puntos": ["De largo plazo: años o décadas", "Económicas, sociales, culturales o políticas", "Crean el terreno fértil"] }
+      ] },
+      "comprueba": { "pregunta": "Décadas de salarios bajos en una región, ¿qué tipo de causa serían para una protesta?", "opciones": ["Causa inmediata", "Causa estructural", "No es una causa"], "correcta": 1, "porque": "Es una condición económica de largo plazo que se acumula durante años: una causa estructural." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "La Revolución de 1910, caso multicausal",
+      "idea": "El Plan de San Luis detonó la Revolución, pero solo funcionó porque el porfiriato había acumulado causas profundas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Causa inmediata", "puntos": ["Plan de San Luis Potosí de Madero (octubre de 1910)", "Llamó a levantarse el 20 de noviembre"] },
+        { "titulo": "Causas estructurales (porfiriato)", "puntos": ["Dictadura sin competencia electoral", "Tierra concentrada en haciendas", "Anarquismo y sindicalismo desde Europa", "Clases medias excluidas e indígenas despojados"] }
+      ] },
+      "comprueba": { "pregunta": "Alguien dice: «La Revolución estalló porque Madero lo convocó». ¿Qué error comete?", "opciones": ["Error monocausal", "Error de fechas", "Ninguno, es la explicación completa"], "correcta": 0, "porque": "Explica el evento con una sola causa e ignora décadas de desigualdad y represión: eso es monocausalismo." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Preguntas para encontrar causas",
+      "idea": "Para hallar causas en las fuentes, pregunta quién ganaba, quién quería cambiar, qué lo hizo posible y qué ideas lo legitimaban.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Pregúntale a la fuente", "puntos": ["¿A quién beneficiaba la situación previa?", "¿Quiénes tenían motivos para un cambio?", "¿Qué condiciones lo hicieron posible?", "¿Qué ideas legitimaban la acción colectiva?"] }
+      ] }
+    }
+  ]
+}

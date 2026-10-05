@@ -1,0 +1,54 @@
+{
+  "codigo": "PM-III-P06-A1",
+  "conceptos": [
+    { "termino": "Parábola", "idea": "La gráfica de toda función cuadrática f(x) = ax² + bx + c." },
+    { "termino": "Vértice", "idea": "El punto mínimo si a > 0, o máximo si a < 0." },
+    { "termino": "Eje de simetría", "idea": "La recta vertical x = xv que parte la parábola en dos mitades iguales." },
+    { "termino": "Ceros", "idea": "Los valores de x donde la parábola cruza el eje horizontal: f(x) = 0." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El parámetro a decide la apertura",
+      "idea": "El signo de a dice si la parábola abre hacia arriba o hacia abajo; su tamaño, qué tan estrecha es.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "a > 0", "puntos": ["Abre hacia arriba", "Tiene un punto mínimo", "Como un cuenco"] },
+        { "titulo": "a < 0", "puntos": ["Abre hacia abajo", "Tiene un punto máximo", "Como una colina"] },
+        { "titulo": "Valor absoluto de a", "puntos": ["Mayor: más estrecha", "Cercano a cero: más ancha"] }
+      ] },
+      "comprueba": { "pregunta": "En f(x) = −3x² + 2, ¿hacia dónde abre la parábola y qué punto tiene?", "opciones": ["Arriba, con un mínimo", "Abajo, con un máximo", "Abajo, con un mínimo"], "correcta": 1, "porque": "a = −3 es negativo: la parábola abre hacia abajo, como una colina, y su vértice es un máximo." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Vértice y eje de simetría",
+      "idea": "Con xv = −b/(2a) encuentras el vértice; la recta vertical que pasa por él es el eje de simetría.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Coordenada horizontal", "expr": "xv = −b / (2a)" },
+        { "nombre": "Coordenada vertical", "expr": "yv = f(xv)", "leyenda": "Sustituyes xv en la función" },
+        { "nombre": "Eje de simetría", "expr": "x = xv" }
+      ] },
+      "comprueba": { "pregunta": "En f(x) = x² − 6x + 1, ¿cuál es el eje de simetría?", "opciones": ["x = 3", "x = −3", "x = 6"], "correcta": 0, "porque": "xv = −b/(2a) = −(−6)/(2 · 1) = 6/2 = 3, así que el eje es x = 3." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Ceros y cómo graficar",
+      "idea": "Los ceros son los cruces con el eje x; junto con el vértice y unos puntos extra bastan para trazar la curva.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Vértice", "texto": "Calcúlalo con la fórmula xv = −b/(2a)." },
+        { "titulo": "Eje de simetría", "texto": "La recta vertical x = xv." },
+        { "titulo": "Apertura", "texto": "Arriba si a > 0; abajo si a < 0." },
+        { "titulo": "Ceros", "texto": "Resuelve f(x) = 0, si existen: dos, uno o ninguno." },
+        { "titulo": "Puntos extra", "texto": "Dos o tres valores de x a cada lado del vértice." },
+        { "titulo": "Traza", "texto": "Une todos los puntos con la curva." }
+      ] },
+      "comprueba": { "pregunta": "Una parábola es tangente al eje x en su vértice. ¿Cuántos ceros tiene?", "opciones": ["Dos", "Ninguno", "Uno"], "correcta": 2, "porque": "Solo toca el eje en un punto, el vértice, así que tiene exactamente un cero." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "La parábola de un balón",
+      "idea": "En el tiro de un balón, el vértice marca la altura máxima y los ceros, cuándo está en el suelo.",
+      "visual": { "tipo": "ejemplo", "titulo": "Altura del balón: h(t) = −4.9t² + 15t", "lineas": ["a = −4.9 < 0: abre hacia abajo y hay un máximo", "tv = −b / (2a) = −15 / (2 × −4.9)", "tv = 15 / 9.8"], "resultado": "Alcanza su altura máxima a los ≈ 1.53 s" },
+      "comprueba": { "pregunta": "En h(t) = −4.9t² + 15t, ¿por qué el vértice es un máximo y no un mínimo?", "opciones": ["Porque a = −4.9 es negativo", "Porque b = 15 es positivo", "Porque no hay término c"], "correcta": 0, "porque": "Cuando a es negativo, la parábola abre hacia abajo y su vértice es el punto más alto." }
+    }
+  ]
+}

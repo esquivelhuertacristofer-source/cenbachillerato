@@ -1,0 +1,105 @@
+{
+  "codigo": "LC-I-P03-A1",
+  "conceptos": [
+    {
+      "termino": "Información",
+      "idea": "Lo que se puede contrastar con la realidad: una fecha, una cifra, un lugar."
+    },
+    {
+      "termino": "Idea",
+      "idea": "La interpretación o valoración que hace el autor a partir de información."
+    },
+    {
+      "termino": "Opinión",
+      "idea": "La postura personal de quien escribe, a menudo imposible de verificar."
+    },
+    {
+      "termino": "Lector crítico",
+      "idea": "No acepta todo como verdad: pregunta quién escribe, para qué y con qué evidencia."
+    }
+  ],
+  "partes": [
+    {
+      "parrafos": [
+        0,
+        1
+      ],
+      "titulo": "Información, ideas y opiniones",
+      "idea": "Un texto puede mezclar hechos verificables, interpretaciones del autor y su postura personal.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Información",
+            "puntos": [
+              "Se contrasta con la realidad",
+              "Fechas, cifras, nombres de lugares"
+            ]
+          },
+          {
+            "titulo": "Idea",
+            "puntos": [
+              "Interpretación o valoración del autor",
+              "Parte de la información"
+            ]
+          },
+          {
+            "titulo": "Opinión",
+            "puntos": [
+              "Postura personal de quien escribe",
+              "A menudo no se puede verificar"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "«Pedro Páramo es la novela más hermosa que se ha escrito.» ¿Qué es esta frase?",
+        "opciones": [
+          "Información",
+          "Opinión",
+          "Un dato verificable"
+        ],
+        "correcta": 1,
+        "porque": "Expresa la postura personal de quien escribe y no se puede verificar objetivamente."
+      }
+    },
+    {
+      "parrafos": [
+        2
+      ],
+      "titulo": "Leer con ojo crítico",
+      "idea": "Distinguir estos elementos te permite leer críticamente, sobre todo en redes donde todo circula mezclado.",
+      "visual": {
+        "tipo": "pasos",
+        "items": [
+          {
+            "titulo": "¿Quién lo escribió?",
+            "texto": "Identifica al autor del texto."
+          },
+          {
+            "titulo": "¿Con qué propósito?",
+            "texto": "Informar, opinar o persuadir."
+          },
+          {
+            "titulo": "¿Qué evidencia presenta?",
+            "texto": "Busca los datos que lo sostienen."
+          },
+          {
+            "titulo": "¿Qué no dice?",
+            "texto": "Fíjate en lo que deja fuera."
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "Ves en redes una publicación que asegura algo sin decir de dónde sale. ¿Qué haría un lector crítico?",
+        "opciones": [
+          "Compartirla de inmediato",
+          "Creerla porque tiene muchos likes",
+          "Preguntarse quién la escribió y qué evidencia presenta"
+        ],
+        "correcta": 2,
+        "porque": "Un lector crítico no acepta todo como verdad absoluta: se pregunta por el autor, el propósito, la evidencia y lo que no se dice."
+      }
+    }
+  ]
+}

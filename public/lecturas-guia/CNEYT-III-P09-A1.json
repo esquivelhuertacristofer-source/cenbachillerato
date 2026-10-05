@@ -1,0 +1,47 @@
+{
+  "codigo": "CNEYT-III-P09-A1",
+  "conceptos": [
+    { "termino": "Reacción química", "idea": "Los reactivos se transforman en productos nuevos porque los átomos se reorganizan." },
+    { "termino": "Subíndice", "idea": "Número pequeño: cuántos átomos de un elemento hay en una molécula." },
+    { "termino": "Coeficiente", "idea": "Número grande delante: cuántas moléculas de esa sustancia participan." },
+    { "termino": "Ecuación balanceada", "idea": "Tiene el mismo número de átomos de cada elemento en ambos lados." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La ecuación: una oración química",
+      "idea": "Una ecuación química se lee de izquierda a derecha: reactivos, flecha que significa «produce», y productos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Combustión del metano", "expr": "CH₄ + 2 O₂ → CO₂ + 2 H₂O", "leyenda": "Reactivos a la izquierda · flecha «produce» · productos a la derecha" }
+      ] },
+      "comprueba": { "pregunta": "En la ecuación HCl + NaOH → NaCl + H₂O, ¿cuáles son los productos?", "opciones": ["HCl y NaOH", "NaCl y H₂O", "HCl y H₂O"], "correcta": 1, "porque": "Los productos van a la derecha de la flecha: NaCl y H₂O." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Coeficientes contra subíndices",
+      "idea": "El subíndice dice cuántos átomos hay en una molécula; el coeficiente, cuántas moléculas. Al balancear solo se cambian coeficientes.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Subíndice", "puntos": ["Número pequeño, abajo", "Átomos en UNA molécula", "H₂O: 2 H y 1 O", "Si lo cambias, cambias la sustancia"] },
+        { "titulo": "Coeficiente", "puntos": ["Número grande, delante", "Cuántas moléculas participan", "2 H₂O: dos moléculas de agua", "Si lo cambias, solo cambia la cantidad"] }
+      ] },
+      "comprueba": { "pregunta": "Un compañero «balancea» cambiando H₂O por H₂O₂. ¿Qué hizo mal?", "opciones": ["Nada, así se balancea", "Debió cambiar el subíndice del hidrógeno", "Cambió un subíndice y con eso cambió la sustancia"], "correcta": 2, "porque": "H₂O es agua y H₂O₂ es agua oxigenada: los subíndices no se tocan; solo se ajustan coeficientes." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Lavoisier: contar átomos en ambos lados",
+      "idea": "La materia no se crea ni se destruye: cada elemento debe tener el mismo número de átomos antes y después.",
+      "visual": { "tipo": "ejemplo", "titulo": "Comprobar CH₄ + 2 O₂ → CO₂ + 2 H₂O", "lineas": ["Izquierda: 1 C, 4 H, 4 O (2 O₂ × 2)", "Derecha: 1 C, 4 H (2 H₂O × 2)", "Oxígenos a la derecha: 2 en CO₂ + 2 en las 2 H₂O = 4"], "resultado": "Todo cuadra: la ecuación está balanceada." },
+      "comprueba": { "pregunta": "En la ecuación 2 H₂O, ¿cuántos átomos de hidrógeno hay en total?", "opciones": ["4", "2", "3"], "correcta": 0, "porque": "Son 2 moléculas con 2 átomos de H cada una: 2 × 2 = 4 átomos de hidrógeno." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Símbolos extra y reacciones cotidianas",
+      "idea": "Los símbolos indican estados, sentido de la reacción o calor; con ellos se leen reacciones de la vida diaria en México.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Estados de agregación", "puntos": ["(s) sólido", "(l) líquido", "(g) gas", "(ac) acuoso"] },
+        { "titulo": "Flechas y marcas", "puntos": ["→ un solo sentido", "⇌ reversible", "Δ sobre la flecha: se necesita calor", "↑ gas que se desprende · ↓ sólido que precipita"] }
+      ] },
+      "comprueba": { "pregunta": "En N₂ + 3 H₂ ⇌ 2 NH₃, ¿qué indica la doble flecha?", "opciones": ["Que se necesita calor", "Que la reacción es reversible", "Que se desprende un gas"], "correcta": 1, "porque": "La doble flecha ⇌ indica una reacción reversible, que ocurre en ambos sentidos a la vez." }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "codigo": "CNEYT-II-P06-A1",
+  "conceptos": [
+    { "termino": "Huella de carbono", "idea": "Emisiones de gases de efecto invernadero de una actividad, en CO2 equivalente." },
+    { "termino": "Justicia climática", "idea": "Quienes más emitieron no siempre son quienes más sufren las consecuencias." },
+    { "termino": "Mix energético", "idea": "De qué fuentes sale la energía de un país." },
+    { "termino": "Intermitencia", "idea": "Las renovables no generan siempre: no hay sol de noche ni viento constante." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La huella de carbono de México",
+      "idea": "Todo uso de energía emite gases; México es gran emisor en total, pero emite menos por persona que Estados Unidos o Canadá.",
+      "visual": { "tipo": "datos", "fuente": "INECC", "items": [
+        { "valor": "≈ 748 millones t", "etiqueta": "CO2 equivalente emitido por México en 2022" },
+        { "valor": "Puesto 12", "etiqueta": "en emisiones absolutas a nivel global" }
+      ] },
+      "comprueba": { "pregunta": "¿Para qué sirve expresar todo en CO2 equivalente?", "opciones": ["Para comparar el impacto climático de actividades muy distintas", "Para medir solo el humo de los autos", "Para calcular el precio de la luz"], "correcta": 0, "porque": "La huella de carbono en CO2e permite comparar el impacto climático de actividades muy distintas." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Fósiles, renovables y sus retos",
+      "idea": "México depende sobre todo de combustibles fósiles; las renovables no emiten CO2 al generar, pero son intermitentes.",
+      "visual": { "tipo": "datos", "fuente": "SENER, 2023", "items": [
+        { "valor": "≈ 76%", "etiqueta": "energía primaria de combustibles fósiles", "barra": 76 }
+      ] },
+      "comprueba": { "pregunta": "Un pueblo usa solo paneles solares. ¿Qué problema enfrenta de noche?", "opciones": ["Emiten mucho CO2", "La intermitencia: sin sol no generan", "Se descomponen con el frío"], "correcta": 1, "porque": "Las renovables presentan intermitencia: el sol no brilla de noche; por eso se desarrolla el almacenamiento en baterías." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Tu huella personal y cómo bajarla",
+      "idea": "El transporte pesa la mitad de tu huella; elecciones informadas la reducen sin sacrificar bienestar.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "≈ 50%", "etiqueta": "transporte", "barra": 50 },
+        { "valor": "25%", "etiqueta": "alimentación", "barra": 25 },
+        { "valor": "20%", "etiqueta": "hogar", "barra": 20 },
+        { "valor": "5%", "etiqueta": "bienes manufacturados", "barra": 5 }
+      ] },
+      "comprueba": { "pregunta": "Quieres reducir tu huella lo más posible con un solo cambio. ¿Cuál tendría mayor impacto según el texto?", "opciones": ["Comprar menos ropa", "Usar transporte público en vez de auto", "Desconectar el cargador"], "correcta": 1, "porque": "El transporte representa cerca del 50% de las emisiones individuales, la mayor parte de la huella." }
+    }
+  ]
+}

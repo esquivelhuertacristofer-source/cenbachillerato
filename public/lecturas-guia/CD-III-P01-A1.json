@@ -1,0 +1,57 @@
+{
+  "codigo": "CD-III-P01-A1",
+  "conceptos": [
+    { "termino": "Comunicación multimodal", "idea": "Un mismo mensaje que mezcla texto, imagen, video, audio, animación e hipervínculos." },
+    { "termino": "Cámara de eco", "idea": "Burbuja donde el algoritmo te muestra solo lo que refuerza lo que ya crees." },
+    { "termino": "Brecha digital de género", "idea": "Diferencias en cómo mujeres y hombres usan la tecnología, por estereotipos y socialización." },
+    { "termino": "Alfabetización mediática", "idea": "Saber leer críticamente los medios: quién produce, para qué y qué omite." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Plataformas y algoritmos que te retienen",
+      "idea": "Las redes son infraestructuras de comunicación cuyos algoritmos buscan retenerte y pueden encerrarte en una burbuja de filtro.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Objetivo: retención", "texto": "Maximizar el tiempo que pasas en la app." },
+        { "titulo": "Estrategia", "texto": "Mostrar contenido que provoca emociones fuertes y refuerza lo que ya crees." },
+        { "titulo": "Resultado", "texto": "Cámara de eco: dos personas ven versiones distintas de la realidad." }
+      ] },
+      "comprueba": { "pregunta": "Dos amigos con opiniones políticas opuestas usan la misma red, pero ven noticias muy distintas. ¿Qué lo explica?", "opciones": ["Que la plataforma es neutral", "La burbuja de filtro del algoritmo", "Que usan celulares diferentes"], "correcta": 1, "porque": "El algoritmo refuerza las creencias previas de cada usuario y crea cámaras de eco con versiones distintas de la realidad." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Identidad digital como actuación",
+      "idea": "Siguiendo a Goffman, en redes gestionamos la impresión que damos; eso puede enriquecer, pero también generar ansiedad y comparación.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Puede enriquecer", "puntos": ["Varias identidades según la plataforma", "Eliges qué mostrar y a quién"] },
+        { "titulo": "Puede presionar", "puntos": ["Ansiedad", "Comparación social", "Más fuerte en la adolescencia"] }
+      ] },
+      "comprueba": { "pregunta": "Eliges con cuidado qué fotos subir a Instagram para dar cierta imagen. ¿Con qué idea de la lectura se relaciona?", "opciones": ["La gestión de la impresión que describió Goffman", "La brecha digital de género", "El slacktivism"], "correcta": 0, "porque": "Goffman describió la vida social como una actuación en la que gestionamos la impresión que producimos; en redes se amplifica." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Desinformación, deepfakes y WhatsApp",
+      "idea": "Los deepfakes son cada vez más fáciles de hacer, y en México la desinformación se viraliza en grupos cerrados de WhatsApp.",
+      "comprueba": { "pregunta": "Según la lectura, ¿por qué WhatsApp es un canal clave de desinformación en México?", "opciones": ["Porque solo lo usan las élites", "Porque verifica cada mensaje", "Porque los reenvíos sin verificar se viralizan en comunidades cerradas"], "correcta": 2, "porque": "La lectura dice que en WhatsApp los mensajes reenviados sin verificación se viralizan en comunidades cerradas." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Brecha digital de género",
+      "idea": "La brecha de acceso se redujo, pero persisten diferencias en el uso que se explican por estereotipos, no por biología.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Mujeres usan más para", "puntos": ["Comunicación", "Entretenimiento"] },
+        { "titulo": "Hombres usan más para", "puntos": ["Actividades laborales y educativas", "Programación"] },
+        { "titulo": "Causas", "puntos": ["Socializaciones distintas", "Estereotipos en educación tecnológica", "Pocas mujeres diseñando plataformas"] }
+      ] },
+      "comprueba": { "pregunta": "Según la lectura, ¿de dónde viene la diferencia de uso de la tecnología entre mujeres y hombres?", "opciones": ["De diferencias biológicas", "De socializaciones y estereotipos de género", "De la falta total de acceso a internet"], "correcta": 1, "porque": "La lectura afirma que no es biológica: es producto de socializaciones distintas, estereotipos y subrepresentación de mujeres." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Alfabetización mediática: cinco preguntas",
+      "idea": "Leer los medios con mirada crítica no es desconfiar de todo, sino hacer las preguntas correctas ante cada contenido.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Pregúntate ante cualquier contenido", "puntos": ["¿Quién lo produjo?", "¿Con qué objetivo?", "¿Qué muestra y qué omite?", "¿Qué emociones busca generar?", "¿Hay fuentes verificables?"] }
+      ] }
+    }
+  ]
+}

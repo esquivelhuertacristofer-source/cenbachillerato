@@ -1,0 +1,41 @@
+{
+  "codigo": "CS-I-P04-A1",
+  "conceptos": [
+    { "termino": "Diversidad", "idea": "Las diferencias étnicas, culturales, de género, de capacidad o de clase: una riqueza democrática." },
+    { "termino": "Jerarquías entre grupos", "idea": "Tratar la diferencia como amenaza y poner a unos grupos como «superiores»." },
+    { "termino": "Democracia sustantiva", "idea": "No solo votar: que todos participen de verdad, sin barreras, en lo que les afecta." },
+    { "termino": "Pluralidad no es relativismo", "idea": "Valorar muchas perspectivas no significa que todo vale." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "La diferencia: riqueza, no amenaza",
+      "idea": "La diversidad es condición de la vida social, aunque históricamente se ha usado para crear jerarquías entre grupos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Diversidad es…", "puntos": ["Condición fundamental de la vida social", "En democracia, una riqueza"] },
+        { "titulo": "Lo que han hecho las sociedades", "puntos": ["Tratar la diferencia como amenaza", "Poner grupos «superiores» e «inferiores»", "Volver invisibles a algunos grupos"] }
+      ] },
+      "comprueba": { "pregunta": "Según el texto, ¿cómo debe verse la diversidad en una democracia?", "opciones": ["Como un problema por resolver", "Como una riqueza", "Como una amenaza"], "correcta": 1, "porque": "El texto dice que la diversidad no es un problema: es una condición de la vida social y, en democracia, una riqueza." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "México, un país diverso y desigual",
+      "idea": "México es pluriétnico y multicultural, pero esa diversidad convive con racismo, discriminación y marginación.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Nuestra diversidad", "puntos": ["Más de 68 lenguas indígenas reconocidas", "Profundas diferencias regionales", "Migración interna e internacional", "Identidades de género y orientación sexual diversas"] },
+        { "titulo": "Con lo que convive", "puntos": ["Racismo estructural", "Discriminación por género", "Homofobia institucional", "Marginación de personas con discapacidad"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué describe mejor la situación de México según el texto?", "opciones": ["Un país diverso sin discriminación", "Un país con una sola cultura", "Un país diverso donde persiste la discriminación"], "correcta": 2, "porque": "El texto dice que la diversidad coexiste con racismo estructural, discriminación por género, homofobia y marginación." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Democracia de verdad, para todos",
+      "idea": "Una democracia sustantiva quita barreras y escucha voces silenciadas, sin caer en el «todo vale».",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Procedimental", "puntos": ["Garantiza el voto"] },
+        { "titulo": "Sustantiva", "puntos": ["Garantiza el voto", "Elimina barreras económicas, culturales e históricas", "Escucha activamente las voces silenciadas"] }
+      ] },
+      "comprueba": { "pregunta": "Un municipio permite votar a todos, pero no traduce la información a la lengua indígena de la mitad de su población. ¿Qué le falta?", "opciones": ["Democracia sustantiva", "Democracia procedimental", "Relativismo"], "correcta": 0, "porque": "Ya garantiza el voto (procedimental), pero no elimina una barrera cultural que impide la participación real: eso pide la democracia sustantiva." }
+    }
+  ]
+}

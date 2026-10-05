@@ -1,0 +1,53 @@
+{
+  "codigo": "CD-III-P04-A1",
+  "conceptos": [
+    { "termino": "Participación ciudadana digital", "idea": "Usar peticiones, campañas y redes para intervenir en la vida pública." },
+    { "termino": "Diagnóstico participativo", "idea": "Identificar el problema en colectivo, escuchando a quienes lo viven." },
+    { "termino": "Slacktivism", "idea": "Sentirte satisfecho con compartir o firmar en línea sin actuar fuera de las pantallas." },
+    { "termino": "Organización en el territorio", "idea": "Conocerse en persona y construir confianza para lograr cambios reales." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Movimientos que crecieron en redes",
+      "idea": "Las redes son parte de la vida política de los jóvenes y amplificaron movimientos como #MeToo y #UnDíaSinNosotras en México.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "#MeToo en México (2019-2020)", "puntos": ["Denuncias de acoso y abuso sexual", "Universidades, medios y círculos culturales", "Rompió décadas de silencio"] },
+        { "titulo": "#UnDíaSinNosotras (9 de marzo de 2020)", "puntos": ["Paro nacional de mujeres", "Organización masiva en redes", "Movilizó a millones"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué fue #UnDíaSinNosotras?", "opciones": ["Un paro nacional de mujeres organizado en redes", "Una campaña de rescate tras un sismo", "Una aplicación para denunciar acoso"], "correcta": 0, "porque": "El 9 de marzo de 2020 convocó a un paro nacional de mujeres con organización masiva en redes sociales." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Del teléfono a la acción concreta",
+      "idea": "Las comunidades digitales logran impactos reales, como coordinar rescates tras el sismo de 2017 o redes de apoyo feministas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sismo del 19 de septiembre de 2017", "puntos": ["Coordinación de rescates en tiempo real", "Distribución de víveres", "Mapeo de edificios dañados con Google Maps"] },
+        { "titulo": "Colectivas feministas", "puntos": ["Redes de apoyo a víctimas", "Información sobre albergues y recursos legales", "Incidencia política"] }
+      ] },
+      "comprueba": { "pregunta": "Tras el sismo de 2017, ¿para qué usaron los voluntarios Google Maps y plataformas colaborativas?", "opciones": ["Para vender víveres", "Para mapear edificios dañados y necesidades de cada colonia", "Para convocar un paro nacional"], "correcta": 1, "porque": "La lectura dice que los voluntarios mapearon los edificios dañados y las necesidades urgentes de cada colonia." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Cómo armar un proyecto comunitario",
+      "idea": "Un proyecto comunitario digital sigue cuatro etapas y se apoya en herramientas colaborativas para organizarse y comunicar.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Diagnóstico participativo", "texto": "Identificar el problema escuchando a quienes lo viven." },
+        { "titulo": "Diseño", "texto": "Definir la solución digital, los recursos y los actores." },
+        { "titulo": "Implementación", "texto": "Poner en marcha con evaluación continua. Apóyate en Trello, Notion o Google Workspace." },
+        { "titulo": "Evaluación del impacto", "texto": "Medir si se resolvió el problema y qué mejorar." }
+      ] },
+      "comprueba": { "pregunta": "Tu grupo hace una encuesta a los vecinos para saber cuál es el problema principal de la colonia. ¿En qué etapa están?", "opciones": ["Implementación", "Evaluación del impacto", "Diagnóstico participativo"], "correcta": 2, "porque": "El diagnóstico participativo consiste en identificar colectivamente el problema, escuchando a quienes lo viven." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Activismo genuino frente a slacktivism",
+      "idea": "Compartir o firmar en línea no basta: los movimientos efectivos combinan la movilización digital con la organización en persona.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Slacktivism", "puntos": ["Compartir una publicación", "Firmar una petición en línea", "Sin compromiso fuera de pantallas"] },
+        { "titulo": "Activismo genuino", "puntos": ["Movilización digital más territorio", "Se conocen en persona y construyen confianza", "Cambian instituciones y políticas"] }
+      ] },
+      "comprueba": { "pregunta": "Alguien comparte diez publicaciones sobre un problema de su colonia, pero nunca va a una reunión vecinal. ¿Qué describe?", "opciones": ["Slacktivism", "Diagnóstico participativo", "Organización en el territorio"], "correcta": 0, "porque": "El slacktivism es sentirse satisfecho con acciones digitales de bajo costo sin comprometerse con acciones concretas fuera de las pantallas." }
+    }
+  ]
+}

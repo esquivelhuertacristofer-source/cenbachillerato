@@ -1,0 +1,39 @@
+{
+  "codigo": "PM-III-P08-A1",
+  "conceptos": [
+    { "termino": "Sistema de ecuaciones", "idea": "Dos o más ecuaciones que comparten las mismas incógnitas." },
+    { "termino": "Solución del sistema", "idea": "Los valores que cumplen todas las ecuaciones al mismo tiempo." },
+    { "termino": "Sistema inconsistente", "idea": "No tiene solución: sus rectas son paralelas." },
+    { "termino": "Eliminación", "idea": "Sumar o restar las ecuaciones para que desaparezca una variable." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Qué es un sistema de ecuaciones",
+      "idea": "La solución de un sistema debe cumplir todas sus ecuaciones a la vez, no solo una.",
+      "comprueba": { "pregunta": "¿Qué par es solución del sistema x + y = 5 y x − y = 1?", "opciones": ["(4, 1)", "(5, 0)", "(3, 2)"], "correcta": 2, "porque": "3 + 2 = 5 y 3 − 2 = 1: cumple las dos. (4, 1) y (5, 0) cumplen la primera, pero no la segunda." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Dos rectas en el plano",
+      "idea": "Cada ecuación es una recta: la solución es donde se cruzan, y su posición dice cuántas soluciones hay.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Se cortan", "puntos": ["Un punto de intersección", "Una solución"] },
+        { "titulo": "Paralelas", "puntos": ["Nunca se cruzan", "Sin solución (inconsistente)"] },
+        { "titulo": "Coincidentes", "puntos": ["Son la misma recta", "Infinitas soluciones"] }
+      ] },
+      "comprueba": { "pregunta": "Al graficar un sistema, las dos rectas resultan paralelas. ¿Cuántas soluciones tiene?", "opciones": ["Infinitas", "Ninguna", "Una"], "correcta": 1, "porque": "Las rectas paralelas nunca se intersectan, así que el sistema no tiene solución: es inconsistente." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Tres métodos algebraicos",
+      "idea": "Sustitución, igualación y eliminación llegan a la misma solución; conviene elegir según la forma del sistema.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sustitución", "puntos": ["Despeja una variable en una ecuación", "Sustitúyela en la otra"] },
+        { "titulo": "Igualación", "puntos": ["Despeja la misma variable en ambas", "Iguala las dos expresiones"] },
+        { "titulo": "Eliminación (Gauss)", "puntos": ["Suma o resta las ecuaciones", "Una variable desaparece"] }
+      ] },
+      "comprueba": { "pregunta": "En x + y = 7 y x − y = 3 sumas las dos ecuaciones y obtienes 2x = 10. ¿Qué método usaste?", "opciones": ["Eliminación", "Sustitución", "Igualación"], "correcta": 0, "porque": "Al sumar las ecuaciones, la y se elimina (y − y = 0). Eso es el método de eliminación." }
+    }
+  ]
+}

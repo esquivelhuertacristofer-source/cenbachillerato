@@ -1,0 +1,52 @@
+{
+  "codigo": "PM-VI-P12-A1",
+  "conceptos": [
+    { "termino": "Tabla de contingencia", "idea": "Tabla que cruza dos variables categóricas y cuenta los casos de cada cruce." },
+    { "termino": "Diagrama de dispersión", "idea": "Cada individuo es un punto (x, y); la nube muestra la relación." },
+    { "termino": "Coeficiente de correlación r", "idea": "Número entre −1 y +1 que mide la fuerza y el sentido de la relación lineal." },
+    { "termino": "Correlación no es causalidad", "idea": "Que dos cosas cambien juntas no prueba que una cause la otra." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "¿Qué tipo de variables cruzas?",
+      "idea": "Para estudiar si dos cosas se relacionan, primero distingue si son cualitativas o cuantitativas: cada tipo usa otras herramientas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cualitativas", "puntos": ["Categorías: sexo, color, preferencia", "Se analizan con tablas de contingencia"] },
+        { "titulo": "Cuantitativas", "puntos": ["Números: horas, calificación, temperatura", "Se analizan con diagramas de dispersión"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber si el color favorito se relaciona con el género musical preferido. ¿Qué tipo de variables son?", "opciones": ["Las dos cuantitativas", "Las dos cualitativas", "Una de cada tipo"], "correcta": 1, "porque": "Color y género musical son categorías, no números: ambas son cualitativas." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Tablas de contingencia: ¿independientes o asociadas?",
+      "idea": "Si la proporción es igual en todos los grupos, las variables son independientes; si difiere mucho, están asociadas.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "70%", "etiqueta": "de los hombres prefiere cierto deporte", "barra": 70 },
+        { "valor": "30%", "etiqueta": "de las mujeres prefiere ese deporte", "barra": 30 }
+      ], "fuente": "Ejemplo de la lectura: proporciones tan distintas indican asociación." },
+      "comprueba": { "pregunta": "En una encuesta, el 50% de los hombres y el 50% de las mujeres prefieren básquetbol. ¿Qué concluyes?", "opciones": ["Sexo y preferencia están asociados", "Hay causalidad", "Sexo y preferencia parecen independientes"], "correcta": 2, "porque": "La proporción es igual en ambos grupos, justo lo que se esperaría si las variables fueran independientes." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Dispersión y coeficiente de correlación",
+      "idea": "La nube de puntos muestra si la relación es positiva, negativa o nula, y r mide qué tan fuerte es, de −1 a +1.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Positiva (r cerca de +1)", "puntos": ["La nube sube", "Horas de estudio y calificación"] },
+        { "titulo": "Negativa (r cerca de −1)", "puntos": ["La nube baja", "Horas frente a la TV y calificación"] },
+        { "titulo": "Sin correlación (r cerca de 0)", "puntos": ["Nube dispersa, sin patrón"] }
+      ] },
+      "comprueba": { "pregunta": "Un estudio obtiene r = −0.9 entre horas de videojuego y horas de sueño. ¿Qué significa?", "opciones": ["Correlación negativa fuerte", "Casi no hay relación", "Correlación positiva fuerte"], "correcta": 0, "porque": "Un r cercano a −1 indica que, al crecer una variable, la otra tiende a bajar, y los puntos casi forman una recta descendente." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Correlación no es causalidad",
+      "idea": "Dos variables pueden subir juntas por una tercera variable oculta o por coincidencia, sin que una cause la otra.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lo que se observa", "puntos": ["Suben las ventas de helado", "Suben los ahogamientos"] },
+        { "titulo": "La explicación", "puntos": ["El helado no causa ahogamientos", "Ambos suben por el calor del verano"] }
+      ] },
+      "comprueba": { "pregunta": "En verano suben las ventas de ventiladores y también las de paletas heladas. ¿Qué es lo más razonable?", "opciones": ["Los ventiladores hacen que la gente compre paletas", "Ambas suben por una tercera variable: el calor", "Las paletas causan que se vendan ventiladores"], "correcta": 1, "porque": "Están correlacionadas, pero ninguna causa la otra: las dos aumentan por el calor, una variable oculta común." }
+    }
+  ]
+}

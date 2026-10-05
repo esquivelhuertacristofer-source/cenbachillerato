@@ -1,0 +1,68 @@
+{
+  "codigo": "PM-V-P05-A1",
+  "conceptos": [
+    { "termino": "Función trascendente", "idea": "Trigonométricas, exponenciales y logarítmicas: las de oscilaciones, crecimiento y decaimiento." },
+    { "termino": "Par seno-coseno", "idea": "La derivada del seno es el coseno; la del coseno, menos el seno." },
+    { "termino": "Exponencial eˣ", "idea": "La función que es igual a su propia derivada." },
+    { "termino": "Logaritmo natural", "idea": "ln x se deriva en algo simple: 1/x." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3, 4, 5],
+      "titulo": "Seno y coseno: derivadas que giran",
+      "idea": "Derivar el seno da coseno y el coseno da menos seno; tras cuatro derivadas vuelves al seno, por eso describen oscilaciones.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Seno", "expr": "d/dx [sen x] = cos x" },
+        { "nombre": "Coseno", "expr": "d/dx [cos x] = −sen x" },
+        { "nombre": "Tangente", "expr": "d/dx [tan x] = sec²x" },
+        { "nombre": "Con la cadena", "expr": "d/dx [sen(3x)] = cos(3x) · 3 = 3cos(3x)" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es la derivada de sen(5x)?", "opciones": ["cos(5x)", "5cos(5x)", "−5cos(5x)"], "correcta": 1, "porque": "Por la cadena: la derivada del seno es coseno, evaluado en 5x, por la derivada de 5x, que es 5." }
+    },
+    {
+      "parrafos": [6, 7, 8, 9, 10],
+      "titulo": "eˣ: su propia derivada",
+      "idea": "Como eˣ es su propia derivada, modela todo proceso cuya tasa de cambio es proporcional a la cantidad actual.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Exponencial natural", "expr": "d/dx [eˣ] = eˣ", "leyenda": "e ≈ 2.71828..." },
+        { "nombre": "Crecimiento bacteriano", "expr": "N(t) = N₀eᵏᵗ" },
+        { "nombre": "Decaimiento radioactivo", "expr": "M(t) = M₀e⁻ᵏᵗ" },
+        { "nombre": "Con la cadena", "expr": "d/dx [e^(2x)] = e^(2x) · 2 = 2e^(2x)" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es la derivada de e^(3x)?", "opciones": ["e^(3x)", "3x · e^(2x)", "3e^(3x)"], "correcta": 2, "porque": "Por la cadena: e^(3x) se queda igual y se multiplica por la derivada de 3x, que es 3." }
+    },
+    {
+      "parrafos": [11, 12, 13, 14],
+      "titulo": "El logaritmo natural simplifica",
+      "idea": "La derivada de ln x es 1/x: convierte una función trascendente en una racional sencilla, y ayuda a derivar productos y cocientes.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Logaritmo natural", "expr": "d/dx [ln x] = 1/x", "leyenda": "Para x > 0" },
+        { "nombre": "Con la cadena", "expr": "d/dx [ln(x² + 1)] = 1/(x² + 1) · 2x = 2x/(x² + 1)" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es la derivada de ln(x² + 5)?", "opciones": ["2x/(x² + 5)", "1/(x² + 5)", "2x · ln(x² + 5)"], "correcta": 0, "porque": "Por la cadena: 1 entre lo de adentro, 1/(x² + 5), por la derivada de adentro, 2x." }
+    },
+    {
+      "parrafos": [15, 16, 17, 18],
+      "titulo": "Carbono-14 y péndulo",
+      "idea": "La derivada confirma que el carbono-14 decae en proporción a lo que queda y que el péndulo sigue el patrón del coseno.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Carbono-14", "expr": "C(t) = C₀e^(−0.000121t)", "leyenda": "t en años" },
+        { "nombre": "Tasa de decaimiento", "expr": "C'(t) = −0.000121 · C(t)", "leyenda": "Proporcional a la cantidad presente" },
+        { "nombre": "Péndulo", "expr": "θ(t) = A·cos(ωt + φ),  ω = √(g/L)" },
+        { "nombre": "Velocidad angular", "expr": "θ'(t) = −Aω·sen(ωt + φ)" }
+      ] },
+      "comprueba": { "pregunta": "Si la cantidad de carbono-14 que queda en una muestra baja a la mitad, ¿qué pasa con su rapidez de decaimiento?", "opciones": ["Se duplica", "Se reduce a la mitad", "No cambia"], "correcta": 1, "porque": "C'(t) = −0.000121 · C(t): la tasa es proporcional a la cantidad presente, así que si C baja a la mitad, la tasa también." }
+    },
+    {
+      "parrafos": [19, 20],
+      "titulo": "Tabla de derivadas trascendentes",
+      "idea": "Además de seno, coseno, eˣ y ln, la tabla agrega las exponenciales y logaritmos en cualquier base a.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Exponencial base a", "expr": "d/dx [aˣ] = aˣ · ln a" },
+        { "nombre": "Logaritmo base a", "expr": "d/dx [logₐ x] = 1/(x · ln a)" },
+        { "nombre": "Tangente", "expr": "d/dx [tan x] = sec²x" }
+      ] },
+      "comprueba": { "pregunta": "Según la tabla, ¿cuál es la derivada de 2ˣ?", "opciones": ["x · 2ˣ⁻¹", "2ˣ", "2ˣ · ln 2"], "correcta": 2, "porque": "Para aˣ la derivada es aˣ · ln a, así que queda 2ˣ · ln 2. La regla de la potencia no aplica: x está en el exponente." }
+    }
+  ]
+}

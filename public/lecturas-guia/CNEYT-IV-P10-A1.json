@@ -1,0 +1,56 @@
+{
+  "codigo": "CNEYT-IV-P10-A1",
+  "conceptos": [
+    { "termino": "Reacción reversible", "idea": "Ocurre en los dos sentidos a la vez; se escribe con doble flecha ⇌." },
+    { "termino": "Equilibrio dinámico", "idea": "Las dos reacciones siguen, pero al mismo ritmo: las concentraciones ya no cambian." },
+    { "termino": "Constante Kc", "idea": "Dice si en el equilibrio dominan productos (Kc grande) o reactivos (Kc pequeña)." },
+    { "termino": "Le Châtelier", "idea": "Si perturbas un equilibrio, se desplaza para contrarrestar el cambio." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Reacciones de ida y vuelta",
+      "idea": "En una reacción reversible, el equilibrio llega cuando la reacción directa y la inversa van a la misma velocidad.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Al inicio", "texto": "Solo hay reactivos: la reacción directa va muy rápido." },
+        { "titulo": "Se acumulan productos", "texto": "Arranca la reacción inversa y se acelera." },
+        { "titulo": "Velocidades iguales", "texto": "Por cada molécula que se forma, otra se descompone." },
+        { "titulo": "Equilibrio dinámico", "texto": "Todo sigue reaccionando, pero las concentraciones ya no cambian." }
+      ] },
+      "comprueba": { "pregunta": "En un equilibrio químico, ¿qué pasa con las moléculas?", "opciones": ["Dejan de reaccionar", "Siguen reaccionando en ambos sentidos al mismo ritmo", "Solo reaccionan hacia los productos"], "correcta": 1, "porque": "El equilibrio es dinámico: ambas reacciones continúan, pero a la misma velocidad, por eso las concentraciones se mantienen constantes." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Kc y Q: medir y predecir",
+      "idea": "Kc dice hacia dónde está corrido el equilibrio; comparar Q con Kc dice hacia dónde se moverá la reacción.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Constante de equilibrio", "expr": "Kc = [C]ᶜ·[D]ᵈ ÷ ([A]ᵃ·[B]ᵇ)", "leyenda": "Para aA + bB ⇌ cC + dD; solo depende de la temperatura" },
+        { "nombre": "Q < Kc", "expr": "faltan productos → avanza a la derecha" },
+        { "nombre": "Q > Kc", "expr": "sobran productos → avanza a la izquierda" },
+        { "nombre": "Q = Kc", "expr": "el sistema ya está en equilibrio" }
+      ] },
+      "comprueba": { "pregunta": "En cierto instante calculas que Q es menor que Kc. ¿Hacia dónde avanza la reacción?", "opciones": ["Hacia la izquierda", "No se mueve", "Hacia la derecha"], "correcta": 2, "porque": "Si Q < Kc faltan productos, así que la reacción avanza a la derecha para formarlos." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Le Châtelier: el equilibrio se defiende",
+      "idea": "Un equilibrio perturbado se desplaza en el sentido que contrarresta el cambio; un catalizador no lo desplaza.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Si haces esto…", "puntos": ["Agregas reactivo", "Agregas producto", "Subes la presión", "Subes la temperatura"] },
+        { "titulo": "…el equilibrio se mueve", "puntos": ["A la derecha, para consumirlo", "A la izquierda", "Al lado con menos moles de gas", "Al lado que absorbe calor"] }
+      ] },
+      "comprueba": { "pregunta": "Agregas un catalizador a una reacción en equilibrio. ¿Qué ocurre?", "opciones": ["El equilibrio se desplaza a los productos", "El equilibrio se alcanza antes, pero no se desplaza", "Kc aumenta"], "correcta": 1, "porque": "El catalizador acelera por igual ambas reacciones: el equilibrio llega antes, pero no se desplaza ni cambia Kc." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "El equilibrio en México y en ti",
+      "idea": "Del amoniaco de los fertilizantes al pH de tu sangre, el equilibrio químico explica y controla muchos procesos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Industria", "puntos": ["Haber-Bosch: N₂ + 3 H₂ ⇌ 2 NH₃", "Alta presión para favorecer el NH₃"] },
+        { "titulo": "Ambiente", "puntos": ["N₂O₄ ⇌ 2 NO₂", "El NO₂ pardo del esmog"] },
+        { "titulo": "Tu cuerpo", "puntos": ["CO₂ + H₂O ⇌ H₂CO₃ ⇌ HCO₃⁻ + H⁺", "Mantiene estable el pH de la sangre"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué el proceso Haber-Bosch trabaja a alta presión?", "opciones": ["Porque el lado del NH₃ tiene menos moles de gas", "Porque la presión cambia el valor de Kc", "Porque así la reacción se vuelve irreversible"], "correcta": 0, "porque": "Al subir la presión, el equilibrio se desplaza al lado con menos moles de gas: 2 NH₃ frente a 4 de N₂ + H₂." }
+    }
+  ]
+}

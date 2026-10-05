@@ -1,0 +1,48 @@
+{
+  "codigo": "PM-VI-P04-A1",
+  "conceptos": [
+    { "termino": "Dispersión", "idea": "Qué tan separados o juntos están los datos entre sí." },
+    { "termino": "Rango", "idea": "El máximo menos el mínimo." },
+    { "termino": "Varianza", "idea": "El promedio de las desviaciones al cuadrado; queda en unidades al cuadrado." },
+    { "termino": "Desviación estándar", "idea": "La raíz de la varianza: dispersión en las mismas unidades de los datos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Misma media, distinta dispersión",
+      "idea": "Dos grupos pueden tener la misma media y ser muy distintos; el rango es la forma más simple de medirlo, pero es frágil.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Grupo A", "puntos": ["60, 70, 75, 80, 90", "Media 75", "Rango 90 − 60 = 30"] },
+        { "titulo": "Grupo B", "puntos": ["73, 74, 75, 76, 77", "Media 75", "Rango 77 − 73 = 4"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es el rango de los datos 12, 15, 20 y 41?", "opciones": ["41", "8", "29"], "correcta": 2, "porque": "Rango = máximo − mínimo = 41 − 12 = 29. Ojo: el 41 parece atípico y por sí solo infla el rango." }
+    },
+    {
+      "parrafos": [2, 3, 4],
+      "titulo": "Varianza y desviación estándar",
+      "idea": "Se elevan al cuadrado las desviaciones para que no se cancelen, se promedian (varianza) y se saca raíz (desviación estándar).",
+      "visual": { "tipo": "ejemplo", "titulo": "Grupo A como población (N = 5)", "lineas": ["Desviaciones: −15, −5, 0, 5, 15 (suman 0)", "Al cuadrado: 225, 25, 0, 25, 225 → suman 500", "Varianza: 500 ÷ 5 = 100 puntos²", "Si fuera muestra se divide entre n − 1 = 4"], "resultado": "s = √100 = 10 puntos (en el Grupo B, s = √2 ≈ 1.41)" },
+      "comprueba": { "pregunta": "La varianza de unos tiempos de llegada es 16 min². ¿Cuál es su desviación estándar?", "opciones": ["4 min", "16 min", "8 min"], "correcta": 0, "porque": "La desviación estándar es la raíz cuadrada de la varianza: √16 = 4, y regresa a las unidades originales, minutos." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "La regla 68-95-99.7",
+      "idea": "En una distribución casi normal, a 1, 2 y 3 desviaciones estándar de la media cae el 68%, 95% y 99.7% de los datos.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "68%", "etiqueta": "entre x̄ − s y x̄ + s", "barra": 68 },
+        { "valor": "95%", "etiqueta": "entre x̄ − 2s y x̄ + 2s", "barra": 95 },
+        { "valor": "99.7%", "etiqueta": "entre x̄ − 3s y x̄ + 3s", "barra": 99.7 }
+      ] },
+      "comprueba": { "pregunta": "Unas calificaciones casi normales tienen media 70 y s = 5. ¿Entre qué valores cae aproximadamente el 95%?", "opciones": ["Entre 65 y 75", "Entre 60 y 80", "Entre 55 y 85"], "correcta": 1, "porque": "El 95% cae entre x̄ − 2s y x̄ + 2s: 70 − 10 = 60 y 70 + 10 = 80." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "Coeficiente de variación: comparar escalas",
+      "idea": "El CV mide la dispersión relativa a la media y permite comparar conjuntos con escalas distintas, como salarios de médicos y maestros.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Coeficiente de variación", "expr": "CV = (s ÷ x̄) × 100%", "leyenda": "Comparación justa sin importar la escala o las unidades" }
+      ] },
+      "comprueba": { "pregunta": "El conjunto X tiene x̄ = 50 y s = 5; el conjunto Y, x̄ = 200 y s = 10. ¿Cuál es más disperso en términos relativos?", "opciones": ["Y, porque su s es mayor", "Son igual de dispersos", "X, con CV de 10%"], "correcta": 2, "porque": "CV de X = 5 ÷ 50 × 100% = 10%; CV de Y = 10 ÷ 200 × 100% = 5%. X varía más respecto a su media." }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "codigo": "CNEYT-II-P10-A1",
+  "conceptos": [
+    { "termino": "Entalpía", "idea": "H = U + PV: mide el calor intercambiado a presión constante." },
+    { "termino": "Exotérmico / endotérmico", "idea": "Exotérmico libera calor al entorno; endotérmico lo absorbe." },
+    { "termino": "Entropía", "idea": "Medida del desorden o de qué tan dispersa está la energía." },
+    { "termino": "Cero absoluto", "idea": "0 K = −273.15 °C: la temperatura más baja posible, inalcanzable." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Lo que la primera ley no explica",
+      "idea": "La primera ley dice que la energía se conserva, pero no explica por qué el calor fluye solo de lo caliente a lo frío.",
+      "comprueba": { "pregunta": "¿Qué pregunta NO responde la primera ley de la termodinámica?", "opciones": ["Si la energía se conserva", "Por qué el calor va de lo caliente a lo frío", "Cómo un motor transforma calor en trabajo"], "correcta": 1, "porque": "La primera ley solo afirma que la energía se conserva; la dirección del flujo de calor necesita otras leyes." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Entalpía: calor a presión constante",
+      "idea": "La entalpía mide el calor de procesos a presión constante; si se libera calor es exotérmico, si se absorbe es endotérmico.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Exotérmico", "puntos": ["Libera calor al entorno", "Ejemplo: una combustión"] },
+        { "titulo": "Endotérmico", "puntos": ["Absorbe calor del entorno", "Ejemplo: disolver sales que enfrían el agua"] }
+      ] },
+      "comprueba": { "pregunta": "Al disolver una sal en agua, el vaso se siente frío. ¿Qué tipo de proceso es?", "opciones": ["Endotérmico", "Exotérmico", "Ninguno: no hay intercambio de calor"], "correcta": 0, "porque": "El proceso absorbe calor del entorno (el agua y tu mano), por eso se enfría: es endotérmico." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Entropía y la segunda ley",
+      "idea": "En todo proceso espontáneo la entropía total del universo aumenta; por eso ninguna máquina térmica es 100% eficiente.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Entropía", "texto": "Mide el desorden, o la dispersión de la energía." },
+        { "titulo": "Segunda ley", "texto": "En todo proceso espontáneo, la entropía del universo aumenta." },
+        { "titulo": "Consecuencia 1", "texto": "El calor fluye solo de lo caliente a lo frío." },
+        { "titulo": "Consecuencia 2", "texto": "Ninguna máquina térmica es 100% eficiente." }
+      ] },
+      "comprueba": { "pregunta": "Un inventor anuncia un motor que convierte todo el calor en trabajo, sin pérdidas. ¿Qué ley lo contradice?", "opciones": ["La primera ley", "La tercera ley", "La segunda ley"], "correcta": 2, "porque": "La segunda ley implica que siempre se pierde algo de energía como calor disperso: ninguna máquina es 100% eficiente." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Tercera ley: el cero absoluto",
+      "idea": "Un cristal perfecto a 0 K tendría entropía cero, pero el cero absoluto es inalcanzable.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "0 K", "etiqueta": "Cero absoluto: la temperatura más baja posible" },
+        { "valor": "−273.15 °C", "etiqueta": "El mismo cero absoluto en grados Celsius" }
+      ] },
+      "comprueba": { "pregunta": "Según la tercera ley, ¿qué pasa si enfrías un material cada vez más?", "opciones": ["Llega exactamente a 0 K", "Se acerca a 0 K sin alcanzarlo nunca", "Su entropía aumenta"], "correcta": 1, "porque": "La tercera ley implica que el cero absoluto es inalcanzable: podemos acercarnos mucho, pero nunca llegar." }
+    }
+  ]
+}

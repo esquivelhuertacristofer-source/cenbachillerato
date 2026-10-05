@@ -1,0 +1,29 @@
+{
+  "codigo": "LC-I-P07-A1",
+  "conceptos": [
+    { "termino": "Dicción", "idea": "Pronunciar con claridad cada sílaba." },
+    { "termino": "Entonación", "idea": "Cambios de tono que distinguen preguntas, exclamaciones y afirmaciones." },
+    { "termino": "Escucha activa", "idea": "Seguir el hilo del texto, detectar inconsistencias y opinar con fundamento." },
+    { "termino": "Opinión fundamentada", "idea": "Explicar por qué, con argumentos del texto, no solo si te gustó." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Dar vida al texto con la voz",
+      "idea": "Al leer en voz alta eres intermediario entre el texto y el público, y para eso necesitas técnica.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Dicción", "puntos": ["Pronunciación clara de cada sílaba"] },
+        { "titulo": "Entonación", "puntos": ["Tono de pregunta, exclamación o afirmación"] },
+        { "titulo": "Ritmo", "puntos": ["Ni demasiado rápido ni demasiado lento"] },
+        { "titulo": "Pausas", "puntos": ["Dan tiempo al oyente para procesar"] }
+      ] },
+      "comprueba": { "pregunta": "Un lector va tan rápido que el público no alcanza a entender. ¿Qué elemento técnico debe cuidar?", "opciones": ["El ritmo", "La entonación", "La concordancia"], "correcta": 0, "porque": "El ritmo es la velocidad adecuada de lectura: ni demasiado rápida ni demasiado lenta." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "El oyente también trabaja",
+      "idea": "Escuchar lecturas te entrena para seguir el hilo, detectar inconsistencias y opinar con argumentos del texto.",
+      "comprueba": { "pregunta": "¿Cuál es una opinión fundamentada sobre un cuento?", "opciones": ["«Me gustó mucho.»", "«No me gustó y ya.»", "«El final sorprende porque el narrador ocultó una pista desde el inicio.»"], "correcta": 2, "porque": "Opinar no es solo decir si te gustó: es explicar por qué, con argumentos basados en el texto." }
+    }
+  ]
+}

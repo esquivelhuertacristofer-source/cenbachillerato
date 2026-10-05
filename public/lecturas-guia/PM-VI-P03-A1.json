@@ -1,0 +1,62 @@
+{
+  "codigo": "PM-VI-P03-A1",
+  "conceptos": [
+    { "termino": "Media", "idea": "El promedio: sumas todo y divides entre el número de datos." },
+    { "termino": "Mediana", "idea": "El dato del centro cuando los ordenas de menor a mayor." },
+    { "termino": "Moda", "idea": "El valor que más se repite." },
+    { "termino": "Valor atípico", "idea": "Un dato extremadamente alto o bajo que se sale del grupo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La media y su punto débil",
+      "idea": "La media resume los datos en un número, pero un solo valor atípico puede jalarla y dejar de representar al grupo.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Media aritmética", "expr": "x̄ = (suma de todos los valores) ÷ n" },
+        { "nombre": "Propiedad", "expr": "Σ(xᵢ − x̄) = 0", "leyenda": "Las desviaciones respecto a la media siempre suman cero" }
+      ] },
+      "comprueba": { "pregunta": "Cinco amigos tienen 2, 3, 4, 5 y 96 estampas. ¿Cuál es la media?", "opciones": ["22", "4", "110"], "correcta": 0, "porque": "(2 + 3 + 4 + 5 + 96) ÷ 5 = 110 ÷ 5 = 22. El 96 la jala hacia arriba: casi nadie tiene 22." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Mediana y moda",
+      "idea": "La mediana es el centro de los datos ordenados y resiste a los atípicos; la moda es lo más frecuente y sirve hasta para categorías.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Mediana con n impar", "expr": "dato en la posición (n + 1)/2" },
+        { "nombre": "Mediana con n par", "expr": "promedio de los datos en n/2 y n/2 + 1" },
+        { "nombre": "Moda", "expr": "el valor más frecuente", "leyenda": "Unimodal, bimodal, multimodal o amodal" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es la mediana de 2, 9, 4 y 5?", "opciones": ["5", "4.5", "4"], "correcta": 1, "porque": "Ordenados quedan 2, 4, 5, 9. Como n = 4 es par, se promedian los dos centrales: (4 + 5) ÷ 2 = 4.5." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Cuál medida elegir",
+      "idea": "Mediana si hay atípicos o asimetría; media si los datos son simétricos; moda si la variable es cualitativa o buscas lo más común.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Mediana", "puntos": ["Valores atípicos extremos", "Distribución muy asimétrica"] },
+        { "titulo": "Media", "puntos": ["Distribución casi simétrica", "Sin atípicos extremos"] },
+        { "titulo": "Moda", "puntos": ["Variable cualitativa", "Buscas el valor más común"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber cuál es la marca de celular más común en tu salón. ¿Qué medida usas?", "opciones": ["La media", "La mediana", "La moda"], "correcta": 2, "porque": "La marca es una variable cualitativa nominal: no tiene media ni mediana, solo moda, el valor más frecuente." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "La media ponderada",
+      "idea": "Cuando los datos no pesan lo mismo, cada uno cuenta según su importancia, como los créditos de una materia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Promedio escolar", "puntos": ["Pesa el número de créditos", "Una materia de 8 créditos cuenta más que una de 3"] },
+        { "titulo": "INPC del INEGI", "puntos": ["Mide la inflación", "Cada bien pesa según su importancia en el gasto de los hogares"] }
+      ] },
+      "comprueba": { "pregunta": "Sacas 10 en una materia de 8 créditos y 5 en una de 2 créditos. ¿Cuál es tu promedio ponderado?", "opciones": ["7.5", "9", "8"], "correcta": 1, "porque": "(10 × 8 + 5 × 2) ÷ (8 + 2) = 90 ÷ 10 = 9. La materia de más créditos pesa más." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "El salario: media contra mediana",
+      "idea": "Los salarios altísimos del decil 10 inflan la media; el salario mediano retrata mejor a la mayoría de los trabajadores.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Salario medio", "puntos": ["Lo elevan los salarios extremos del decil 10", "Se ve más alto de lo que gana la mayoría"] },
+        { "titulo": "Salario mediano", "puntos": ["La mitad gana más y la mitad gana menos", "Significativamente menor que la media", "Refleja mejor a la mayoría (datos de la ENOE)"] }
+      ] }
+    }
+  ]
+}

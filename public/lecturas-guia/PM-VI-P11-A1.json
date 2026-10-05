@@ -1,0 +1,50 @@
+{
+  "codigo": "PM-VI-P11-A1",
+  "conceptos": [
+    { "termino": "Principio multiplicativo", "idea": "Si decides en etapas, multiplicas las opciones de cada etapa." },
+    { "termino": "Permutación", "idea": "Arreglo donde el orden sí importa." },
+    { "termino": "Combinación", "idea": "Selección donde el orden no importa." },
+    { "termino": "Con o sin reemplazo", "idea": "Si regresas el objeto, el total no cambia; si no, disminuye." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Contar antes de calcular probabilidad",
+      "idea": "Si una decisión se toma en etapas, el total de resultados es el producto de las opciones de cada etapa.",
+      "visual": { "tipo": "ejemplo", "titulo": "3 playeras y 2 pantalones", "lineas": ["Etapa 1: elegir playera → 3 opciones", "Etapa 2: elegir pantalón → 2 opciones", "Total = 3 × 2"], "resultado": "6 atuendos distintos" },
+      "comprueba": { "pregunta": "Una nevería tiene 4 sabores y 3 toppings. ¿Cuántos helados de un sabor y un topping puedes armar?", "opciones": ["7", "12", "24"], "correcta": 1, "porque": "Por el principio multiplicativo: 4 sabores × 3 toppings = 12 helados." }
+    },
+    {
+      "parrafos": [1, 2],
+      "titulo": "¿Importa el orden?",
+      "idea": "Si el orden importa, cuentas permutaciones; si no, combinaciones, que siempre son menos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Permutaciones", "expr": "P(n,r) = n! ÷ (n − r)!", "leyenda": "Podio de 5 corredores: 5 × 4 × 3 = 60" },
+        { "nombre": "Combinaciones", "expr": "C(n,r) = n! ÷ [r!·(n − r)!]", "leyenda": "Comité de 3 entre 5: 120 ÷ (6 × 2) = 10" },
+        { "nombre": "Factorial", "expr": "n! = 1 × 2 × … × n" }
+      ] },
+      "comprueba": { "pregunta": "Vas a invitar a 2 de tus 4 amigos al cine; no importa el orden. ¿De cuántas formas puedes elegirlos?", "opciones": ["6", "12", "16"], "correcta": 0, "porque": "Es combinación: C(4,2) = 4! ÷ (2!·2!) = 24 ÷ 4 = 6. El 12 sería si el orden importara." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Con y sin reemplazo",
+      "idea": "Sin reemplazo cada extracción reduce lo disponible; con reemplazo el total se mantiene, y eso cambia el conteo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sin reemplazo", "puntos": ["No se devuelve el objeto", "El total disponible baja", "Sacar 2 cartas sin regresarlas"] },
+        { "titulo": "Con reemplazo", "puntos": ["Se devuelve el objeto", "El total no cambia", "Tirar un dado dos veces"] }
+      ] },
+      "comprueba": { "pregunta": "Una bolsa tiene 10 papelitos. Sacas uno, no lo regresas y sacas otro. ¿Entre cuántos papelitos sale el segundo?", "opciones": ["10", "11", "9"], "correcta": 2, "porque": "Es sin reemplazo: el primero ya no está, así que quedan 10 − 1 = 9 papelitos." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "De contar a la probabilidad",
+      "idea": "Contando casos favorables y posibles calculas probabilidades, y debes distinguir eventos independientes, dependientes y condicionados.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Probabilidad clásica", "expr": "P = casos favorables ÷ casos posibles", "leyenda": "Sorteo de 6 números entre 49: 1 ÷ C(49,6)" },
+        { "nombre": "Independientes", "expr": "P(A y B) = P(A) × P(B)", "leyenda": "Dos tiros de dado" },
+        { "nombre": "Condicionada", "expr": "P(B|A) = P(A y B) ÷ P(A)", "leyenda": "B sabiendo que ya ocurrió A" }
+      ] },
+      "comprueba": { "pregunta": "Tiras un dado dos veces. ¿Cuál es la probabilidad de sacar 6 en ambos tiros?", "opciones": ["1/12", "1/36", "1/6"], "correcta": 1, "porque": "Los tiros son independientes: P = 1/6 × 1/6 = 1/36." }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "codigo": "PM-III-P03-A1",
+  "conceptos": [
+    { "termino": "Fórmula general", "idea": "Resuelve cualquier ax² + bx + c = 0; el ± da hasta dos soluciones." },
+    { "termino": "Discriminante", "idea": "Δ = b² − 4ac, lo que va bajo la raíz; dice cuántas soluciones reales hay." },
+    { "termino": "Raíz doble", "idea": "Cuando Δ = 0, los dos valores de la fórmula coinciden en x = −b/2a." },
+    { "termino": "Punto de equilibrio", "idea": "El momento en que los ingresos igualan a los costos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La fórmula general y su discriminante",
+      "idea": "Antes de resolver toda la fórmula, el discriminante te dice cuántas soluciones reales tiene la ecuación.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Fórmula general", "expr": "x = (−b ± √(b² − 4ac)) / (2a)", "leyenda": "El ± da dos cálculos: uno con suma y otro con resta" },
+        { "nombre": "Discriminante", "expr": "Δ = b² − 4ac", "leyenda": "La expresión que queda bajo el radical" }
+      ] },
+      "comprueba": { "pregunta": "En x² + 4x + 1 = 0, ¿cuánto vale el discriminante?", "opciones": ["12", "20", "4"], "correcta": 0, "porque": "Δ = b² − 4ac = 4² − 4(1)(1) = 16 − 4 = 12." }
+    },
+    {
+      "parrafos": [2, 3, 4],
+      "titulo": "Tres casos según el signo de Δ",
+      "idea": "Si Δ es positivo hay dos raíces reales, si es cero hay una, y si es negativo no hay ninguna.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Δ > 0", "puntos": ["Dos raíces reales distintas", "La parábola cruza el eje horizontal en dos puntos"] },
+        { "titulo": "Δ = 0", "puntos": ["Una raíz real (doble): x = −b/2a", "La parábola toca el eje solo en el vértice"] },
+        { "titulo": "Δ < 0", "puntos": ["Sin raíces reales", "La parábola no toca el eje horizontal"] }
+      ] },
+      "comprueba": { "pregunta": "En x² + 2x + 5 = 0, Δ = 4 − 20 = −16. ¿Cuántas raíces reales tiene?", "opciones": ["Dos", "Una", "Ninguna"], "correcta": 2, "porque": "Δ es negativo, y la raíz cuadrada de un número negativo no existe en los reales: la parábola no toca el eje." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Saber cuántas soluciones sin resolver",
+      "idea": "Calcular solo Δ basta para saber, por ejemplo, cuántos puntos de equilibrio tiene una empresa familiar.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Modela", "texto": "Escribe la situación como una ecuación cuadrática." },
+        { "titulo": "Calcula Δ", "texto": "Solo b² − 4ac, sin resolver toda la fórmula." },
+        { "titulo": "Interpreta", "texto": "Δ > 0: dos puntos de equilibrio. Δ = 0: uno. Δ < 0: ninguno; revisa el modelo." }
+      ] },
+      "comprueba": { "pregunta": "El modelo de una empresa da Δ = 0. ¿Cuántos puntos de equilibrio tiene?", "opciones": ["Ninguno", "Exactamente uno", "Dos"], "correcta": 1, "porque": "Con Δ = 0 la ecuación tiene una sola raíz real, así que hay exactamente un punto de equilibrio." }
+    }
+  ]
+}

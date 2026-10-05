@@ -1,0 +1,45 @@
+{
+  "codigo": "CH-II-P02-A1",
+  "conceptos": [
+    { "termino": "Hipótesis histórica", "idea": "Afirmación provisional sobre el pasado que la evidencia puede sustentar o refutar." },
+    { "termino": "Fuente histórica", "idea": "Rastro del pasado: documento, objeto, imagen, edificio o testimonio." },
+    { "termino": "Contextualizar", "idea": "Situar la fuente en su época para entender qué significaba entonces." },
+    { "termino": "AGN", "idea": "Archivo General de la Nación: guarda decretos, juicios, correspondencia y padrones." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Qué es una hipótesis histórica",
+      "idea": "El pasado se reconstruye con rastros, y la hipótesis es una interpretación provisional que se revisa cuando aparecen nuevas fuentes.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Condiciones X", "texto": "Dado que existen ciertas condiciones…" },
+        { "titulo": "Ocurrió Y", "texto": "…se propone que ocurrió algo…" },
+        { "titulo": "Razones Z", "texto": "…por estas razones." }
+      ] },
+      "comprueba": { "pregunta": "Aparece una carta nueva que contradice tu hipótesis sobre un hecho del siglo XIX. ¿Qué haces?", "opciones": ["Ignoras la carta, la hipótesis ya estaba hecha", "Revisas tu hipótesis a la luz de la nueva fuente", "Declaras que el hecho nunca ocurrió"], "correcta": 1, "porque": "La hipótesis es provisional: se revisa cuando aparecen nuevas fuentes. La historia es una conversación abierta con el pasado." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Fuentes del México del siglo XIX",
+      "idea": "Periódicos, fotografías, memorias de viajeros y archivos oficiales muestran el siglo XIX desde ángulos distintos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Periódicos", "puntos": ["El Monitor Republicano (1844), liberal", "Debates políticos y opiniones de las élites"] },
+        { "titulo": "Imágenes y miradas externas", "puntos": ["Archivo Casasola: vida cotidiana y personajes", "Frances Calderón de la Barca: mirada de una extranjera"] },
+        { "titulo": "Archivo oficial (AGN)", "puntos": ["Decretos y juicios", "Correspondencia gubernamental y padrones"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber cómo veía una persona extranjera la sociedad mexicana de la época. ¿Qué fuente consultas?", "opciones": ["Las memorias de Frances Calderón de la Barca", "Los padrones de población del AGN", "Los decretos oficiales"], "correcta": 0, "porque": "Las memorias de viajeros extranjeros, como las de Calderón de la Barca, ofrecen una mirada externa sobre la sociedad mexicana." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Cuatro pasos para formular hipótesis",
+      "idea": "Observas, contextualizas, formulas y luego buscas otras fuentes que confirmen, maticen o contradigan tu idea.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Observar", "texto": "Qué tipo de documento es, quién lo produjo, cuándo y en qué contexto." },
+        { "titulo": "Contextualizar", "texto": "Situarlo en el marco histórico amplio." },
+        { "titulo": "Formular", "texto": "Escribir la hipótesis con la estructura X, Y, Z." },
+        { "titulo": "Contrastar", "texto": "Buscar otras fuentes para fortalecer o revisar la interpretación." }
+      ] },
+      "comprueba": { "pregunta": "Ya leíste el Plan de Ayutla y escribiste tu hipótesis. ¿Qué paso sigue?", "opciones": ["Observar la fuente", "Darla por comprobada", "Buscar otras fuentes que la confirmen o contradigan"], "correcta": 2, "porque": "El cuarto paso es contrastar con otras fuentes para fortalecer o revisar la interpretación." }
+    }
+  ]
+}

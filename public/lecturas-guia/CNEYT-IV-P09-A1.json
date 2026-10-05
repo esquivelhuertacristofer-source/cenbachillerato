@@ -1,0 +1,46 @@
+{
+  "codigo": "CNEYT-IV-P09-A1",
+  "conceptos": [
+    { "termino": "Oxidación", "idea": "Perder electrones: el número de oxidación sube." },
+    { "termino": "Reducción", "idea": "Ganar electrones: el número de oxidación baja." },
+    { "termino": "Agente reductor", "idea": "La especie que cede electrones y por eso se oxida." },
+    { "termino": "Pila galvánica", "idea": "Un redox separado en dos electrodos que obliga a los electrones a pasar por un cable." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Oxidar y reducir: pasar electrones",
+      "idea": "En todo redox una especie pierde electrones (se oxida) y otra los gana (se reduce); nunca ocurre una sin la otra.",
+      "visual": { "tipo": "ejemplo", "titulo": "Lámina de zinc en sulfato de cobre", "lineas": ["Oxidación: Zn → Zn²⁺ + 2e⁻", "Reducción: Cu²⁺ + 2e⁻ → Cu", "Global: Zn + Cu²⁺ → Zn²⁺ + Cu"], "resultado": "La lámina se cubre de cobre rojizo y la disolución se decolora." },
+      "comprueba": { "pregunta": "En Zn + Cu²⁺ → Zn²⁺ + Cu, ¿quién es el agente reductor?", "opciones": ["El Cu²⁺", "El Cu", "El Zn"], "correcta": 2, "porque": "El zinc cede electrones, así que se oxida; quien se oxida es el agente reductor." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "La combustión también es redox",
+      "idea": "Quemar es oxidar rápido con oxígeno: libera calor y luz, y si falta oxígeno se forma monóxido de carbono tóxico.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Combustión completa", "puntos": ["Hay oxígeno suficiente", "Produce CO₂ y agua"] },
+        { "titulo": "Combustión incompleta", "puntos": ["Falta oxígeno", "Produce CO (tóxico) y hollín"] }
+      ] },
+      "comprueba": { "pregunta": "Un calentador de gas está en un baño cerrado y sin ventilación. ¿Cuál es el peligro?", "opciones": ["Que produzca demasiado oxígeno", "Que la combustión sea incompleta y genere CO", "Que el metano se reduzca"], "correcta": 1, "porque": "Sin oxígeno suficiente la combustión es incompleta y produce monóxido de carbono, un gas tóxico." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Pilas: redox que da corriente",
+      "idea": "Si separas oxidación y reducción en dos electrodos, los electrones viajan por un cable; un voltaje positivo indica reacción espontánea.",
+      "visual": { "tipo": "ejemplo", "titulo": "Voltaje de la pila de Daniell", "lineas": ["E°pila = E°cátodo − E°ánodo", "Cátodo: cobre, E° = 0.34 V · Ánodo: zinc, E° = −0.76 V", "E°pila = 0.34 − (−0.76)"], "resultado": "E°pila = +1.10 V: positivo, la reacción es espontánea." },
+      "comprueba": { "pregunta": "En la pila de Daniell, ¿en qué electrodo ocurre la oxidación del zinc?", "opciones": ["En el ánodo (−)", "En el cátodo (+)", "En el cable"], "correcta": 0, "porque": "El zinc se oxida en el ánodo (−) y los iones cobre se reducen en el cátodo (+)." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Redox en la vida y la industria",
+      "idea": "La respiración, la fotosíntesis, la herrumbre, los motores y las baterías son reacciones redox.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Respiración celular", "puntos": ["Oxida la glucosa", "Como una combustión, pero por pasos"] },
+        { "titulo": "Fotosíntesis", "puntos": ["Redox inverso", "Reduce el CO₂ a glucosa y libera O₂"] },
+        { "titulo": "Herrumbre", "puntos": ["Hierro que se oxida con oxígeno y humedad", "Se combate con galvanizado (zinc)"] }
+      ] },
+      "comprueba": { "pregunta": "Una reja de hierro se galvaniza (se recubre de zinc). ¿Por qué deja de oxidarse?", "opciones": ["Porque el zinc elimina el oxígeno del aire", "Porque el zinc se oxida en su lugar", "Porque el hierro gana electrones del aire"], "correcta": 1, "porque": "El texto explica que el galvanizado protege al hierro porque el zinc se oxida «en su lugar»." }
+    }
+  ]
+}

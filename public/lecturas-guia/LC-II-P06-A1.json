@@ -1,0 +1,52 @@
+{
+  "codigo": "LC-II-P06-A1",
+  "conceptos": [
+    { "termino": "Reescribir", "idea": "Transformar a fondo un texto para hacerlo más claro, rico o adecuado." },
+    { "termino": "Amplificación", "idea": "Añadir detalles, ejemplos, datos o contexto." },
+    { "termino": "Condensación", "idea": "Quitar lo redundante y el relleno para que cada palabra cuente." },
+    { "termino": "Sustitución léxica", "idea": "Cambiar palabras por otras de registro más adecuado al tono." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Reescribir: amplificar y condensar",
+      "idea": "Reescribir es transformar a fondo el texto; amplificar le suma riqueza y condensar le quita lo que sobra.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Amplificación", "puntos": ["Añade detalles sensoriales, ejemplos o contexto", "«hacía calor» → «el pavimento de la avenida irradiaba el calor acumulado del mediodía…»"] },
+        { "titulo": "Condensación", "puntos": ["Elimina lo redundante y el relleno", "Respeta el tiempo del lector"] }
+      ] },
+      "comprueba": { "pregunta": "Borras de tu texto tres frases que repetían lo que ya habías dicho. ¿Qué estrategia usaste?", "opciones": ["Amplificación", "Cambio de voz narrativa", "Condensación"], "correcta": 2, "porque": "La condensación elimina lo redundante, lo ya dicho y las frases de relleno que no aportan significado." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cambiar la voz y las palabras",
+      "idea": "Cambiar de persona o de tiempo verbal transforma el efecto del texto; cambiar palabras ajusta su tono.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cambio de voz narrativa", "puntos": ["De tercera a primera persona: el reporte se vuelve testimonio", "De pasado a presente: más inmediatez"] },
+        { "titulo": "Sustitución léxica", "puntos": ["«comer» → «devorar», «saborear», «ingerir» o «picotear»", "Según el tono que buscas"] }
+      ] },
+      "comprueba": { "pregunta": "Cambias «Ella corrió hacia la puerta» por «Yo corro hacia la puerta». ¿Qué efecto consigues?", "opciones": ["Un testimonio con más inmediatez", "Un texto más condensado", "Un reporte más objetivo"], "correcta": 0, "porque": "Pasar a primera persona convierte el reporte en testimonio, y pasar a presente aumenta la sensación de inmediatez." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "La reescritura en las editoriales mexicanas",
+      "idea": "Las editoriales trabajan con los autores en varias rondas de revisión antes de imprimir un libro.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Almadía (Oaxaca)", "puntos": ["Cuidado minucioso de los manuscritos", "Múltiples rondas de revisión con los autores"] },
+        { "titulo": "Planeta México", "puntos": ["Mayor escala comercial", "Reescrituras con cambios profundos de estructura y voz"] }
+      ] }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Cómo practicar la reescritura",
+      "idea": "Lee tu texto en voz alta, pregúntate qué sobra y qué falta, y revísalo con distancia temporal.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Lee en voz alta", "texto": "Toma un párrafo propio y escúchalo." },
+        { "titulo": "¿Qué sobra?", "texto": "Busca palabras que puedas quitar sin perder significado." },
+        { "titulo": "¿Qué falta?", "texto": "Añade una imagen para que el lector vea lo que viste." },
+        { "titulo": "Deja pasar el tiempo", "texto": "Revisa horas o días después, con ojos frescos." }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué conviene revisar tu texto días después de escribirlo?", "opciones": ["Porque así se corrige solo", "Porque lo lees con ojos frescos y detectas lo que antes era invisible", "Porque así sale más largo"], "correcta": 1, "porque": "La distancia temporal permite detectar inconsistencias y oportunidades de mejora invisibles al escribir." }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "codigo": "PM-IV-P05-A1",
+  "conceptos": [
+    { "termino": "Triángulo oblicuángulo", "idea": "El que no tiene ningún ángulo de 90°." },
+    { "termino": "Ley de Senos", "idea": "Cada lado entre el seno de su ángulo opuesto da siempre lo mismo." },
+    { "termino": "Ley de Cosenos", "idea": "Generaliza Pitágoras a triángulos sin ángulo recto." },
+    { "termino": "Triangulación", "idea": "Medir distancias inaccesibles con triángulos; así se hacían los mapas antes del GPS." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Triángulos sin ángulo recto",
+      "idea": "Seno, coseno y tangente del triángulo rectángulo no bastan cuando ningún ángulo mide 90°.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Acutángulo", "puntos": ["Todos sus ángulos miden menos de 90°"] },
+        { "titulo": "Obtusángulo", "puntos": ["Un ángulo mide más de 90°"] },
+        { "titulo": "Para resolverlo", "puntos": ["Al menos tres elementos conocidos", "Al menos uno debe ser un lado"] }
+      ] },
+      "comprueba": { "pregunta": "Un triángulo tiene ángulos de 100°, 50° y 30°. ¿Qué tipo es?", "opciones": ["Rectángulo", "Acutángulo", "Obtusángulo"], "correcta": 2, "porque": "Uno de sus ángulos (100°) es mayor de 90°, así que es obtusángulo." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Ley de Senos: casos ALA y LAA",
+      "idea": "Cuando conoces dos ángulos y un lado, la Ley de Senos te da los elementos que faltan.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Ley de Senos", "expr": "a / sen(A) = b / sen(B) = c / sen(C)", "leyenda": "Cada lado entre el seno de su ángulo opuesto" }
+      ] },
+      "comprueba": { "pregunta": "Conoces dos ángulos y el lado comprendido entre ellos. ¿Qué herramienta usas?", "opciones": ["Ley de Senos", "Ley de Cosenos", "Teorema de Pitágoras"], "correcta": 0, "porque": "Es el caso ALA, uno de los dos casos de la Ley de Senos." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Ley de Cosenos: casos LLL y LAL",
+      "idea": "La Ley de Cosenos es Pitágoras con un ajuste; si el ángulo es de 90°, el ajuste vale cero.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Ley de Cosenos", "expr": "c² = a² + b² − 2ab·cos(C)", "leyenda": "Casos LLL y LAL" },
+        { "nombre": "Si C = 90°", "expr": "c² = a² + b²", "leyenda": "cos(90°) = 0 y queda el Teorema de Pitágoras" }
+      ] },
+      "comprueba": { "pregunta": "Conoces dos lados y el ángulo entre ellos, y buscas el tercer lado. ¿Qué herramienta usas?", "opciones": ["Ley de Senos", "Ley de Cosenos", "Ninguna: faltan datos"], "correcta": 1, "porque": "Es el caso LAL, que se resuelve con la Ley de Cosenos." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Mapas por triangulación",
+      "idea": "Con una distancia medida y dos ángulos, la Ley de Senos calcula la distancia a un punto inaccesible.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Base", "texto": "Mide la distancia entre dos puntos accesibles." },
+        { "titulo": "Ángulos", "texto": "Mide los ángulos hacia el punto que no puedes alcanzar." },
+        { "titulo": "Calcula", "texto": "La Ley de Senos da la distancia al punto inaccesible." }
+      ] },
+      "comprueba": { "pregunta": "Entre tú y una torre hay un lago. Mides la distancia entre dos puntos de tu orilla y los dos ángulos hacia la torre. ¿Qué caso es?", "opciones": ["LLL", "LAL", "ALA"], "correcta": 2, "porque": "Conoces dos ángulos y el lado comprendido entre ellos: es el caso ALA, que resuelve la Ley de Senos." }
+    }
+  ]
+}

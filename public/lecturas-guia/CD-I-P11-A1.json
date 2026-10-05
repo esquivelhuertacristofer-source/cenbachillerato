@@ -1,0 +1,44 @@
+{
+  "codigo": "CD-I-P11-A1",
+  "conceptos": [
+    { "termino": "Dato", "idea": "Un valor, como un número o un texto; organizado y con sentido se vuelve información." },
+    { "termino": "Variable", "idea": "Espacio con nombre cuyo contenido puede cambiar, como edad = 15." },
+    { "termino": "Constante", "idea": "Espacio con nombre cuyo valor se mantiene fijo, como PI = 3.1416." },
+    { "termino": "Estructura de control", "idea": "Forma de ordenar los pasos: en secuencia, con condiciones o repitiendo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "De los datos a la información",
+      "idea": "Un lenguaje algorítmico describe la solución paso a paso, y su materia prima son los datos.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Datos", "texto": "Valores sueltos, como un número o un texto." },
+        { "titulo": "Organizarlos y darles sentido", "texto": "Se relacionan y se interpretan." },
+        { "titulo": "Información", "texto": "Lo que resulta y sirve para resolver el problema." }
+      ] },
+      "comprueba": { "pregunta": "El número 15, solo, sin decir a qué se refiere, ¿qué es?", "opciones": ["Un dato", "Información", "Un algoritmo"], "correcta": 0, "porque": "Es un valor suelto; se convierte en información cuando se organiza y se le da sentido." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Variables, constantes y operadores",
+      "idea": "Los datos se guardan en variables o constantes y se combinan con operadores aritméticos, relacionales o lógicos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Aritméticos", "expr": "+  −  ×  ÷", "leyenda": "Para hacer cálculos" },
+        { "nombre": "Relacionales", "expr": ">  <  =  ≠", "leyenda": "Para comparar valores" },
+        { "nombre": "Lógicos", "expr": "Y  O  NO", "leyenda": "Para combinar condiciones" }
+      ] },
+      "comprueba": { "pregunta": "En la expresión «edad > 15», ¿qué tipo de operador es >?", "opciones": ["Aritmético", "Lógico", "Relacional"], "correcta": 2, "porque": "Los operadores relacionales (>, <, =, ≠) sirven para comparar valores." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Tres estructuras de control",
+      "idea": "Todo algoritmo se arma con secuencias, condiciones y repeticiones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Secuencial", "puntos": ["Instrucciones una tras otra"] },
+        { "titulo": "Condicional o selectiva", "puntos": ["Elige un camino según una condición", "si… entonces…"] },
+        { "titulo": "Repetitiva o cíclica", "puntos": ["Repite acciones mientras se cumpla una condición"] }
+      ] },
+      "comprueba": { "pregunta": "«Mientras haya platos sucios, lava un plato». ¿Qué estructura es?", "opciones": ["Secuencial", "Repetitiva o cíclica", "Condicional"], "correcta": 1, "porque": "Repite una acción mientras se cumpla una condición: eso es una estructura repetitiva o cíclica." }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "codigo": "CNEYT-IV-P11-A1",
+  "conceptos": [
+    { "termino": "ATP", "idea": "La molécula recargable donde la célula guarda energía: su «moneda energética»." },
+    { "termino": "Glucólisis", "idea": "Parte la glucosa en dos piruvatos en el citoplasma, sin oxígeno; deja 2 ATP netos." },
+    { "termino": "Respiración aerobia", "idea": "Con oxígeno, en la mitocondria: saca casi toda la energía de la glucosa." },
+    { "termino": "Fermentación", "idea": "Ruta sin oxígeno que solo da 2 ATP, pero regenera NAD⁺." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La glucosa se desarma por pasos",
+      "idea": "La célula desarma la glucosa poco a poco y guarda la energía en ATP; todo empieza con la glucólisis.",
+      "visual": { "tipo": "ejemplo", "titulo": "Balance de la glucólisis (en el citoplasma)", "lineas": ["Glucosa (6 C) → 2 piruvato (3 C cada uno)", "Se gastan 2 ATP al inicio y se producen 4", "Además se forman 2 NADH"], "resultado": "2 ATP netos + 2 NADH" },
+      "comprueba": { "pregunta": "¿Dónde ocurre la glucólisis y necesita oxígeno?", "opciones": ["En la mitocondria y sí necesita oxígeno", "En el citoplasma y no necesita oxígeno", "En el núcleo y sí necesita oxígeno"], "correcta": 1, "porque": "La glucólisis es el paso común de toda degradación de glucosa: ocurre en el citoplasma y sin oxígeno." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Con oxígeno: tres etapas en la mitocondria",
+      "idea": "Con O₂, el piruvato se oxida por completo en la mitocondria y se produce la mayor parte del ATP.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Oxidación del piruvato", "texto": "Cada piruvato se vuelve acetil-CoA; sale CO₂ y se forma NADH." },
+        { "titulo": "Ciclo de Krebs", "texto": "El acetil-CoA se oxida por completo: más CO₂, NADH, FADH₂ y algo de ATP/GTP." },
+        { "titulo": "Cadena transportadora", "texto": "Los electrones bombean protones; el O₂ los acepta al final y forma agua." },
+        { "titulo": "Resultado global", "texto": "C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O, unos 38 ATP teóricos." }
+      ] },
+      "comprueba": { "pregunta": "¿Qué papel tiene el O₂ en la cadena transportadora de electrones?", "opciones": ["Es el aceptor final de electrones y forma agua", "Es el combustible que se parte en piruvato", "Se convierte en CO₂"], "correcta": 0, "porque": "Al final de la cadena, el O₂ recibe los electrones y, junto con protones, forma agua." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Sin oxígeno: fermentar",
+      "idea": "La fermentación no da más ATP que la glucólisis, pero regenera NAD⁺ para que la glucólisis siga.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Fermentación láctica", "puntos": ["Piruvato → ácido láctico", "Tus músculos en un sprint", "Bacterias del yogur y los quesos"] },
+        { "titulo": "Fermentación alcohólica", "puntos": ["Piruvato → etanol + CO₂", "La hacen las levaduras", "Pan, pulque, tequila, cerveza"] }
+      ] },
+      "comprueba": { "pregunta": "La masa del pan se esponja al hornearse. ¿Qué fermentación lo explica?", "opciones": ["Láctica, por el ácido láctico", "Aerobia, por el oxígeno", "Alcohólica, por el CO₂ de las levaduras"], "correcta": 2, "porque": "En la fermentación alcohólica las levaduras producen etanol y CO₂; ese gas es el que esponja la masa." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Aerobia contra anaerobia",
+      "idea": "Con oxígeno se obtiene unas 19 veces más energía, pero la fermentación es vital y sostiene industrias mexicanas.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "~38 ATP", "etiqueta": "por glucosa con oxígeno (rendimiento teórico)" },
+        { "valor": "2 ATP", "etiqueta": "por glucosa sin oxígeno" },
+        { "valor": "≈ 19 veces", "etiqueta": "más energía con oxígeno" }
+      ] },
+      "comprueba": { "pregunta": "Un biodigestor convierte residuos orgánicos en biogás. ¿En qué proceso se basa?", "opciones": ["En la respiración aerobia", "En la fermentación", "En la glucólisis de las plantas"], "correcta": 1, "porque": "El texto menciona la producción de biogás en biodigestores como una aplicación de la fermentación." }
+    }
+  ]
+}

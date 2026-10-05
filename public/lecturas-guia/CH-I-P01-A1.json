@@ -1,0 +1,51 @@
+{
+  "codigo": "CH-I-P01-A1",
+  "conceptos": [
+    { "termino": "Coordenadas espacio-temporales", "idea": "El dónde y el cuándo de cualquier hecho histórico." },
+    { "termino": "Sistema de datación", "idea": "Forma de contar el tiempo, como el calendario gregoriano con a.C. y d.C." },
+    { "termino": "Línea del tiempo", "idea": "Muestra qué pasó antes, después y al mismo tiempo en distintos lugares." },
+    { "termino": "Mapa histórico", "idea": "Muestra cómo eran los territorios en otra época, porque las fronteras cambian." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El cuándo: fechar los hechos",
+      "idea": "Todo hecho histórico tiene un lugar y un momento; los sistemas de datación anclan los hechos en el tiempo.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "100 a.C. – 650 d.C.", "texto": "Florecen civilizaciones mesoamericanas como Teotihuacán." },
+        { "titulo": "476 d.C.", "texto": "Cae el Imperio Romano de Occidente: fin convencional de la Antigüedad." },
+        { "titulo": "1821", "texto": "Se consuma la Independencia de México." },
+        { "titulo": "1910", "texto": "Inicia la Revolución Mexicana." }
+      ] },
+      "comprueba": { "pregunta": "Según la lectura, ¿qué hecho marca convencionalmente el fin de la Antigüedad y el inicio de la Edad Media?", "opciones": ["La consumación de la Independencia", "La caída del Imperio Romano de Occidente", "El florecimiento de Teotihuacán"], "correcta": 1, "porque": "La caída del Imperio Romano de Occidente, en 476 d.C., marca convencionalmente ese cambio de época." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Líneas del tiempo: ver relaciones",
+      "idea": "Una buena línea del tiempo muestra lo que pasó antes, después y, sobre todo, al mismo tiempo en distintos lugares.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Línea general", "puntos": ["Toda la historia de la humanidad"] },
+        { "titulo": "Línea específica", "puntos": ["Solo la historia de México", "O solo la de tu ciudad"] }
+      ] },
+      "comprueba": { "pregunta": "Una línea del tiempo que muestra Teotihuacán y el Imperio Romano en paralelo, ¿qué relación destaca?", "opciones": ["Qué ocurrió al mismo tiempo en distintos lugares", "Que uno causó al otro", "Que ocurrieron en el mismo lugar"], "correcta": 0, "porque": "La lectura dice que lo más importante es mostrar qué ocurrió al mismo tiempo en distintos lugares, como Teotihuacán y Roma." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "El dónde: territorios que cambian",
+      "idea": "Los mapas históricos son indispensables porque fronteras, nombres e imperios cambian con el tiempo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Valle de México en 1519", "puntos": ["Lago de Texcoco", "Tenochtitlán y sus ciudades aliadas"] },
+        { "titulo": "Hoy", "puntos": ["Ciudad de México actual", "Un paisaje completamente diferente"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué no basta un mapa actual para estudiar la Nueva España del siglo XVII?", "opciones": ["Porque los mapas actuales son imprecisos", "Porque entonces no había ciudades", "Porque las fronteras y los nombres han cambiado"], "correcta": 2, "porque": "Los territorios cambian: las fronteras se trazan y se borran y los nombres de las ciudades se modifican." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Espacio y tiempo juntos",
+      "idea": "Combinar espacio y tiempo permite entender cómo se relacionan los hechos en secuencia, distancia y contexto geográfico.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Herramientas que combinan ambos", "puntos": ["Matrices espacio-temporales", "Mapas con líneas del tiempo integradas", "SIG histórico"] }
+      ] }
+    }
+  ]
+}

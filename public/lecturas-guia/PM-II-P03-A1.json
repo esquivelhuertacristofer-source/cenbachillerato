@@ -1,0 +1,39 @@
+{
+  "codigo": "PM-II-P03-A1",
+  "conceptos": [
+    { "termino": "Factorizar", "idea": "Escribir un polinomio como la multiplicación de sus factores; es el camino de regreso." },
+    { "termino": "Factor común", "idea": "Lo que comparten todos los términos y se saca: 3x + 6 = 3(x + 2)." },
+    { "termino": "Diferencia de cuadrados", "idea": "a² − b² se factoriza como (a + b)(a − b)." },
+    { "termino": "Ceros de una función", "idea": "Los valores donde la función vale cero; factorizar ayuda a encontrarlos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Factorizar: multiplicar al revés",
+      "idea": "Factorizar es encontrar los factores que, multiplicados, dan el polinomio; por eso se comprueba multiplicando.",
+      "visual": { "tipo": "ejemplo", "titulo": "¿Por qué x² + 5x + 6 = (x + 2)(x + 3)?", "lineas": ["(x + 2)(x + 3) = x² + 3x + 2x + 6", "Se juntan 3x + 2x = 5x"], "resultado": "x² + 5x + 6: el polinomio original" },
+      "comprueba": { "pregunta": "¿Cuál de estos productos da x² + 4x + 3?", "opciones": ["(x + 1)(x + 3)", "(x + 2)(x + 2)", "(x + 4)(x + 3)"], "correcta": 0, "porque": "(x + 1)(x + 3) = x² + 3x + x + 3 = x² + 4x + 3. Multiplicar los factores comprueba la factorización." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Para qué sirve factorizar",
+      "idea": "Factorizar simplifica expresiones, facilita resolver ecuaciones cuadráticas y ayuda a encontrar los ceros de una función.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Usos de factorizar", "puntos": ["Simplificar expresiones algebraicas", "Resolver ecuaciones cuadráticas con mayor facilidad", "Encontrar los ceros de una función (física, economía, ingeniería)"] }
+      ] },
+      "comprueba": { "pregunta": "Según la lectura, ¿cuál NO es un uso de factorizar?", "opciones": ["Simplificar expresiones algebraicas", "Calcular el área de un círculo", "Resolver ecuaciones cuadráticas"], "correcta": 1, "porque": "La lectura menciona simplificar, resolver ecuaciones cuadráticas y hallar ceros de funciones. El área de un círculo no aparece." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cuatro técnicas básicas",
+      "idea": "Antes de factorizar, reconoce la forma del polinomio: cada forma tiene su técnica.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Factor común", "expr": "3x + 6 = 3(x + 2)" },
+        { "nombre": "Diferencia de cuadrados", "expr": "a² − b² = (a + b)(a − b)" },
+        { "nombre": "Trinomio cuadrado perfecto", "expr": "a² + 2ab + b² = (a + b)²" },
+        { "nombre": "Trinomio x² + bx + c", "expr": "x² + 5x + 6 = (x + 2)(x + 3)", "leyenda": "Dos números que sumen b (2 + 3 = 5) y multipliquen c (2 × 3 = 6)" }
+      ] },
+      "comprueba": { "pregunta": "¿Qué técnica usas para factorizar x² − 49?", "opciones": ["Factor común", "Trinomio cuadrado perfecto", "Diferencia de cuadrados"], "correcta": 2, "porque": "x² − 49 = x² − 7², una diferencia de cuadrados: se factoriza como (x + 7)(x − 7)." }
+    }
+  ]
+}

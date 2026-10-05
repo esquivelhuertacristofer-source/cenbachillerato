@@ -1,0 +1,39 @@
+{
+  "codigo": "IN-I-P02-A1",
+  "conceptos": [
+    { "termino": "Pedir permiso", "idea": "Con «May I…?» o «Can I…?» al inicio de la pregunta." },
+    { "termino": "Aclarar dudas", "idea": "Frases para cuando no entiendes: «I don't understand», «Can you repeat that, please?»" },
+    { "termino": "Instrucciones del maestro", "idea": "Órdenes cortas como «Work in pairs» o «Listen and repeat»." },
+    { "termino": "Practice makes perfect", "idea": "Equivocarte es parte de aprender un idioma." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Pedir permiso y aclarar dudas",
+      "idea": "Con unas pocas frases puedes pedir permiso y preguntar lo que no entiendes, todo en inglés.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Pedir permiso", "puntos": ["May I go to the bathroom?", "Can I open the window?"] },
+        { "titulo": "Aclarar dudas", "puntos": ["I don't understand", "Can you repeat that, please?", "What does [palabra] mean?"] }
+      ] },
+      "comprueba": { "pregunta": "Tu maestra dice una palabra que no conoces: «homework». ¿Qué le preguntas?", "opciones": ["May I go to the bathroom?", "What does homework mean?", "I agree."], "correcta": 1, "porque": "«What does [palabra] mean?» sirve para preguntar qué significa una palabra." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Entender las instrucciones",
+      "idea": "Reconocer las órdenes del maestro te permite seguir la clase sin perderte.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Frases del maestro", "puntos": ["Open your book to page... (Abran su libro en la página...)", "Work in pairs (Trabajen en parejas)", "Listen and repeat (Escuchen y repitan)", "Write in your notebook (Escriban en su cuaderno)", "Hand in your homework (Entreguen su tarea)"] }
+      ] },
+      "comprueba": { "pregunta": "El maestro dice «Hand in your homework». ¿Qué tienes que hacer?", "opciones": ["Abrir el libro", "Trabajar en pareja", "Entregar tu tarea"], "correcta": 2, "porque": "«Hand in your homework» significa «Entreguen su tarea»." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Participa sin miedo",
+      "idea": "Opina, pregunta y equivócate: los errores son parte del proceso de aprender.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Para participar", "puntos": ["I have a question", "I think the answer is...", "I agree", "I disagree"] }
+      ] },
+      "comprueba": { "pregunta": "Un compañero da una respuesta y tú piensas distinto. ¿Qué dices?", "opciones": ["I disagree.", "I agree.", "I don't understand."], "correcta": 0, "porque": "«I disagree» significa «No estoy de acuerdo»." }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "codigo": "CNEYT-I-P05-A1",
+  "conceptos": [
+    { "termino": "Estado de agregación", "idea": "Forma en que se organiza la materia: sólido, líquido, gas o plasma." },
+    { "termino": "Energía cinética", "idea": "El movimiento de las partículas; depende de la temperatura y la presión." },
+    { "termino": "Sublimación", "idea": "Paso directo de sólido a gas, sin pasar por líquido." },
+    { "termino": "Cambio reversible", "idea": "La materia cambia de forma de organizarse, pero no su naturaleza química." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Sólido, líquido y gas por dentro",
+      "idea": "Temperatura y presión deciden qué tan juntas y libres están las partículas, y eso define el estado.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sólido", "puntos": ["Partículas muy juntas, vibran en su lugar", "Forma y volumen definidos", "Muy poco compresible"] },
+        { "titulo": "Líquido", "puntos": ["Partículas unidas que se deslizan", "Volumen definido", "Toma la forma del recipiente"] },
+        { "titulo": "Gas", "puntos": ["Partículas muy separadas y libres", "Sin forma ni volumen definidos", "Se comprime fácilmente"] }
+      ] },
+      "comprueba": { "pregunta": "Viertes jugo de un vaso alto a un plato. Cambia de forma pero no de cantidad. ¿En qué estado está?", "opciones": ["Líquido", "Sólido", "Gas"], "correcta": 0, "porque": "Los líquidos tienen volumen definido pero adoptan la forma del recipiente que los contiene." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Los cambios de estado",
+      "idea": "Al agregar o quitar calor la materia cambia de estado, y esos cambios son reversibles.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Fusión / solidificación", "expr": "sólido ⇄ líquido", "leyenda": "El agua se funde a 0 °C" },
+        { "nombre": "Vaporización / condensación", "expr": "líquido ⇄ gas", "leyenda": "El agua hierve a 100 °C a nivel del mar" },
+        { "nombre": "Sublimación / deposición", "expr": "sólido ⇄ gas", "leyenda": "Directo, sin pasar por líquido" }
+      ] },
+      "comprueba": { "pregunta": "En una mañana fría se forman gotitas en la ventana a partir del vapor del aire. ¿Qué cambio es?", "opciones": ["Evaporación", "Fusión", "Condensación"], "correcta": 2, "porque": "El paso de gas a líquido se llama condensación." }
+    }
+  ]
+}

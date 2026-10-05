@@ -1,0 +1,28 @@
+{
+  "codigo": "PM-II-P01-A1",
+  "conceptos": [
+    { "termino": "Patrón", "idea": "Una regularidad que se repite siguiendo una regla." },
+    { "termino": "Patrón aritmético", "idea": "Se suma o resta siempre la misma cantidad: 2, 5, 8, 11…" },
+    { "termino": "Patrón geométrico", "idea": "Se multiplica o divide siempre por la misma cantidad: 3, 6, 12, 24…" },
+    { "termino": "Fórmula general", "idea": "Una regla con letras que da cualquier término según su posición n." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Qué es un patrón y sus tipos",
+      "idea": "Un patrón es una regularidad con regla: en los aritméticos se suma lo mismo y en los geométricos se multiplica.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Aritmético", "puntos": ["Se suma o resta siempre lo mismo", "2, 5, 8, 11… (suma 3)"] },
+        { "titulo": "Geométrico", "puntos": ["Se multiplica o divide siempre por lo mismo", "3, 6, 12, 24… (por 2)"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué tipo de patrón es 4, 8, 16, 32…?", "opciones": ["Aritmético: suma 4", "Geométrico: multiplica por 2", "No sigue ninguna regla"], "correcta": 1, "porque": "Cada término es el anterior multiplicado por 2. Sumar 4 solo funciona del 4 al 8, no del 8 al 16." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "De la secuencia a la fórmula",
+      "idea": "Con una letra para la posición, una sola fórmula describe todos los términos: eso es el álgebra.",
+      "visual": { "tipo": "ejemplo", "titulo": "El patrón 2, 5, 8, 11", "lineas": ["a = 3n − 1, donde n es la posición", "n = 1 → 3(1) − 1 = 2", "n = 2 → 3(2) − 1 = 5", "n = 4 → 3(4) − 1 = 11"], "resultado": "La fórmula da cualquier término sin escribir los anteriores." },
+      "comprueba": { "pregunta": "Con a = 3n − 1, ¿cuál es el término en la posición 10?", "opciones": ["29", "30", "31"], "correcta": 0, "porque": "Sustituyes n = 10: 3(10) − 1 = 30 − 1 = 29." }
+    }
+  ]
+}

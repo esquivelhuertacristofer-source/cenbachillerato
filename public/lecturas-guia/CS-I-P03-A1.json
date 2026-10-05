@@ -1,0 +1,39 @@
+{
+  "codigo": "CS-I-P03-A1",
+  "conceptos": [
+    { "termino": "Norma social", "idea": "Regla, escrita o no, que regula cómo nos comportamos en sociedad." },
+    { "termino": "Norma formal / informal", "idea": "Formal: leyes y reglamentos. Informal: costumbres, tradiciones y expectativas culturales." },
+    { "termino": "Institución", "idea": "Conjunto estable de normas y prácticas: familia, escuela, mercado, sistema judicial." },
+    { "termino": "Cambio social", "idea": "Ocurre cuando personas y movimientos cuestionan normas e instituciones y proponen alternativas." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Las normas se construyen en la historia",
+      "idea": "Las normas no son naturales ni eternas: hay que entenderlas en su época y cuestionarlas cuando producen injusticia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Formales", "puntos": ["Leyes", "Reglamentos", "Constituciones"] },
+        { "titulo": "Informales", "puntos": ["Costumbres", "Tradiciones", "Expectativas culturales"] },
+        { "titulo": "Antes «normal», hoy cuestionado", "puntos": ["La esclavitud, legal durante siglos", "El trabajo infantil, aceptado hace cien años", "Excluir a las mujeres de la vida pública"] }
+      ] },
+      "comprueba": { "pregunta": "En tu familia se acostumbra saludar de beso a los mayores. ¿Qué tipo de norma es?", "opciones": ["Formal", "Informal", "Constitucional"], "correcta": 1, "porque": "Es una costumbre no escrita: las costumbres y tradiciones son normas informales." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Instituciones: normas que se vuelven estables",
+      "idea": "Las instituciones reflejan los valores y el poder de quien las construyó; por eso no son neutras y pueden transformarse.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ejemplos de instituciones", "puntos": ["La familia", "La escuela", "El mercado", "El sistema judicial", "Los partidos políticos"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué el texto dice que las instituciones pueden transformarse?", "opciones": ["Porque no son neutras y reflejan a la sociedad que las construyó", "Porque son naturales y eternas", "Porque no tienen normas"], "correcta": 0, "porque": "Las instituciones reflejan valores y relaciones de poder de una sociedad; si la sociedad lo demanda, pueden cambiar." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Cómo cambian las sociedades",
+      "idea": "El cambio social llega cuando la gente cuestiona las normas existentes y propone otras.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Movimientos que cambiaron normas", "puntos": ["Movimiento feminista", "Movimiento por los derechos civiles", "Movimientos indígenas", "Movimiento LGBTQ+"] }
+      ] }
+    }
+  ]
+}

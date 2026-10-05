@@ -1,0 +1,43 @@
+{
+  "codigo": "CNEYT-VI-P10-A1",
+  "conceptos": [
+    { "termino": "Célula", "idea": "La unidad básica de estructura, función y origen de todo ser vivo." },
+    { "termino": "Microscopio", "idea": "La herramienta sin la cual la célula habría sido invisible para siempre." },
+    { "termino": "Teoría celular", "idea": "Tres postulados que unifican a todos los seres vivos en la célula." },
+    { "termino": "Omnis cellula e cellula", "idea": "Toda célula proviene de otra célula (Virchow, 1855)." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El microscopio abre un mundo",
+      "idea": "Sin el microscopio no habríamos visto la célula: Hooke le puso nombre y Leeuwenhoek vio los primeros seres vivos microscópicos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Robert Hooke (1665)", "puntos": ["Observó una lámina de corcho", "Vio cavidades como celdas de panal", "Las llamó «cells»: células"] },
+        { "titulo": "Anton van Leeuwenhoek", "puntos": ["Pulió lentes de gran calidad", "Vio bacterias, protozoos y espermatozoides", "Los llamó «animáculos»"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué vio en realidad Hooke en el corcho?", "opciones": ["Bacterias vivas", "Las paredes de células vegetales muertas", "Núcleos celulares"], "correcta": 1, "porque": "Hooke veía las paredes de células vegetales muertas, pero acuñó la palabra «célula» que usamos hoy." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Tres científicos, una teoría",
+      "idea": "En el siglo XIX, Schleiden, Schwann y Virchow unieron casi dos siglos de observaciones en una sola idea.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "1838 · Schleiden", "texto": "Todas las plantas están formadas por células." },
+        { "titulo": "1839 · Schwann", "texto": "Los animales también están hechos de células." },
+        { "titulo": "1855 · Virchow", "texto": "«Omnis cellula e cellula»: toda célula proviene de otra." }
+      ] },
+      "comprueba": { "pregunta": "¿Qué idea descartó Virchow con su frase «omnis cellula e cellula»?", "opciones": ["Que las plantas tienen células", "Que la célula es la unidad básica", "La generación espontánea a nivel celular"], "correcta": 2, "porque": "Al afirmar que toda célula proviene de otra, Virchow descartó que las células surgieran espontáneamente." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Los tres postulados y su importancia",
+      "idea": "La célula es la unidad de estructura, de función y de origen de la vida, y la tecnología hizo posible saberlo.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Unidad estructural", "texto": "Todos los seres vivos están formados por una o más células." },
+        { "titulo": "Unidad funcional", "texto": "Es lo más pequeño capaz de realizar las funciones vitales." },
+        { "titulo": "Unidad de origen", "texto": "Toda célula proviene de otra célula preexistente." }
+      ] },
+      "comprueba": { "pregunta": "«Una bacteria de una sola célula puede nutrirse y reproducirse por sí misma.» ¿Qué postulado ilustra mejor?", "opciones": ["La célula es la unidad funcional", "La célula es la unidad de origen", "Ninguno de los tres"], "correcta": 0, "porque": "La unidad funcional es la más pequeña capaz de realizar las funciones vitales, como nutrirse y reproducirse." }
+    }
+  ]
+}

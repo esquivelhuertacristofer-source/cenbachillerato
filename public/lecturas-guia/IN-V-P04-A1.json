@@ -1,0 +1,54 @@
+{
+  "codigo": "IN-V-P04-A1",
+  "conceptos": [
+    { "termino": "Opinion", "idea": "Lo que piensas o crees: In my opinion, I believe that." },
+    { "termino": "Evidence", "idea": "Datos, ejemplos o razones que apoyan tu opinión: According to..." },
+    { "termino": "Modal verbs", "idea": "Should, could, might, would: matizan recomendación, posibilidad o condición." },
+    { "termino": "Contrast connectors", "idea": "However, although, despite: presentan la otra cara de una idea." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Opinión, evidencia y conclusión",
+      "idea": "Una opinión convincente se arma en tres partes: lo que piensas, lo que lo respalda y tu postura final.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Opinión", "texto": "Lo que piensas o crees." },
+        { "titulo": "Evidencia", "texto": "Datos, ejemplos o razones que apoyan tu opinión." },
+        { "titulo": "Conclusión", "texto": "Tu postura final o un llamado a la acción." }
+      ] },
+      "comprueba": { "pregunta": "«For example, our school recycled less paper this year.» ¿Qué parte de la estructura es?", "opciones": ["Opinión", "Evidencia", "Conclusión"], "correcta": 1, "porque": "Da un ejemplo concreto que apoya una idea: eso es evidencia." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Frases para opinar y para probar",
+      "idea": "Usa In my opinion o I believe para opinar, y According to o Studies show para presentar evidencia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Para opinar", "puntos": ["In my opinion, ...", "I believe that ...", "I think it is important to ... because ...", "From my point of view, ..."] },
+        { "titulo": "Para dar evidencia", "puntos": ["The evidence suggests that ...", "According to [source], ...", "For example, ...", "Studies show that ..."] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué frase introduce evidencia y no una opinión?", "opciones": ["From my point of view,", "I believe that", "Studies show that"], "correcta": 2, "porque": "Studies show that presenta lo que muestran los estudios; las otras dos expresan lo que tú piensas." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Modales y conectores de contraste",
+      "idea": "Should, could, might y would matizan tu postura; however, although, despite y on the other hand marcan contraste.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Modales", "puntos": ["should: recomendación", "could: posibilidad", "might: posibilidad menos segura", "would: condición"] },
+        { "titulo": "Contraste", "puntos": ["however: sin embargo", "although: aunque", "despite: a pesar de", "on the other hand: por otro lado"] }
+      ] },
+      "comprueba": { "pregunta": "Crees que algo tal vez pase, pero no estás muy seguro. ¿Qué modal usas?", "opciones": ["might", "should", "would"], "correcta": 0, "porque": "Might expresa una posibilidad menos segura; should recomienda y would expresa condición." }
+    },
+    {
+      "parrafos": [7, 8, 9, 10, 11, 12, 13],
+      "titulo": "Texto modelo: clima y acción juvenil",
+      "idea": "El texto aplica la estructura: opina, se apoya en SEMARNAT, contrasta con However y On the other hand, y concluye.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Opinión", "texto": "El cambio climático es el reto más urgente de nuestra generación." },
+        { "titulo": "Evidencia", "texto": "Según SEMARNAT, aumentaron las sequías en Sonora y las inundaciones en Tabasco." },
+        { "titulo": "Contraste", "texto": "Hay razones para el optimismo, pero la acción individual no basta." },
+        { "titulo": "Conclusión", "texto": "Se necesita acción colectiva en todos los niveles." }
+      ] },
+      "comprueba": { "pregunta": "En el texto, ¿qué función cumple «According to SEMARNAT...»?", "opciones": ["Marca un contraste", "Presenta evidencia", "Expresa la conclusión"], "correcta": 1, "porque": "According to [source] es una frase para presentar evidencia, aquí datos de SEMARNAT sobre fenómenos extremos." }
+    }
+  ]
+}

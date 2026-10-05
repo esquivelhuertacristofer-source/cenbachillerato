@@ -1,0 +1,41 @@
+{
+  "codigo": "CS-I-P02-A1",
+  "conceptos": [
+    { "termino": "Ciudadanía formal", "idea": "El estatus jurídico: papeles, derecho a votar y a ser votado." },
+    { "termino": "Ciudadanía sustantiva", "idea": "Poder ejercer de verdad tus derechos, no solo tenerlos en papel." },
+    { "termino": "Ciudadanía como conquista", "idea": "Los derechos se ampliaron gracias a luchas y movimientos sociales." },
+    { "termino": "Nuevas ciudadanías", "idea": "Digital, ambiental y global: derechos y responsabilidades más allá de lo tradicional." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "En papel y en la realidad",
+      "idea": "Tener la credencial no basta: la ciudadanía real depende de poder ejercer tus derechos sin barreras.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Formal", "puntos": ["Estatus jurídico reconocido por el Estado", "Documentos, votar, ser votado, servicios públicos", "En México, a los 18 años con la credencial del INE"] },
+        { "titulo": "Sustantiva o real", "puntos": ["Ejercer los derechos de verdad", "La frenan la falta de información y la discriminación", "También vivir donde el Estado no llega", "Y las barreras económicas o culturales"] }
+      ] },
+      "comprueba": { "pregunta": "Una joven de 19 años tiene credencial del INE, pero en su comunidad no hay escuela ni clínica. ¿Qué dimensión de su ciudadanía está limitada?", "opciones": ["La formal", "La sustantiva", "Ninguna"], "correcta": 1, "porque": "Tiene los papeles en regla (formal), pero no puede ejercer sus derechos plenos porque el Estado no llega: eso es la dimensión sustantiva." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Una conquista, no un regalo",
+      "idea": "La ciudadanía se ha ampliado poco a poco gracias a luchas sociales; no es un dato natural.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Quiénes estuvieron excluidos", "puntos": ["Las mujeres, sin voto hasta el siglo XX en muchos países", "En México, ellas obtuvieron el sufragio en 1953", "Personas de ciertos grupos étnicos", "Trabajadores sin propiedad"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué muestra la historia del voto de las mujeres en México?", "opciones": ["Que la ciudadanía siempre fue igual para todos", "Que la ciudadanía es una conquista de luchas sociales", "Que solo los propietarios deben votar"], "correcta": 1, "porque": "Las mujeres obtuvieron el sufragio hasta 1953: la ciudadanía se amplió por luchas y movimientos, no es algo natural." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Ciudadanías del siglo XXI",
+      "idea": "Hoy la ciudadanía también abarca el mundo digital, el planeta y los problemas que cruzan fronteras.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Digital", "puntos": ["Derechos y responsabilidades en el entorno virtual"] },
+        { "titulo": "Ambiental", "puntos": ["Responsabilidades hacia el planeta"] },
+        { "titulo": "Global", "puntos": ["Conciencia de problemas que trascienden las fronteras"] }
+      ] },
+      "comprueba": { "pregunta": "Reportar una cuenta que acosa a otros en redes sociales es un ejemplo de ciudadanía…", "opciones": ["ambiental", "global", "digital"], "correcta": 2, "porque": "Ejercer responsabilidades en el entorno virtual corresponde a la ciudadanía digital." }
+    }
+  ]
+}

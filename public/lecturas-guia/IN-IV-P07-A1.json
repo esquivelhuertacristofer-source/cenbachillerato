@@ -1,0 +1,41 @@
+{
+  "codigo": "IN-IV-P07-A1",
+  "conceptos": [
+    { "termino": "Past continuous", "idea": "Was/were + -ing: una acción que estaba en progreso en el pasado." },
+    { "termino": "Past simple", "idea": "Acciones completadas que hacen avanzar la historia: ran, dropped, said." },
+    { "termino": "When", "idea": "Introduce el hecho que interrumpe: when I saw my favorite singer." },
+    { "termino": "While", "idea": "Acompaña la acción en progreso: While I was reading the letter..." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Past continuous: la acción en progreso",
+      "idea": "Was o were más el verbo con -ing describe algo que estaba pasando en un momento del pasado.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "I, he, she, it", "expr": "was + verb-ing", "leyenda": "She was studying in the library." },
+        { "nombre": "you, we, they", "expr": "were + verb-ing", "leyenda": "We were playing fútbol in the park." }
+      ] },
+      "comprueba": { "pregunta": "Completa: «My cousins ___ watching TV.»", "opciones": ["was", "were", "are"], "correcta": 1, "porque": "My cousins es plural (they), así que va were + verb-ing." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "When y while: la interrupción",
+      "idea": "La acción larga va en past continuous y la que la interrumpe en past simple, unidas con when o while.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Con when", "expr": "was / were + verb-ing + WHEN + past simple", "leyenda": "I was eating tacos when I saw my favorite singer." },
+        { "nombre": "Con while", "expr": "WHILE + was / were + verb-ing, + past simple", "leyenda": "While we were watching the Chivas game, the lights went out." }
+      ] },
+      "comprueba": { "pregunta": "Estabas dormido y sonó el teléfono. ¿Qué oración sigue el patrón de la lectura?", "opciones": ["I slept when the phone was ringing.", "I was sleep when the phone rang.", "I was sleeping when the phone rang."], "correcta": 2, "porque": "La acción en progreso (was sleeping) va en past continuous y la interrupción (rang) en past simple." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Una anécdota en el metro",
+      "idea": "En la historia, was standing y was reading pintan el fondo; ran, dropped y said cuentan lo que pasó.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Past continuous (en progreso)", "puntos": ["was standing", "was reading"] },
+        { "titulo": "Past simple (completadas)", "puntos": ["ran, dropped, picked up", "came back, said, started", "turned out, exchanged, invited"] }
+      ] },
+      "comprueba": { "pregunta": "En la anécdota, ¿qué hacía el narrador cuando la mujer regresó?", "opciones": ["Estaba leyendo la carta", "Estaba corriendo al metro", "Estaba hablando por teléfono"], "correcta": 0, "porque": "«While I was reading the letter, the woman came back»: la lectura era la acción en progreso." }
+    }
+  ]
+}

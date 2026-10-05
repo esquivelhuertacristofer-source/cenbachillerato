@@ -1,0 +1,39 @@
+{
+  "codigo": "LC-I-P01-A1",
+  "conceptos": [
+    { "termino": "Leer", "idea": "Construir significado a partir de las palabras de otras personas." },
+    { "termino": "Escribir", "idea": "Crear significado para que otras personas lo lean." },
+    { "termino": "Práctica social", "idea": "Usamos la lengua para relacionarnos, aprender, expresarnos y transformar la realidad." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Dos caras de la misma moneda",
+      "idea": "La lectura alimenta a la escritura y la escritura transforma nuestra manera de leer.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cuando lees", "puntos": ["Construyes significado", "A partir de las palabras de otros"] },
+        { "titulo": "Cuando escribes", "puntos": ["Creas significado", "Para que otras personas lo lean"] }
+      ] },
+      "comprueba": { "pregunta": "Después de escribir tu primer cuento empiezas a fijarte en cómo otros autores arman los suyos. ¿Qué idea del texto ilustra?", "opciones": ["La escritura transforma tu manera de leer", "Leer y escribir son actividades aisladas", "Las letras solo representan sonidos"], "correcta": 0, "porque": "La relación no es unidireccional: así como leer alimenta la escritura, escribir cambia la forma en que lees." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Más allá del código",
+      "idea": "Leer y escribir no es solo descifrar letras: cada texto te pide algo distinto.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Texto literario", "puntos": ["Te invita a imaginar mundos posibles"] },
+        { "titulo": "Artículo informativo", "puntos": ["Te pide activar tu capacidad crítica"] },
+        { "titulo": "Diario personal", "puntos": ["Te ayuda a procesar emociones y experiencias"] }
+      ] },
+      "comprueba": { "pregunta": "Lees una nota sobre un nuevo impuesto y te preguntas si los datos son confiables. ¿Qué tipo de texto te pide eso?", "opciones": ["Un texto literario", "Un diario personal", "Un artículo informativo"], "correcta": 2, "porque": "El artículo informativo te pide activar tu capacidad crítica frente a lo que dice." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "La lengua como práctica social",
+      "idea": "En el Modelo Educativo 2025 desarrollas estas habilidades en situaciones reales y significativas, no de forma aislada.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Situaciones reales para practicar", "puntos": ["Investigar tu comunidad", "Analizar textos que te interesan", "Leer en voz alta", "Preparar exposiciones orales"] }
+      ] }
+    }
+  ]
+}

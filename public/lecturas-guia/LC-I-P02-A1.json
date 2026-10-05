@@ -1,0 +1,40 @@
+{
+  "codigo": "LC-I-P02-A1",
+  "conceptos": [
+    { "termino": "Inclinaciones lectoras", "idea": "Los tipos de textos que cada persona prefiere leer." },
+    { "termino": "Textos informativos", "idea": "Noticias, artículos y manuales que nos dan información." },
+    { "termino": "Textos narrativos", "idea": "Cuentos, novelas e historias de vida que cuentan algo." },
+    { "termino": "Textos digitales", "idea": "Publicaciones en redes sociales, blogs y foros." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Se lee en todas partes",
+      "idea": "La lectura no ocurre solo en la escuela: está en el trabajo, el hogar, el transporte, las redes y los mercados.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lecturas de todos los días", "puntos": ["Instrucciones de un medicamento", "Etiquetas de productos", "Mensajes de WhatsApp de la familia", "Subtítulos de una película"] }
+      ] },
+      "comprueba": { "pregunta": "Tu abuela revisa la caducidad en la etiqueta de la leche. ¿Está leyendo?", "opciones": ["No, solo se lee en la escuela", "Sí, leer etiquetas también es leer", "Solo si es un libro"], "correcta": 1, "porque": "La lectura ocurre también en el hogar y en los mercados: leer etiquetas de productos es una forma de leer." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Tres formas de relacionarse con textos",
+      "idea": "Cada persona tiene inclinaciones lectoras distintas: informativas, narrativas o digitales.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Informativos", "puntos": ["Noticias", "Artículos", "Manuales"] },
+        { "titulo": "Narrativos", "puntos": ["Cuentos", "Novelas", "Historias de vida"] },
+        { "titulo": "Digitales", "puntos": ["Publicaciones en redes", "Blogs", "Foros"] }
+      ] },
+      "comprueba": { "pregunta": "A tu primo le encanta leer biografías de deportistas. ¿Qué tipo de texto prefiere?", "opciones": ["Informativo", "Digital", "Narrativo"], "correcta": 2, "porque": "Las historias de vida están entre los textos narrativos, junto con cuentos y novelas." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Ninguna lectura vale más",
+      "idea": "No hay jerarquías entre lecturas: importa para qué leemos, y al investigar aprendes a preguntar, escuchar y sistematizar.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lo que aprendes al investigar hábitos lectores", "puntos": ["Formular preguntas", "Escuchar activamente", "Sistematizar información"] }
+      ] },
+      "comprueba": { "pregunta": "Alguien dice: «Leer foros no cuenta, solo las novelas son lectura de verdad». ¿Qué responde el texto?", "opciones": ["Que tiene razón", "Que ningún tipo de lectura es más válido que otro", "Que solo valen los textos informativos"], "correcta": 1, "porque": "La diversidad lectora no tiene jerarquías: lo que importa es comprender para qué leemos." }
+    }
+  ]
+}

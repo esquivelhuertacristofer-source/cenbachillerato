@@ -1,0 +1,50 @@
+{
+  "codigo": "IN-IV-P05-A1",
+  "conceptos": [
+    { "termino": "Be going to", "idea": "Para planes e intenciones que ya decidiste antes de hablar." },
+    { "termino": "Will", "idea": "Para decisiones tomadas en el momento o predicciones basadas en tu opinión." },
+    { "termino": "Present evidence", "idea": "Si ves la prueba ahora, usa going to: it is going to rain." },
+    { "termino": "Time expressions", "idea": "Next year, soon, tomorrow: dejan claro que hablas del futuro." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Be going to: planes ya decididos",
+      "idea": "Usa be going to para planes e intenciones que decidiste antes del momento de hablar.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Plan decidido", "expr": "am / is / are + going to + verb", "leyenda": "She is going to visit her grandparents this weekend." }
+      ] },
+      "comprueba": { "pregunta": "Ya te inscribiste a un curso de verano. ¿Qué dices?", "opciones": ["I am going to take a summer course.", "I will take a summer course if I have time.", "I took a summer course last year."], "correcta": 0, "porque": "Es un plan ya decidido antes de hablar, así que va con be going to." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Will: decidir al momento y predecir",
+      "idea": "Will sirve para decisiones espontáneas y predicciones por opinión; con evidencia a la vista, se prefiere going to.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Will: decisión espontánea", "puntos": ["You are carrying a lot of bags, I will help you.", "It is very hot in here, I will open the window."] },
+        { "titulo": "Will: predicción por opinión", "puntos": ["Prices will increase next year.", "Technology will change education."] },
+        { "titulo": "Going to: evidencia presente", "puntos": ["Look at those clouds — it is going to rain this afternoon."] }
+      ] },
+      "comprueba": { "pregunta": "«It's cold in here. I'll close the door.» ¿Qué uso de will es?", "opciones": ["Una predicción", "Una decisión espontánea", "Un plan decidido antes"], "correcta": 1, "porque": "Decides cerrar la puerta en ese mismo momento: es una decisión espontánea, el primer uso de will." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Expresiones de tiempo y contraste",
+      "idea": "Next year o soon marcan el futuro; going to anuncia un plan hecho y will puede ser una predicción condicional.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Plan ya hecho", "puntos": ["I am going to visit my grandparents in Veracruz next holiday."] },
+        { "titulo": "Predicción condicional", "puntos": ["I will visit my grandparents if I have time."] },
+        { "titulo": "Expresiones de tiempo", "puntos": ["next week, next month, tomorrow, soon", "in five years, by the end of the semester"] }
+      ] },
+      "comprueba": { "pregunta": "«I will go to the concert if I finish my homework.» ¿Qué expresa?", "opciones": ["Un plan ya decidido", "Una acción pasada", "Una predicción condicional, aún sin decidir"], "correcta": 2, "porque": "Depende de una condición (if...), así que no es un plan hecho: es una predicción condicional." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Tus planes después del bachillerato",
+      "idea": "Entrevista a un compañero y escribe al menos cinco oraciones sobre tus planes y predicciones con be going to y will.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Preguntas para la entrevista", "puntos": ["What are you going to do after bachillerato?", "Do you think you will continue studying?", "What skills will be most important for your future?"] }
+      ] }
+    }
+  ]
+}

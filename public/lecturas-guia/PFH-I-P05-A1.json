@@ -1,0 +1,30 @@
+{
+  "codigo": "PFH-I-P05-A1",
+  "conceptos": [
+    { "termino": "Filosofía occidental", "idea": "La tradición griega, romana y europea que dominó la enseñanza." },
+    { "termino": "Filosofía oriental", "idea": "Tradiciones milenarias como el confucianismo, el budismo, el taoísmo y el vedanta." },
+    { "termino": "Relativismo", "idea": "Creer que todas las ideas valen igual sin importar su contenido." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Más allá de Occidente: Oriente",
+      "idea": "La escuela enseñó casi solo filosofía occidental, pero Oriente tiene tradiciones milenarias igual de rigurosas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Confucianismo y taoísmo", "puntos": ["Confucianismo: relaciones humanas, virtud y orden social", "Taoísmo: armonía con el cosmos y el fluir de la existencia"] },
+        { "titulo": "Budismo y vedanta", "puntos": ["Budismo: sufrimiento, mente y camino a la liberación", "Vedanta hindú: el ser, la conciencia y el yo"] }
+      ] },
+      "comprueba": { "pregunta": "Una tradición se pregunta por la naturaleza del sufrimiento y cómo liberarse de él. ¿Cuál es?", "opciones": ["El confucianismo", "El budismo", "El taoísmo"], "correcta": 1, "porque": "La lectura dice que el budismo analizó la naturaleza del sufrimiento, la mente y el camino hacia la liberación." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Filosofías indígenas y horizonte amplio",
+      "idea": "Las cosmovisiones indígenas son diferentes y complementarias, no inferiores; reconocerlas amplía el horizonte sin caer en relativismo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Relativismo", "puntos": ["Todas las ideas valen igual", "Sin importar su contenido"] },
+        { "titulo": "Ampliar el horizonte", "puntos": ["Más herramientas para pensar", "Más preguntas y perspectivas", "Nahua, maya, zapoteca: diferentes y complementarias"] }
+      ] },
+      "comprueba": { "pregunta": "Según la lectura, reconocer la diversidad filosófica significa…", "opciones": ["que cualquier idea es igual de válida", "que la filosofía occidental es inferior", "tener más perspectivas para comprender el mundo"], "correcta": 2, "porque": "La lectura aclara que no es relativismo: es ampliar el horizonte con más herramientas, preguntas y perspectivas." }
+    }
+  ]
+}

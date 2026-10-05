@@ -1,0 +1,45 @@
+{
+  "codigo": "PM-III-P05-A1",
+  "conceptos": [
+    { "termino": "Congruencia", "idea": "Misma forma y mismo tamaño: lados y ángulos correspondientes iguales." },
+    { "termino": "Semejanza", "idea": "Misma forma, distinto tamaño: ángulos iguales y lados proporcionales." },
+    { "termino": "Razón de semejanza", "idea": "k, el cociente entre lados correspondientes de dos figuras semejantes." },
+    { "termino": "Medición indirecta", "idea": "Calcular una altura con triángulos semejantes, sin medirla directamente." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Congruentes o semejantes",
+      "idea": "Las figuras congruentes son copias exactas; las semejantes tienen la misma forma pero otro tamaño.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Congruentes", "puntos": ["Misma forma y mismo tamaño", "Lados y ángulos correspondientes iguales"] },
+        { "titulo": "Semejantes", "puntos": ["Misma forma, distinto tamaño", "Ángulos correspondientes iguales", "Lados proporcionales con razón k"] }
+      ] },
+      "comprueba": { "pregunta": "Una foto y su ampliación al doble, ¿cómo son entre sí?", "opciones": ["Congruentes", "Semejantes", "Ni una ni otra"], "correcta": 1, "porque": "Tienen la misma forma pero distinto tamaño: sus lados son proporcionales con k = 2." }
+    },
+    {
+      "parrafos": [1, 2, 3],
+      "titulo": "Criterios para no medirlo todo",
+      "idea": "Con solo algunos lados y ángulos puedes asegurar si dos triángulos son congruentes o semejantes.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Congruencia", "puntos": ["LLL: tres pares de lados iguales", "LAL: dos lados y el ángulo comprendido", "ALA: dos ángulos y el lado comprendido"] },
+        { "titulo": "Semejanza", "puntos": ["AA: dos pares de ángulos iguales", "LLL proporcional: tres pares de lados proporcionales", "LAL proporcional: dos lados proporcionales y el ángulo comprendido igual"] }
+      ] },
+      "comprueba": { "pregunta": "Dos triángulos tienen dos pares de ángulos iguales y lados de distinto tamaño. ¿Qué concluyes?", "opciones": ["Son semejantes por AA", "Son congruentes por LLL", "Son congruentes por ALA"], "correcta": 0, "porque": "El criterio AA basta para la semejanza. No son congruentes, porque sus lados tienen distinto tamaño." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "La razón k: lados, áreas, volúmenes",
+      "idea": "Si los lados crecen k veces, las áreas crecen k² veces y los volúmenes k³ veces.",
+      "visual": { "tipo": "ejemplo", "titulo": "Razón de semejanza k = 3", "lineas": ["Lados: 3 veces más largos", "Áreas: k² = 3² = 9 veces", "Volúmenes: k³ = 3³ = 27 veces"], "resultado": "Área y volumen crecen mucho más rápido que los lados." },
+      "comprueba": { "pregunta": "Si k = 2, ¿cuántas veces mayor es el área del triángulo grande?", "opciones": ["2", "8", "4"], "correcta": 2, "porque": "Las áreas se relacionan con k²: 2² = 4. El 8 sería k³, que corresponde a volúmenes." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Medir un árbol con su sombra",
+      "idea": "El sol forma triángulos semejantes, así que tu estatura y tu sombra te dan la altura del árbol.",
+      "visual": { "tipo": "ejemplo", "titulo": "Altura de un árbol por sus sombras", "lineas": ["Tu estatura: 1.65 m; tu sombra: 1.5 m", "Sombra del árbol: 8 m", "Altura = 1.65 × (8 ÷ 1.5)"], "resultado": "El árbol mide 8.8 m" },
+      "comprueba": { "pregunta": "¿Por qué funciona el método de las sombras?", "opciones": ["Porque las sombras siempre miden lo mismo", "Porque el sol forma triángulos semejantes", "Porque los triángulos son congruentes"], "correcta": 1, "porque": "Los rayos del sol forman con cada objeto y su sombra triángulos semejantes, y sus lados son proporcionales." }
+    }
+  ]
+}

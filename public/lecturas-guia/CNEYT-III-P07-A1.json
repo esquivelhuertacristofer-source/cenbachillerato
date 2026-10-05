@@ -1,0 +1,52 @@
+{
+  "codigo": "CNEYT-III-P07-A1",
+  "conceptos": [
+    { "termino": "ANP", "idea": "Áreas Naturales Protegidas: el instrumento más importante de conservación en México." },
+    { "termino": "LGEEPA", "idea": "Ley de 1988 que regula la protección del ambiente y el uso de recursos." },
+    { "termino": "CDB", "idea": "Convenio internacional de 1992 para conservar y usar con justicia la biodiversidad." },
+    { "termino": "Conservación comunitaria", "idea": "Ejidos y comunidades que cuidan sus tierras, a veces mejor que las ANP." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Áreas Naturales Protegidas",
+      "idea": "México tiene más de 182 ANP de distintas categorías; las Reservas de Biosfera son las de mayor restricción.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "~17%", "etiqueta": "Territorio y aguas jurisdiccionales protegidos (unos 90 millones de ha)", "barra": 17 },
+        { "valor": "~11.6%", "etiqueta": "Territorio terrestre protegido (unos 23 millones de ha)", "barra": 11.6 },
+        { "valor": "182+", "etiqueta": "Áreas Naturales Protegidas" }
+      ] },
+      "comprueba": { "pregunta": "¿Qué categoría de ANP tiene la mayor restricción?", "opciones": ["Parques Nacionales", "Reservas de Biosfera", "Zonas de Restauración Ecológica"], "correcta": 1, "porque": "El texto señala que las Reservas de Biosfera son las de mayor restricción." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "La LGEEPA y quién la aplica",
+      "idea": "La LGEEPA (1988) es el marco legal principal, y SEMARNAT, CONANP y PROFEPA administran y vigilan su aplicación.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Qué regula la LGEEPA", "puntos": ["Protección del ambiente", "Uso racional de recursos naturales", "Preservación de ecosistemas", "Participación ciudadana"] },
+        { "titulo": "Quién la aplica", "puntos": ["SEMARNAT", "CONANP", "PROFEPA"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es el marco legal principal de conservación en México según el texto?", "opciones": ["El CDB", "Las Metas de Kunming-Montreal", "La LGEEPA"], "correcta": 2, "porque": "La LGEEPA es la ley nacional principal; el CDB y Kunming-Montreal son acuerdos internacionales." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Compromisos internacionales",
+      "idea": "México forma parte del CDB (1992) y suscribió las Metas de Kunming-Montreal: proteger el 30% de tierra y mar para 2030.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "1992: CDB", "texto": "Conservar la biodiversidad, usarla sosteniblemente y repartir sus beneficios con equidad." },
+        { "titulo": "2022: Kunming-Montreal", "texto": "Meta de proteger el 30% de la superficie terrestre y marina." },
+        { "titulo": "2030", "texto": "Fecha límite para alcanzar esa meta." }
+      ] },
+      "comprueba": { "pregunta": "Hoy México protege ~11.6% de su territorio terrestre. ¿Cumple ya la meta terrestre de Kunming-Montreal?", "opciones": ["No, la meta es 30% para 2030", "Sí, la meta es 10%", "Sí, la meta solo aplica al mar"], "correcta": 0, "porque": "Las Metas de Kunming-Montreal piden proteger el 30% de la superficie terrestre y marina para 2030." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "El pilar olvidado: las comunidades",
+      "idea": "Más del 80% de la biodiversidad silvestre está en tierras de ejidos y comunidades, cuyo conocimiento tradicional la ha conservado por siglos.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "80%+", "etiqueta": "Biodiversidad silvestre en tierras de uso común", "barra": 80 }
+      ] },
+      "comprueba": { "pregunta": "¿Dónde se encuentra la mayor parte de la biodiversidad silvestre de México?", "opciones": ["En zoológicos y jardines botánicos", "En tierras de uso común: ejidos y comunidades", "Solo dentro de las ANP formales"], "correcta": 1, "porque": "Más del 80% de la biodiversidad silvestre está en ejidos y comunidades, no solo en áreas protegidas formales." }
+    }
+  ]
+}

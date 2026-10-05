@@ -1,0 +1,44 @@
+{
+  "codigo": "PM-III-P02-A1",
+  "conceptos": [
+    { "termino": "Ecuación cuadrática", "idea": "Ecuación de grado dos: ax² + bx + c = 0, con a distinto de cero." },
+    { "termino": "Factorización", "idea": "Escribirla como producto e igualar cada factor a cero." },
+    { "termino": "Completar el cuadrado", "idea": "Llevarla a la forma (x + h)² = k y sacar raíz; siempre funciona." },
+    { "termino": "Fórmula general", "idea": "La herramienta universal que resuelve cualquier ecuación cuadrática." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Qué es una ecuación cuadrática",
+      "idea": "Es una ecuación de grado dos que aparece en proyectiles, ganancias y diseño de arcos.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Forma general", "expr": "ax² + bx + c = 0,  a ≠ 0", "leyenda": "Si a fuera 0, ya no sería de grado dos" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estas es una ecuación cuadrática?", "opciones": ["3x + 2 = 0", "x² − 4x = 0", "x³ + 1 = 0"], "correcta": 1, "porque": "Es de grado dos (a = 1, b = −4, c = 0). La primera es de grado uno y la tercera de grado tres." }
+    },
+    {
+      "parrafos": [1, 2],
+      "titulo": "Método 1: factorización",
+      "idea": "Si la ecuación se escribe como producto de dos binomios, cada factor igualado a cero da una solución.",
+      "visual": { "tipo": "ejemplo", "titulo": "Resolver x² − 5x + 6 = 0", "lineas": ["(x − 2)(x − 3) = 0", "x − 2 = 0  o  x − 3 = 0"], "resultado": "x = 2 o x = 3" },
+      "comprueba": { "pregunta": "Si (x − 1)(x + 4) = 0, ¿cuáles son las soluciones?", "opciones": ["x = 1 o x = −4", "x = −1 o x = 4", "x = 1 o x = 4"], "correcta": 0, "porque": "Cada factor igualado a cero: x − 1 = 0 da x = 1, y x + 4 = 0 da x = −4." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Método 2: completar el cuadrado",
+      "idea": "Se transforma la ecuación en (x + h)² = k y se saca raíz; siempre funciona.",
+      "visual": { "tipo": "ejemplo", "titulo": "Resolver x² + 6x + 5 = 0", "lineas": ["x² + 6x = −5", "x² + 6x + 9 = 4", "(x + 3)² = 4", "x = −3 ± 2"], "resultado": "x = −1 o x = −5" },
+      "comprueba": { "pregunta": "Una ecuación cuadrática no se puede factorizar con enteros. ¿Cuál de estos métodos sí te servirá?", "opciones": ["Factorización con enteros", "Ninguno: no tiene solución", "Completar el cuadrado"], "correcta": 2, "porque": "Factorizar no siempre es posible, pero completar el cuadrado siempre funciona." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Método 3: la fórmula general",
+      "idea": "La fórmula general resuelve cualquier ecuación cuadrática, y su discriminante anticipa cuántas soluciones reales hay.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Fórmula general", "expr": "x = (−b ± √(b² − 4ac)) / 2a", "leyenda": "Funciona para cualquier ecuación cuadrática" },
+        { "nombre": "Discriminante", "expr": "b² − 4ac", "leyenda": "Determina cuántas soluciones reales existen" }
+      ] },
+      "comprueba": { "pregunta": "En 2x² + 3x − 5 = 0, ¿qué valores usas en la fórmula?", "opciones": ["a = 2, b = 3, c = −5", "a = 3, b = 2, c = −5", "a = 2, b = 3, c = 5"], "correcta": 0, "porque": "a acompaña a x², b acompaña a x y c es el término solo, con su signo: −5." }
+    }
+  ]
+}

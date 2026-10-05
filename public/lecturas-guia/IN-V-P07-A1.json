@@ -1,0 +1,172 @@
+{
+  "codigo": "IN-V-P07-A1",
+  "conceptos": [
+    {
+      "termino": "Proposition / Opposition",
+      "idea": "Los dos bandos de un debate: uno a favor de la afirmación y otro en contra."
+    },
+    {
+      "termino": "Rebuttal",
+      "idea": "Tu respuesta a los argumentos del otro bando."
+    },
+    {
+      "termino": "Panel discussion",
+      "idea": "Varios ponentes dan su perspectiva sin tener que oponerse entre sí."
+    },
+    {
+      "termino": "Active listening",
+      "idea": "Escuchar de verdad: parafrasear y hacer preguntas para aclarar."
+    }
+  ],
+  "partes": [
+    {
+      "parrafos": [
+        0,
+        1,
+        2
+      ],
+      "titulo": "Debate y panel: dos formatos distintos",
+      "idea": "En un debate hay dos bandos que se enfrentan; en un panel se suman varios puntos de vista sobre el mismo tema.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Academic debate",
+            "puntos": [
+              "Dos bandos: proposition y opposition",
+              "Argumentos, luego rebuttals y al final resúmenes",
+              "El moderador controla el tiempo y da la palabra"
+            ]
+          },
+          {
+            "titulo": "Panel discussion",
+            "puntos": [
+              "Varios ponentes, cada uno con su perspectiva",
+              "No hace falta tomar posturas opuestas",
+              "El moderador invita preguntas del público"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "Cinco expertos comparten distintas ideas sobre la educación y luego el público les hace preguntas. ¿Qué formato es?",
+        "opciones": [
+          "Un panel de discusión",
+          "Un debate formal",
+          "Un rebuttal"
+        ],
+        "correcta": 0,
+        "porque": "En un panel varios ponentes dan su perspectiva sin oponerse, y el moderador invita preguntas del público."
+      }
+    },
+    {
+      "parrafos": [
+        3
+      ],
+      "titulo": "Frases para cada momento",
+      "idea": "Hay expresiones fijas para pedir la palabra, estar de acuerdo, discrepar con respeto y ampliar tu idea.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Pedir la palabra",
+            "puntos": [
+              "May I add something?",
+              "Could I respond to that?"
+            ]
+          },
+          {
+            "titulo": "Estar de acuerdo",
+            "puntos": [
+              "I agree with what [name] said because...",
+              "That is a valid point, and I would add that..."
+            ]
+          },
+          {
+            "titulo": "Discrepar con respeto",
+            "puntos": [
+              "I see your point; however, I would argue that...",
+              "On the contrary, the evidence shows..."
+            ]
+          },
+          {
+            "titulo": "Ampliar tu idea",
+            "puntos": [
+              "In other words...",
+              "As an example of what I mean..."
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "Quieres discrepar de un compañero sin sonar grosero. ¿Qué frase usas?",
+        "opciones": [
+          "May I add something?",
+          "I see your point; however, I would argue that...",
+          "To be more specific..."
+        ],
+        "correcta": 1,
+        "porque": "Reconoce la idea del otro («I see your point») antes de presentar la tuya: es la forma respetuosa de discrepar."
+      }
+    },
+    {
+      "parrafos": [
+        4
+      ],
+      "titulo": "Escuchar también es participar",
+      "idea": "Parafrasear demuestra que entendiste y las preguntas de aclaración muestran que te importa la conversación.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Parafrasear",
+            "puntos": [
+              "So what you are saying is that...",
+              "What I hear is that you believe..."
+            ]
+          },
+          {
+            "titulo": "Pedir aclaración",
+            "puntos": [
+              "Could you clarify what you mean by...?",
+              "Are you saying that...?"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "«So what you are saying is that schools need more computers.» ¿Qué está haciendo quien habla?",
+        "opciones": [
+          "Pidiendo la palabra",
+          "Dando un rebuttal",
+          "Parafraseando"
+        ],
+        "correcta": 2,
+        "porque": "Repite con sus palabras lo que dijo el otro para mostrar que entendió: eso es parafrasear."
+      }
+    },
+    {
+      "parrafos": [
+        5
+      ],
+      "titulo": "Temas y vocabulario de nivel B1",
+      "idea": "En B1 debes poder discutir medio ambiente, tecnología, educación e igualdad, y practicar en foros como los de la UNAM o MUN.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Vocabulario para practicar",
+            "puntos": [
+              "sustainability",
+              "inequality",
+              "access to education",
+              "digital rights",
+              "renewable energy",
+              "social justice"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

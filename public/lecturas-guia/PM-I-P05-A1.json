@@ -1,0 +1,32 @@
+{
+  "codigo": "PM-I-P05-A1",
+  "conceptos": [
+    { "termino": "Razón", "idea": "Comparar dos cantidades, como 3 mujeres por cada 2 hombres (3:2)." },
+    { "termino": "Proporción", "idea": "Igualdad entre dos razones: 3/2 = 6/4." },
+    { "termino": "Proporcionalidad directa", "idea": "Si una sube, la otra sube igual: y = kx." },
+    { "termino": "Proporcionalidad inversa", "idea": "Si una sube, la otra baja en la misma proporción: y = k/x." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Razones y proporciones",
+      "idea": "Una razón compara dos cantidades; una proporción dice que dos razones son iguales.",
+      "visual": { "tipo": "ejemplo", "titulo": "3 mujeres por cada 2 hombres", "lineas": [
+        "Razón: 3:2, o sea 3/2",
+        "Duplicamos ambos grupos: 6 mujeres y 4 hombres",
+        "3/2 = 6/4"
+      ], "resultado": "La relación se mantiene: es una proporción." },
+      "comprueba": { "pregunta": "¿Cuál razón forma una proporción con 3/2?", "opciones": ["4/3", "9/6", "5/2"], "correcta": 1, "porque": "9/6 se obtiene multiplicando 3 y 2 por 3, así que 3/2 = 9/6." }
+    },
+    {
+      "parrafos": [1, 2, 3],
+      "titulo": "¿Directa o inversa?",
+      "idea": "En la directa ambas cantidades crecen juntas; en la inversa, una crece y la otra baja. Identifica cuál antes de calcular.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Directa", "expr": "y = kx", "leyenda": "5 piezas/hora × 3 horas = 15 piezas" },
+        { "nombre": "Inversa", "expr": "y = k/x", "leyenda": "4 trabajadores en 6 días → 8 trabajadores en 3 días" }
+      ] },
+      "comprueba": { "pregunta": "Un auto va más rápido en el mismo trayecto y tarda menos. ¿Qué tipo de proporcionalidad es?", "opciones": ["Directa", "No hay relación", "Inversa"], "correcta": 2, "porque": "Al aumentar la velocidad disminuye el tiempo: una sube y la otra baja, como en el caso de los trabajadores." }
+    }
+  ]
+}

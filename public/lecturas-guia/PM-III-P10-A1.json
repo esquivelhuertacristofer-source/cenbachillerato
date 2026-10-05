@@ -1,0 +1,41 @@
+{
+  "codigo": "PM-III-P10-A1",
+  "conceptos": [
+    { "termino": "Ecuación con dos incógnitas", "idea": "Relaciona dos cantidades que cambian juntas, como y = m·x + b." },
+    { "termino": "Pendiente (m)", "idea": "Cuánto cambia y por cada unidad que aumenta x." },
+    { "termino": "Ordenada al origen (b)", "idea": "El valor de y cuando x = 0: el punto de partida." },
+    { "termino": "Plano cartesiano", "idea": "Dos ejes perpendiculares donde cada punto se nombra con un par (x, y)." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Pendiente y ordenada al origen",
+      "idea": "La pendiente dice cuánto y cómo cambia y; la ordenada al origen, desde dónde parte.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Forma pendiente–ordenada", "expr": "y = m·x + b" },
+        { "nombre": "Pendiente", "expr": "m", "leyenda": "m > 0 crece · m < 0 decrece · m = 0 constante" },
+        { "nombre": "Ordenada al origen", "expr": "b", "leyenda": "El valor de y cuando x = 0" }
+      ] },
+      "comprueba": { "pregunta": "En y = −3x + 8, ¿cómo es la relación y desde dónde parte?", "opciones": ["Crece; parte de 3", "Decrece; parte de 8", "Decrece; parte de −3"], "correcta": 1, "porque": "m = −3 es negativa, así que decrece; b = 8 es el valor de y cuando x = 0." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "No una solución, sino infinitas",
+      "idea": "Cada pareja (x, y) que cumple la ecuación es una solución, y hay infinitas.",
+      "visual": { "tipo": "ejemplo", "titulo": "Soluciones de y = 2x + 1", "lineas": ["x = 0 → y = 2(0) + 1 = 1 → (0, 1)", "x = 1 → y = 2(1) + 1 = 3 → (1, 3)", "x = 2 → y = 2(2) + 1 = 5 → (2, 5)"], "resultado": "Cualquier x da su propia pareja: las soluciones son infinitas." },
+      "comprueba": { "pregunta": "¿Cuál de estas parejas es solución de y = 2x + 1?", "opciones": ["(3, 6)", "(5, 10)", "(4, 9)"], "correcta": 2, "porque": "Con x = 4: y = 2(4) + 1 = 9. Las otras dan y = 7 y y = 11, no 6 ni 10." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Todas las soluciones forman una recta",
+      "idea": "Al dibujar todas las soluciones en el plano cartesiano, los puntos se alinean: por eso la gráfica es una recta.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Primero x", "texto": "Cuánto a la derecha o a la izquierda del origen (0, 0)." },
+        { "titulo": "Luego y", "texto": "Cuánto arriba o abajo." },
+        { "titulo": "Marca soluciones", "texto": "Cada pareja (x, y) que cumple la ecuación es un punto." },
+        { "titulo": "Observa", "texto": "Todos los puntos se alinean formando una recta." }
+      ] },
+      "comprueba": { "pregunta": "¿Dónde está el punto (−2, 3)?", "opciones": ["2 a la izquierda y 3 arriba", "2 a la derecha y 3 abajo", "3 a la izquierda y 2 arriba"], "correcta": 0, "porque": "Primero va x = −2 (dos a la izquierda del origen) y luego y = 3 (tres hacia arriba)." }
+    }
+  ]
+}

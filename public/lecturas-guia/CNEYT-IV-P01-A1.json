@@ -1,0 +1,39 @@
+{
+  "codigo": "CNEYT-IV-P01-A1",
+  "conceptos": [
+    { "termino": "Conservación de la masa", "idea": "La masa de los reactivos es igual a la masa de los productos." },
+    { "termino": "Ecuación balanceada", "idea": "Tiene los mismos átomos de cada elemento en ambos lados." },
+    { "termino": "Coeficiente estequiométrico", "idea": "Número delante de la fórmula: es lo único que ajustas al balancear." },
+    { "termino": "Balanceo por tanteo", "idea": "Probar coeficientes hasta que los átomos cuadren, sin tocar subíndices." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Lavoisier: la masa se conserva",
+      "idea": "Los átomos no se crean ni se destruyen, por eso una ecuación debe tener los mismos átomos en ambos lados.",
+      "visual": { "tipo": "ejemplo", "titulo": "Balancear H₂ + O₂ → H₂O", "lineas": ["Sin balancear: 2 O a la izquierda, 1 O a la derecha", "Pon 2 delante del agua: 2 H₂O → ahora hay 2 O y 4 H a la derecha", "Pon 2 delante del hidrógeno: 2 H₂ → 4 H a la izquierda"], "resultado": "2 H₂ + O₂ → 2 H₂O" },
+      "comprueba": { "pregunta": "Si 10 g de reactivos reaccionan por completo, ¿cuánta masa de productos se obtiene?", "opciones": ["Menos de 10 g", "Exactamente 10 g", "Más de 10 g"], "correcta": 1, "porque": "Por la Ley de Conservación de la Masa, la masa de los productos es igual a la de los reactivos." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Balanceo por tanteo",
+      "idea": "Se ajustan solo los coeficientes; cambiar un subíndice cambiaría la sustancia misma.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sí se cambia", "puntos": ["Coeficientes: 2 H₂O", "Cambia la cantidad de moléculas"] },
+        { "titulo": "No se cambia", "puntos": ["Subíndices: H₂O → H₂O₂", "Cambiaría agua por agua oxigenada"] }
+      ] },
+      "comprueba": { "pregunta": "Al balancear, ¿qué número puedes modificar en CO₂?", "opciones": ["El 2 del oxígeno", "Ninguno, ya está balanceado siempre", "Un coeficiente delante de CO₂"], "correcta": 2, "porque": "Solo se ajustan los coeficientes; el subíndice 2 es parte de la fórmula y cambiarlo cambiaría la sustancia." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "El balanceo en la industria mexicana",
+      "idea": "Con ecuaciones balanceadas, la industria calcula cuánto reactivo usar y cuánto producto obtener, con menos desperdicio y más seguridad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "PEMEX", "puntos": ["Rendimiento de combustibles", "Subproductos de la refinación"] },
+        { "titulo": "Cementeras (CEMEX)", "puntos": ["Descomposición del carbonato de calcio", "CaCO₃ → CaO + CO₂"] },
+        { "titulo": "Metalurgia (Lázaro Cárdenas)", "puntos": ["Reducción del hierro", "Cantidades exactas de coque y mineral"] }
+      ] },
+      "comprueba": { "pregunta": "En CaCO₃ → CaO + CO₂, ¿cuántos átomos de oxígeno hay en los productos?", "opciones": ["3", "2", "1"], "correcta": 0, "porque": "CaO aporta 1 oxígeno y CO₂ aporta 2: en total 3, igual que en CaCO₃. La ecuación ya está balanceada." }
+    }
+  ]
+}

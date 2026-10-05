@@ -1,0 +1,41 @@
+{
+  "codigo": "CNEYT-IV-P06-A1",
+  "conceptos": [
+    { "termino": "Principio activo", "idea": "La molécula de un medicamento que actúa sobre el cuerpo." },
+    { "termino": "Aditivo alimentario", "idea": "Sustancia que conserva, colorea, endulza o da sabor a un alimento." },
+    { "termino": "Polímero", "idea": "Molécula gigante hecha de muchos monómeros unidos, como los plásticos." },
+    { "termino": "Reciclaje de PET", "idea": "Recuperar botellas para depender menos del petróleo crudo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Fármacos: moléculas orgánicas que curan",
+      "idea": "La mayoría de los medicamentos son moléculas orgánicas diseñadas para actuar sobre receptores del cuerpo, que también son orgánicos.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "~16,000 mdd", "etiqueta": "Valor anual de la industria farmacéutica en México" },
+        { "valor": "700 millones+", "etiqueta": "Recetas al año entre IMSS e ISSSTE" }
+      ] },
+      "comprueba": { "pregunta": "El ibuprofeno tiene la fórmula C₁₃H₁₈O₂. ¿Por qué se considera una molécula orgánica?", "opciones": ["Porque es un compuesto de carbono", "Porque se vende en farmacias", "Porque no tiene oxígeno"], "correcta": 0, "porque": "La química orgánica estudia los compuestos del carbono, y el ibuprofeno está formado por carbono, hidrógeno y oxígeno." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Aditivos: conservar, endulzar, dar sabor",
+      "idea": "La industria alimentaria usa aditivos orgánicos para conservar, colorear, endulzar y potenciar sabores.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Conservadores", "puntos": ["Ácido benzoico", "Benzoato de sodio"] },
+        { "titulo": "Acidulante", "puntos": ["Ácido cítrico"] },
+        { "titulo": "Edulcorantes sin calorías", "puntos": ["Sacarina", "Aspartamo"] }
+      ] },
+      "comprueba": { "pregunta": "Un refresco «light» endulza sin aportar calorías. ¿Qué aditivo del texto podría llevar?", "opciones": ["Benzoato de sodio", "Aspartamo", "Ácido benzoico"], "correcta": 1, "porque": "El aspartamo y la sacarina son edulcorantes que endulzan sin aportar calorías; el benzoato y el ácido benzoico son conservadores." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Plásticos: polímeros por todas partes",
+      "idea": "Casi todo plástico es un polímero orgánico; México produce más de 4 millones de toneladas al año y eso es un reto ambiental.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Polímeros y sus usos", "puntos": ["Polietileno: bolsas", "PET: botellas de refresco", "PVC: tuberías", "Poliestireno: unicel", "Nylon: textiles"] }
+      ] },
+      "comprueba": { "pregunta": "Tiras una botella de refresco al contenedor de reciclaje. ¿Qué polímero estás reciclando?", "opciones": ["PVC", "Poliestireno", "PET"], "correcta": 2, "porque": "Las botellas de refresco son de PET, el polímero que el programa ECOCE busca reciclar." }
+    }
+  ]
+}

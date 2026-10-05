@@ -1,0 +1,61 @@
+{
+  "codigo": "IN-III-P02-A1",
+  "conceptos": [
+    { "termino": "Present perfect", "idea": "Have/has + participio: para contar experiencias sin decir cuándo pasaron." },
+    { "termino": "Past participle", "idea": "La forma del verbo que va después de have: visited, eaten, gone." },
+    { "termino": "Ever / never", "idea": "Ever pregunta si alguna vez pasó; never dice que nunca ha pasado." },
+    { "termino": "For / since", "idea": "For marca una duración; since, el punto en que empezó." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Present perfect: experiencias de vida",
+      "idea": "Sirve para contar experiencias sin decir cuándo; se forma con have o has más el participio pasado.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "I, you, we, they", "expr": "subject + have + past participle", "leyenda": "We have eaten tamales." },
+        { "nombre": "He, she, it", "expr": "subject + has + past participle", "leyenda": "She has traveled to Oaxaca." }
+      ] },
+      "comprueba": { "pregunta": "Completa: «My sister ___ visited Puebla.»", "opciones": ["have", "has", "is"], "correcta": 1, "porque": "My sister equivale a she, y con he, she o it se usa has." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Participios regulares e irregulares",
+      "idea": "Los regulares agregan -ed; los irregulares cambian de forma y hay que memorizarlos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Regulares (-ed)", "puntos": ["visit → visited", "travel → traveled", "live → lived"] },
+        { "titulo": "Irregulares", "puntos": ["go → gone", "eat → eaten", "see → seen", "be → been", "write → written", "speak → spoken"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál es el participio de write?", "opciones": ["written", "wrote", "writed"], "correcta": 0, "porque": "Write es irregular y su participio es written. Wrote es el pasado simple." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Ever para preguntar, never para negar",
+      "idea": "Ever pregunta por cualquier momento de tu vida hasta hoy; never subraya que algo jamás ha pasado.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ever (preguntas)", "puntos": ["Have you ever visited a cenote?", "Have you ever tried chapulines?", "Yes, I have. / No, I have not."] },
+        { "titulo": "Never (negativas)", "puntos": ["I have never eaten huitlacoche.", "She has never been to Chiapas."] }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber si tu amigo alguna vez ha visto el mar. ¿Qué preguntas?", "opciones": ["Have you never seen the sea?", "Did you see the sea yesterday?", "Have you ever seen the sea?"], "correcta": 2, "porque": "Ever se usa en preguntas sobre cualquier momento de la vida hasta ahora: Have you ever...?" }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "For y since: lo que sigue hoy",
+      "idea": "For va con una duración y since con un punto de inicio, para algo que empezó antes y continúa.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "For + duración", "puntos": ["I have lived in Guadalajara for three years."] },
+        { "titulo": "Since + punto de inicio", "puntos": ["I have studied English since 2021.", "We have been classmates since primary school."] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «I have known her ___ kindergarten.»", "opciones": ["for", "since", "ever"], "correcta": 1, "porque": "Kindergarten es un punto de inicio, como since primary school; for iría con una duración." }
+    },
+    {
+      "parrafos": [6, 7],
+      "titulo": "Present perfect frente a pasado simple",
+      "idea": "Si no dices cuándo, usa present perfect; si mencionas un momento específico, usa pasado simple.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Present perfect", "puntos": ["Sin momento específico", "I have eaten tacos at a taqueria."] },
+        { "titulo": "Simple past", "puntos": ["Con momento específico", "I ate tacos last Friday at the taqueria."] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «I ___ the pyramids last summer.»", "opciones": ["visited", "have visited", "has visited"], "correcta": 0, "porque": "Last summer es un momento específico, así que va pasado simple: visited." }
+    }
+  ]
+}

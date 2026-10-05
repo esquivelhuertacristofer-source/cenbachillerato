@@ -1,0 +1,32 @@
+{
+  "codigo": "CD-II-P03-A1",
+  "conceptos": [
+    { "termino": "Fake news", "idea": "Contenido deliberadamente falso o engañoso disfrazado de noticia real." },
+    { "termino": "Fact-checking", "idea": "Organizaciones que revisan noticias y publican correcciones." },
+    { "termino": "Búsqueda inversa de imágenes", "idea": "Saber si una foto ya se usó en otro contexto, con Google Imágenes o TinEye." },
+    { "termino": "Titular sensacionalista", "idea": "Impactante pero ausente en medios serios: probablemente falso." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Qué son y por qué se crean",
+      "idea": "Las fake news existen desde siempre, pero las redes las amplifican; se crean por política, dinero o para sembrar miedo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Motivos para crearlas", "puntos": ["Políticos: desprestigiar a alguien", "Económicos: generar clics y publicidad", "Crear confusión o miedo"] }
+      ] },
+      "comprueba": { "pregunta": "Una página inventa notas escandalosas para que la visiten y ganar con anuncios. ¿Qué motivo tiene?", "opciones": ["Económico", "Político", "Educativo"], "correcta": 0, "porque": "Generar clics y publicidad es una razón económica para crear fake news." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cómo verificar antes de compartir",
+      "idea": "Usa verificadores, rastrea la imagen, busca la fuente original y desconfía de titulares impactantes.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Fact-checking", "texto": "Consulta Verificado, Animal Político o AFP Factual." },
+        { "titulo": "Búsqueda inversa", "texto": "Revisa la foto en Google Imágenes o TinEye." },
+        { "titulo": "Fuente original", "texto": "¿Hay comunicado oficial o fuente verificable?" },
+        { "titulo": "Titular", "texto": "Si es impactante y no sale en medios serios, desconfía." }
+      ] },
+      "comprueba": { "pregunta": "Te llega una foto de una inundación «de hoy», pero sospechas que es vieja. ¿Qué herramienta usas?", "opciones": ["Leer solo el titular", "Una búsqueda inversa de imágenes", "Reenviarla para preguntar"], "correcta": 1, "porque": "La búsqueda inversa de imágenes permite verificar si una fotografía fue usada antes en otro contexto." }
+    }
+  ]
+}

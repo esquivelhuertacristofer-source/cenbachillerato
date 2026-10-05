@@ -1,0 +1,53 @@
+{
+  "codigo": "PM-VI-P07-A1",
+  "conceptos": [
+    { "termino": "Muestreo estadístico", "idea": "Elegir una parte de la población que la represente bien." },
+    { "termino": "Error muestral", "idea": "La diferencia entre lo que da la muestra y el valor real de la población." },
+    { "termino": "Muestreo probabilístico", "idea": "Cada elemento tiene una probabilidad conocida y mayor a cero de salir elegido." },
+    { "termino": "Sesgo de selección", "idea": "La muestra deja fuera a parte de la población y no puede generalizarse." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Por qué muestrear y su error",
+      "idea": "Estudiar a todos es caro, así que se usa una muestra representativa; su error es inevitable, pero se controla.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Censo del INEGI", "puntos": ["Intenta contar a todos los mexicanos", "Solo cada diez años por su enorme costo"] },
+        { "titulo": "ENIGH", "puntos": ["Decenas de miles de hogares", "Estima las condiciones de vida de millones"] },
+        { "titulo": "Error muestral", "puntos": ["Baja con una muestra más grande", "Baja con un mejor método de selección", "Margen de error: ± 3 puntos porcentuales"] }
+      ] },
+      "comprueba": { "pregunta": "Una encuesta repite el mismo buen método, pero entrevista a cuatro veces más personas. ¿Qué pasa con el error muestral?", "opciones": ["Aumenta", "Desaparece por completo", "Disminuye"], "correcta": 2, "porque": "El error muestral disminuye al aumentar el tamaño de la muestra, aunque nunca desaparece del todo: es inevitable." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cuatro muestreos probabilísticos",
+      "idea": "Al azar, cada k-ésimo de una lista, por estratos o por grupos completos: cada método da a todos una probabilidad conocida.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Aleatorio simple", "puntos": ["Al azar, como boletos de una urna"] },
+        { "titulo": "Sistemático", "puntos": ["Cada k-ésimo de una lista: k = N/n", "N = 800, n = 80 → k = 10"] },
+        { "titulo": "Estratificado", "puntos": ["Divide en estratos: edad, región, nivel educativo", "Muestra proporcional de cada uno"] },
+        { "titulo": "Por conglomerados", "puntos": ["Grupos naturales completos: manzanas, escuelas", "Más económico si la población está dispersa"] }
+      ] },
+      "comprueba": { "pregunta": "Quieres una muestra sistemática de n = 60 alumnos de una lista de N = 1,200. ¿Cada cuántos eliges uno?", "opciones": ["Cada 20", "Cada 60", "Cada 1,260"], "correcta": 0, "porque": "k = N/n = 1,200 ÷ 60 = 20: eliges un inicio al azar entre el 1 y el 20 y luego cada vigésimo." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Muestras sesgadas: conveniencia y autoselección",
+      "idea": "Si encuestas solo a quien es accesible o a quien quiere responder, la muestra está sesgada y no representa a la población.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "No probabilísticos", "puntos": ["De conveniencia: a quien sea accesible", "En línea con autoselección: solo responden los interesados o con internet", "No se pueden generalizar"] }
+      ] },
+      "comprueba": { "pregunta": "Un youtuber pregunta a sus seguidores qué opinan de una ley y publica el resultado como la opinión de México. ¿Qué problema tiene?", "opciones": ["Es una muestra autoseleccionada y sesgada", "El error muestral es cero", "Es un muestreo estratificado"], "correcta": 0, "porque": "Solo responden quienes lo siguen, tienen internet y quieren participar: no representa a la población general mexicana." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Cómo muestrea el INEGI",
+      "idea": "La ENIGH combina muestreo estratificado y por conglomerados en varias etapas para ser representativa a escala nacional, estatal y rural/urbana.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "ENIGH", "puntos": ["Estratificado y por conglomerados", "En múltiples etapas", "Representativa nacional, estatal y rural/urbana"] },
+        { "titulo": "ENOE", "puntos": ["Se levanta cada trimestre", "Metodología similar"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué tipos de muestreo combina la ENIGH?", "opciones": ["De conveniencia y autoselección", "Estratificado y por conglomerados", "Solo aleatorio simple"], "correcta": 1, "porque": "La ENIGH usa muestreo estratificado y por conglomerados en múltiples etapas para garantizar representatividad." }
+    }
+  ]
+}

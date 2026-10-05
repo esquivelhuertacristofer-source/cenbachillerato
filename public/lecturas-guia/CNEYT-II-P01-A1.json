@@ -1,0 +1,43 @@
+{
+  "codigo": "CNEYT-II-P01-A1",
+  "conceptos": [
+    { "termino": "Energía", "idea": "Capacidad de producir cambios o realizar trabajo." },
+    { "termino": "Conservación de la energía", "idea": "No se crea ni se destruye: solo se transforma." },
+    { "termino": "Energía cinética", "idea": "La del movimiento; depende de la masa y la velocidad." },
+    { "termino": "Energía potencial", "idea": "Energía guardada por la posición, como un libro en un estante." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Energía de movimiento y de posición",
+      "idea": "La energía se transforma pero no se pierde; la cinética depende del movimiento y la potencial de la altura.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Energía cinética", "expr": "Ec = ½mv²", "leyenda": "m masa · v velocidad" },
+        { "nombre": "Energía potencial gravitacional", "expr": "Ep = mgh", "leyenda": "m masa · g gravedad · h altura" }
+      ] },
+      "comprueba": { "pregunta": "Subes una mochila del piso a una repisa más alta. ¿Qué energía aumenta?", "opciones": ["La potencial gravitacional", "La cinética", "La luminosa"], "correcta": 0, "porque": "Ep = mgh: al aumentar la altura h, aumenta la energía potencial gravitacional." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Térmica, luminosa y eléctrica",
+      "idea": "La energía también está en el movimiento de las moléculas, en la luz y en las cargas que se mueven.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Térmica", "puntos": ["Movimiento de átomos y moléculas", "Más rápido, mayor temperatura"] },
+        { "titulo": "Luminosa", "puntos": ["Viaja en ondas electromagnéticas", "Ej.: la luz del Sol"] },
+        { "titulo": "Eléctrica", "puntos": ["Cargas que se mueven por un conductor"] }
+      ] },
+      "comprueba": { "pregunta": "Calientas agua en una olla. ¿Qué les pasa a sus moléculas?", "opciones": ["Se mueven más lento", "Se mueven más rápido", "Dejan de moverse"], "correcta": 1, "porque": "La energía térmica se relaciona con el movimiento de las moléculas: cuanto más rápido, mayor temperatura." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Transformaciones de energía a tu alrededor",
+      "idea": "Plantas eléctricas y tu propio cuerpo convierten una forma de energía en otra todo el tiempo.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Potencial del agua", "texto": "El agua almacenada en la hidroeléctrica." },
+        { "titulo": "Cinética", "texto": "El agua mueve la turbina." },
+        { "titulo": "Eléctrica", "texto": "El generador produce electricidad." }
+      ] },
+      "comprueba": { "pregunta": "Comes y luego corres. ¿Qué transformación hace tu cuerpo?", "opciones": ["Luminosa → eléctrica", "Química → mecánica y térmica", "Eléctrica → potencial"], "correcta": 1, "porque": "El cuerpo convierte la energía química de los alimentos en movimiento y en calor corporal." }
+    }
+  ]
+}

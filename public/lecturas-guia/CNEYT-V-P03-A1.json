@@ -1,0 +1,56 @@
+{
+  "codigo": "CNEYT-V-P03-A1",
+  "conceptos": [
+    { "termino": "Gravitación universal", "idea": "Toda masa atrae a otra; la fuerza cae con el cuadrado de la distancia." },
+    { "termino": "Peso", "idea": "La fuerza con que un planeta te atrae: W = mg; cambia según el planeta." },
+    { "termino": "Masa", "idea": "Propiedad del cuerpo: es la misma en la Tierra, la Luna o Júpiter." },
+    { "termino": "Órbita geoestacionaria", "idea": "Órbita de 24 h sobre el ecuador: el satélite parece fijo en el cielo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "La ley de la manzana y la Luna",
+      "idea": "La misma fuerza que hace caer una manzana mantiene a la Luna en órbita: es siempre atractiva y actúa a distancia.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Gravitación universal", "expr": "F = G · m₁ · m₂ ÷ r²", "leyenda": "r es la distancia entre los centros de los dos cuerpos" },
+        { "nombre": "Constante de gravitación", "expr": "G = 6.674 × 10⁻¹¹ N·m²/kg²" }
+      ] },
+      "comprueba": { "pregunta": "Si la distancia entre dos masas se duplica, la fuerza gravitacional entre ellas…", "opciones": ["se reduce a la cuarta parte", "se reduce a la mitad", "se duplica"], "correcta": 0, "porque": "La fuerza es inversamente proporcional al cuadrado de la distancia: 2² = 4, así que queda en 1/4." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Tu peso en otros mundos",
+      "idea": "El peso cambia porque g cambia de un astro a otro; la masa, en cambio, es siempre la misma.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "9.8 m/s²", "etiqueta": "g en la Tierra" },
+        { "valor": "1.62 m/s²", "etiqueta": "g en la Luna: una persona de 70 kg pesa 113.4 N" },
+        { "valor": "3.71 m/s²", "etiqueta": "g en Marte (≈ 38% de la Tierra)" },
+        { "valor": "24.8 m/s²", "etiqueta": "g en Júpiter: la misma persona pesa 1,736 N" }
+      ] },
+      "comprueba": { "pregunta": "Una astronauta de 60 kg viaja a la Luna. ¿Qué cambia?", "opciones": ["Su masa y su peso", "Solo su masa", "Solo su peso"], "correcta": 2, "porque": "La masa es una propiedad intrínseca y no cambia; el peso W = mg disminuye porque g es menor en la Luna." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Las tres leyes de Kepler",
+      "idea": "Kepler describió cómo se mueven los planetas, y Newton demostró que sus leyes salen de la gravitación universal.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "1.ª De las órbitas", "texto": "Los planetas giran en elipses con el Sol en un foco." },
+        { "titulo": "2.ª De las áreas", "texto": "Barren áreas iguales en tiempos iguales: van más rápido cerca del Sol." },
+        { "titulo": "3.ª De los períodos", "texto": "T² ∝ a³: el cuadrado del período es proporcional al cubo del semieje mayor." }
+      ] },
+      "comprueba": { "pregunta": "Según la segunda ley de Kepler, ¿cuándo va más rápido un planeta?", "opciones": ["Cuando está más lejos del Sol", "Cuando está más cerca del Sol", "Siempre va igual de rápido"], "correcta": 1, "porque": "La línea Sol-planeta barre áreas iguales en tiempos iguales, así que cerca del Sol el planeta debe ir más rápido." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Satélites geoestacionarios y México",
+      "idea": "Un satélite a 35,786 km sobre el ecuador gira al ritmo de la Tierra; México lleva satélites así desde 1985.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "1985", "texto": "Morelos I (Discovery) y Morelos II (Atlantis)." },
+        { "titulo": "1998", "texto": "Satmex 5." },
+        { "titulo": "2010", "texto": "Se funda la Agencia Espacial Mexicana (AEM)." },
+        { "titulo": "2015", "texto": "Morelos 3, de la constelación Mexsat." }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué la órbita geoestacionaria es ideal para la televisión satelital?", "opciones": ["Porque está muy cerca de la superficie", "Porque el satélite parece fijo en el cielo", "Porque el satélite da una vuelta cada hora"], "correcta": 1, "porque": "Su período es igual a la rotación de la Tierra (24 h), así que el satélite parece fijo y la antena no tiene que seguirlo." }
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "codigo": "CNEYT-VI-P04-A1",
+  "conceptos": [
+    { "termino": "Dogma central", "idea": "La información genética fluye del ADN al ARN y de ahí a la proteína." },
+    { "termino": "Replicación", "idea": "El ADN hace una copia exacta de sí mismo antes de que la célula se divida." },
+    { "termino": "Transcripción", "idea": "Con el ADN de molde se fabrica ARN mensajero en el núcleo." },
+    { "termino": "Traducción", "idea": "El ribosoma lee el ARNm por codones y arma la proteína." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El dogma central y la replicación",
+      "idea": "La información va del ADN al ARN a la proteína; antes de dividirse, la célula copia su ADN.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Helicasa", "texto": "Separa las dos hebras como si abriera un cierre." },
+        { "titulo": "ADN polimerasa", "texto": "Lee cada hebra molde y arma la complementaria: A con T, C con G." },
+        { "titulo": "Ligasa", "texto": "Une los fragmentos del ADN recién hecho." },
+        { "titulo": "Resultado", "texto": "Dos moléculas de ADN idénticas a la original." }
+      ] },
+      "comprueba": { "pregunta": "Una hebra molde de ADN dice ATCG. ¿Cuál es su hebra complementaria?", "opciones": ["ATCG", "TAGC", "UAGC"], "correcta": 1, "porque": "En el ADN, A se aparea con T y C con G: ATCG se complementa con TAGC." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Transcripción: del ADN al ARNm",
+      "idea": "La ARN polimerasa copia el ADN en ARN; en eucariontes se quitan los intrones antes de que el ARNm salga del núcleo.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Copiar", "texto": "La ARN polimerasa lee la hebra molde y sintetiza ARN complementario." },
+        { "titulo": "Splicing", "texto": "Se eliminan los intrones, secuencias no codificantes del pre-ARNm." },
+        { "titulo": "Salir", "texto": "El ARNm maduro viaja del núcleo al citoplasma." }
+      ] },
+      "comprueba": { "pregunta": "¿Qué se elimina del pre-ARNm durante el splicing?", "opciones": ["Los codones de inicio", "Los aminoácidos", "Los intrones"], "correcta": 2, "porque": "Los intrones son secuencias no codificantes que se eliminan para formar el ARNm maduro." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Traducción: leer codones en el ribosoma",
+      "idea": "El ribosoma lee el ARNm de tres en tres; el ARNt trae el aminoácido que corresponde a cada codón.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Codón de inicio", "puntos": ["AUG (metionina)"] },
+        { "titulo": "Codones de parada", "puntos": ["UAA", "UAG", "UGA"] },
+        { "titulo": "ARNt", "puntos": ["Adaptador: su anticodón reconoce el codón", "Lleva el aminoácido al ribosoma"] }
+      ] },
+      "comprueba": { "pregunta": "Un ribosoma encuentra el codón UGA. ¿Qué hace?", "opciones": ["Termina la cadena de la proteína", "Empieza la proteína con metionina", "Añade cualquier aminoácido"], "correcta": 0, "porque": "UGA, igual que UAA y UAG, es una señal de parada: indica que la cadena polipeptídica está completa." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Las proteínas que resultan",
+      "idea": "Las proteínas pueden ser estructurales o funcionales; con unos 20,000 genes, la variedad es inmensa.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Estructurales", "puntos": ["Colágeno", "Da resistencia a piel y tendones"] },
+        { "titulo": "Funcionales o enzimáticas", "puntos": ["Amilasa salival", "Digiere el almidón"] }
+      ] },
+      "comprueba": { "pregunta": "Una proteína acelera la digestión de un alimento en la boca. ¿De qué tipo es?", "opciones": ["Estructural", "Funcional o enzimática", "No es una proteína"], "correcta": 1, "porque": "Como la amilasa salival, las proteínas que digieren o catalizan reacciones son funcionales o enzimáticas." }
+    }
+  ]
+}

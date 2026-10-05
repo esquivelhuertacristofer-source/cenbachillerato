@@ -1,0 +1,35 @@
+{
+  "codigo": "CNEYT-I-P06-A1",
+  "conceptos": [
+    { "termino": "Hipótesis falsificable", "idea": "Explicación provisional que los datos podrían refutar." },
+    { "termino": "Variable independiente", "idea": "La que tú manipulas en el experimento." },
+    { "termino": "Variable dependiente", "idea": "La que mides para ver el efecto." },
+    { "termino": "Replicación", "idea": "Otros repiten el experimento y deben obtener los mismos resultados." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Los componentes del método científico",
+      "idea": "No es una receta rígida, pero tiene pasos reconocibles: de observar un fenómeno a comunicar los resultados.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Observación y pregunta", "texto": "Notar el fenómeno con precisión y preguntar algo claro." },
+        { "titulo": "Hipótesis", "texto": "Explicación provisional y falsificable." },
+        { "titulo": "Experimentación", "texto": "Variables independiente, dependiente y de control." },
+        { "titulo": "Análisis de datos", "texto": "Estadística y gráficas." },
+        { "titulo": "Conclusión", "texto": "Aceptar, rechazar o modificar la hipótesis." },
+        { "titulo": "Comunicación", "texto": "Publicar para que otros repliquen y critiquen." }
+      ] },
+      "comprueba": { "pregunta": "Riegas plantas con distintas cantidades de agua y mides cuánto crecen. ¿Cuál es la variable independiente?", "opciones": ["Cuánto crecen", "La cantidad de agua", "El tipo de maceta, que no cambias"], "correcta": 1, "porque": "La variable independiente es la que tú manipulas: la cantidad de agua. El crecimiento es la dependiente." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cómo se corrige la ciencia",
+      "idea": "La replicación y la revisión por pares vuelven confiable al conocimiento científico, aunque siempre provisional.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Replicación", "puntos": ["Otros repiten el experimento", "Deben obtener los mismos resultados"] },
+        { "titulo": "Revisión por pares", "puntos": ["Otros expertos evalúan los resultados", "Ocurre antes de publicarse"] }
+      ] },
+      "comprueba": { "pregunta": "Un laboratorio anuncia un hallazgo, pero nadie más logra repetir su experimento. ¿Qué mecanismo falló?", "opciones": ["La replicación", "La observación", "La variable de control"], "correcta": 0, "porque": "La replicación exige que otros puedan repetir el experimento y obtener los mismos resultados." }
+    }
+  ]
+}

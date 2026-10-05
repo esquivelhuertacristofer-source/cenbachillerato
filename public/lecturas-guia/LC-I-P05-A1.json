@@ -1,0 +1,41 @@
+{
+  "codigo": "LC-I-P05-A1",
+  "conceptos": [
+    { "termino": "Información relevante", "idea": "Las ideas más importantes de un texto, separadas de detalles y ejemplos." },
+    { "termino": "Subrayado", "idea": "Marcar solo las palabras o frases clave del texto." },
+    { "termino": "Resumen", "idea": "Reescribir las ideas principales con tus propias palabras, no copiar fragmentos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Separar lo esencial de lo secundario",
+      "idea": "Leer bien es distinguir ideas principales, detalles de apoyo y datos secundarios.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lo que hay en un texto", "puntos": ["Ideas más importantes", "Detalles de apoyo", "Ejemplos o datos secundarios"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo se llama la habilidad de distinguir las ideas más importantes de un texto?", "opciones": ["Selección de información relevante", "Lectura en voz alta", "Concordancia"], "correcta": 0, "porque": "El texto la nombra selección de información relevante y dice que es fundamental para estudiar e investigar." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Estrategias para encontrar lo importante",
+      "idea": "Subraya, anota al margen, busca la oración temática y hazle preguntas al texto.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Subraya", "texto": "Solo palabras o frases clave." },
+        { "titulo": "Anota al margen", "texto": "Escribe notas junto al texto." },
+        { "titulo": "Busca la oración temática", "texto": "Identifícala en cada párrafo." },
+        { "titulo": "Pregunta al texto", "texto": "¿Quién? ¿Qué? ¿Cómo? ¿Por qué? ¿Para qué?" }
+      ] },
+      "comprueba": { "pregunta": "Un compañero subraya casi todo el párrafo. ¿Qué le falla?", "opciones": ["Nada, así se subraya", "No eligió solo las palabras o frases clave", "Debió subrayar solo los ejemplos"], "correcta": 1, "porque": "Subrayar sirve para señalar palabras o frases clave; si marcas todo, no distingues lo relevante." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Organizar lo aprendido",
+      "idea": "Con lo relevante haces resúmenes, esquemas o mapas conceptuales; resumir es reescribir con tus palabras.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Un resumen sí es", "puntos": ["Reescribir las ideas principales", "Con tus propias palabras", "Prueba de que comprendiste"] },
+        { "titulo": "Un resumen no es", "puntos": ["Copiar fragmentos del texto original"] }
+      ] },
+      "comprueba": { "pregunta": "Para resumir un capítulo, Ana pega tres frases copiadas del libro. ¿Hizo un resumen?", "opciones": ["Sí, porque son frases importantes", "Sí, si las subrayó antes", "No, un resumen reescribe las ideas con sus propias palabras"], "correcta": 2, "porque": "El resumen no es copiar fragmentos: es reescribir las ideas principales con tus palabras, demostrando que comprendiste." }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "codigo": "CNEYT-IV-P07-A1",
+  "conceptos": [
+    { "termino": "Metales pesados", "idea": "Plomo, mercurio, cadmio y arsénico: muy tóxicos en altas concentraciones." },
+    { "termino": "COPs", "idea": "Compuestos sintéticos que casi no se degradan y viajan por todo el planeta." },
+    { "termino": "Microplásticos", "idea": "Fragmentos de plástico menores a 5 mm." },
+    { "termino": "Biomagnificación", "idea": "El contaminante se concentra más en cada nivel de la cadena alimenticia." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Una contaminación invisible: metales pesados",
+      "idea": "La contaminación química se acumula lento y sin verse; los metales pesados como plomo y mercurio dañan el sistema nervioso.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Plomo", "puntos": ["Afecta el desarrollo neurológico infantil", "Gasolina con plomo eliminada en 1998", "Persiste en suelos de ciudades antiguas"] },
+        { "titulo": "Mercurio", "puntos": ["Se concentra en peces", "Daña el sistema nervioso central"] }
+      ] },
+      "comprueba": { "pregunta": "México dejó de usar gasolina con plomo en 1998. ¿Por qué aún hay plomo en suelos de ciudades antiguas?", "opciones": ["Porque se sigue usando en gasolina", "Porque los efectos se acumulan y persisten por décadas", "Porque el plomo se forma solo en el suelo"], "correcta": 1, "porque": "La contaminación química se acumula lentamente y sus efectos duran décadas después de la exposición." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "COPs y microplásticos: llegan a todas partes",
+      "idea": "Los COPs no se degradan y aparecen hasta en el Ártico; los microplásticos ya están en el agua, la sal, el aire y la sangre.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "COPs", "puntos": ["DDT, PCBs, dioxinas", "Sintéticos y persistentes", "Hallados en osos polares del Ártico"] },
+        { "titulo": "Microplásticos", "puntos": ["Menores a 5 mm", "Vienen de plásticos degradados o microesferas", "En agua potable, sal, aire y sangre"] }
+      ] },
+      "comprueba": { "pregunta": "Encuentran DDT en la grasa de osos polares, aunque nunca se usó en el Ártico. ¿Qué lo explica?", "opciones": ["Es un COP: no se degrada y se dispersa por el planeta", "Los osos lo producen en su grasa", "Es un microplástico de cosméticos"], "correcta": 0, "porque": "El DDT es un contaminante orgánico persistente: no se degrada fácilmente y llega a todos los rincones del planeta." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Bioacumulación y biomagnificación",
+      "idea": "Un organismo acumula contaminantes más rápido de lo que los elimina, y al ser comido los pasa concentrados al siguiente nivel.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Bioacumulación", "texto": "Un organismo absorbe el contaminante más rápido de lo que lo elimina." },
+        { "titulo": "Lo come otro", "texto": "El depredador recibe el contaminante acumulado." },
+        { "titulo": "Biomagnificación", "texto": "Cada nivel de la cadena lo concentra más." },
+        { "titulo": "Depredador tope", "texto": "Orcas, atunes y águilas son los más afectados." }
+      ] },
+      "comprueba": { "pregunta": "En la cadena alga → pez pequeño → atún, ¿quién tendrá la mayor concentración de mercurio?", "opciones": ["El alga", "El pez pequeño", "El atún"], "correcta": 2, "porque": "Por biomagnificación, cada nivel concentra más el contaminante; el depredador tope acumula más." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Residuos, reciclaje y alternativas",
+      "idea": "En México se recicla formalmente muy poco; el PET tarda unos 450 años en degradarse y la economía circular busca evitar residuos.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "~9.6%", "etiqueta": "Residuos sólidos urbanos que se reciclan formalmente", "barra": 9.6 },
+        { "valor": "~450 años", "etiqueta": "Tiempo que tarda el PET en degradarse" }
+      ] },
+      "comprueba": { "pregunta": "Una empresa diseña envases para que su material se recupere y se reutilice una y otra vez. ¿Qué propuesta aplica?", "opciones": ["Biomagnificación", "Economía circular", "Bioacumulación"], "correcta": 1, "porque": "La economía circular rediseña los productos para recuperar y reutilizar sus materiales indefinidamente." }
+    }
+  ]
+}

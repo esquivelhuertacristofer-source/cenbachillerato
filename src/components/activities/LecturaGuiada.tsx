@@ -264,6 +264,7 @@ export function LecturaGuiada({ guia, parrafos, pintar, color, todoAbierto, onCo
         </div>
       )}
 
+      {total > 1 && (
       <nav className="lg-mapa" aria-label="Partes de la lectura">
         {guia.partes.map((p, i) => {
           const estado = i >= abiertas ? 'cerrada' : i === abiertas - 1 && abiertas < total ? 'actual' : 'abierta';
@@ -283,6 +284,7 @@ export function LecturaGuiada({ guia, parrafos, pintar, color, todoAbierto, onCo
           );
         })}
       </nav>
+      )}
 
       {guia.partes.slice(0, abiertas).map((p, i) => {
         const ultimaAbierta = i === abiertas - 1;
@@ -297,7 +299,7 @@ export function LecturaGuiada({ guia, parrafos, pintar, color, todoAbierto, onCo
             animate={{ opacity: 1, y: 0 }}
             transition={reducedMotion ? { duration: 0 } : springs.gentle}
           >
-            <span className="lg-parte-num">Parte {i + 1} de {total}</span>
+            {total > 1 && <span className="lg-parte-num">Parte {i + 1} de {total}</span>}
             <h2>{p.titulo}</h2>
             <p className="lg-idea"><Lightbulb size={20} />{p.idea}</p>
             <div className="lg-texto">{pintar(p.parrafos.map((k) => parrafos[k]).join('\n\n'))}</div>

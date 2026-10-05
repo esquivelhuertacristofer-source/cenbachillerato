@@ -1,0 +1,41 @@
+{
+  "codigo": "IN-II-P07-A1",
+  "conceptos": [
+    { "termino": "Would like", "idea": "Forma cortés de decir lo que quieres; es más amable que want." },
+    { "termino": "How much", "idea": "Pregunta la cantidad de algo incontable: How much water do you need?" },
+    { "termino": "How many", "idea": "Pregunta la cantidad de algo contable: How many students are in your class?" },
+    { "termino": "Uncountable nouns", "idea": "Cosas que no se cuentan una por una: water, love, money, information." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Would like: pedir con cortesía",
+      "idea": "Would like es más cortés que want y va seguido de un sustantivo o de to + verbo.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Con sustantivo", "expr": "would like + noun", "leyenda": "I would like a glass of water, please." },
+        { "nombre": "Con verbo", "expr": "would like + to + verb", "leyenda": "She would like to study medicine." },
+        { "nombre": "Pregunta", "expr": "Would + subject + like ...?", "leyenda": "Would you like some coffee?" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál oración está bien formada?", "opciones": ["I would like to drink juice.", "I would like drink juice.", "I would like to juice."], "correcta": 0, "porque": "Con un verbo se usa would like + to + verbo: would like to drink." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "How much o how many",
+      "idea": "How many va con sustantivos que se cuentan; how much, con los que no se cuentan, como water o money.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "How many + contables", "puntos": ["apples, people, days", "one apple, two apples", "How many students are in your class?"] },
+        { "titulo": "How much + incontables", "puntos": ["water, money, rice", "love, information", "How much water do you need?"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «___ books do you have?»", "opciones": ["How much", "How long", "How many"], "correcta": 2, "porque": "Books se puede contar (one book, two books), así que va con how many." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Úsalo en tu vida diaria",
+      "idea": "Estas estructuras te sirven para expresar deseos y necesidades en la tienda, el restaurante, con vecinos o en proyectos comunitarios.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Dónde usarlas", "puntos": ["At a store", "At a restaurant", "Con tus vecinos", "Al hablar de proyectos comunitarios"] }
+      ] },
+      "comprueba": { "pregunta": "En un restaurante quieres pedir agua de forma cortés. ¿Qué dices?", "opciones": ["I want water.", "I would like some water, please.", "How much water?"], "correcta": 1, "porque": "Would like es la forma cortés de pedir algo; want suena más directo." }
+    }
+  ]
+}

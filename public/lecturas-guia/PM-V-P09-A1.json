@@ -1,0 +1,52 @@
+{
+  "codigo": "PM-V-P09-A1",
+  "conceptos": [
+    { "termino": "Función de variable real", "idea": "Regla que da a cada número real x un único valor y = f(x)." },
+    { "termino": "Raíz o cero", "idea": "El valor de x donde la gráfica cruza el eje X: f(x) = 0." },
+    { "termino": "Función par", "idea": "f(−x) = f(x): su gráfica es un espejo respecto al eje Y." },
+    { "termino": "Función impar", "idea": "f(−x) = −f(x): su gráfica gira 180° alrededor del origen." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Funciones: la regla del cambio",
+      "idea": "Una función asigna a cada x un único y; x es la variable que movemos y y la que responde.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Variable independiente x", "puntos": ["La que «movemos»", "Ejemplo: la distancia del viaje"] },
+        { "titulo": "Variable dependiente y = f(x)", "puntos": ["La que «responde»", "Ejemplo: el costo del viaje"] }
+      ] },
+      "comprueba": { "pregunta": "La temperatura cambia a lo largo del día. ¿Cuál es la variable independiente?", "opciones": ["La temperatura", "La hora del día", "El termómetro"], "correcta": 1, "porque": "La hora es la que avanza y la temperatura responde a ella: la hora es x y la temperatura es y = f(x)." }
+    },
+    {
+      "parrafos": [1, 2],
+      "titulo": "Qué se lee en una gráfica",
+      "idea": "La gráfica convierte una fórmula en imagen y deja ver raíces, cortes, crecimiento, máximos, mínimos y continuidad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lo que se lee de un vistazo", "puntos": ["Raíces: donde cruza el eje X, f(x) = 0", "Intersección con Y: el punto (0, f(0))", "Crece donde sube, decrece donde baja", "Máximos y mínimos: cumbres y valles", "Continuidad: se dibuja sin levantar el lápiz"] }
+      ] },
+      "comprueba": { "pregunta": "¿En qué punto corta el eje Y la gráfica de f(x) = x² − 4?", "opciones": ["(0, −4)", "(2, 0)", "(0, 4)"], "correcta": 0, "porque": "La intersección con Y es (0, f(0)), y f(0) = 0² − 4 = −4. El punto (2, 0) es una raíz." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Simetría: pares e impares",
+      "idea": "Si una función es par o impar, basta conocer la mitad de su gráfica para dibujar la otra.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Par: f(−x) = f(x)", "puntos": ["Espejo respecto al eje Y", "x², |x|, cos(x)"] },
+        { "titulo": "Impar: f(−x) = −f(x)", "puntos": ["Giro de 180° alrededor del origen", "x³, 2x, sen(x)"] },
+        { "titulo": "Ninguna", "puntos": ["No cumple ninguna condición", "2x + 1"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué simetría tiene f(x) = 5x?", "opciones": ["Par", "Ninguna", "Impar"], "correcta": 2, "porque": "f(−x) = 5(−x) = −5x = −f(x), así que es impar, igual que 2x." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Cada forma modela un cambio",
+      "idea": "Reconocer la forma de una gráfica permite predecir un fenómeno y hallar sus máximos y mínimos, el corazón del cálculo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Recta", "puntos": ["Ritmo constante", "Tarifa de un taxi"] },
+        { "titulo": "Parábola", "puntos": ["Un tiro o un clavado"] },
+        { "titulo": "Senoidal", "puntos": ["Ciclo que se repite", "Temperatura del día, mareas"] }
+      ] },
+      "comprueba": { "pregunta": "El nivel del mar en un puerto sube y baja una y otra vez. ¿Qué función lo modela?", "opciones": ["Una recta", "Una senoidal", "Una parábola"], "correcta": 1, "porque": "Las mareas son un ciclo que se repite, y los ciclos se modelan con funciones senoidales." }
+    }
+  ]
+}

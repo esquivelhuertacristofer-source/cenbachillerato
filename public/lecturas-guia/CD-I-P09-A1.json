@@ -1,0 +1,38 @@
+{
+  "codigo": "CD-I-P09-A1",
+  "conceptos": [
+    { "termino": "Software libre", "idea": "Software que respeta la libertad de quien lo usa, definido por cuatro libertades." },
+    { "termino": "Código fuente", "idea": "Las instrucciones del programa; necesitas verlas para estudiarlo y adaptarlo." },
+    { "termino": "GNU/Linux", "idea": "Sistema operativo nacido del proyecto GNU y el núcleo Linux." },
+    { "termino": "Open source", "idea": "Código abierto: destaca ventajas prácticas; el software libre pone el acento en la ética." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Las cuatro libertades",
+      "idea": "Un programa es libre si puedes usarlo, estudiarlo, distribuirlo y mejorarlo; la idea nació con el proyecto GNU de Richard Stallman.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Libertad 0: usar", "texto": "Para cualquier propósito." },
+        { "titulo": "Libertad 1: estudiar", "texto": "Ver cómo funciona y adaptarlo; requiere el código fuente." },
+        { "titulo": "Libertad 2: distribuir", "texto": "Dar copias para ayudar a otras personas." },
+        { "titulo": "Libertad 3: mejorar", "texto": "Publicar las mejoras para que toda la comunidad se beneficie." }
+      ] },
+      "comprueba": { "pregunta": "Le pasas a un amigo una copia de un programa libre para que también lo use. ¿Qué libertad ejerces?", "opciones": ["La libertad 0: usar", "La libertad 1: estudiar", "La libertad 2: distribuir copias"], "correcta": 2, "porque": "La libertad 2 es distribuir copias para ayudar a otras personas." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Cultura hacker: libre frente a abierto",
+      "idea": "El software libre viene de la cultura hacker original; se parece al open source, pero su motivación es distinta.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Software libre", "puntos": ["Acento en la libertad y la ética"] },
+        { "titulo": "Open source", "puntos": ["Acento en ventajas prácticas y de desarrollo"] }
+      ] },
+      "comprueba": { "pregunta": "Una empresa abre su código porque así más programadores lo mejoran rápido. ¿Con qué enfoque coincide su motivo?", "opciones": ["Open source: ventajas prácticas", "Software libre: libertad y ética", "Software propietario"], "correcta": 0, "porque": "El open source destaca las ventajas prácticas y de desarrollo; el software libre pone el acento en la libertad y la ética." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Ofimática libre y gratuita",
+      "idea": "Gracias al software libre, suites como LibreOffice te permiten estudiar y trabajar sin pagar licencias privativas."
+    }
+  ]
+}

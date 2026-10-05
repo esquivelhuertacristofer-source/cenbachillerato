@@ -1,0 +1,44 @@
+{
+  "codigo": "IN-IV-P01-A1",
+  "conceptos": [
+    { "termino": "Past Simple", "idea": "El tiempo para contar hechos ya terminados: we traveled, we arrived." },
+    { "termino": "Regular verbs", "idea": "Forman el pasado con -ed: visit → visited." },
+    { "termino": "Irregular verbs", "idea": "Cambian de forma en pasado: buy → bought, teach → taught." },
+    { "termino": "Sequence connectors", "idea": "First, then, after, in the end: ordenan la historia." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Rumbo a Oaxaca: salida y llegada",
+      "idea": "La historia cuenta en pasado simple el viaje a Oaxaca para Día de Muertos, en el orden en que ocurrió.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Salida", "texto": "We left Mexico City early in the morning." },
+        { "titulo": "En el camino", "texto": "My mother packed tamales and pan dulce for the road." },
+        { "titulo": "Llegada", "texto": "After four hours on the bus, we arrived in Oaxaca City." },
+        { "titulo": "Hotel", "texto": "First, we checked into a small hotel near the zócalo." }
+      ] },
+      "comprueba": { "pregunta": "Completa: «We ___ home very early.» (leave)", "opciones": ["leaved", "left", "leaving"], "correcta": 1, "porque": "Leave es irregular: su pasado es left, como en «We left Mexico City»." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "El panteón y el mercado",
+      "idea": "En el panteón y en el mercado la familia vive la tradición: cempasúchil, velas, alebrijes, mole y chapulines.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "1 de noviembre: Panteón General", "puntos": ["Tumbas con cempasúchil, velas y fotografías", "Niños y abuelos juntos compartiendo comida"] },
+        { "titulo": "Al día siguiente: el mercado", "puntos": ["Compran alebrijes", "Prueban mole oaxaqueño", "El hermano prueba chapulines"] }
+      ] },
+      "comprueba": { "pregunta": "En «We bought colorful alebrijes», ¿qué es bought?", "opciones": ["El pasado irregular de buy", "Un pasado regular, con -ed", "El presente de buy"], "correcta": 0, "porque": "Buy es irregular: su pasado es bought, no buyed." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Lección del viaje y gramática",
+      "idea": "Regulares con -ed, irregulares con forma especial y conectores como First o In the end dan orden a la historia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Regulares (-ed)", "puntos": ["traveled", "packed", "arrived", "decorated", "visited"] },
+        { "titulo": "Irregulares", "puntos": ["leave → left", "be → was", "see → saw", "buy → bought", "say → said", "teach → taught"] },
+        { "titulo": "Conectores", "puntos": ["First", "then", "after", "In the end"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estos pasados es regular?", "opciones": ["taught", "said", "decorated"], "correcta": 2, "porque": "Decorated se forma agregando -ed; taught y said son irregulares." }
+    }
+  ]
+}

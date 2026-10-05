@@ -1,0 +1,34 @@
+{
+  "codigo": "CD-II-P01-A1",
+  "conceptos": [
+    { "termino": "Fuente confiable", "idea": "Información con autor identificable, fecha clara y referencias que puedes verificar." },
+    { "termino": "Autoría", "idea": "Quién publicó el contenido y si tiene credenciales verificables." },
+    { "termino": "Lateral reading", "idea": "Antes de leer a fondo, investigar qué dicen otras fuentes del sitio." },
+    { "termino": "Tono alarmista", "idea": "Lenguaje extremo que puede indicar baja calidad o sesgo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "En internet conviven fuentes muy distintas",
+      "idea": "En la red hay de todo, desde artículos revisados por expertos hasta contenido para desinformar; distinguirlos es esencial.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Más confiables", "puntos": ["Artículos académicos revisados por expertos", "Noticias de medios serios"] },
+        { "titulo": "Menos confiables", "puntos": ["Blogs personales sin verificación", "Contenido generado para desinformar"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estas fuentes pasó por una revisión de expertos?", "opciones": ["Un blog personal", "Un artículo académico", "Una cadena de mensajes"], "correcta": 1, "porque": "La lectura menciona los artículos académicos revisados por expertos frente a blogs sin verificación." }
+    },
+    {
+      "parrafos": [1, 2, 3],
+      "titulo": "Cinco preguntas para evaluar una fuente",
+      "idea": "Revisa quién publica, cuándo, qué cita, qué dicen otros del sitio y su tono; y compara varias fuentes antes de creer.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Dominio y autoría", "texto": "¿Quién lo publicó y con qué credenciales?" },
+        { "titulo": "Fecha", "texto": "¿Es actual o puede estar desactualizada?" },
+        { "titulo": "Citas y referencias", "texto": "¿Cita fuentes que puedes verificar?" },
+        { "titulo": "Lateral reading", "texto": "¿Qué dicen otras fuentes del sitio?" },
+        { "titulo": "Tono", "texto": "¿Usa lenguaje alarmista o extremo?" }
+      ] },
+      "comprueba": { "pregunta": "Antes de leer un artículo, buscas qué dicen otros sitios sobre la página que lo publicó. ¿Qué estrategia usas?", "opciones": ["Revisar la fecha", "Evaluar el tono", "Lateral reading"], "correcta": 2, "porque": "El lateral reading consiste en buscar qué dicen otras fuentes sobre el sitio antes de leer el texto a fondo." }
+    }
+  ]
+}

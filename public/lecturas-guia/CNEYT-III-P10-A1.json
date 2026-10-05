@@ -1,0 +1,55 @@
+{
+  "codigo": "CNEYT-III-P10-A1",
+  "conceptos": [
+    { "termino": "Atmósfera", "idea": "Mezcla de gases que rodea la Tierra, organizada en capas." },
+    { "termino": "Presión atmosférica", "idea": "El peso del aire: disminuye conforme subes." },
+    { "termino": "Densidad", "idea": "Masa entre volumen: el aire caliente es menos denso y sube." },
+    { "termino": "Clima vs tiempo", "idea": "El tiempo es el estado de hoy; el clima, el promedio de muchos años." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "La atmósfera: un océano de aire",
+      "idea": "El aire es una mezcla de gases ordenada en capas, y su presión baja con la altura.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "78%", "etiqueta": "Nitrógeno (N₂) en el aire", "barra": 78 },
+        { "valor": "21%", "etiqueta": "Oxígeno (O₂) en el aire", "barra": 21 },
+        { "valor": "1%", "etiqueta": "Otros gases: argón, CO₂, vapor de agua", "barra": 1 },
+        { "valor": "~12 km", "etiqueta": "Altura de la tropósfera, donde ocurre el clima" }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué en la Ciudad de México el agua hierve a unos 92 °C y no a 100 °C?", "opciones": ["Porque el agua de la ciudad tiene sales", "Porque a 2240 m la presión atmosférica es menor", "Porque hace más calor que a nivel del mar"], "correcta": 1, "porque": "La presión atmosférica disminuye con la altura; con menos presión, el agua hierve a menor temperatura." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Densidad, presión y temperatura",
+      "idea": "Estas tres propiedades explican por qué sube el humo, se forman nubes y circula el agua del mar.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Densidad", "expr": "densidad = masa ÷ volumen", "leyenda": "El aire caliente es menos denso y sube" },
+        { "nombre": "Presión", "expr": "presión = fuerza ÷ área", "leyenda": "En gases sube con la temperatura y baja con la altura" }
+      ] },
+      "comprueba": { "pregunta": "El humo de una fogata sube. ¿Qué propiedad lo explica?", "opciones": ["El aire caliente es menos denso", "El aire caliente tiene más masa", "La presión aumenta con la altura"], "correcta": 0, "porque": "Al calentarse, el aire se vuelve menos denso y sube, llevando el humo consigo." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "La hidrósfera y el ciclo del agua",
+      "idea": "El agua está en tres estados y viaja entre ellos impulsada por el Sol; casi toda es salada y la dulce está casi toda congelada.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Evaporación", "texto": "De océanos y lagos: líquido → gas." },
+        { "titulo": "Condensación", "texto": "En las nubes: gas → líquido." },
+        { "titulo": "Precipitación", "texto": "Cae como lluvia o nieve." },
+        { "titulo": "Regreso", "texto": "Vuelve por ríos e infiltración." }
+      ] },
+      "comprueba": { "pregunta": "Se forman gotitas en el exterior de un vaso con agua helada. ¿Qué cambio de estado es?", "opciones": ["Evaporación", "Precipitación", "Condensación"], "correcta": 2, "porque": "El vapor del aire (gas) se enfría al tocar el vaso y pasa a líquido: eso es condensación." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Clima no es tiempo atmosférico",
+      "idea": "El tiempo atmosférico es el estado de un momento; el clima es el patrón promedio de muchos años en una región.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Tiempo atmosférico", "puntos": ["Lugar y momento concretos", "Ejemplo: hoy está nublado y llueve"] },
+        { "titulo": "Clima", "puntos": ["Promedio de muchos años", "Ejemplo: Mérida es cálida y húmeda"] }
+      ] },
+      "comprueba": { "pregunta": "«Mañana habrá tormenta en Monterrey». ¿Esa frase habla de clima o de tiempo atmosférico?", "opciones": ["De clima", "De tiempo atmosférico", "De ninguno"], "correcta": 1, "porque": "Describe el estado de la atmósfera en un lugar y momento concretos: eso es tiempo atmosférico." }
+    }
+  ]
+}

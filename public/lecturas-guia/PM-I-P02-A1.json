@@ -1,0 +1,31 @@
+{
+  "codigo": "PM-I-P02-A1",
+  "conceptos": [
+    { "termino": "Números naturales", "idea": "Los que usas para contar objetos: 1, 2, 3, 4…" },
+    { "termino": "Números enteros", "idea": "Agregan el cero y los negativos: deudas, temperaturas bajo cero, sótanos." },
+    { "termino": "Números racionales", "idea": "Los que se escriben como fracción de dos enteros, como 1.5 o 3/4." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Naturales, enteros y racionales",
+      "idea": "Cada conjunto de números amplía lo que puedes representar: contar, deber y medir partes.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Naturales", "puntos": ["1, 2, 3, 4…", "Para contar objetos"] },
+        { "titulo": "Enteros", "puntos": ["Incluyen negativos y el 0", "Deudas, temperaturas bajo cero, sótanos"] },
+        { "titulo": "Racionales", "puntos": ["Fracción de dos enteros", "Decimales finitos y periódicos", "1.5 litros, 3/4 de taza"] }
+      ] },
+      "comprueba": { "pregunta": "El elevador marca el piso −2 (estacionamiento). ¿Qué conjunto necesitas como mínimo para representarlo?", "opciones": ["Naturales", "Enteros", "Solo fracciones"], "correcta": 1, "porque": "Los enteros incluyen los negativos, que representan pisos bajo tierra; los naturales no los tienen." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Las operaciones cambian de conjunto",
+      "idea": "Una operación puede sacarte del conjunto inicial, y hay reglas como «negativo por negativo da positivo».",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Dividir naturales", "expr": "7 ÷ 2 = 3.5", "leyenda": "El resultado ya no es natural: es racional" },
+        { "nombre": "Negativo × negativo", "expr": "(−3) × (−4) = 12", "leyenda": "Da un número positivo" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto es (−5) × (−2)?", "opciones": ["−10", "−7", "10"], "correcta": 2, "porque": "Multiplicar dos números negativos da un número positivo: 5 × 2 = 10." }
+    }
+  ]
+}

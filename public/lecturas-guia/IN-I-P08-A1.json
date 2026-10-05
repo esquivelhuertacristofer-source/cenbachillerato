@@ -1,0 +1,41 @@
+{
+  "codigo": "IN-I-P08-A1",
+  "conceptos": [
+    { "termino": "Genitivo sajón ('s)", "idea": "Apóstrofo + s al poseedor: María's book." },
+    { "termino": "Posesivos con sustantivo", "idea": "my, your, his, her, our, their: van antes de la cosa poseída." },
+    { "termino": "Posesivos que van solos", "idea": "mine, yours, his, hers, ours, theirs: sin sustantivo después." },
+    { "termino": "Whose", "idea": "Pregunta de quién es algo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "El genitivo sajón: 's",
+      "idea": "Agregas apóstrofo + s al poseedor; si es plural terminado en s, solo el apóstrofo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Poseedor singular: 's", "puntos": ["María's book (el libro de María)", "the teacher's desk (el escritorio del maestro)"] },
+        { "titulo": "Plural que termina en s: '", "puntos": ["the students' notebooks (los cuadernos de los estudiantes)"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo dices «la mochila de Pedro»?", "opciones": ["the backpack Pedro", "Pedro's backpack", "Pedros' backpack"], "correcta": 1, "porque": "Pedro es un solo poseedor: se agrega apóstrofo + s → Pedro's backpack." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Posesivos antes del sustantivo",
+      "idea": "My, your, his, her, our y their van antes de la cosa que se posee.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Posesivo", "puntos": ["My (mi/mis)", "Your (tu/tus)", "His (de él) / Her (de ella)", "Our (nuestro/a/os/as)", "Their (de ellos/as)"] },
+        { "titulo": "Ejemplo", "puntos": ["My backpack is green.", "Is this your pencil?", "His name is Carlos. / Her book is on the desk.", "Our classroom is big.", "Their homework is ready."] }
+      ] },
+      "comprueba": { "pregunta": "Hablas del cuaderno de tu amiga Laura. ¿Qué posesivo usas?", "opciones": ["His notebook", "Their notebook", "Her notebook"], "correcta": 2, "porque": "«Her» es el posesivo para una mujer (de ella); «his» es de él y «their» de ellos." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "¿De quién es? Whose y mine",
+      "idea": "Preguntas con «Whose…is this?» y respondes con un posesivo que va solo, como «It is mine».",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Pregunta y respuesta", "puntos": ["Whose [objeto] is this?", "It is mine. (Es mío/mía.)"] },
+        { "titulo": "Posesivos que van solos", "puntos": ["mine (mío), yours (tuyo)", "his (de él), hers (de ella)", "ours (nuestro), theirs (de ellos)"] }
+      ] },
+      "comprueba": { "pregunta": "Te preguntan «Whose pen is this?» y la pluma es de tu hermana. ¿Qué respondes?", "opciones": ["It is hers.", "It is her.", "It is mine."], "correcta": 0, "porque": "Sin sustantivo después se usa el posesivo que va solo: «hers» (de ella)." }
+    }
+  ]
+}

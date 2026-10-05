@@ -1,0 +1,44 @@
+{
+  "codigo": "PM-IV-P02-A1",
+  "conceptos": [
+    { "termino": "Pendiente (m)", "idea": "Cuánto sube o baja una función lineal por cada unidad que avanza x." },
+    { "termino": "Ordenada al origen (b)", "idea": "Donde la gráfica cruza el eje vertical." },
+    { "termino": "Transformación", "idea": "Mueve, voltea o estira una gráfica sin cambiar su forma fundamental." },
+    { "termino": "Función por tramos", "idea": "Usa una regla distinta en cada intervalo, como una tarifa escalonada." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Lineal y cuadrática: las dos fundamentales",
+      "idea": "La lineal es una recta guiada por su pendiente; la cuadrática, una parábola guiada por el signo de a.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Lineal", "expr": "f(x) = mx + b", "leyenda": "m > 0 sube · m < 0 baja · m = 0 horizontal; b cruza el eje vertical" },
+        { "nombre": "Cuadrática", "expr": "f(x) = ax² + bx + c", "leyenda": "Parábola con vértice, eje de simetría y ceros; el signo de a da la apertura" }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo es la gráfica de f(x) = −2x + 5?", "opciones": ["Sube de izquierda a derecha", "Baja de izquierda a derecha", "Es una línea horizontal"], "correcta": 1, "porque": "La pendiente m = −2 es negativa, así que la función es decreciente: baja de izquierda a derecha." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Mover, voltear y estirar gráficas",
+      "idea": "Sumar fuera de f mueve vertical; cambiar x por x − h mueve horizontal, al revés de como parece el signo.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Vertical", "expr": "f(x) + k", "leyenda": "Sube k unidades; f(x) − k la baja" },
+        { "nombre": "Horizontal", "expr": "f(x − h)", "leyenda": "h unidades a la derecha; f(x + h), a la izquierda" },
+        { "nombre": "Reflexión", "expr": "−f(x)", "leyenda": "Voltea la gráfica respecto al eje x" },
+        { "nombre": "Escalamiento", "expr": "2f(x)", "leyenda": "La estira verticalmente; (1/2)f(x) la comprime" }
+      ] },
+      "comprueba": { "pregunta": "¿Qué le hace g(x) = (x + 4)² a la gráfica de f(x) = x²?", "opciones": ["La mueve 4 unidades a la derecha", "La sube 4 unidades", "La mueve 4 unidades a la izquierda"], "correcta": 2, "porque": "Es f(x + h) con h = 4: la gráfica se mueve 4 unidades a la izquierda. Ojo con el signo." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Funciones por tramos en el recibo",
+      "idea": "La tarifa doméstica de la CFE cambia de regla en cada tramo de consumo: es una función por tramos.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Primer tramo", "texto": "Consumo bajo: se aplica una tarifa." },
+        { "titulo": "Segundo tramo", "texto": "Consumo mayor: se aplica otra tarifa, más alta." },
+        { "titulo": "Excedente", "texto": "Lo que pasa del último tramo: una tarifa aún más alta." }
+      ] },
+      "comprueba": { "pregunta": "En la tarifa de la CFE, ¿qué forma tiene la regla dentro de cada tramo?", "opciones": ["Función lineal", "Parábola", "Circunferencia"], "correcta": 0, "porque": "Cada tramo es una función lineal; unidas forman una función por tramos o escalón." }
+    }
+  ]
+}

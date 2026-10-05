@@ -1,0 +1,43 @@
+{
+  "codigo": "CNEYT-IV-P03-A1",
+  "conceptos": [
+    { "termino": "pH", "idea": "Escala de 0 a 14 que indica qué tan ácida o básica es una solución." },
+    { "termino": "Ácido", "idea": "Sustancia con pH menor a 7; entre más bajo, más ácida." },
+    { "termino": "Base (álcali)", "idea": "Sustancia con pH mayor a 7, como el bicarbonato o el jabón." },
+    { "termino": "Indicador natural", "idea": "Pigmento que cambia de color según el pH, como el de la col morada." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3],
+      "titulo": "Escala del pH: de 0 a 14",
+      "idea": "Debajo de 7 es ácido, arriba de 7 es básico y 7 exacto es neutro, como el agua pura a 25 °C.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ácidos (pH < 7)", "puntos": ["Ácido del estómago: 1.5 a 2", "Jugo de limón: ~2", "Vinagre: 3", "Café negro: 5"] },
+        { "titulo": "Neutro (pH = 7)", "puntos": ["Agua pura a 25 °C"] },
+        { "titulo": "Bases (pH > 7)", "puntos": ["Bicarbonato de sodio: 8.4", "Jabón de barra: 9 a 10", "Lejía: 12 a 13"] }
+      ] },
+      "comprueba": { "pregunta": "Una persona tiene acidez estomacal. ¿Cuál de estas sustancias del texto le ayudaría a neutralizar el exceso de ácido?", "opciones": ["Vinagre", "Bicarbonato de sodio", "Jugo de limón"], "correcta": 1, "porque": "El bicarbonato es una base (pH 8.4) y neutraliza el exceso de ácido; vinagre y limón son ácidos." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "La col morada como medidor de pH",
+      "idea": "Las antocianinas de la col morada cambian de color según el pH, así que sirven de indicador barato.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ácido", "puntos": ["Rojo o rosa"] },
+        { "titulo": "Neutro", "puntos": ["Morado"] },
+        { "titulo": "Básico", "puntos": ["Azul o verde"] }
+      ] },
+      "comprueba": { "pregunta": "Agregas extracto de col morada a agua con jabón y se pone verde. ¿Qué te dice eso?", "opciones": ["Que la solución es ácida", "Que la solución es neutra", "Que la solución es básica"], "correcta": 2, "porque": "En soluciones básicas las antocianinas se tornan azules o verdes; el jabón tiene pH de 9 a 10." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "El pH de tu sangre y agua",
+      "idea": "La sangre debe estar entre pH 7.35 y 7.45, y el agua potable en México entre 6.5 y 8.5.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "7.35 – 7.45", "etiqueta": "Rango de pH de la sangre" },
+        { "valor": "6.5 – 8.5", "etiqueta": "pH del agua potable (NOM-127-SSA1-2021)" }
+      ] },
+      "comprueba": { "pregunta": "Una muestra de agua de la llave tiene pH 9. Según la norma mexicana, ¿es apta para beber?", "opciones": ["No, está fuera del rango 6.5–8.5", "Sí, cualquier pH mayor a 7 es seguro", "Sí, porque el agua siempre es neutra"], "correcta": 0, "porque": "La NOM-127-SSA1-2021 pide que el agua potable tenga pH entre 6.5 y 8.5; 9 queda fuera." }
+    }
+  ]
+}

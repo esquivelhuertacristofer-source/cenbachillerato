@@ -1,0 +1,56 @@
+{
+  "codigo": "IN-II-P02-A1",
+  "conceptos": [
+    { "termino": "Simple present", "idea": "Tiempo para rutinas, hábitos y hechos: I play, she plays." },
+    { "termino": "Tercera persona singular", "idea": "Con he, she o it el verbo cambia: -s, -es o -ies." },
+    { "termino": "Does", "idea": "Auxiliar para preguntar con he o she: Does she cook?" },
+    { "termino": "Frequency adverbs", "idea": "Dicen qué tan seguido: always, usually, often, sometimes, rarely, never." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Simple present: cómo cambia el verbo",
+      "idea": "Con he, she e it el verbo cambia: casi siempre -s, a veces -es o -ies según cómo termina.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Mayoría: + -s", "puntos": ["play → plays", "read → reads"] },
+        { "titulo": "-sh, -ch, -x, -o, -ss: + -es", "puntos": ["watch → watches", "go → goes"] },
+        { "titulo": "Consonante + y: y → -ies", "puntos": ["study → studies"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «She ___ TV every night.» (watch)", "opciones": ["watchs", "watches", "watch"], "correcta": 1, "porque": "«Watch» termina en -ch, así que con she se agrega -es: watches." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Preguntas con «does»",
+      "idea": "Con he o she, la pregunta empieza con Does y el verbo vuelve a su forma base.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Pregunta", "puntos": ["Does he play basketball?", "Does she cook at home?", "Does your brother study English?"] },
+        { "titulo": "Respuesta corta", "puntos": ["Yes, he does.", "No, she does not."] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál pregunta está bien formada?", "opciones": ["Does she plays tennis?", "Do she play tennis?", "Does she play tennis?"], "correcta": 2, "porque": "Con she se usa «does» y el verbo va en forma base: «Does she play…?», como en «Does she cook at home?»." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Actividades de tiempo libre en México",
+      "idea": "Hay vocabulario para muchas actividades, y en México el tiempo libre suele compartirse con la familia y la comunidad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Vocabulario", "puntos": ["play sports, play video games", "watch TV series, listen to music", "hang out with friends, go to the park", "go swimming, do yoga, paint or draw"] },
+        { "titulo": "En México", "puntos": ["Domingos en el zócalo o la plaza", "Football (futbol), el deporte más popular", "Ir al tianguis el fin de semana", "Bailar salsa o cumbia; comida familiar del domingo"] }
+      ] },
+      "comprueba": { "pregunta": "Según el texto, ¿qué es el tianguis?", "opciones": ["Un mercado al aire libre", "Un deporte regional", "Un baile tradicional"], "correcta": 0, "porque": "El texto lo define como «the open-air market», al que muchas familias van los fines de semana." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Qué tan seguido: adverbios de frecuencia",
+      "idea": "Los adverbios de frecuencia dicen qué tan seguido haces algo y van antes del verbo principal.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "always", "etiqueta": "100%", "barra": 100 },
+        { "valor": "usually", "etiqueta": "about 80%", "barra": 80 },
+        { "valor": "often", "etiqueta": "about 60%", "barra": 60 },
+        { "valor": "sometimes", "etiqueta": "about 40%", "barra": 40 },
+        { "valor": "rarely / seldom", "etiqueta": "about 20%", "barra": 20 },
+        { "valor": "never", "etiqueta": "0%", "barra": 0 }
+      ] },
+      "comprueba": { "pregunta": "¿Dónde va el adverbio en la oración?", "opciones": ["They go sometimes to the cinema.", "They sometimes go to the cinema.", "Sometimes they to the cinema go."], "correcta": 1, "porque": "Los adverbios de frecuencia van antes del verbo principal: «They sometimes go to the cinema»." }
+    }
+  ]
+}

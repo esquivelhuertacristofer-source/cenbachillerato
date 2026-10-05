@@ -1,0 +1,50 @@
+{
+  "codigo": "CS-III-P01-A1",
+  "conceptos": [
+    { "termino": "Crisis social", "idea": "Golpe que se origina, se profundiza y se enfrenta según las estructuras de la sociedad." },
+    { "termino": "Escalas de análisis", "idea": "Mirar un fenómeno a nivel global, nacional y local." },
+    { "termino": "Actores sociales", "idea": "Estado, sociedad civil, empresas y organismos internacionales, cada uno con sus intereses." },
+    { "termino": "Causas estructurales", "idea": "Desigualdad, informalidad y falta de servicios que deciden quién pierde más en una crisis." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "COVID-19: una crisis global",
+      "idea": "La pandemia fue también crisis económica, social y política, y mostró cuánto dependen los países unos de otros.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Golpes a escala global", "puntos": ["Interrupción de cadenas de suministro", "Colapso del turismo", "Caída del precio del petróleo"] },
+        { "titulo": "Respuesta internacional", "puntos": ["OMS y FMI coordinaron respuestas urgentes", "Resultados desiguales según el poder de negociación de cada país"] }
+      ] },
+      "comprueba": { "pregunta": "Una fábrica en México se detiene porque no le llegan piezas de otro continente. ¿Qué mostró la pandemia con casos así?", "opciones": ["Que cada país es autosuficiente", "La interdependencia de los sistemas productivos mundiales", "Que el turismo no afecta la economía"], "correcta": 1, "porque": "La interrupción de cadenas de suministro mostró la interdependencia de los sistemas productivos y logísticos mundiales." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "México y las colonias: problemas previos",
+      "idea": "La pandemia golpeó más donde ya había informalidad, salud fragmentada, hacinamiento y desigualdad de género.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Escala nacional", "puntos": ["≈55% de la fuerza laboral en la informalidad", "Salud fragmentada: IMSS, ISSSTE, Seguro Popular → INSABI", "Diabetes e hipertensión frecuentes", "Exceso de mortalidad de los más altos del mundo"] },
+        { "titulo": "Escala local", "puntos": ["Hacinamiento que impedía el confinamiento", "Pérdida inmediata del ingreso diario", "Estudiar en línea era un privilegio", "Más carga, violencia y desempleo para las mujeres"] }
+      ] },
+      "comprueba": { "pregunta": "Un jornalero sin seguro médico pierde su ingreso desde el primer día de confinamiento. ¿Qué problema previo explica su situación?", "opciones": ["El colapso del turismo mundial", "La caída del precio del petróleo", "La informalidad laboral"], "correcta": 2, "porque": "Sin acceso a seguro médico ni prestaciones de desempleo, los trabajadores informales perdieron sus ingresos diarios de inmediato." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Quién actuó y cómo",
+      "idea": "Cada actor respondió a la crisis desde sus propios intereses, y la sociedad civil llenó vacíos del Estado.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Estado", "puntos": ["Medidas de contención", "Apoyos económicos parciales"] },
+        { "titulo": "Sociedad civil", "puntos": ["Organizaciones comunitarias, colectivos feministas, redes de apoyo mutuo", "Llegó donde el Estado no llegaba"] },
+        { "titulo": "Empresas y organismos", "puntos": ["Empresas: negociaron la reapertura", "OPS, OMS, UNICEF: política sanitaria y vacunas"] }
+      ] },
+      "comprueba": { "pregunta": "Unos vecinos organizan una despensa colectiva para familias sin ingresos. ¿Qué actor representan?", "opciones": ["El Estado", "La sociedad civil", "El sector empresarial"], "correcta": 1, "porque": "Las redes de apoyo mutuo y organizaciones comunitarias forman parte de la sociedad civil, que llenó vacíos donde el Estado no llegaba." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Las crisis nunca son solo naturales",
+      "idea": "Las estructuras previas deciden quién sobrevive, quién pierde más y quién tiene voz para exigir.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Estructuras previas que pesan", "puntos": ["Desigualdad", "Falta de servicios públicos universales", "Informalidad laboral"] }
+      ] }
+    }
+  ]
+}

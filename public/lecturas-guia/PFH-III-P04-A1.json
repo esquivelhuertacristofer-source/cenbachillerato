@@ -1,0 +1,42 @@
+{
+  "codigo": "PFH-III-P04-A1",
+  "conceptos": [
+    { "termino": "Praxis filosófica", "idea": "Llevar el pensamiento filosófico al encuentro con la vida real." },
+    { "termino": "Comunidad de indagación", "idea": "Grupo donde las preguntas se exploran con rigor, sin respuestas impuestas." },
+    { "termino": "Educación bancaria", "idea": "El maestro deposita saber en un alumno pasivo; Freire la rechaza." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El mito del filósofo solitario",
+      "idea": "La filosofía siempre ha querido transformar; toda comunidad tiene sus propias preguntas filosóficas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "El mito", "puntos": ["Un hombre solitario en su biblioteca", "Problemas abstractos sin conexión con el mundo"] },
+        { "titulo": "La praxis", "puntos": ["Sócrates en la plaza pública", "Comunidades, escuelas, barrios", "Toda comunidad tiene preguntas filosóficas"] }
+      ] },
+      "comprueba": { "pregunta": "Según la lectura, la praxis filosófica NO consiste en…", "opciones": ["dialogar con comunidades y barrios", "«bajar» la filosofía al pueblo como bien de élite", "reconocer las preguntas propias de cada comunidad"], "correcta": 1, "porque": "La lectura aclara que no se trata de «bajar» la filosofía como si fuera de élite, sino de reconocer las preguntas de cada comunidad." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Filosofía con jóvenes y diagnóstico comunitario",
+      "idea": "Los jóvenes ya son sujetos filosóficos, y en una comunidad el filósofo escucha primero en vez de imponer teorías.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Escuchar", "texto": "¿Qué problemas nombra la gente?" },
+        { "titulo": "Identificar tensiones", "texto": "¿Qué valores están en tensión?" },
+        { "titulo": "Entender la vida buena", "texto": "¿Qué tipo de vida se considera buena ahí?" },
+        { "titulo": "Acompañar", "texto": "Ayudar a articular, cuestionar y transformar sus propias concepciones." }
+      ] },
+      "comprueba": { "pregunta": "¿Con qué empieza el diagnóstico comunitario filosófico?", "opciones": ["Con escuchar a la comunidad", "Con explicar una teoría", "Con aplicar un examen"], "correcta": 0, "porque": "Comienza por escuchar qué problemas nombra la gente; el filósofo no impone marcos teóricos." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Freire: nadie educa a nadie",
+      "idea": "Freire cambia la educación bancaria por el diálogo; filosofar es pensar críticamente con otros para transformar la realidad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Educación bancaria", "puntos": ["El maestro deposita conocimiento", "El alumno es pasivo"] },
+        { "titulo": "Diálogo (Freire)", "puntos": ["Nadie educa a nadie", "Todos se educan en comunión con el mundo"] }
+      ] },
+      "comprueba": { "pregunta": "Un maestro dicta y los alumnos solo copian sin preguntar. ¿Cómo lo llamaría Freire?", "opciones": ["Comunidad de indagación", "Diagnóstico comunitario", "Educación bancaria"], "correcta": 2, "porque": "Es la «educación bancaria»: el maestro deposita conocimiento en un alumno pasivo." }
+    }
+  ]
+}

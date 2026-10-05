@@ -1,0 +1,136 @@
+{
+  "codigo": "LC-I-P04-A1",
+  "conceptos": [
+    {
+      "termino": "Párrafo",
+      "idea": "La unidad básica del texto escrito: desarrolla una idea principal."
+    },
+    {
+      "termino": "Oración temática",
+      "idea": "La oración que expresa la idea principal del párrafo."
+    },
+    {
+      "termino": "Conectores",
+      "idea": "Palabras que unen oraciones y párrafos para que el texto sea coherente."
+    }
+  ],
+  "partes": [
+    {
+      "parrafos": [
+        0
+      ],
+      "titulo": "Una idea principal por párrafo",
+      "idea": "Cada párrafo gira en torno a una oración temática, y las demás oraciones la apoyan, ejemplifican o amplían.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Oración temática",
+            "puntos": [
+              "Expresa la idea principal",
+              "Puede ir al inicio, al final o en medio"
+            ]
+          },
+          {
+            "titulo": "Demás oraciones",
+            "puntos": [
+              "Apoyan la idea",
+              "La ejemplifican",
+              "La amplían"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "En un párrafo, la oración temática aparece en la última línea. ¿Es un error?",
+        "opciones": [
+          "No, puede estar al inicio, al final o en medio",
+          "Sí, siempre debe ir al inicio",
+          "Sí, debe ir en medio"
+        ],
+        "correcta": 0,
+        "porque": "El texto dice que la oración temática puede estar al inicio, al final o en medio del párrafo."
+      }
+    },
+    {
+      "parrafos": [
+        1
+      ],
+      "titulo": "Tipos de párrafos según su función",
+      "idea": "Hay párrafos que introducen, otros que desarrollan y otros que concluyen el texto.",
+      "visual": {
+        "tipo": "pasos",
+        "items": [
+          {
+            "titulo": "Introductorio",
+            "texto": "Presenta el tema y anuncia lo que se desarrollará."
+          },
+          {
+            "titulo": "De desarrollo",
+            "texto": "Amplía, explica o argumenta una idea."
+          },
+          {
+            "titulo": "De conclusión",
+            "texto": "Cierra el texto retomando las ideas principales."
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "Un párrafo dice: «En resumen, como vimos, el agua es indispensable para la vida». ¿De qué tipo es?",
+        "opciones": [
+          "Introductorio",
+          "De conclusión",
+          "De desarrollo"
+        ],
+        "correcta": 1,
+        "porque": "Cierra el texto retomando las ideas principales: es un párrafo de conclusión."
+      }
+    },
+    {
+      "parrafos": [
+        2
+      ],
+      "titulo": "Conectores: lo que une las ideas",
+      "idea": "Los conectores indican adición, contraste o causa y consecuencia, y hacen el texto más claro y fluido.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Adición",
+            "puntos": [
+              "además",
+              "también",
+              "igualmente"
+            ]
+          },
+          {
+            "titulo": "Contraste",
+            "puntos": [
+              "sin embargo",
+              "aunque",
+              "no obstante"
+            ]
+          },
+          {
+            "titulo": "Causa o consecuencia",
+            "puntos": [
+              "porque",
+              "por lo tanto",
+              "en consecuencia"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "«Estudié mucho; ___, no aprobé el examen.» ¿Qué tipo de conector va en el hueco?",
+        "opciones": [
+          "De adición, como «además»",
+          "De causa, como «porque»",
+          "De contraste, como «sin embargo»"
+        ],
+        "correcta": 2,
+        "porque": "Las dos ideas se oponen (estudié, pero no aprobé): se necesita un conector de contraste."
+      }
+    }
+  ]
+}

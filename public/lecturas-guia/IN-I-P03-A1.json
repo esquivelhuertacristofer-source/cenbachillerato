@@ -1,0 +1,41 @@
+{
+  "codigo": "IN-I-P03-A1",
+  "conceptos": [
+    { "termino": "Adjetivo antes del sustantivo", "idea": "En inglés se dice «a red book», al revés que en español." },
+    { "termino": "Tamaño", "idea": "big/large, small/little, medium, long, short, tall." },
+    { "termino": "Forma y color", "idea": "Palabras como square, round, red o blue para describir objetos." },
+    { "termino": "Objetos cotidianos", "idea": "Vocabulario de casa y escuela: desk, chair, board, backpack…" }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "El adjetivo va primero",
+      "idea": "En inglés el adjetivo va antes del sustantivo: «a red book», nunca «a book red».",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Español", "puntos": ["un libro rojo", "sustantivo + adjetivo"] },
+        { "titulo": "Inglés", "puntos": ["a red book", "adjetivo + sustantivo"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo dices «una silla verde» en inglés?", "opciones": ["a chair green", "a green chair", "a chair of green"], "correcta": 1, "porque": "En inglés el adjetivo (green) va antes del sustantivo (chair)." }
+    },
+    {
+      "parrafos": [1, 2],
+      "titulo": "Tamaño, color y forma",
+      "idea": "Con palabras de tamaño, color y forma puedes describir casi cualquier objeto con una oración que empieza con «It is a…».",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Tamaño", "puntos": ["big/large (grande)", "small/little (pequeño)", "medium, long, short", "tall (personas y edificios)"] },
+        { "titulo": "Color", "puntos": ["red, blue, green, yellow", "white, black, orange, purple"] },
+        { "titulo": "Forma", "puntos": ["circle/round", "square, triangle", "rectangular"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué palabra usarías para decir que un edificio es alto?", "opciones": ["long", "big", "tall"], "correcta": 2, "porque": "El texto indica que «tall» (alto) se usa para personas y edificios." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Objetos de la casa y la escuela",
+      "idea": "Aprende los nombres de los objetos que ves todos los días para poder describirlos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Objetos comunes en casa y en la escuela", "puntos": ["desk (escritorio), chair (silla), board (pizarrón)", "window (ventana), door (puerta)", "pencil (lápiz), notebook (cuaderno), backpack (mochila)", "table (mesa), shelf (estante), lamp (lámpara)"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo se dice «mochila» en inglés?", "opciones": ["backpack", "shelf", "notebook"], "correcta": 0, "porque": "«Backpack» es mochila; «shelf» es estante y «notebook» es cuaderno." }
+    }
+  ]
+}

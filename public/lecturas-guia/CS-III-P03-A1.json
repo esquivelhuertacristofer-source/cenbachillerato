@@ -1,0 +1,45 @@
+{
+  "codigo": "CS-III-P03-A1",
+  "conceptos": [
+    { "termino": "Juventud", "idea": "No solo una edad: una construcción social que cambia según cultura, clase, género y época." },
+    { "termino": "Agencia política juvenil", "idea": "La capacidad de los jóvenes de organizarse y transformar su sociedad." },
+    { "termino": "Participación política", "idea": "Votar, pero también colectivos, cooperativas, brigadas, activismo digital y asambleas." },
+    { "termino": "Ciudadanos de hoy", "idea": "Los jóvenes no son el futuro: el presente también les pertenece." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Ser joven: más que una edad",
+      "idea": "La juventud es una construcción social, y los jóvenes no solo reciben políticas: también transforman la sociedad.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "12 a 29 años", "etiqueta": "definición institucional de juventud en México" },
+        { "valor": "1999", "etiqueta": "año de creación del INJUVE" }
+      ] },
+      "comprueba": { "pregunta": "En una época se esperaba que los jóvenes se casaran a los 16 y hoy no. ¿Qué idea del texto ilustra?", "opciones": ["Que la juventud es solo biológica", "Que la juventud es una construcción social que cambia con la época", "Que el INJUVE define todas las costumbres"], "correcta": 1, "porque": "Lo que se espera de los jóvenes varía según la época, la cultura y el contexto: la juventud es una construcción social." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "#YoSoy132: jóvenes que se organizan",
+      "idea": "En 2012, estudiantes mostraron que podían organizarse sin partidos y plantear demandas políticas concretas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Qué mostró #YoSoy132 (mayo de 2012)", "puntos": ["Exigió cobertura mediática más democrática en las elecciones", "Organización horizontal", "Comunicación por redes sociales", "Demandas concretas sin estructuras partidistas"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué caracterizó la forma de organizarse de #YoSoy132?", "opciones": ["Dependía de un partido político", "Tenía un solo líder que daba órdenes", "Era horizontal y usaba las redes sociales"], "correcta": 2, "porque": "El movimiento se organizó horizontalmente, se comunicó por redes sociales y no necesitó estructuras partidistas." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Votar y mucho más",
+      "idea": "El voto desde los 18 es solo una forma de participar; tener derechos en la Constitución no garantiza ejercerlos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Participación formal", "puntos": ["Votar a partir de los 18 años", "Voto joven relevante en 2018 y 2024"] },
+        { "titulo": "Otras formas de participar", "puntos": ["Organizaciones estudiantiles y colectivos comunitarios", "Cooperativas juveniles y brigadas de reforestación", "Activismo digital y asambleas barriales"] }
+      ] },
+      "comprueba": { "pregunta": "Un grupo de jóvenes de 16 años organiza una brigada de reforestación en su colonia. ¿Están participando políticamente?", "opciones": ["Sí, la participación no se agota en el voto", "No, porque todavía no pueden votar", "Solo si se afilian a un partido"], "correcta": 0, "porque": "El texto incluye las brigadas de reforestación entre las formas de participación política más allá del voto." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Ciudadanos de hoy, no del mañana",
+      "idea": "Reconocer a las juventudes es escucharlas e incluirlas ya en los espacios de decisión."
+    }
+  ]
+}

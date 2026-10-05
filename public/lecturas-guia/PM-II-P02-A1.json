@@ -1,0 +1,43 @@
+{
+  "codigo": "PM-II-P02-A1",
+  "conceptos": [
+    { "termino": "Monomio", "idea": "Una expresión de un solo término, como 5x²." },
+    { "termino": "Polinomio", "idea": "Una suma de monomios; con dos términos es binomio y con tres, trinomio." },
+    { "termino": "Términos semejantes", "idea": "Tienen la misma variable con el mismo exponente; solo esos se combinan." },
+    { "termino": "Propiedad distributiva", "idea": "El monomio multiplica a cada término del polinomio." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El lenguaje algebraico y el monomio",
+      "idea": "El álgebra habla de cantidades sin conocer su valor; su pieza básica es el monomio, como 5x².",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "5", "etiqueta": "coeficiente: cuántas veces tienes la variable" },
+        { "valor": "x", "etiqueta": "variable: la cantidad desconocida" },
+        { "valor": "2", "etiqueta": "exponente: cuántas veces x se multiplica por sí misma" }
+      ], "fuente": "Las tres partes del monomio 5x²" },
+      "comprueba": { "pregunta": "En el monomio 4a³, ¿cuál es el coeficiente?", "opciones": ["a", "3", "4"], "correcta": 2, "porque": "El coeficiente es el número que multiplica a la variable: 4. La a es la variable y el 3 es el exponente." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Polinomios y términos semejantes",
+      "idea": "Para sumar o restar polinomios solo se combinan términos con la misma variable y el mismo exponente.",
+      "visual": { "tipo": "ejemplo", "titulo": "Reducir 3x² + 2x + 5x² − x", "lineas": ["Semejantes con x²: 3x² + 5x² = 8x²", "Semejantes con x: 2x − x = x"], "resultado": "8x² + x" },
+      "comprueba": { "pregunta": "¿Cuál de estos pares son términos semejantes?", "opciones": ["4x y 4x²", "2x² y −6x²", "3x y 3y"], "correcta": 1, "porque": "2x² y −6x² tienen la misma variable con el mismo exponente. En los otros cambia el exponente o la letra." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Multiplicar con la propiedad distributiva",
+      "idea": "Para multiplicar un monomio por un polinomio, el monomio multiplica a cada uno de sus términos.",
+      "visual": { "tipo": "ejemplo", "titulo": "Calcular 3x(2x² + x − 4)", "lineas": ["3x · 2x² = 6x³", "3x · x = 3x²", "3x · (−4) = −12x"], "resultado": "6x³ + 3x² − 12x" },
+      "comprueba": { "pregunta": "¿Cuánto es 2x(x + 5)?", "opciones": ["2x² + 10x", "2x² + 5", "x² + 10x"], "correcta": 0, "porque": "Se distribuye: 2x · x = 2x² y 2x · 5 = 10x. El 5 también se multiplica por 2x." }
+    },
+    {
+      "parrafos": [4, 5, 6],
+      "titulo": "El álgebra en un lote de INFONAVIT",
+      "idea": "Una expresión algebraica describe el área de muchos lotes a la vez; al dar valor a x, obtienes cada caso.",
+      "visual": { "tipo": "ejemplo", "titulo": "Lote de largo (2x + 5) m y ancho x m", "lineas": ["Área = x(2x + 5) = 2x² + 5x", "Con x = 6 m: 2(36) + 5(6)", "= 72 + 30"], "resultado": "Área = 102 m²" },
+      "comprueba": { "pregunta": "Con el mismo lote, si x = 10 m, ¿cuál es el área?", "opciones": ["150 m²", "205 m²", "250 m²"], "correcta": 2, "porque": "2x² + 5x con x = 10: 2(100) + 5(10) = 200 + 50 = 250 m²." }
+    }
+  ]
+}

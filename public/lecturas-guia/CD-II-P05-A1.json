@@ -1,0 +1,59 @@
+{
+  "codigo": "CD-II-P05-A1",
+  "conceptos": [
+    { "termino": "Contenido éticamente responsable", "idea": "Veraz, respetuoso de la privacidad, no discriminatorio y transparente." },
+    { "termino": "Creative Commons", "idea": "Licencias para decidir cómo se usa tu obra sin perder tus derechos de autor." },
+    { "termino": "Deepfake", "idea": "Video o audio manipulado con IA para que alguien parezca decir o hacer algo falso." },
+    { "termino": "Ley Olimpia", "idea": "Reformas que castigan difundir contenido sexual íntimo sin consentimiento." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Cuatro principios para publicar",
+      "idea": "Publicar tiene consecuencias sociales, legales y éticas; un contenido responsable es veraz, respetuoso, no discriminatorio y transparente.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Principios éticos", "puntos": ["Veracidad: verificado, u opinión señalada como tal", "Privacidad: nada de otros sin su consentimiento", "No discriminación: no atacar ni estereotipar", "Transparencia: quién eres, tus intereses y tus fuentes"] }
+      ] },
+      "comprueba": { "pregunta": "Subes un video de tu amigo cantando sin preguntarle. ¿Qué principio no respetas?", "opciones": ["La veracidad", "El respeto a la privacidad", "La transparencia"], "correcta": 1, "porque": "Respetar la privacidad significa no publicar imágenes o información de otras personas sin su consentimiento." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Licencias Creative Commons",
+      "idea": "Con Creative Commons el creador decide cómo se usa su obra sin renunciar a sus derechos de autor.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "CC-BY", "puntos": ["Úsalo dando crédito al autor"] },
+        { "titulo": "CC-SA", "puntos": ["Las derivadas mantienen la misma licencia"] },
+        { "titulo": "CC-NC", "puntos": ["Prohíbe el uso comercial sin autorización"] }
+      ] },
+      "comprueba": { "pregunta": "Remezclas una canción con licencia SA (Share Alike). ¿Qué licencia debe llevar tu versión?", "opciones": ["La misma licencia que la original", "La que tú quieras", "Ninguna, por ser derivada"], "correcta": 0, "porque": "CC-SA exige que las obras derivadas mantengan la misma licencia." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Cómo detectar un deepfake",
+      "idea": "Un deepfake se delata en detalles del rostro y la luz, pero lo más seguro es verificar la fuente original.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Señales de deepfake", "puntos": ["Parpadeos irregulares", "Iluminación inconsistente", "Movimientos faciales poco naturales", "Sobre todo: verificar la fuente original"] }
+      ] },
+      "comprueba": { "pregunta": "Un video muestra a un político con parpadeos raros diciendo algo escandaloso. ¿Qué es lo más importante hacer?", "opciones": ["Compartirlo rápido", "Creerlo porque tiene formato de noticiero", "Verificar la fuente original"], "correcta": 2, "porque": "La lectura dice que, sobre todo, hay que verificar la fuente original; la desinformación puede imitar al periodismo serio." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Ley Olimpia: violencia digital",
+      "idea": "La Ley Olimpia reconoce que la violencia digital es real y castiga difundir contenido sexual íntimo sin consentimiento.",
+      "comprueba": { "pregunta": "¿Qué penaliza la Ley Olimpia?", "opciones": ["Usar redes sociales en la escuela", "Difundir contenido sexual íntimo sin consentimiento", "Publicar opiniones políticas"], "correcta": 1, "porque": "Son reformas al Código Penal que penalizan la difusión de contenido sexual íntimo sin consentimiento." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "La ruta del creador responsable",
+      "idea": "La ética se integra en cada etapa del proceso creativo, no solo al final.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Idea inicial", "texto": "Qué quieres comunicar." },
+        { "titulo": "Investigación y verificación", "texto": "Confirmas tus datos." },
+        { "titulo": "Boceto o borrador", "texto": "Primera versión." },
+        { "titulo": "Producción", "texto": "Creas el contenido." },
+        { "titulo": "Revisión ética", "texto": "¿Viola la privacidad? ¿Puede ser discriminatorio?" },
+        { "titulo": "Difusión", "texto": "Lo publicas." }
+      ] }
+    }
+  ]
+}

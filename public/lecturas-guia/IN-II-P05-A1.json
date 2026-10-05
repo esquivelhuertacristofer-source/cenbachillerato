@@ -1,0 +1,39 @@
+{
+  "codigo": "IN-II-P05-A1",
+  "conceptos": [
+    { "termino": "Comparative adjective", "idea": "La forma del adjetivo para comparar dos cosas." },
+    { "termino": "-er + than", "idea": "Para adjetivos cortos de una sílaba: taller than." },
+    { "termino": "more ... than", "idea": "Para adjetivos largos: more interesting than." },
+    { "termino": "Irregulares", "idea": "No siguen reglas y se memorizan: better, worse, farther/further." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Adjetivos cortos y largos",
+      "idea": "Cuenta las sílabas: los de una sílaba llevan -er; los largos, more antes del adjetivo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Una sílaba: -er + than", "puntos": ["tall → taller than", "fast → faster than", "big → bigger than (dobla la consonante final)"] },
+        { "titulo": "Largos: more + adjetivo + than", "puntos": ["interesting → more interesting than", "expensive → more expensive than", "beautiful → more beautiful than"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo se compara «expensive»?", "opciones": ["expensiver than", "more expensive than", "most expensive than"], "correcta": 1, "porque": "«Expensive» es un adjetivo largo, así que se usa more + adjetivo + than." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Los irregulares: a memorizar",
+      "idea": "Algunos comparativos no siguen ninguna regla y hay que aprenderlos de memoria.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Irregulares", "puntos": ["good → better than", "bad → worse than", "far → farther/further than"] }
+      ] },
+      "comprueba": { "pregunta": "Completa: «This movie is ___ than the book.» (good)", "opciones": ["better", "gooder", "more good"], "correcta": 0, "porque": "«Good» es irregular: su comparativo es «better than»." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Comparar en la vida diaria",
+      "idea": "Los comparativos sirven para expresar diferencias entre personas, lugares, objetos y situaciones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ejemplos", "puntos": ["Mexico City is bigger than Querétaro.", "My sister is more intelligent than me.", "The mountains are farther than the beach."] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué oración está bien?", "opciones": ["Monterrey is more big than Puebla.", "Monterrey is bigger that Puebla.", "Monterrey is bigger than Puebla."], "correcta": 2, "porque": "«Big» tiene una sílaba: se dobla la g, se agrega -er y se usa «than», no «that»." }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "codigo": "CNEYT-I-P10-A1",
+  "conceptos": [
+    { "termino": "Regla del octeto", "idea": "Muchos átomos se estabilizan con ocho electrones en su última capa." },
+    { "termino": "Catión y anión", "idea": "Ion positivo que perdió electrones; ion negativo que los ganó." },
+    { "termino": "Enlace covalente", "idea": "Dos no metales comparten electrones y forman moléculas." },
+    { "termino": "Electronegatividad", "idea": "Qué tanto atrae un átomo a los electrones." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Electrones de valencia, octeto e iones",
+      "idea": "Los átomos ganan, pierden o comparten electrones de su última capa para completar ocho; al ganar o perder quedan cargados.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Catión", "puntos": ["Pierde electrones", "Queda con carga positiva"] },
+        { "titulo": "Anión", "puntos": ["Gana electrones", "Queda con carga negativa"] },
+        { "titulo": "Isótopo", "puntos": ["Distinto número de neutrones", "Cambia la masa, no la carga"] }
+      ] },
+      "comprueba": { "pregunta": "Un átomo de sodio pierde un electrón. ¿En qué se convierte?", "opciones": ["En un anión", "En un isótopo", "En un catión"], "correcta": 2, "porque": "Al perder electrones el átomo queda con carga positiva: es un catión." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Iónico, covalente y metálico",
+      "idea": "El tipo de enlace depende de si los átomos ceden, comparten o ponen en común electrones; la electronegatividad da la pista.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Iónico", "puntos": ["Un átomo cede electrones a otro", "Metal + no metal", "Ej.: sal, NaCl"] },
+        { "titulo": "Covalente", "puntos": ["Dos no metales comparten electrones", "Forman moléculas", "Ej.: agua, H₂O"] },
+        { "titulo": "Metálico", "puntos": ["Un «mar» de electrones libres", "Por eso los metales conducen electricidad"] }
+      ] },
+      "comprueba": { "pregunta": "Dos átomos tienen una diferencia de electronegatividad muy pequeña. ¿Qué enlace tienden a formar?", "opciones": ["Iónico", "Covalente", "Ninguno"], "correcta": 1, "porque": "Si la diferencia de electronegatividad es pequeña, el enlace tiende a ser covalente; si es muy grande, iónico." }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "codigo": "PFH-II-P04-A1",
+  "conceptos": [
+    { "termino": "Sesgo androcéntrico", "idea": "Mirar todo desde la perspectiva masculina como si fuera universal." },
+    { "termino": "Construcción social", "idea": "Algo que la cultura forma, no que viene dado por naturaleza." },
+    { "termino": "Epistemología feminista", "idea": "Pregunta quién filosofa, desde dónde y para quién." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Una filosofía hecha por hombres",
+      "idea": "La filosofía se dijo universal pero la hicieron hombres de élite; Beauvoir mostró que el género se construye socialmente.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "La exclusión", "puntos": ["Filosofía hecha casi solo por hombres de élite occidental", "Problemas, ejemplos y conclusiones con sesgo androcéntrico"] },
+        { "titulo": "Beauvoir, El segundo sexo (1949)", "puntos": ["«No se nace mujer, se llega a serlo»", "El género como construcción social y cultural"] }
+      ] },
+      "comprueba": { "pregunta": "«No se nace mujer, se llega a serlo» sostiene que las diferencias de género son…", "opciones": ["construcciones sociales y culturales", "naturales e inevitables", "un problema sin importancia filosófica"], "correcta": 0, "porque": "Beauvoir cuestiona que sean naturales o inevitables y las enmarca como construcciones sociales y culturales." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Conocer desde los márgenes",
+      "idea": "Quienes viven en los márgenes producen conocimientos ignorados; la perspectiva de género transforma métodos, preguntas y criterios.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Voces", "puntos": ["Gloria Anzaldúa y bell hooks: saberes desde los márgenes", "Graciela Hierro: placer, bienestar de las mujeres y justicia social"] },
+        { "titulo": "Perspectiva de género transforma", "puntos": ["Los métodos", "Las preguntas", "Los criterios de validez"] }
+      ] },
+      "comprueba": { "pregunta": "Según la lectura, incorporar la perspectiva de género a la filosofía es sobre todo…", "opciones": ["agregar algunos nombres de mujeres", "transformar métodos, preguntas y criterios", "dejar de estudiar a los filósofos clásicos"], "correcta": 1, "porque": "La lectura dice que no es solo «incluir mujeres», sino transformar los métodos, las preguntas y los criterios de validez." }
+    }
+  ]
+}

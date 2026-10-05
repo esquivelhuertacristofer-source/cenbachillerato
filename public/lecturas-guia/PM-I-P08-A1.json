@@ -1,0 +1,23 @@
+{
+  "codigo": "PM-I-P08-A1",
+  "conceptos": [
+    { "termino": "Sistema vigesimal", "idea": "Contar en base 20, como hacían olmecas y mayas." },
+    { "termino": "Sistema indoarábigo", "idea": "Nació en la India con diez símbolos; los árabes lo difundieron." },
+    { "termino": "Sistema posicional", "idea": "El valor de un dígito depende de su lugar: en 4 700, el 7 vale 700." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Cada cultura inventó cómo contar",
+      "idea": "Contar fue una necesidad social; muchas culturas crearon sistemas y hoy usamos el indoarábigo, que es posicional.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Mesopotamia", "texto": "Contaba en grupos de 60." },
+        { "titulo": "Egipto", "texto": "Símbolos para 1, 10, 100 y 1000." },
+        { "titulo": "Olmecas y mayas", "texto": "Sistema vigesimal (base 20) y el uso del cero." },
+        { "titulo": "India", "texto": "Diez símbolos, del 0 al 9." },
+        { "titulo": "Árabes y Fibonacci", "texto": "Lo difundieron y lo llevaron a Europa: sistema indoarábigo." }
+      ] },
+      "comprueba": { "pregunta": "En el número 3 520, ¿cuánto vale el 5?", "opciones": ["5", "500", "50"], "correcta": 1, "porque": "En un sistema posicional el valor depende del lugar: el 5 está en las centenas, así que vale 500." }
+    }
+  ]
+}

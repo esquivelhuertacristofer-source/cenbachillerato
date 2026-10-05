@@ -1,0 +1,53 @@
+{
+  "codigo": "IN-IV-P08-A1",
+  "conceptos": [
+    { "termino": "A2+", "idea": "Nivel en el que te comunicas en situaciones conocidas y temas cotidianos." },
+    { "termino": "Skimming", "idea": "Leer rápido para captar el tema general, sin leer cada palabra." },
+    { "termino": "Scanning", "idea": "Buscar un dato concreto, como un nombre o un número." },
+    { "termino": "Topic sentence", "idea": "La oración que presenta la idea principal de un párrafo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Los tiempos clave del A2+",
+      "idea": "Presente simple para hábitos y hechos, pasado simple para acciones terminadas y present perfect para experiencias o lo que sigue hasta hoy.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Simple present", "puntos": ["Hábitos, rutinas y hechos", "I study every day."] },
+        { "titulo": "Simple past", "puntos": ["Acciones completadas", "She visited Teotihuacan last summer."] },
+        { "titulo": "Present perfect", "puntos": ["have / has + participio", "I have eaten mole negro.", "I have lived in Puebla for three years."] }
+      ] },
+      "comprueba": { "pregunta": "«Water boils at 100 degrees Celsius.» ¿Qué tiempo es y por qué?", "opciones": ["Presente simple: es un hecho", "Pasado simple: ya ocurrió", "Present perfect: es una experiencia"], "correcta": 0, "porque": "El presente simple describe hábitos, rutinas y hechos, como el punto de ebullición del agua." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Más herramientas y cuatro tipos de texto",
+      "idea": "Comparativos y futuros completan la gramática; con todo ello produces narraciones, descripciones, instrucciones y opiniones.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Narrative", "puntos": ["Historia con inicio, desarrollo y final", "What happened last weekend?"] },
+        { "titulo": "Description", "puntos": ["Retrata una persona, un lugar o un objeto", "What does your town look like?"] },
+        { "titulo": "Instruction", "puntos": ["Explica cómo hacer algo paso a paso", "How do you make tamales?"] },
+        { "titulo": "Opinion", "puntos": ["Tu punto de vista con razones", "Do you think social media is good for young people?"] }
+      ] },
+      "comprueba": { "pregunta": "Escribes cómo preparar agua de jamaica paso a paso. ¿Qué tipo de texto es?", "opciones": ["Narrative", "Opinion", "Instruction"], "correcta": 2, "porque": "Explicar cómo hacer algo paso a paso es una instruction." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Leer y escribir con estrategia",
+      "idea": "Skimming da el tema general y scanning encuentra un dato; al escribir, usa oración temática, detalles y conclusión.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Skimming", "puntos": ["Leer rápido para el tema general"] },
+        { "titulo": "Scanning", "puntos": ["Buscar un dato: un nombre o un número"] },
+        { "titulo": "Escribir en tres partes", "puntos": ["Topic sentence", "Supporting details o examples", "Conclusion"] }
+      ] },
+      "comprueba": { "pregunta": "Buscas en un horario a qué hora sale tu autobús. ¿Qué estrategia usas?", "opciones": ["Skimming", "Scanning", "Una topic sentence"], "correcta": 1, "porque": "Buscas un dato específico, una hora, sin leer todo: eso es scanning." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "El siguiente paso: B1",
+      "idea": "Pasar de A2 a B1 implica textos más largos, escritura más detallada, conversaciones a velocidad natural y más vocabulario.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Del A2 al B1", "puntos": ["Leer textos más largos y complejos", "Escribir composiciones más detalladas", "Escuchar conversaciones a velocidad natural", "Ampliar el vocabulario a unas 2,000 familias de palabras"] }
+      ] }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "codigo": "PM-I-P10-A1",
+  "conceptos": [
+    { "termino": "Jerarquía de operaciones", "idea": "El orden acordado para resolver una expresión con varias operaciones." },
+    { "termino": "Símbolos de agrupación", "idea": "Paréntesis, corchetes y llaves: lo de adentro se resuelve primero." },
+    { "termino": "De izquierda a derecha", "idea": "Así se hacen las multiplicaciones y divisiones, y luego las sumas y restas." },
+    { "termino": "Opuesto", "idea": "Restar un número es sumar su opuesto: 7 − 5 = 7 + (−5)." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "El orden en que se opera",
+      "idea": "Primero agrupaciones, luego potencias y raíces, después multiplicar y dividir, y al final sumar y restar.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Agrupaciones", "texto": "Lo que está dentro de ( ), [ ] y { }." },
+        { "titulo": "Potencias y raíces", "texto": "Se resuelven en segundo lugar." },
+        { "titulo": "Multiplicar y dividir", "texto": "De izquierda a derecha: 2 + 3 × 4 = 2 + 12." },
+        { "titulo": "Sumar y restar", "texto": "Al final, de izquierda a derecha: 2 + 12 = 14, no 20." }
+      ] },
+      "comprueba": { "pregunta": "¿Cuánto vale 10 − 2 × 3?", "opciones": ["24", "4", "16"], "correcta": 1, "porque": "Primero se multiplica (2 × 3 = 6) y luego se resta: 10 − 6 = 4. El 24 sale de operar de izquierda a derecha sin respetar la jerarquía." }
+    }
+  ]
+}

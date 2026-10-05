@@ -1,0 +1,42 @@
+{
+  "codigo": "LC-III-P06-A1",
+  "conceptos": [
+    { "termino": "Reseña crítica", "idea": "Opinión fundamentada sobre una obra: combina descripción, análisis y juicio." },
+    { "termino": "Síntesis sin spoilers", "idea": "Contar de qué trata la obra sin arruinarla a quien no la conoce." },
+    { "termino": "Juicio fundamentado", "idea": "Una valoración que se sostiene con argumentos, no con gustos sueltos." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Qué es una reseña crítica",
+      "idea": "No es un resumen ni un comentario superficial: es una evaluación razonada para alguien que aún no conoce la obra.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Identifica la obra", "texto": "Título y autor, con claridad." },
+        { "titulo": "Sintetiza", "texto": "El contenido, sin spoilers innecesarios." },
+        { "titulo": "Analiza", "texto": "Estilo, estructura y recursos." },
+        { "titulo": "Juzga", "texto": "Un juicio crítico basado en argumentos." },
+        { "titulo": "Piensa en tu lector", "texto": "Alguien que no ha visto la obra pero podría hacerlo." }
+      ] },
+      "comprueba": { "pregunta": "Un texto sobre una película solo cuenta la trama completa, incluido el final. ¿Es una reseña crítica?", "opciones": ["Sí, porque habla de la película", "Sí, si es largo", "No: es un resumen con spoilers y sin análisis ni juicio"], "correcta": 2, "porque": "La reseña no es un resumen: sintetiza sin spoilers innecesarios, analiza y emite un juicio fundamentado." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Estructura y proceso de escritura",
+      "idea": "La reseña tiene introducción, desarrollo y conclusión, y se escribe en etapas, de tomar notas a revisar.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Lee o mira con atención", "texto": "Toma notas." },
+        { "titulo": "Identifica lo significativo", "texto": "Los aspectos más relevantes." },
+        { "titulo": "Formula tu opinión", "texto": "Argumentada, no solo «me gustó»." },
+        { "titulo": "Redacta", "texto": "Con tono preciso y accesible." },
+        { "titulo": "Revisa", "texto": "Que sea coherente, fluido y útil." }
+      ] },
+      "comprueba": { "pregunta": "¿En qué parte de la reseña va la recomendación final?", "opciones": ["En la introducción", "En la conclusión", "En el desarrollo"], "correcta": 1, "porque": "La conclusión contiene la valoración final y la recomendación; la introducción presenta la obra y su contexto." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Informar, no imponer",
+      "idea": "Una buena reseña no impone su opinión: le da al lector elementos para formar la suya.",
+      "comprueba": { "pregunta": "¿Cuál es el objetivo de una buena reseña?", "opciones": ["Que el lector forme su propia opinión informada", "Convencer al lector de que la opinión del reseñista es la correcta", "Contar toda la obra"], "correcta": 0, "porque": "Una buena reseña no busca convencer: da elementos para que el lector forme su propia opinión de manera informada." }
+    }
+  ]
+}

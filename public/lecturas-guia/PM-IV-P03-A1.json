@@ -1,0 +1,48 @@
+{
+  "codigo": "PM-IV-P03-A1",
+  "conceptos": [
+    { "termino": "Seno", "idea": "Cateto opuesto entre hipotenusa." },
+    { "termino": "Coseno", "idea": "Cateto adyacente entre hipotenusa." },
+    { "termino": "Tangente", "idea": "Cateto opuesto entre cateto adyacente; también sen θ / cos θ." },
+    { "termino": "SOHCAHTOA", "idea": "Truco para recordar las tres razones: Seno-Opuesto-Hipotenusa, Coseno-Adyacente-Hipotenusa, Tangente-Opuesto-Adyacente." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Medir lo que no se alcanza",
+      "idea": "La trigonometría nació para medir lo que no se puede medir directamente, como la altura de una pirámide.",
+      "comprueba": { "pregunta": "¿Cuál de estos problemas es típico de la trigonometría?", "opciones": ["Calcular la altura de un edificio sin subirlo", "Sumar fracciones con distinto denominador", "Contar los alumnos de un salón"], "correcta": 0, "porque": "La trigonometría sirve para medir lo que no se alcanza directamente, como una altura o el ancho de un barranco." }
+    },
+    {
+      "parrafos": [1, 2, 3],
+      "titulo": "Seno, coseno y tangente",
+      "idea": "Las tres razones relacionan los lados de un triángulo rectángulo con sus ángulos; SOHCAHTOA te ayuda a recordarlas.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Seno", "expr": "sen θ = opuesto / hipotenusa" },
+        { "nombre": "Coseno", "expr": "cos θ = adyacente / hipotenusa" },
+        { "nombre": "Tangente", "expr": "tan θ = opuesto / adyacente = sen θ / cos θ" }
+      ] },
+      "comprueba": { "pregunta": "En un triángulo rectángulo, el cateto opuesto a θ mide 3, el adyacente 4 y la hipotenusa 5. ¿Cuánto vale tan θ?", "opciones": ["3/5", "4/5", "3/4"], "correcta": 2, "porque": "Tangente = opuesto / adyacente = 3/4. El 3/5 sería el seno y el 4/5, el coseno." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "La altura de la Pirámide del Sol",
+      "idea": "Con una distancia horizontal conocida y el ángulo de elevación, la tangente da la altura.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Distancia", "texto": "Colócate a una distancia horizontal conocida de la base." },
+        { "titulo": "Ángulo", "texto": "Mide con un teodolito el ángulo de elevación hasta la cima." },
+        { "titulo": "Tangente", "texto": "altura = distancia × tan(ángulo)." }
+      ] },
+      "comprueba": { "pregunta": "Conoces tu distancia a la base de un edificio y el ángulo de elevación a la cima. ¿Qué razón usas para la altura?", "opciones": ["Seno", "Tangente", "Coseno"], "correcta": 1, "porque": "La altura es el cateto opuesto y la distancia es el adyacente; la razón que los une es la tangente." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "La identidad fundamental",
+      "idea": "sen²θ + cos²θ = 1 sale de Pitágoras; con dos datos de un triángulo rectángulo calculas todo lo demás.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Identidad fundamental", "expr": "sen²θ + cos²θ = 1", "leyenda": "Sale del Teorema de Pitágoras en el círculo unitario" }
+      ] },
+      "comprueba": { "pregunta": "En un triángulo rectángulo conoces un lado y un ángulo agudo. ¿Qué puedes calcular?", "opciones": ["Solo la hipotenusa", "Nada sin medir más", "Todos los demás lados y ángulos"], "correcta": 2, "porque": "Con dos elementos (un lado y un ángulo, o dos lados) las tres razones permiten calcular todo lo demás." }
+    }
+  ]
+}

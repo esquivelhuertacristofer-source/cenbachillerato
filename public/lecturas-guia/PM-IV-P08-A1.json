@@ -1,0 +1,60 @@
+{
+  "codigo": "PM-IV-P08-A1",
+  "conceptos": [
+    { "termino": "Sección cónica", "idea": "La curva que sale al cortar un cono con un plano." },
+    { "termino": "Foco", "idea": "Punto especial donde, en la parábola, se juntan los rayos paralelos al eje." },
+    { "termino": "Semiejes a y b", "idea": "Las medidas que dicen qué tan ancha y alta es una elipse." },
+    { "termino": "Modelar", "idea": "Usar la ecuación de una curva para describir y estimar algo real." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Cuatro curvas que modelan el mundo",
+      "idea": "Circunferencia, parábola, elipse e hipérbola salen de cortar un cono, y sus ecuaciones permiten modelar y estimar situaciones reales.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Las cuatro cónicas", "puntos": ["Circunferencia", "Parábola", "Elipse", "Hipérbola"] },
+        { "titulo": "Preguntas que responden", "puntos": ["¿Hasta dónde llega un balón?", "¿Dónde se concentra la señal de una antena?", "¿Qué forma tiene la órbita de un planeta?"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo se obtienen las secciones cónicas?", "opciones": ["Cortando un cono con un plano", "Uniendo dos rectas paralelas", "Doblando un círculo a la mitad"], "correcta": 0, "porque": "Las cónicas son las curvas que aparecen al cortar un cono con un plano." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "La parábola: subir, bajar y concentrar",
+      "idea": "La parábola modela lo que sube y baja por la gravedad y concentra en su foco los rayos paralelos al eje.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Parábola con vértice en el origen", "expr": "y = a·x²   o   x² = 4py", "leyenda": "Balones, fuentes, puentes colgantes, antenas y faros" }
+      ] },
+      "comprueba": { "pregunta": "Vas a instalar una antena parabólica de internet satelital. ¿Dónde va el receptor?", "opciones": ["En el borde del plato", "En el vértice", "En el foco"], "correcta": 2, "porque": "Todos los rayos paralelos al eje se concentran en el foco; ahí se coloca el receptor." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Elipse y circunferencia",
+      "idea": "La elipse tiene dos focos y modela órbitas y arcos; la circunferencia es la elipse con a = b y modela alcances.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Elipse", "puntos": ["x²/a² + y²/b² = 1", "Dos focos", "Órbitas (Kepler: el Sol en un foco), arcos, galerías de susurros"] },
+        { "titulo": "Circunferencia", "puntos": ["(x − h)² + (y − k)² = r²", "Todos sus puntos a distancia r del centro", "Alcance de wifi o radio, aspersores, antenas de telefonía"] }
+      ] },
+      "comprueba": { "pregunta": "Un módem wifi está en (0, 0) y alcanza r = 5. ¿El punto (3, 3) queda dentro del alcance?", "opciones": ["Sí, queda dentro", "No, queda fuera", "Queda justo en el borde"], "correcta": 0, "porque": "3² + 3² = 18, y 18 es menor que r² = 25, así que el punto está dentro del círculo." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "La hipérbola: una sube, otra baja",
+      "idea": "La hipérbola modela relaciones donde una variable crece mientras la otra decrece, y sirve para posicionar por diferencia de distancias.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Hipérbola", "expr": "x²/a² − y²/b² = 1", "leyenda": "Ley de Boyle presión-volumen y sistemas de navegación" }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estos fenómenos se modela con una hipérbola?", "opciones": ["La órbita de un satélite", "La presión y el volumen de un gas", "La trayectoria de un balón"], "correcta": 1, "porque": "En la ley de Boyle, cuando el volumen crece la presión decrece: proporcionalidad inversa, que dibuja una hipérbola." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "Modelar y estimar en tres pasos",
+      "idea": "Para aplicar una cónica identificas la curva, escribes su ecuación con los datos y la usas para estimar.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "1. Identificar", "texto": "¿Qué curva describe el fenómeno?" },
+        { "titulo": "2. Escribir", "texto": "La ecuación de esa curva con los datos conocidos." },
+        { "titulo": "3. Estimar", "texto": "El valor buscado: una altura, un alcance, una distancia." }
+      ] },
+      "comprueba": { "pregunta": "Quieres estimar la altura máxima de un balón pateado. ¿Qué haces primero?", "opciones": ["Calcular la altura", "Escribir la ecuación de la elipse", "Identificar que la trayectoria es una parábola"], "correcta": 2, "porque": "El primer paso es identificar la curva; un balón sube y baja por la gravedad, así que es una parábola." }
+    }
+  ]
+}

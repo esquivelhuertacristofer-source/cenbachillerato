@@ -1,0 +1,52 @@
+{
+  "codigo": "IN-III-P06-A1",
+  "conceptos": [
+    { "termino": "Imperative", "idea": "El verbo en forma base y sin sujeto: Open the document." },
+    { "termino": "Sequence connectors", "idea": "First, then, next, after that, finally: ordenan los pasos." },
+    { "termino": "Make sure to", "idea": "Resalta un paso crítico que no puedes fallar." },
+    { "termino": "Negative imperative", "idea": "Do not o Never + verbo: advierte para evitar errores." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El imperativo: instrucciones directas",
+      "idea": "Las instrucciones usan el verbo en forma base sin sujeto, porque el «you» se entiende.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Imperativos", "puntos": ["Open the document.", "Click on the menu.", "Select the file.", "Type your name."] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuál de estas es una instrucción en imperativo?", "opciones": ["You are saving the file.", "Save the file.", "He saves the file."], "correcta": 1, "porque": "El imperativo es el verbo en forma base sin sujeto: Save the file." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Conectores de secuencia: el guacamole",
+      "idea": "First, then, next, after that y finally ordenan los pasos para que nadie se pierda.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "First", "texto": "Wash and peel the avocados." },
+        { "titulo": "Then", "texto": "Mash them in a bowl with a fork." },
+        { "titulo": "Next", "texto": "Add lime juice, salt, and chopped onion." },
+        { "titulo": "After that", "texto": "Stir everything together." },
+        { "titulo": "Finally", "texto": "Taste and adjust the seasoning." }
+      ] },
+      "comprueba": { "pregunta": "Escribes la receta del agua de jamaica. ¿Con qué conector introduces el último paso?", "opciones": ["Finally", "Then", "First"], "correcta": 0, "porque": "Finally introduce el último paso; First abre el primero y Then los siguientes." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Precisión y advertencias",
+      "idea": "Always, make sure to y be careful not to resaltan pasos clave; los imperativos negativos previenen errores.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Para precisar", "puntos": ["Always: un paso que nunca se omite", "Make sure to: un paso crítico", "Be careful not to: una advertencia"] },
+        { "titulo": "Imperativo negativo", "puntos": ["Do not press the red button before the system is ready.", "Never share your password with anyone."] }
+      ] },
+      "comprueba": { "pregunta": "Quieres advertir que no se debe dejar la estufa encendida. ¿Qué escribes?", "opciones": ["Leave the stove on.", "Make sure to leave the stove on.", "Do not leave the stove on."], "correcta": 2, "porque": "Un imperativo negativo, Do not + verbo, sirve para prevenir un error." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Practica con recetas y tareas",
+      "idea": "Escribe instrucciones de al menos seis pasos, con conectores, para una receta mexicana o una tarea digital.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "En la escuela", "puntos": ["Subir un archivo a la plataforma", "Dar formato a un documento", "Enviar un correo al profesor"] },
+        { "titulo": "En la cocina", "puntos": ["Guacamole", "Agua de jamaica", "Arroz con leche"] }
+      ] }
+    }
+  ]
+}

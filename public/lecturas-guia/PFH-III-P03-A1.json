@@ -1,0 +1,42 @@
+{
+  "codigo": "PFH-III-P03-A1",
+  "conceptos": [
+    { "termino": "Estética", "idea": "Estudia la experiencia sensible y el juicio de gusto." },
+    { "termino": "Placer desinteresado", "idea": "Disfrutar lo bello sin querer poseerlo ni usarlo, solo contemplarlo." },
+    { "termino": "Lo sublime", "idea": "Mezcla de terror y admiración ante lo que nos sobrepasa." },
+    { "termino": "Lo grotesco", "idea": "Lo que perturba y mezcla lo alto y lo bajo, lo serio y lo ridículo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Qué es la estética y lo bello",
+      "idea": "La estética estudia el gusto; para Kant, juzgar algo bello es subjetivo pero pretende que todos coincidan.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "1735: Baumgarten acuña el nombre", "texto": "En Meditationes philosophicae: la ciencia del conocimiento sensible." },
+        { "titulo": "1750: Aesthetica", "texto": "Baumgarten desarrolla el concepto." },
+        { "titulo": "1790: Kant, Crítica del juicio", "texto": "Lo bello es subjetivo pero pretende universalidad; da un placer desinteresado." }
+      ] },
+      "comprueba": { "pregunta": "Contemplas un atardecer sin querer comprarlo ni usarlo, solo mirarlo. ¿Cómo llama Kant a ese placer?", "opciones": ["Placer desinteresado", "Placer útil", "Experiencia de lo grotesco"], "correcta": 0, "porque": "Para Kant, lo bello produce un placer desinteresado: no buscamos poseerlo ni usarlo, solo contemplarlo." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Lo sublime y lo grotesco",
+      "idea": "Lo sublime nos sobrepasa y mezcla terror con admiración; lo grotesco subvierte el orden mezclando lo macabro y lo festivo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Lo sublime (Burke, Kant)", "puntos": ["Terror y admiración", "Lo que desborda nuestra comprensión", "Popocatépetl activo, Sierra Madre Occidental"] },
+        { "titulo": "Lo grotesco (Bajtin)", "puntos": ["Subvierte el orden estético", "Mezcla lo serio y lo ridículo", "Catrinas de Posada, Día de Muertos"] }
+      ] },
+      "comprueba": { "pregunta": "Ves de cerca una tormenta enorme en el mar y sientes miedo y fascinación a la vez. ¿Qué experiencia es?", "opciones": ["Lo grotesco", "Lo sublime", "Lo bello"], "correcta": 1, "porque": "Lo sublime mezcla terror y admiración ante lo que nos sobrepasa, como el océano en tempestad." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Arte mexicano y la pregunta abierta",
+      "idea": "El muralismo hizo del arte una herramienta política y Kahlo volvió universal su experiencia; el gusto es universal y cultural a la vez.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Muralismo", "puntos": ["Rivera, Orozco, Siqueiros", "Arte para la educación popular", "Transformación social"] },
+        { "titulo": "Frida Kahlo", "puntos": ["El autorretrato", "Dolor físico, identidad cultural y género"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué tiende a responder la filosofía del arte contemporánea sobre el gusto?", "opciones": ["Que es solo universal", "Que es solo cultural", "Que lo universal y lo cultural coexisten"], "correcta": 2, "porque": "La lectura dice que ambas dimensiones, la subjetividad universal y la determinación cultural, son reales y coexisten." }
+    }
+  ]
+}

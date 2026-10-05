@@ -1,0 +1,44 @@
+{
+  "codigo": "CNEYT-VI-P07-A1",
+  "conceptos": [
+    { "termino": "Selección natural", "idea": "Los rasgos que ayudan a sobrevivir y reproducirse se vuelven más frecuentes." },
+    { "termino": "Evolución", "idea": "Cambio en las frecuencias alélicas de una población a lo largo del tiempo." },
+    { "termino": "Especiación alopátrica", "idea": "Poblaciones separadas geográficamente acumulan diferencias hasta ser especies distintas." },
+    { "termino": "Estructura homóloga", "idea": "Mismo origen y distinta función, como el húmero de humano y ballena." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Los cuatro postulados de Darwin",
+      "idea": "La selección natural no es aleatoria: favorece los rasgos heredables que mejor se adaptan al ambiente.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Variación", "texto": "Hay variación heredable en la población." },
+        { "titulo": "Exceso de crías", "texto": "Nacen más individuos de los que pueden sobrevivir." },
+        { "titulo": "Ventaja", "texto": "Algunos rasgos aumentan la probabilidad de sobrevivir y reproducirse." },
+        { "titulo": "Acumulación", "texto": "Los rasgos favorables se vuelven más frecuentes con el tiempo." }
+      ] },
+      "comprueba": { "pregunta": "En un bosque oscuro, los ratones de pelaje oscuro escapan mejor de sus depredadores. Con los años…", "opciones": ["todos los ratones se vuelven claros", "aumenta la proporción de ratones oscuros", "la población deja de variar al azar"], "correcta": 1, "porque": "Un rasgo que aumenta la supervivencia y la reproducción se vuelve más frecuente en la población: eso es selección natural." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Cómo nace una especie",
+      "idea": "Si dos poblaciones quedan aisladas, acumulan diferencias hasta que ya no pueden reproducirse entre sí.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Aislamiento geográfico", "texto": "Una barrera separa a la población en dos." },
+        { "titulo": "Diferencias genéticas", "texto": "Cada grupo acumula cambios por su lado." },
+        { "titulo": "Nueva especie", "texto": "Ya no pueden reproducirse entre sí." }
+      ] },
+      "comprueba": { "pregunta": "Un río nuevo divide a una población de ranas durante miles de años. ¿Qué tipo de especiación puede ocurrir?", "opciones": ["Alopátrica", "Ninguna, porque son la misma especie", "Por mutación cromosómica"], "correcta": 0, "porque": "Cuando el aislamiento es geográfico y lleva a nuevas especies, se llama especiación alopátrica." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Las pruebas de la evolución",
+      "idea": "Fósiles, anatomía, biogeografía y genómica son evidencias distintas que apuntan a lo mismo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Fósiles y anatomía", "puntos": ["Tiktaalik: transición entre peces y tetrápodos", "Homólogas: el húmero en humano, ballena y murciélago", "Vestigiales: el cóccix humano"] },
+        { "titulo": "Biogeografía y genómica", "puntos": ["La distribución de las especies", "Más parentesco, más ADN compartido", "Humanos y chimpancés: ~98.7% del genoma"] }
+      ] },
+      "comprueba": { "pregunta": "El cóccix humano ya no cumple la función de una cola. ¿Qué tipo de estructura es?", "opciones": ["Homóloga", "Fósil de transición", "Vestigial"], "correcta": 2, "porque": "Las estructuras vestigiales son las que perdieron su función, como el cóccix humano." }
+    }
+  ]
+}

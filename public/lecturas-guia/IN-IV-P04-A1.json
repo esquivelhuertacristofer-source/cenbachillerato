@@ -1,0 +1,41 @@
+{
+  "codigo": "IN-IV-P04-A1",
+  "conceptos": [
+    { "termino": "Should", "idea": "Recomienda una acción: You should drink more water." },
+    { "termino": "Shouldn't", "idea": "Aconseja no hacer algo: You shouldn't eat too much junk food." },
+    { "termino": "Imperatives", "idea": "Instrucciones directas: Eat more fruit. Don't skip breakfast." },
+    { "termino": "Empathetic response", "idea": "Una frase que muestra comprensión antes de dar el consejo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Should y shouldn't: recomendar",
+      "idea": "Should recomienda hacer algo y shouldn't aconseja no hacerlo; ambos suenan más amables que must.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Recomendar", "expr": "should + base verb", "leyenda": "You should drink more water." },
+        { "nombre": "Desaconsejar", "expr": "shouldn't + base verb", "leyenda": "You shouldn't stay up all night before an exam." }
+      ] },
+      "comprueba": { "pregunta": "Tu amigo casi no duerme. ¿Qué consejo está bien dicho?", "opciones": ["You should sleep more.", "You should to sleep more.", "You shouldn't sleep more."], "correcta": 0, "porque": "Should va seguido del verbo en forma base, sin to: should sleep." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Imperativos y cómo pedir consejo",
+      "idea": "Los imperativos dan instrucciones directas; para pedir consejo, pregunta What should I do?",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Imperativos", "puntos": ["Eat more fruit and vegetables.", "Don't skip breakfast.", "Don't leave everything to the last minute."] },
+        { "titulo": "Pedir consejo", "puntos": ["What should I do?", "Do you have any advice for me?", "What do you think I should do about...?"] }
+      ] },
+      "comprueba": { "pregunta": "Tienes un problema con un compañero y quieres que te aconsejen. ¿Qué dices?", "opciones": ["Don't skip breakfast.", "You should talk to him.", "What should I do?"], "correcta": 2, "porque": "What should I do? es la frase para pedir consejo; las otras dan una instrucción o un consejo." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Empatía primero, y según a quién",
+      "idea": "Antes de aconsejar muestra empatía, y ajusta el tono según si hablas con un amigo, un estudiante menor o tu comunidad.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Respuestas empáticas", "puntos": ["That sounds difficult. I think you should...", "I understand. Maybe you shouldn't...", "Don't worry. Here's what I suggest..."] },
+        { "titulo": "El contexto importa", "puntos": ["A un amigo: informal", "A un estudiante menor: alentador", "En la comunidad: más responsable"] }
+      ] },
+      "comprueba": { "pregunta": "Una amiga te cuenta que reprobó un examen. ¿Cuál es la mejor respuesta?", "opciones": ["Study more.", "That sounds difficult. I think you should ask your teacher for help.", "You mustn't fail."], "correcta": 1, "porque": "Primero muestra empatía (That sounds difficult) y luego da el consejo con should." }
+    }
+  ]
+}

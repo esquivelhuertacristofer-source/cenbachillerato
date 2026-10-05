@@ -1,0 +1,115 @@
+{
+  "codigo": "LC-II-P07-A1",
+  "conceptos": [
+    {
+      "termino": "Análisis colaborativo",
+      "idea": "Leer y discutir un texto entre varios para comprenderlo mejor."
+    },
+    {
+      "termino": "Elementos narrativos",
+      "idea": "Trama, personajes, tema y tono de un texto."
+    },
+    {
+      "termino": "Retroalimentación constructiva",
+      "idea": "Señala aciertos y mejoras, enfocada en el texto, no en la persona."
+    }
+  ],
+  "partes": [
+    {
+      "parrafos": [
+        0
+      ],
+      "titulo": "Leer en compañía",
+      "idea": "Cada lector nota cosas distintas; juntos logran una comprensión más rica que leyendo solos.",
+      "comprueba": {
+        "pregunta": "A ti un párrafo te pareció confuso y a tu compañera le resultó claro. ¿Qué muestra eso?",
+        "opciones": [
+          "Que uno de los dos leyó mal",
+          "Que el texto está mal escrito",
+          "Que cada persona aporta una perspectiva distinta"
+        ],
+        "correcta": 2,
+        "porque": "En el análisis colaborativo, lo que a uno le parece confuso a otro le resulta claro: las perspectivas se complementan."
+      }
+    },
+    {
+      "parrafos": [
+        1
+      ],
+      "titulo": "Los cinco pasos del análisis",
+      "idea": "Primero lees y analizas solo; luego discutes, das retroalimentación y mejoran el texto juntos.",
+      "visual": {
+        "tipo": "pasos",
+        "items": [
+          {
+            "titulo": "Lectura individual",
+            "texto": "Cada quien lee el texto por su cuenta."
+          },
+          {
+            "titulo": "Identificación personal",
+            "texto": "Trama, personajes, tema y tono."
+          },
+          {
+            "titulo": "Puesta en común",
+            "texto": "Se discuten las interpretaciones."
+          },
+          {
+            "titulo": "Retroalimentación",
+            "texto": "Comentarios constructivos entre pares."
+          },
+          {
+            "titulo": "Revisión colectiva",
+            "texto": "Mejoran juntos el texto analizado."
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "¿Qué paso va justo antes de la puesta en común?",
+        "opciones": [
+          "La identificación personal de elementos narrativos",
+          "La revisión colectiva",
+          "La retroalimentación entre pares"
+        ],
+        "correcta": 0,
+        "porque": "Primero lees y ubicas por tu cuenta trama, personajes, tema y tono; después se ponen en común las interpretaciones."
+      }
+    },
+    {
+      "parrafos": [
+        2
+      ],
+      "titulo": "Respeto y apertura",
+      "idea": "El objetivo no es ganar la discusión sino aprender; la crítica se enfoca en el texto, no en quien lo escribió.",
+      "visual": {
+        "tipo": "comparar",
+        "columnas": [
+          {
+            "titulo": "Sí",
+            "puntos": [
+              "Señalar aciertos",
+              "Señalar aspectos a mejorar",
+              "Hablar del texto"
+            ]
+          },
+          {
+            "titulo": "No",
+            "puntos": [
+              "Querer «ganar» la discusión",
+              "Criticar a la persona que escribió"
+            ]
+          }
+        ]
+      },
+      "comprueba": {
+        "pregunta": "¿Cuál es retroalimentación constructiva?",
+        "opciones": [
+          "«Eres pésimo escribiendo.»",
+          "«El diálogo del inicio funciona; el final podría explicar mejor por qué huye el personaje.»",
+          "«Está bien, no tengo nada que decir.»"
+        ],
+        "correcta": 1,
+        "porque": "Señala con claridad un acierto y un aspecto a mejorar, y se enfoca en el texto, no en la persona."
+      }
+    }
+  ]
+}

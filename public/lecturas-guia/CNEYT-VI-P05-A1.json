@@ -1,0 +1,38 @@
+{
+  "codigo": "CNEYT-VI-P05-A1",
+  "conceptos": [
+    { "termino": "Alelo", "idea": "Cada versión de un gen; tienes dos por gen y heredas uno de cada padre." },
+    { "termino": "Cuadro de Punnett", "idea": "Tabla que combina los gametos para predecir los hijos posibles." },
+    { "termino": "Codominancia", "idea": "Los dos alelos se expresan a la vez, como en el grupo sanguíneo AB." },
+    { "termino": "Herencia ligada al X", "idea": "Genes en el cromosoma X; por eso afectan distinto a hombres y mujeres." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Las leyes de Mendel y Punnett",
+      "idea": "Cada progenitor pasa un solo alelo de cada gen; el cuadro de Punnett predice las proporciones de los hijos.",
+      "visual": { "tipo": "ejemplo", "titulo": "Cruce monohíbrido Aa × Aa", "lineas": ["Gametos de cada padre: A y a", "Genotipos: 1 AA : 2 Aa : 1 aa", "Fenotipos: 3 dominante : 1 recesivo"], "resultado": "Probabilidad de aa = 25%" },
+      "comprueba": { "pregunta": "En un cruce Aa × Aa, ¿qué proporción de los hijos muestra el rasgo dominante?", "opciones": ["1 de cada 4", "2 de cada 4", "3 de cada 4"], "correcta": 2, "porque": "AA y Aa muestran el dominante: 1 + 2 = 3 de cada 4. Solo aa muestra el recesivo." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Cuando no se cumple a la Mendel",
+      "idea": "En la dominancia incompleta sale un intermedio; en la codominancia, como en el grupo AB, se expresan los dos alelos.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Dominancia incompleta", "puntos": ["El heterocigoto tiene un fenotipo intermedio"] },
+        { "titulo": "Codominancia", "puntos": ["Ambos alelos se expresan", "Grupo ABO: IA e IB codominantes", "IA e IB dominan sobre i"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué grupo sanguíneo tiene una persona con genotipo IAi?", "opciones": ["A", "AB", "O"], "correcta": 0, "porque": "IA es dominante sobre i, así que solo se expresa el antígeno A." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Herencia ligada al sexo",
+      "idea": "Los hombres tienen un solo X, así que un alelo recesivo ligado al X basta para que lo expresen.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Hombres (XY)", "puntos": ["Un solo cromosoma X", "Una copia del alelo recesivo basta", "El daltonismo los afecta más"] },
+        { "titulo": "Mujeres (XX)", "puntos": ["Necesitan dos copias del alelo recesivo", "Con una copia pueden ser portadoras"] }
+      ] },
+      "comprueba": { "pregunta": "Una mujer tiene un X con el alelo del daltonismo y otro X normal. ¿Qué es?", "opciones": ["Daltónica", "Portadora", "No puede heredarlo a nadie"], "correcta": 1, "porque": "Las mujeres necesitan dos copias del alelo recesivo para expresarlo; con una sola son portadoras." }
+    }
+  ]
+}

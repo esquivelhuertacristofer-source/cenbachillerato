@@ -1,0 +1,54 @@
+{
+  "codigo": "CH-III-P01-A1",
+  "conceptos": [
+    { "termino": "Fuente primaria", "idea": "Producida en el momento del evento o por sus actores directos." },
+    { "termino": "Fuente secundaria", "idea": "Interpretación hecha después: libros de historia, artículos, enciclopedias." },
+    { "termino": "Sesgo", "idea": "El punto de vista de quien produjo la fuente; no la vuelve falsa." },
+    { "termino": "Evaluar e interpretar", "idea": "Primero ver si la fuente es confiable; después, qué dice del pasado." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Primarias, secundarias y terciarias",
+      "idea": "Antes de confiar en una fuente, ubícala: ¿se hizo durante el evento, se interpretó después o solo recopila otras?",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Primarias", "puntos": ["Decretos, cartas, actas", "Herramientas, edificios, monedas", "Testimonios orales y fotografías"] },
+        { "titulo": "Secundarias", "puntos": ["Libros de historia", "Artículos académicos", "Enciclopedias"] },
+        { "titulo": "Terciarias", "puntos": ["Bibliografías", "Bases de datos"] }
+      ] },
+      "comprueba": { "pregunta": "Una moneda acuñada durante la Revolución Mexicana es una fuente…", "opciones": ["secundaria", "terciaria", "primaria"], "correcta": 2, "porque": "Los objetos materiales producidos en el período estudiado, como las monedas, son fuentes primarias." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Fotos y mapas no son neutros",
+      "idea": "Una fotografía o un mapa es una selección de quien lo hizo, con sus intenciones e intereses.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Preguntas ante una fuente iconográfica", "puntos": ["¿Quién fue fotografiado y quién fue omitido?", "¿Qué imágenes circularon y cuáles se archivaron?", "¿Qué intereses refleja el mapa además de la geografía?"] }
+      ] },
+      "comprueba": { "pregunta": "Un mapa colonial del siglo XVI muestra América. ¿Qué refleja además del territorio?", "opciones": ["La visión europea y sus intereses de dominación", "Solo la geografía objetiva", "La opinión de los pueblos originarios"], "correcta": 0, "porque": "El texto dice que un mapa colonial refleja la visión europea del territorio y sus intereses de dominación." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Cinco criterios y el sesgo",
+      "idea": "Autoría, fecha, intención, audiencia y contexto te dicen cuánto confiar; el sesgo no invalida la fuente, la vuelve útil críticamente.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Autoría", "texto": "¿Quién la produjo? ¿Fue testigo directo?" },
+        { "titulo": "Fecha", "texto": "¿Es contemporánea al evento o muy posterior?" },
+        { "titulo": "Intención", "texto": "¿Para qué fue producida?" },
+        { "titulo": "Audiencia", "texto": "¿Para el público masivo o para uso interno?" },
+        { "titulo": "Contexto", "texto": "¿En qué circunstancias históricas, políticas y sociales?" }
+      ] },
+      "comprueba": { "pregunta": "Te preguntas si un panfleto se hizo para convencer a la gente de apoyar una causa. ¿Qué criterio aplicas?", "opciones": ["Fecha", "Intención", "Autoría"], "correcta": 1, "porque": "Preguntar para qué fue producida la fuente es el criterio de intención; un panfleto de propaganda tiene una intención distinta a una carta personal." }
+    },
+    {
+      "parrafos": [5, 6],
+      "titulo": "Dónde buscar y cómo trabajar",
+      "idea": "AGN, INAH y la Hemeroteca Nacional Digital guardan fuentes primarias; un historiador riguroso siempre evalúa antes de interpretar.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Evaluar", "puntos": ["¿Es confiable?", "¿Es auténtica?", "¿Es representativa del período?"] },
+        { "titulo": "Interpretar", "puntos": ["¿Qué información aporta?", "¿Qué silencia?", "¿Qué revela de mentalidades y poder?"] }
+      ] },
+      "comprueba": { "pregunta": "Necesitas leer un periódico del siglo XIX desde tu casa. ¿Qué repositorio usas?", "opciones": ["El INAH", "La Hemeroteca Nacional Digital de México", "Una enciclopedia"], "correcta": 1, "porque": "La HNDM ofrece acceso en línea a periódicos históricos desde el siglo XIX." }
+    }
+  ]
+}

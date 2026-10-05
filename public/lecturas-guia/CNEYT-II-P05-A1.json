@@ -1,0 +1,35 @@
+{
+  "codigo": "CNEYT-II-P05-A1",
+  "conceptos": [
+    { "termino": "Trabajo (W)", "idea": "Energía transferida cuando una fuerza desplaza un objeto en su dirección." },
+    { "termino": "Joule (J)", "idea": "Unidad de trabajo: 1 J = 1 N·m." },
+    { "termino": "Potencia (P)", "idea": "Qué tan rápido se realiza un trabajo." },
+    { "termino": "Watt (W)", "idea": "Unidad de potencia: un joule por segundo." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3],
+      "titulo": "Trabajo: fuerza que desplaza",
+      "idea": "Solo hay trabajo si la fuerza mueve el objeto en su dirección; si es perpendicular, el trabajo es cero.",
+      "visual": { "tipo": "ejemplo", "titulo": "Empujas una caja con 20 N a lo largo de 3 m", "lineas": ["W = F × d × cos θ", "θ = 0°, cos 0° = 1", "W = 20 × 3 × 1"], "resultado": "W = 60 J. Si la fuerza fuera perpendicular (θ = 90°), W = 0." },
+      "comprueba": { "pregunta": "Cargas una mochila y caminas en línea recta sobre piso plano; la fuerza que haces es hacia arriba. ¿Cuánto trabajo hace esa fuerza?", "opciones": ["Mucho, porque te cansas", "Cero, porque es perpendicular al desplazamiento", "Depende de tu velocidad"], "correcta": 1, "porque": "Con θ = 90°, cos 90° = 0: la fuerza no transfiere energía en la dirección del movimiento." }
+    },
+    {
+      "parrafos": [4, 5, 6],
+      "titulo": "Potencia: qué tan rápido",
+      "idea": "La potencia es el trabajo dividido entre el tiempo, y se mide en watts.",
+      "visual": { "tipo": "ejemplo", "titulo": "Un motor realiza 600 J en 3 s", "lineas": ["P = W / t", "P = 600 J / 3 s", "1 W = 1 J/s;  1 hp ≈ 746 W"], "resultado": "P = 200 W" },
+      "comprueba": { "pregunta": "Un motor realiza 600 J en 6 s. ¿Cuál es su potencia?", "opciones": ["3,600 W", "200 W", "100 W"], "correcta": 2, "porque": "P = W / t = 600 J / 6 s = 100 W." }
+    },
+    {
+      "parrafos": [7],
+      "titulo": "Comparar máquinas por sus watts",
+      "idea": "A más potencia, el mismo trabajo se hace en menos tiempo; por eso los aparatos se etiquetan en watts.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Motor de 1000 W", "puntos": ["Mismo trabajo", "Tiempo t"] },
+        { "titulo": "Motor de 2000 W", "puntos": ["Mismo trabajo", "La mitad del tiempo"] }
+      ] },
+      "comprueba": { "pregunta": "Una licuadora de 1000 W tarda 2 minutos en una tarea. ¿Cuánto tardaría una de 2000 W haciendo el mismo trabajo?", "opciones": ["1 minuto", "4 minutos", "2 minutos"], "correcta": 0, "porque": "Con el doble de potencia, el mismo trabajo se hace en la mitad del tiempo." }
+    }
+  ]
+}

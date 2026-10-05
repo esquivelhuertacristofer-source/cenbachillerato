@@ -1,0 +1,58 @@
+{
+  "codigo": "PM-V-P03-A1",
+  "conceptos": [
+    { "termino": "Derivada", "idea": "La rapidez con que cambia una función en un instante exacto." },
+    { "termino": "Cociente diferencial", "idea": "[f(x+h) − f(x)]/h: la pendiente de una recta secante." },
+    { "termino": "Recta tangente", "idea": "La recta que toca la curva en un punto; su pendiente es f'(a)." },
+    { "termino": "Segunda derivada", "idea": "Derivar dos veces: de la posición pasas a la aceleración." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3],
+      "titulo": "El problema: velocidad en un instante",
+      "idea": "Con dos momentos solo obtienes velocidad promedio; para la velocidad exacta en un instante necesitas un límite con h → 0.",
+      "visual": { "tipo": "ejemplo", "titulo": "Proyectil con h(t) = −5t² + 30t", "lineas": ["h(2) = −5·4 + 60 = 40 m", "h(1) = −5 + 30 = 25 m", "[h(2) − h(1)] / (2 − 1) = 15 / 1"], "resultado": "Velocidad promedio entre t = 1 y t = 2: 15 m/s" },
+      "comprueba": { "pregunta": "Con h(t) = −5t² + 30t, ¿cuál es la velocidad promedio entre t = 0 y t = 1?", "opciones": ["15 m/s", "25 m/s", "30 m/s"], "correcta": 1, "porque": "h(1) = 25 y h(0) = 0, así que (25 − 0) / (1 − 0) = 25 m/s." }
+    },
+    {
+      "parrafos": [4, 5, 6, 7, 8],
+      "titulo": "De la secante a la tangente",
+      "idea": "La derivada es el límite del cociente diferencial: la pendiente de la tangente, que dice si la función crece o decrece.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Cociente diferencial", "expr": "[f(x + h) − f(x)] / h", "leyenda": "Pendiente de la recta secante" },
+        { "nombre": "Derivada", "expr": "f'(x) = lim(h→0) [f(x + h) − f(x)] / h", "leyenda": "Pendiente de la recta tangente" },
+        { "nombre": "Signo de f'(a)", "expr": "f'(a) > 0 crece · f'(a) < 0 decrece · f'(a) = 0 posible máximo, mínimo o inflexión" }
+      ] },
+      "comprueba": { "pregunta": "Si f'(4) = −3, ¿qué hace la función en x = 4?", "opciones": ["Decrece", "Crece", "Tiene un máximo seguro"], "correcta": 0, "porque": "Una pendiente de la tangente negativa significa que la función decrece en ese punto." }
+    },
+    {
+      "parrafos": [9, 10, 11],
+      "titulo": "Derivar x² desde la definición",
+      "idea": "Aplicando la definición paso a paso, la pendiente de la parábola y = x² en cualquier punto es 2x.",
+      "visual": { "tipo": "ejemplo", "titulo": "f(x) = x²", "lineas": ["f'(x) = lim(h→0) [(x + h)² − x²] / h", "= lim(h→0) [2xh + h²] / h", "= lim(h→0) [2x + h]", "En x = 1 la pendiente es 2; en x = 3 es 6"], "resultado": "f'(x) = 2x" },
+      "comprueba": { "pregunta": "¿Cuál es la pendiente de la tangente a y = x² en x = 5?", "opciones": ["25", "5", "10"], "correcta": 2, "porque": "La derivada de x² es 2x, así que en x = 5 la pendiente es 2 × 5 = 10." }
+    },
+    {
+      "parrafos": [12, 13, 14],
+      "titulo": "Notaciones y su sentido físico",
+      "idea": "La derivada se escribe f'(x), dy/dx o D[f]; derivar la posición da la velocidad y derivar otra vez, la aceleración.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Posición s(t)", "texto": "Dónde está el objeto en el tiempo t." },
+        { "titulo": "Velocidad v(t) = s'(t)", "texto": "Primera derivada de la posición." },
+        { "titulo": "Aceleración a(t) = s''(t)", "texto": "Segunda derivada de la posición." },
+        { "titulo": "F = ma", "texto": "Fuerza: masa por la segunda derivada de la posición." }
+      ] },
+      "comprueba": { "pregunta": "Si s(t) es la posición de un objeto, ¿qué representa s''(t)?", "opciones": ["La velocidad", "La aceleración", "La posición inicial"], "correcta": 1, "porque": "La primera derivada de la posición es la velocidad; la segunda derivada es la aceleración." }
+    },
+    {
+      "parrafos": [15, 16],
+      "titulo": "Derivable implica continua, no al revés",
+      "idea": "Toda función derivable es continua, pero una función puede ser continua y no derivable, como |x| en su pico.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Sí se cumple", "puntos": ["Derivable en a → continua en a"] },
+        { "titulo": "No se cumple", "puntos": ["Continua en a no garantiza derivable", "f(x) = |x| en x = 0: pico con dos tangentes distintas"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cómo es f(x) = |x| en x = 0?", "opciones": ["Derivable y continua", "Ni continua ni derivable", "Continua pero no derivable"], "correcta": 2, "porque": "La gráfica no se rompe en 0, pero forma un pico con tangentes distintas por la izquierda y la derecha." }
+    }
+  ]
+}

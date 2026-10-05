@@ -1,0 +1,31 @@
+{
+  "codigo": "PM-I-P06-A1",
+  "conceptos": [
+    { "termino": "Sistema Internacional (SI)", "idea": "El sistema de medición estándar en ciencia, adoptado en 1960." },
+    { "termino": "Unidad base", "idea": "Una de las siete del SI: metro, kilogramo, segundo, ampere, kelvin, mol, candela." },
+    { "termino": "Prefijo", "idea": "Indica una potencia de 10: kilo es ×1,000, mili es ÷1,000." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Unidades base y prefijos",
+      "idea": "El SI tiene siete unidades base, y los prefijos las multiplican o dividen por potencias de 10.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Unidades base", "puntos": ["Metro, kilogramo, segundo", "Ampere, kelvin", "Mol, candela"] },
+        { "titulo": "Prefijos que multiplican", "puntos": ["kilo ×1,000", "hecto ×100", "deca ×10"] },
+        { "titulo": "Prefijos que dividen", "puntos": ["deci ÷10", "centi ÷100", "mili ÷1,000"] }
+      ] },
+      "comprueba": { "pregunta": "¿Cuántos metros son 1 hectómetro?", "opciones": ["10", "1,000", "100"], "correcta": 2, "porque": "El prefijo hecto multiplica por 100." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Convertir sin equivocarse",
+      "idea": "Para convertir multiplicas o divides por la relación entre unidades; un error de unidades puede hacer fracasar una misión.",
+      "visual": { "tipo": "ejemplo", "titulo": "Dos conversiones", "lineas": [
+        "3.5 km a metros: 3.5 × 1,000 = 3,500 m",
+        "750 mL a litros: 750 ÷ 1,000 = 0.75 L"
+      ], "resultado": "De mayor a menor unidad multiplicas; de menor a mayor divides." },
+      "comprueba": { "pregunta": "¿Cuántos litros son 250 mililitros?", "opciones": ["0.25 L", "2.5 L", "250,000 L"], "correcta": 0, "porque": "Mili divide entre 1,000: 250 ÷ 1,000 = 0.25 litros." }
+    }
+  ]
+}

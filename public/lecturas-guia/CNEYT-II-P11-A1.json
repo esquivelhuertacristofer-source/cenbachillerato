@@ -1,0 +1,61 @@
+{
+  "codigo": "CNEYT-II-P11-A1",
+  "conceptos": [
+    { "termino": "Conducción", "idea": "El calor pasa átomo a átomo por contacto, sin que la materia se mueva." },
+    { "termino": "Convección", "idea": "El calor viaja con el fluido que se mueve: lo caliente sube, lo frío baja." },
+    { "termino": "Radiación", "idea": "El calor viaja como ondas electromagnéticas, incluso en el vacío." },
+    { "termino": "Calor específico", "idea": "Energía para subir 1 °C un kilogramo de sustancia." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0],
+      "titulo": "Calor no es lo mismo que temperatura",
+      "idea": "La temperatura mide la energía cinética promedio de las partículas; el calor es la energía que viaja entre cuerpos a distinta temperatura.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Temperatura", "puntos": ["Energía cinética promedio de las partículas", "Se mide en un cuerpo"] },
+        { "titulo": "Calor", "puntos": ["Energía que se transfiere", "Va de lo caliente a lo frío hasta el equilibrio térmico"] }
+      ] },
+      "comprueba": { "pregunta": "Dejas un vaso de agua fría junto a uno de agua caliente, en contacto. ¿Cuándo deja de fluir calor entre ellos?", "opciones": ["Cuando alcanzan la misma temperatura", "Nunca, fluye para siempre", "Cuando el frío se vuelve el más caliente"], "correcta": 0, "porque": "El calor fluye de lo caliente a lo frío hasta el equilibrio térmico, es decir, hasta que ambos tienen la misma temperatura." }
+    },
+    {
+      "parrafos": [1],
+      "titulo": "Conducción: el calor avanza átomo a átomo",
+      "idea": "En la conducción el calor pasa por contacto sin que la materia se desplace; los metales conducen muy bien y los aislantes muy mal.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Ley de Fourier", "expr": "Q/t = k·A·ΔT / L", "leyenda": "k conductividad · A área · ΔT diferencia de temperatura · L grosor" },
+        { "nombre": "Cobre", "expr": "k ≈ 401 W/m·K", "leyenda": "Muy buen conductor" },
+        { "nombre": "Madera", "expr": "k ≈ 0.15 W/m·K", "leyenda": "Aislante" }
+      ] },
+      "comprueba": { "pregunta": "Para el mango de un sartén, ¿qué material evita mejor quemarte la mano?", "opciones": ["Cobre", "Madera", "Hierro"], "correcta": 1, "porque": "La madera es aislante (k ≈ 0.15), mientras que los metales conducen muy bien el calor por sus electrones libres." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Convección: el fluido carga el calor",
+      "idea": "En líquidos y gases, lo caliente se dilata y sube y lo frío baja, formando corrientes que transportan el calor con la materia.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Se calienta abajo", "texto": "El fluido del fondo se dilata y pierde densidad." },
+        { "titulo": "Sube", "texto": "Lo menos denso asciende y lleva el calor consigo." },
+        { "titulo": "Se enfría arriba", "texto": "Se vuelve más denso." },
+        { "titulo": "Baja", "texto": "Desciende y el ciclo forma una corriente de convección." }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué el aire acondicionado se instala arriba de la pared?", "opciones": ["Porque el aire frío es denso y baja, repartiéndose por el cuarto", "Porque así conduce mejor por el muro", "Porque la radiación solo viaja hacia abajo"], "correcta": 0, "porque": "El aire frío es más denso y baja; al soltarlo arriba se forma una corriente de convección que enfría todo el cuarto." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Radiación: calor que cruza el vacío",
+      "idea": "La radiación viaja como ondas electromagnéticas sin necesitar materia, y la potencia emitida crece con la cuarta potencia de la temperatura absoluta.",
+      "visual": { "tipo": "ejemplo", "titulo": "Ley de Stefan-Boltzmann: ¿qué pasa si T se duplica?", "lineas": ["Q/t = ε·σ·A·T⁴,  σ = 5.67×10⁻⁸ W/m²·K⁴", "Si T pasa a 2T, la potencia se multiplica por 2⁴", "2⁴ = 2 × 2 × 2 × 2 = 16"], "resultado": "Irradia 16 veces más energía." },
+      "comprueba": { "pregunta": "¿Cómo nos llega el calor del Sol?", "opciones": ["Por conducción a través del espacio", "Por convección del aire espacial", "Por radiación, que no necesita medio material"], "correcta": 2, "porque": "Entre el Sol y la Tierra hay vacío; solo la radiación (ondas electromagnéticas) puede cruzarlo." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Propiedades térmicas y vida real",
+      "idea": "El agua tiene un calor específico altísimo y por eso modera el clima; en la vida real los tres mecanismos actúan a la vez.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Calor sensible", "expr": "Q = m·c·ΔT", "leyenda": "m masa · c calor específico · ΔT cambio de temperatura" },
+        { "nombre": "Agua", "expr": "c ≈ 4186 J/kg·K", "leyenda": "Mucho mayor que el de los metales" }
+      ] },
+      "comprueba": { "pregunta": "En una olla con agua sobre la estufa, ¿qué mecanismo hace circular el agua?", "opciones": ["Conducción", "Convección", "Radiación"], "correcta": 1, "porque": "El metal conduce el calor de la flama, pero el agua, que es un fluido, circula por convección." }
+    }
+  ]
+}

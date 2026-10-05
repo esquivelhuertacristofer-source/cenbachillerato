@@ -1,0 +1,52 @@
+{
+  "codigo": "IN-V-P01-A1",
+  "conceptos": [
+    { "termino": "Field of study", "idea": "Tu área de estudio o la carrera que te interesa." },
+    { "termino": "I'm interested in", "idea": "Frase para decir qué te interesa, seguida de la razón con because." },
+    { "termino": "Connectors", "idea": "First, Also, Moreover, Finally: ordenan tu descripción." },
+    { "termino": "Biotechnology", "idea": "Usar organismos vivos para crear medicinas, mejorar cultivos y limpiar agua." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2],
+      "titulo": "Describe tu campo de interés",
+      "idea": "En B1 aprendes a presentar tu área de estudio en inglés con frases base como I'm interested in... because.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Frases base", "puntos": ["I'm interested in [field] because...", "My field of study is [area].", "In this area, we [work on / study / develop / investigate]..."] }
+      ] },
+      "comprueba": { "pregunta": "Quieres decir por qué te interesa la medicina. ¿Qué frase está bien construida?", "opciones": ["Medicine is my interested.", "I'm interested in medicine because I want to help people.", "I interested medicine because help."], "correcta": 1, "porque": "Sigue la estructura base: I'm interested in [field] because..." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Vocabulario de campos y conectores",
+      "idea": "Nombra tu campo (technology, health, arts…) y ordena tu descripción con First, Also, Moreover y Finally.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Campos frecuentes", "puntos": ["technology", "health", "environment", "education", "arts, sports, business"] },
+        { "titulo": "Conectores", "puntos": ["First: para empezar", "Also: también", "Moreover / In addition: además", "Finally: para cerrar"] }
+      ] },
+      "comprueba": { "pregunta": "Vas a cerrar tu descripción con tu meta a futuro. ¿Qué conector usas?", "opciones": ["Finally", "First", "Also"], "correcta": 0, "porque": "Finally introduce el cierre, como en «Finally, I hope to specialize in biotechnology»." }
+    },
+    {
+      "parrafos": [5, 6, 7],
+      "titulo": "Ejemplo: Rodrigo y la biotecnología",
+      "idea": "Rodrigo, alumno de un bachillerato en Puebla, elige biotecnología porque puede resolver retos de salud y alimentación en México.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Qué se investiga en su campo", "puntos": ["Usar organismos vivos, como bacterias y plantas", "Desarrollar medicinas", "Mejorar cultivos", "Limpiar agua contaminada"] }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué le interesa a Rodrigo la biotecnología?", "opciones": ["Porque su escuela solo ofrece esa materia", "Porque quiere ser atleta profesional", "Porque puede resolver retos de salud y alimentación en México"], "correcta": 2, "porque": "Él lo dice: «I believe it can solve some of Mexico's most important health and food challenges»." }
+    },
+    {
+      "parrafos": [8, 9, 10],
+      "titulo": "El plan de Rodrigo, paso a paso",
+      "idea": "Rodrigo ordena su plan con conectores y suma mejorar su inglés, porque la mayoría de los artículos científicos están en inglés.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "First", "texto": "Terminar el bachillerato con buenas calificaciones en biología y química." },
+        { "titulo": "In addition", "texto": "Participar en una feria de ciencias con un proyecto de filtración natural de agua." },
+        { "titulo": "Moreover", "texto": "Ver videos de científicos mexicanos para entender la investigación actual." },
+        { "titulo": "Finally", "texto": "Estudiar ingeniería bioquímica en la Universidad Autónoma Metropolitana." },
+        { "titulo": "Y además", "texto": "Mejorar su inglés, porque casi toda la ciencia se publica en ese idioma." }
+      ] },
+      "comprueba": { "pregunta": "¿Por qué Rodrigo incluye el inglés en su plan?", "opciones": ["Porque la mayoría de los artículos científicos se publican en inglés", "Porque la UAM solo enseña en inglés", "Porque quiere ser maestro de inglés"], "correcta": 0, "porque": "Él explica que «most scientific articles are published in English», así que mejorar su inglés es parte del plan." }
+    }
+  ]
+}

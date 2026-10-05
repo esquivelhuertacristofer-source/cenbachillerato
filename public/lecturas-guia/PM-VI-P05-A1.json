@@ -1,0 +1,55 @@
+{
+  "codigo": "PM-VI-P05-A1",
+  "conceptos": [
+    { "termino": "Experimento aleatorio", "idea": "Un proceso cuyo resultado no puedes predecir con certeza." },
+    { "termino": "Espacio muestral Ω", "idea": "El conjunto de todos los resultados posibles." },
+    { "termino": "Evento", "idea": "Un subconjunto del espacio muestral, como sacar par en un dado." },
+    { "termino": "Complemento", "idea": "Todo lo que no es A: P(A') = 1 − P(A)." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Azar, espacio muestral y eventos",
+      "idea": "La probabilidad asigna un número entre 0 y 1 a un evento, que es una parte de todos los resultados posibles.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Experimento aleatorio", "texto": "Lanzar un dado de seis caras." },
+        { "titulo": "Espacio muestral", "texto": "Ω = {1, 2, 3, 4, 5, 6}" },
+        { "titulo": "Evento", "texto": "Sacar un número par = {2, 4, 6}" }
+      ] },
+      "comprueba": { "pregunta": "Al lanzar un dado, ¿qué subconjunto es el evento «sacar un número mayor que 4»?", "opciones": ["{5, 6}", "{4, 5, 6}", "{1, 2, 3, 4}"], "correcta": 0, "porque": "Del espacio muestral {1, 2, 3, 4, 5, 6}, solo 5 y 6 son mayores que 4. El 4 no es mayor que 4." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Tres formas de medir probabilidad",
+      "idea": "La clásica cuenta casos igualmente posibles, la frecuentista repite el experimento muchas veces y la subjetiva expresa un grado de creencia.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Clásica (Laplace)", "puntos": ["Casos favorables ÷ casos posibles", "Exige equiprobabilidad", "Dados, monedas, cartas, urnas"] },
+        { "titulo": "Frecuentista", "puntos": ["Veces que ocurrió A ÷ repeticiones", "Ley de los grandes números"] },
+        { "titulo": "Subjetiva", "puntos": ["Grado de creencia personal", "Medicina, seguros, empresas"] }
+      ] },
+      "comprueba": { "pregunta": "Lanzas una tachuela muchísimas veces y estimas la probabilidad de que caiga con la punta hacia arriba. ¿Qué enfoque usas?", "opciones": ["Clásico", "Subjetivo", "Frecuentista"], "correcta": 2, "porque": "Calculas la frecuencia relativa en muchas repeticiones; además, sus dos posiciones no son igualmente posibles, así que la fórmula clásica no aplica." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "Las reglas de Kolmogorov",
+      "idea": "Tres axiomas de 1933 sostienen toda la probabilidad; de ellos sale, por ejemplo, que P(A') = 1 − P(A).",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Axioma 1", "expr": "P(A) ≥ 0" },
+        { "nombre": "Axioma 2", "expr": "P(Ω) = 1" },
+        { "nombre": "Axioma 3", "expr": "Si A ∩ B = ∅: P(A ∪ B) = P(A) + P(B)", "leyenda": "Eventos mutuamente excluyentes" },
+        { "nombre": "Complemento", "expr": "P(A') = 1 − P(A)", "leyenda": "Lluvia 0.30 → no lluvia 0.70" }
+      ] },
+      "comprueba": { "pregunta": "Si la probabilidad de aprobar un examen es 0.85, ¿cuál es la probabilidad de no aprobarlo?", "opciones": ["0.15", "0.85", "0.015"], "correcta": 0, "porque": "Es el complemento: P(A') = 1 − P(A) = 1 − 0.85 = 0.15." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Probabilidad en la vida diaria",
+      "idea": "El pronóstico del tiempo y los seguros usan datos frecuentistas; el diagnóstico del médico usa probabilidad subjetiva.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Frecuentista", "puntos": ["Meteorólogo: lluvia del 70%", "Aseguradora: tablas de mortalidad"] },
+        { "titulo": "Subjetiva", "puntos": ["Médico: por tus síntomas, es probable que sea dengue"] }
+      ] },
+      "comprueba": { "pregunta": "Un entrenador dice que, por su experiencia, su equipo probablemente ganará. ¿Qué probabilidad usa?", "opciones": ["Clásica", "Subjetiva", "Frecuentista"], "correcta": 1, "porque": "Es un grado de creencia basado en su experiencia, como el médico que sospecha dengue: probabilidad subjetiva." }
+    }
+  ]
+}

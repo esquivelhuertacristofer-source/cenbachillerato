@@ -1,0 +1,57 @@
+{
+  "codigo": "IN-V-P05-A1",
+  "conceptos": [
+    { "termino": "Skimming", "idea": "Lectura rápida para captar el tema principal y la estructura." },
+    { "termino": "Scanning", "idea": "Búsqueda rápida de un dato concreto: una fecha, un nombre o una cifra." },
+    { "termino": "Close reading", "idea": "Lectura detallada y atenta para entender argumentos y matices." },
+    { "termino": "Fact vs. opinion", "idea": "Un hecho se verifica con datos; una opinión depende de quien la dice." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3, 4],
+      "titulo": "Skimming: la idea general",
+      "idea": "Leer en B1 es usar estrategias; con skimming captas de qué trata un texto sin leer cada palabra.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Título y subtítulos", "texto": "Lee el título y los headings." },
+        { "titulo": "Primer y último párrafo", "texto": "Léelos completos." },
+        { "titulo": "Topic sentences", "texto": "Lee la primera oración de cada párrafo intermedio." },
+        { "titulo": "Lo visual", "texto": "Mira imágenes, gráficos y palabras en negrita o cursiva." }
+      ] },
+      "comprueba": { "pregunta": "Tienes un minuto para decidir si un artículo sirve para tu proyecto. ¿Qué estrategia usas?", "opciones": ["Scanning", "Lectura detallada", "Skimming"], "correcta": 2, "porque": "Skimming sirve para identificar rápido el tema y decidir si un texto es relevante antes de leerlo a fondo." }
+    },
+    {
+      "parrafos": [5, 6, 7, 8],
+      "titulo": "Scanning: buscar un dato",
+      "idea": "Scanning es mover la vista rápido para encontrar un dato concreto, y parar en cuanto lo hallas.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Cuándo usarlo", "puntos": ["La fecha de un evento histórico", "El nombre de una organización o persona", "Estadísticas o porcentajes", "Preguntas de opción múltiple sobre un texto largo"] },
+        { "titulo": "Trucos", "puntos": ["Saber qué buscas ANTES de empezar", "Mover los ojos en zigzag o en «S»", "Parar cuando lo encuentres"] }
+      ] },
+      "comprueba": { "pregunta": "Necesitas el año en que se fundó una ciudad, dentro de un artículo largo. ¿Qué haces?", "opciones": ["Leer cada palabra desde el inicio", "Hacer scanning buscando un año", "Leer solo el título"], "correcta": 1, "porque": "Buscas un dato específico, una fecha: mueves la vista rápido hasta encontrarlo y ahí paras." }
+    },
+    {
+      "parrafos": [9, 10, 11, 12],
+      "titulo": "Lectura detallada: hechos y opiniones",
+      "idea": "La lectura detallada analiza argumentos: distingue hechos verificables de opiniones y usa verbos académicos como analyze o evaluate.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Hecho (fact)", "puntos": ["Se puede verificar con datos", "Mexico has over 130 million inhabitants.", "Señales: show, prove, demonstrate"] },
+        { "titulo": "Opinión (opinion)", "puntos": ["Refleja el punto de vista de alguien", "Mexico City is the best place to study in Latin America.", "Señales: believe, think, argue, suggest"] },
+        { "titulo": "Vocabulario Tier 2", "puntos": ["analyze, identify", "compare, evaluate", "summarize"] }
+      ] },
+      "comprueba": { "pregunta": "«This is the most beautiful beach in the world.» ¿Hecho u opinión?", "opciones": ["Opinión: varía según la persona", "Hecho: se puede verificar", "Hecho: lo dice un texto"], "correcta": 0, "porque": "Que algo sea «el más bonito» no se comprueba con datos: es un punto de vista." }
+    },
+    {
+      "parrafos": [13, 14, 15, 16, 17],
+      "titulo": "Práctica: la biodiversidad de México",
+      "idea": "El texto mezcla cifras verificables y opiniones de científicos: ideal para practicar las tres estrategias.",
+      "visual": { "tipo": "datos", "items": [
+        { "valor": "17", "etiqueta": "países megadiversos, entre ellos México" },
+        { "valor": "≈70%", "etiqueta": "de las especies de plantas y animales viven en esos 17 países", "barra": 70 },
+        { "valor": "≈35%", "etiqueta": "de su cobertura forestal original ha perdido México (CONABIO)", "barra": 35 },
+        { "valor": "180+", "etiqueta": "áreas naturales protegidas" },
+        { "valor": "≈12%", "etiqueta": "del territorio nacional es área protegida terrestre", "barra": 12 }
+      ] },
+      "comprueba": { "pregunta": "«Scientists argue that this biodiversity is under serious threat.» ¿Qué palabra señala que es una opinión?", "opciones": ["threat", "argue", "biodiversity"], "correcta": 1, "porque": "Argue está en la lista de palabras que señalan opinión, junto con believe, think y suggest." }
+    }
+  ]
+}

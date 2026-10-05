@@ -1,0 +1,30 @@
+{
+  "codigo": "CNEYT-I-P02-A1",
+  "conceptos": [
+    { "termino": "Materia", "idea": "Todo lo que tiene masa y ocupa un espacio." },
+    { "termino": "Propiedad física", "idea": "Se mide u observa sin cambiar la composición química." },
+    { "termino": "Propiedad química", "idea": "Cómo reacciona o se transforma una sustancia en otra." },
+    { "termino": "Densidad", "idea": "Masa por unidad de volumen; ayuda a identificar sustancias como el oro." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Materia y propiedades físicas",
+      "idea": "Todo lo que tiene masa y ocupa espacio es materia, y sus propiedades físicas se miden sin cambiarla.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Propiedades físicas", "puntos": ["Masa, volumen, densidad", "Color, punto de fusión y de ebullición", "Conductividad eléctrica y térmica", "Dureza y maleabilidad"] }
+      ] },
+      "comprueba": { "pregunta": "Mides cuánto pesa un trozo de metal y su volumen. ¿Qué tipo de propiedades estás obteniendo?", "opciones": ["Químicas", "Físicas", "Ninguna, porque no reaccionó"], "correcta": 1, "porque": "Masa y volumen se miden sin cambiar la composición química: son propiedades físicas." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "Propiedades químicas: cuando hay cambio",
+      "idea": "Las propiedades químicas solo se observan cuando la sustancia reacciona y se transforma en otra.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Físicas", "puntos": ["No cambia la composición", "Ej.: color, densidad, dureza"] },
+        { "titulo": "Químicas", "puntos": ["Solo con un cambio químico", "Ej.: inflamabilidad, oxidación, acidez, reactividad"] }
+      ] },
+      "comprueba": { "pregunta": "Un clavo de hierro se cubre de óxido. ¿Qué propiedad muestra?", "opciones": ["Química: oxidación", "Física: color", "Física: dureza"], "correcta": 0, "porque": "La oxidación es una reacción con el oxígeno que forma una sustancia nueva: es una propiedad química." }
+    }
+  ]
+}

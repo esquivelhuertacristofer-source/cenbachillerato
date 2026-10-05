@@ -1,0 +1,44 @@
+{
+  "codigo": "CNEYT-IV-P08-A1",
+  "conceptos": [
+    { "termino": "Evidencia de reacción", "idea": "Una señal visible, como burbujas de gas, de que ocurrió una reacción." },
+    { "termino": "Antocianinas", "idea": "Pigmentos de la col morada que cambian de color con el pH." },
+    { "termino": "Control de variables", "idea": "Cambiar solo una cosa a la vez para saber qué causa el resultado." },
+    { "termino": "Método científico", "idea": "Pregunta, diseño, observación, análisis y conclusiones." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Bicarbonato y vinagre: burbujas químicas",
+      "idea": "La cocina es un laboratorio: el bicarbonato y el vinagre reaccionan y liberan CO₂, el mismo gas que esponja el pan.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Bicarbonato + vinagre", "expr": "CH₃COOH + NaHCO₃ → CH₃COONa + H₂O + CO₂", "leyenda": "Las burbujas de CO₂ son la evidencia visible de la reacción" }
+      ] },
+      "comprueba": { "pregunta": "Mezclas bicarbonato y vinagre y salen burbujas. ¿Qué gas se forma?", "opciones": ["Oxígeno (O₂)", "Hidrógeno (H₂)", "Dióxido de carbono (CO₂)"], "correcta": 2, "porque": "La ecuación muestra CO₂ entre los productos; ese gas forma las burbujas y también esponja el pan." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Una escala de pH casera",
+      "idea": "El extracto de col morada cambia de color según el pH y permite ordenar líquidos del hogar en una escala.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Ácido", "puntos": ["Rojo o rosa"] },
+        { "titulo": "Neutro", "puntos": ["Morado"] },
+        { "titulo": "Básico", "puntos": ["Verde o amarillo"] }
+      ] },
+      "comprueba": { "pregunta": "Agregas extracto de col morada a jugo de limón. ¿De qué color esperas que se ponga?", "opciones": ["Rojo o rosa", "Morado", "Verde"], "correcta": 0, "porque": "El limón es ácido, y en ambiente ácido las antocianinas viran hacia el rojo o rosa." }
+    },
+    {
+      "parrafos": [3, 4],
+      "titulo": "Ciencia con pocos recursos",
+      "idea": "La química experimental requiere curiosidad, método y observación; los pasos son los mismos en casa que en un gran laboratorio.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Pregunta o hipótesis", "texto": "Formula qué quieres averiguar." },
+        { "titulo": "Diseño", "texto": "Planea el experimento controlando variables." },
+        { "titulo": "Observación", "texto": "Registra lo que pasa de forma sistemática." },
+        { "titulo": "Análisis", "texto": "Interpreta los resultados." },
+        { "titulo": "Conclusiones", "texto": "Comunica lo que encontraste." }
+      ] },
+      "comprueba": { "pregunta": "Quieres saber si la cantidad de vinagre cambia las burbujas. ¿Qué haces al diseñar el experimento?", "opciones": ["Cambias vinagre y bicarbonato a la vez", "Cambias solo el vinagre y dejas igual lo demás", "No mides nada, solo observas"], "correcta": 1, "porque": "Diseñar controlando variables significa cambiar solo una cosa para saber qué causa el resultado." }
+    }
+  ]
+}

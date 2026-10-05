@@ -1,0 +1,51 @@
+{
+  "codigo": "PM-V-P08-A1",
+  "conceptos": [
+    { "termino": "Diferencial dy", "idea": "El cambio aproximado de y: la derivada por el cambio en x." },
+    { "termino": "Δy", "idea": "El cambio real de y al moverte sobre la curva." },
+    { "termino": "Linealización", "idea": "Usar la recta tangente en un punto para aproximar la función cerca de él." },
+    { "termino": "Propagación de incertidumbre", "idea": "Estimar cuánto error pasa de una medición a un resultado calculado." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1, 2, 3, 4],
+      "titulo": "El diferencial dy",
+      "idea": "El diferencial dy = f'(x)·dx aproxima linealmente el cambio real de una función cuando x cambia en dx.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Diferencial", "expr": "dy = f'(x) · dx", "leyenda": "dx es un cambio arbitrario en x" },
+        { "nombre": "Cambio real", "expr": "Δy = f(x + Δx) − f(x)", "leyenda": "dy es su aproximación lineal" }
+      ] },
+      "comprueba": { "pregunta": "Si f(x) = x², x = 3 y dx = 0.1, ¿cuánto vale dy?", "opciones": ["0.6", "0.61", "6"], "correcta": 0, "porque": "f'(x) = 2x, así que dy = 2(3)(0.1) = 0.6. El 0.61 sería el cambio real Δy, no el diferencial." }
+    },
+    {
+      "parrafos": [5, 6, 7],
+      "titulo": "Por la curva o por la tangente",
+      "idea": "Δy se mide subiendo por la curva y dy subiendo por la tangente; se parecen mucho solo cuando Δx es pequeño.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Δy: cambio real", "puntos": ["Se avanza por la curva", "Llega a (x + Δx, f(x + Δx))"] },
+        { "titulo": "dy: cambio aproximado", "puntos": ["Se avanza por la recta tangente en P", "Llega a (x + Δx, y + dy)", "Δx pequeño: dy ≈ Δy"] }
+      ] },
+      "comprueba": { "pregunta": "¿En cuál caso dy es una mejor aproximación de Δy?", "opciones": ["Cuando Δx es muy grande", "Cuando la función no tiene derivada", "Cuando Δx es pequeño"], "correcta": 2, "porque": "Para Δx pequeño la tangente casi no se separa de la curva; con Δx grande la aproximación empeora." }
+    },
+    {
+      "parrafos": [8, 9, 10, 11, 12, 13, 14],
+      "titulo": "Linealizar: estimar √4.02 sin calculadora",
+      "idea": "La recta tangente L(x) = f(a) + f'(a)(x − a) aproxima la función cerca de un punto cuyo valor conoces exacto.",
+      "visual": { "tipo": "ejemplo", "titulo": "Estimar √4.02 con a = 4", "lineas": ["L(x) = f(a) + f'(a)(x − a)", "f(4) = 2;  f'(x) = 1/(2√x), así que f'(4) = 1/4", "L(4.02) = 2 + (1/4)(0.02) = 2 + 0.005"], "resultado": "√4.02 ≈ 2.005 (el valor real es ≈ 2.00499...)" },
+      "comprueba": { "pregunta": "Con la misma idea y a = 9, ¿cuánto estimas para √9.06?", "opciones": ["3.06", "3.01", "3.006"], "correcta": 1, "porque": "f(9) = 3 y f'(9) = 1/(2·3) = 1/6, así que L(9.06) = 3 + (1/6)(0.06) = 3 + 0.01 = 3.01." }
+    },
+    {
+      "parrafos": [15, 16, 17, 18, 19],
+      "titulo": "Cuánto error pasa al resultado",
+      "idea": "El diferencial estima cómo un pequeño error al medir se agranda en lo que calculas, y así se fijan tolerancias en manufactura.",
+      "visual": { "tipo": "ejemplo", "titulo": "Volumen de un cubo con L = 10 cm y ΔL = 0.1 cm", "lineas": ["V = L³  →  dV = 3L² dL", "dV = 3(100)(0.1)"], "resultado": "Error en el volumen ≈ ±30 cm³" },
+      "comprueba": { "pregunta": "Si el lado del mismo cubo de 10 cm se mide con un error de ±0.2 cm, ¿cuál es el error aproximado del volumen?", "opciones": ["±60 cm³", "±30 cm³", "±0.6 cm³"], "correcta": 0, "porque": "dV = 3L² dL = 3(100)(0.2) = 60 cm³: al duplicar el error del lado, se duplica el del volumen." }
+    },
+    {
+      "parrafos": [20],
+      "titulo": "Puente hacia la integral",
+      "idea": "La integral ∫f(x)dx puede verse como la suma de infinitos diferenciales f(x)dx, franjas delgadísimas de área bajo la curva.",
+      "comprueba": { "pregunta": "En la integral ∫f(x)dx, ¿qué representa cada f(x)dx?", "opciones": ["La pendiente de la tangente", "El área de una franja muy delgada bajo la curva", "El error de una medición"], "correcta": 1, "porque": "Cada diferencial f(x)dx es el área de una franja infinitesimalmente delgada; la integral los suma todos." }
+    }
+  ]
+}
