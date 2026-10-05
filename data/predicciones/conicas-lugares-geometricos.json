@@ -1,0 +1,12 @@
+{
+  "escena": "Un plano con una circunferencia de radio 4 y un punto de prueba Q que se mueve con deslizadores; una barra compara su distancia al centro con el radio.",
+  "pregunta": "Si Q queda a una distancia del centro igual al radio, ¿dónde está?",
+  "opciones": [
+    { "id": "a", "texto": "Dentro de la circunferencia", "icono": "fa-circle-dot" },
+    { "id": "b", "texto": "Fuera de la circunferencia", "icono": "fa-arrow-up-right-from-square" },
+    { "id": "c", "texto": "Justo sobre la curva", "icono": "fa-bullseye" }
+  ],
+  "correcta": "c",
+  "porque": "La circunferencia es el conjunto de puntos que están a una misma distancia, el radio, del centro. Si la distancia de Q es menor queda dentro; si es mayor, fuera.",
+  "comoComprobarlo": "Mueve los deslizadores de Q hasta que las dos barras de distancia midan lo mismo y mira dónde cae el punto."
+}

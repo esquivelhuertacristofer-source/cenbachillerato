@@ -1,0 +1,12 @@
+{
+  "escena": "Átomos de hidrógeno y oxígeno unidos por barras; un avance los lleva de reactivos a productos.",
+  "pregunta": "Al llevar el avance a la mitad, ¿qué pasa con átomos y enlaces?",
+  "opciones": [
+    { "id": "a", "texto": "Desaparecen átomos y surgen otros nuevos", "icono": "fa-wand-magic-sparkles" },
+    { "id": "b", "texto": "Enlaces viejos se rompen; mismos átomos", "icono": "fa-link-slash" },
+    { "id": "c", "texto": "Los enlaces no cambian, solo se acercan", "icono": "fa-arrows-left-right-to-line" }
+  ],
+  "correcta": "b",
+  "porque": "En una reacción los átomos solo se reorganizan: ninguno se crea ni se destruye (Lavoisier). Los enlaces de los reactivos se rompen y se forman los de los productos, por eso el conteo de átomos no cambia.",
+  "comoComprobarlo": "Arrastra el avance poco a poco y observa las dos barras de enlaces, además del conteo de átomos en el panel."
+}

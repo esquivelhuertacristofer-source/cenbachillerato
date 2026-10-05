@@ -1,0 +1,11 @@
+{
+  "slug": "taller-parrafos",
+  "items": [
+    { "clave": "tema-agua", "formato": "16:9", "estilo": "ilustracion", "escena": "Un grifo del que cae una gota de agua sobre un lavabo de cerámica blanca, con luz suave de mañana y una ventana al fondo" },
+    { "clave": "tema-lectura", "formato": "16:9", "estilo": "ilustracion", "escena": "Un libro abierto sobre un escritorio de madera junto a una taza y una lámpara encendida, luz cálida de tarde" },
+    { "clave": "lector-perdido", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una estudiante de bachillerato con una hoja en la mano, ceja levantada y mirada desorientada, signos de interrogación de humo sobre su cabeza, fondo liso" },
+    { "clave": "lector-confuso", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una estudiante de bachillerato leyendo una hoja con el ceño fruncido y la cabeza ladeada, fondo liso" },
+    { "clave": "lector-sigue", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una estudiante de bachillerato leyendo una hoja con expresión atenta y una leve sonrisa, fondo liso" },
+    { "clave": "lector-entiende", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una estudiante de bachillerato sonriendo con satisfacción al terminar de leer una hoja, pulgar arriba, fondo liso" }
+  ]
+}

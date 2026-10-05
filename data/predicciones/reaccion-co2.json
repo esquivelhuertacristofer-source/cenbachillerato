@@ -1,0 +1,12 @@
+{
+  "escena": "Un frasco con 50 mL de vinagre y un globo en la boca que se infla con el CO₂ producido; un deslizador controla los gramos de bicarbonato.",
+  "pregunta": "Ya con el bicarbonato justo, ¿qué pasa si le echas el doble?",
+  "opciones": [
+    { "id": "a", "texto": "El globo crece al doble", "icono": "fa-arrow-up-right-dots" },
+    { "id": "b", "texto": "Igual: se acabó el vinagre", "icono": "fa-equals" },
+    { "id": "c", "texto": "Se desinfla un poco", "icono": "fa-arrow-down" }
+  ],
+  "correcta": "b",
+  "porque": "El vinagre es el reactivo limitante: cuando se consume todo el ácido, la reacción para. El bicarbonato extra queda sin reaccionar, así que no se produce más CO₂.",
+  "comoComprobarlo": "Sube el deslizador de bicarbonato pasando el «punto exacto», pulsa ¡Reaccionar! y compara el tamaño del globo con el de antes."
+}

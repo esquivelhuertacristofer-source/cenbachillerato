@@ -1,0 +1,12 @@
+{
+  "escena": "Un cono doble y un plano de corte que se inclina; la curva del corte se dibuja sobre el plano.",
+  "pregunta": "Si el plano queda paralelo al borde del cono, ¿qué curva sale?",
+  "opciones": [
+    { "id": "a", "texto": "Una elipse cerrada, más grande", "icono": "fa-egg" },
+    { "id": "b", "texto": "Una parábola, que ya no se cierra", "icono": "fa-bowl-food" },
+    { "id": "c", "texto": "Una hipérbola de dos ramas", "icono": "fa-bezier-curve" }
+  ],
+  "correcta": "b",
+  "porque": "Con el plano paralelo a la generatriz, la curva deja de cerrarse pero no alcanza a cortar la otra napa. Menos inclinado da elipse; más inclinado corta ambas napas y da hipérbola.",
+  "comoComprobarlo": "Mueve el ángulo del plano hasta que quede paralelo a la línea dorada del cono y mira cómo cambia el medidor de colores."
+}

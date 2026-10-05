@@ -1,0 +1,11 @@
+{
+  "slug": "presentaciones-ingles",
+  "items": [
+    { "clave": "escena-aula", "formato": "16:9", "estilo": "ilustracion", "escena": "Salón luminoso de un club de idiomas con sillas en semicírculo, un pizarrón verde vacío y ventanales con luz de mañana" },
+    { "clave": "escena-patio", "formato": "16:9", "estilo": "ilustracion", "escena": "Patio de una escuela preparatoria con árboles, bancas de concreto y jóvenes al fondo, luz de media mañana" },
+    { "clave": "escena-salida", "formato": "16:9", "estilo": "ilustracion", "escena": "Pasillo escolar con casilleros de colores y puertas de salones abiertas, luz cálida de mediodía" },
+    { "clave": "torres", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una maestra de unos 40 años, cabello recogido, saco azul y sonrisa amable, fondo liso" },
+    { "clave": "valeria", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una chica de 16 años de cabello oscuro largo, sudadera naranja y mochila al hombro, fondo liso" },
+    { "clave": "diego", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de un chico de 16 años de cabello corto y chamarra verde, expresión amistosa, fondo liso" }
+  ]
+}

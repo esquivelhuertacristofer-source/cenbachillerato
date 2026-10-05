@@ -1,27 +1,28 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — English Lab: Greetings & introductions.
  * Práctica experimental para IN-I-P01-A2 (Inglés I · presentaciones).
  *
- * Interactividad máxima: el alumno EXPERIMENTA con la lengua. Tres modos:
- *  1. «Build the sentence»: arrastra las palabras hasta ordenar cada oración
- *     (My name is Valeria / I am from Guadalajara / This is my friend Diego /
- *     Nice to meet you). Solo avanza con la palabra correcta a continuación.
- *  2. «The verb to be»: arrastra cada sujeto (I, You, He, She, It, We, They) a
- *     su forma del verbo to be (am / is / are).
- *  3. «Greeting, introduction or farewell?»: arrastra cada frase a su función.
- *  + Cuestionario de comprensión.
+ * «Club day» es el simulador: una situación social ramificada. Ana (el alumno)
+ * llega al club de inglés y elige qué decir para saludar, presentarse, presentar a
+ * un amigo y despedirse. Cada frase cambia la reacción ilustrada de los
+ * personajes (contenta, normal, confundida), la línea del siguiente personaje y el
+ * medidor de amistad. Personajes ficticios; el puntaje es una simulación.
+ * Modos extra de repaso:
+ *  · «Build the sentence»: ordena las palabras de cada oración.
+ *  · «The verb to be»: sujeto → am / is / are.
+ *  · «Greeting or farewell?»: frase → saludo / presentación / despedida.
+ *  · «Complete the text» (huecos de la progresión).
+ *  + Reto «Check your English» (pestaña «Reto»); la teoría vive en «Teoría».
  *
- * DOM puro (sin three.js): no infla el bundle del Worker y funciona con ratón,
- * teclado y pantalla táctil (clic-para-seleccionar y clic-para-colocar).
- *
- * Contenido VERBATIM de las actividades A1/A2/A4/A6 de IN-I·P01.
+ * DOM puro (sin three.js). Contenido VERBATIM de las actividades A1/A2/A4/A6 de IN-I·P01.
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { PRESENTACIONES_INGLES_HUECOS } from "./presentaciones-ingles-huecos";
@@ -39,14 +40,28 @@ import {
   type ToBe,
   type Funcion,
 } from "./ingles-presentaciones-data";
+import {
+  NODOS,
+  PERSONAJES,
+  ANIMO_INFO,
+  ESCENAS,
+  PUNTOS_MAX,
+  animosDe,
+  finalDe,
+  type Animo,
+  type NodoSim,
+  type PersonajeId,
+} from "./presentaciones-ingles-sim";
 
 const NO = "#FF5E5E";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-ingles-presentaciones-reto";
+const RUTA_FOTOS = "/media/labs-sim/presentaciones-ingles";
 
-type Modo = "construir" | "tobe" | "funciones" | "texto";
+type Modo = "club" | "construir" | "tobe" | "funciones" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "club", label: "Club day", icono: "fa-people-group" },
   { id: "construir", label: "Build the sentence", icono: "fa-quote-right" },
   { id: "tobe", label: "The verb to be", icono: "fa-equals" },
   { id: "funciones", label: "Greeting or farewell?", icono: "fa-comments" },
@@ -57,12 +72,11 @@ const porTexto = (a: { texto: string }, b: { texto: string }) => a.texto.localeC
 
 export function LabPresentacionesIngles({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("construir");
+  const [modo, setModo] = useState<Modo>("club");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -95,6 +109,54 @@ export function LabPresentacionesIngles({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+  const sfxBlip = () => sonido && audioRef.current?.blip();
+
+  // ── simulador: Club day ───────────────────────────────────────────────
+  const [nodoIdx, setNodoIdx] = useState(0);
+  const [resp, setResp] = useState<Record<string, string>>({});
+  const [reaccion, setReaccion] = useState(false);
+  const [simFin, setSimFin] = useState(false);
+  const [simBest, setSimBest] = useState(0);
+  const enFinal = nodoIdx >= NODOS.length;
+  const nodo: NodoSim = NODOS[Math.min(nodoIdx, NODOS.length - 1)]!;
+  const ptsPorNodo: Record<string, number> = {};
+  for (const n of NODOS) {
+    const op = n.opciones.find((o) => o.id === resp[n.id]);
+    if (op) ptsPorNodo[n.id] = op.puntos;
+  }
+  const totalPts = Object.values(ptsPorNodo).reduce((a, b) => a + b, 0);
+  const simDone = simBest >= 11;
+
+  const elegirOpcion = (opId: string) => {
+    if (reaccion || enFinal) return;
+    const op = nodo.opciones.find((o) => o.id === opId);
+    if (!op) return;
+    setResp((r) => ({ ...r, [nodo.id]: opId }));
+    setReaccion(true);
+    if (op.puntos === 2) sfxPlace();
+    else if (op.puntos === 0) sfxNo();
+    else sfxBlip();
+  };
+  const siguienteNodo = () => {
+    if (!reaccion) return;
+    setReaccion(false);
+    if (nodoIdx + 1 >= NODOS.length) {
+      setNodoIdx(NODOS.length);
+      setSimFin(true);
+      if (totalPts > simBest) setSimBest(totalPts);
+      if (totalPts >= 11) {
+        sfxOk();
+        persistMejor(armarDone, tobeDone, funcionesDone, true);
+      }
+    } else {
+      setNodoIdx((i) => i + 1);
+    }
+  };
+  const resetClub = () => {
+    setNodoIdx(0);
+    setResp({});
+    setReaccion(false);
+  };
 
   // ── modo Construir (ordenar palabras) ─────────────────────────────────
   const [oraIdx, setOraIdx] = useState(0);
@@ -122,7 +184,7 @@ export function LabPresentacionesIngles({ color }: PracticaLabProps) {
         const nuevasArmadas = new Set(armadas).add(oracion.id);
         setArmadas(nuevasArmadas);
         sfxOk();
-        persistMejor(nuevasArmadas.size >= ORACIONES.length, tobeDone, funcionesDone);
+        persistMejor(nuevasArmadas.size >= ORACIONES.length, tobeDone, funcionesDone, simDone);
       }
     } else {
       setShakeWord(true);
@@ -150,7 +212,7 @@ export function LabPresentacionesIngles({ color }: PracticaLabProps) {
       sfxPlace();
       if (Object.keys(ubicSuj).length + 1 >= SUJETOS.length) {
         sfxOk();
-        persistMejor(armarDone, true, funcionesDone);
+        persistMejor(armarDone, true, funcionesDone, simDone);
       }
     } else {
       setShakeBe(forma);
@@ -178,7 +240,7 @@ export function LabPresentacionesIngles({ color }: PracticaLabProps) {
       sfxPlace();
       if (Object.keys(ubicFra).length + 1 >= FRASES.length) {
         sfxOk();
-        persistMejor(armarDone, tobeDone, true);
+        persistMejor(armarDone, tobeDone, true, simDone);
       }
     } else {
       setShakeFun(fun);
@@ -197,20 +259,22 @@ export function LabPresentacionesIngles({ color }: PracticaLabProps) {
   const armarDone = armadas.size >= ORACIONES.length;
   const tobeDone = Object.keys(ubicSuj).length >= SUJETOS.length;
   const funcionesDone = Object.keys(ubicFra).length >= FRASES.length;
-  const modosHechos = (armarDone ? 1 : 0) + (tobeDone ? 1 : 0) + (funcionesDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
-  const estrellas = partida.estrellasCon(modosHechos, 4);
+  const modosHechos = (simDone ? 1 : 0) + (armarDone ? 1 : 0) + (tobeDone ? 1 : 0) + (funcionesDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 5);
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
 
   // Persiste la mejor marca al completar un modo (en el handler, no en un efecto).
-  const persistMejor = (a: boolean, t: boolean, f: boolean) => {
-    const est = (a ? 1 : 0) + (t ? 1 : 0) + (f ? 1 : 0);
-    registraEstrellas(est);
+  const persistMejor = (a: boolean, t: boolean, f: boolean, s: boolean) => {
+    const est = (a ? 1 : 0) + (t ? 1 : 0) + (f ? 1 : 0) + (s ? 1 : 0);
+    registraEstrellas(Math.min(3, est));
   };
 
   const objetivos = [
+    { txt: "Termina el día en el club: saluda, preséntate y despídete", done: simFin },
+    { txt: "Logra «Great first day»: 11 de 12 puntos", done: simDone },
     { txt: "Arma las 4 oraciones en inglés", done: armarDone },
     { txt: "Clasifica los 7 sujetos por su forma de «to be»", done: tobeDone },
     { txt: "Clasifica las 10 frases (saludo/presentación/despedida)", done: funcionesDone },
@@ -268,136 +332,61 @@ export function LabPresentacionesIngles({ color }: PracticaLabProps) {
     },
   });
 
+  const resetActual =
+    modo === "club" ? resetClub : modo === "texto" ? resetHuecos : modo === "construir" ? resetOracion : modo === "tobe" ? resetBe : resetFunciones;
+
+  const lectura =
+    modo === "club" ? (
+      <>Friendship: {totalPts}/{PUNTOS_MAX} · {enFinal ? "day over" : `scene ${nodoIdx + 1} of ${NODOS.length}`}</>
+    ) : modo === "construir" ? (
+      <>Words in place: {placed.length}/{oracion.palabras.length}</>
+    ) : modo === "tobe" ? (
+      <>Subjects sorted: {Object.keys(ubicSuj).length}/{SUJETOS.length}</>
+    ) : modo === "funciones" ? (
+      <>Phrases sorted: {Object.keys(ubicFra).length}/{FRASES.length}</>
+    ) : (
+      <>Fill in the missing words</>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes enShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes enPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .en-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .en-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .en-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .en-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .en-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .en-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .en-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; padding:11px 16px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:15px; font-weight:800; transition:all .14s; user-select:none; }
-        .en-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .en-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .en-chip:active { cursor:grabbing; }
-        .en-bin { border-radius:16px; border:2px dashed ${T.lineStrong}; padding:16px; min-height:140px; transition:all .16s; }
-        .en-bin[data-shake="true"] { animation:enShake .4s; }
-        .en-slot { border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-width:74px; min-height:48px; padding:0 12px;
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:13px; gap:6px; transition:all .16s; }
-        .en-slot[data-active="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); cursor:pointer; }
-        .en-slot[data-shake="true"] { animation:enShake .4s; border-color:${NO}; }
-        .en-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .en-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .en-q:disabled{ cursor:default; }
-        .en-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .en-btn:hover { border-color:${T.lineStrong}; }
-        .en-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
-        .en-prob:hover { border-color:${T.lineStrong}; color:#fff; }
-        .en-prob[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
-        .en-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
-        .en-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .en-slot[data-shake="true"], .en-bin[data-shake="true"] { animation:none; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
 
-        /* Cajón de teoría */
-        .en-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .en-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .en-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .en-drawer[data-open="true"] { transform:translateX(0); }
-        .en-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .en-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .en-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .en-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .en-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .en-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .en-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+          {modo === "club" && (
+            <ClubPanel
+              accent={accent}
+              nodoIdx={nodoIdx}
+              nodo={nodo}
+              enFinal={enFinal}
+              resp={resp}
+              ptsPorNodo={ptsPorNodo}
+              totalPts={totalPts}
+              reaccion={reaccion}
+              onOpcion={elegirOpcion}
+              onSiguiente={siguienteNodo}
+              onReiniciar={resetClub}
+            />
+          )}
 
-        /* Identidad del tablero */
-        .en-bin { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .en-bin:nth-of-type(6n+1) { --tono:188; }
-        .en-bin:nth-of-type(6n+2) { --tono:262; }
-        .en-bin:nth-of-type(6n+3) { --tono:44; }
-        .en-bin:nth-of-type(6n+4) { --tono:152; }
-        .en-bin:nth-of-type(6n+5) { --tono:330; }
-        .en-bin:nth-of-type(6n+6) { --tono:18; }
-        .en-bin::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .en-bin[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .en-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .en-chip:hover { transform:translateY(-2px); }
-        .en-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .en-chip, .en-chip:hover, .en-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="en-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="en-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="en-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button
-          className="en-icobtn"
-          onClick={modo === "texto" ? resetHuecos : modo === "construir" ? resetOracion : modo === "tobe" ? resetBe : resetFunciones}
-          title="Reiniciar este modo"
-        >
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="en-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="en-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="en-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="en-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="en-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="en-drawer-body">
-          <FichaTeorica data={PRESENTACIONES_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }} className="en-grid">
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
@@ -484,74 +473,323 @@ export function LabPresentacionesIngles({ color }: PracticaLabProps) {
             />
           )}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Amistad ahora" value={`${totalPts}/${PUNTOS_MAX}`} col={totalPts >= 11 ? OK : undefined} />
+                  <Dato label="Mejor día" value={`${simBest}/${PUNTOS_MAX}`} col={simDone ? OK : undefined} />
                 </div>
-              ))}
-            </div>
-
-            <div className="en-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1, 2, 3].map((s) => (
+                      <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
+                    {bestEstrellas >= 3 ? "¡Dominaste las presentaciones!" : "Completa los modos para 2★; la tercera pide 2 errores o menos."}
+                  </span>
                 </div>
+              </Bloque>
+              <Bloque titulo="Lo que dijiste en el club" icono="fa-comments">
+                {NODOS.map((n, i) => {
+                  const op = n.opciones.find((o) => o.id === resp[n.id]);
+                  return (
+                    <p key={n.id} style={{ margin: 0, color: T.text2 }}>
+                      <strong style={{ color: T.text }}>{i + 1}.</strong>{" "}
+                      {op ? (
+                        <>
+                          «{op.texto}» <span style={{ color: op.puntos === 2 ? OK : op.puntos === 1 ? "#FFC75A" : NO }}>{op.puntos === 2 ? "✓" : op.puntos === 1 ? "~" : "✗"}</span>
+                        </>
+                      ) : (
+                        <span style={{ color: T.text3 }}>pendiente</span>
+                      )}
+                    </p>
+                  );
+                })}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="El verbo to be" icono="fa-equals">
+                {(Object.keys(TOBE_INFO) as ToBe[]).map((b) => (
+                  <p key={b} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{TOBE_INFO[b].label}.</strong> {TOBE_INFO[b].descripcion}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Saludos, presentaciones y despedidas" icono="fa-hand">
+                {(Object.keys(FUNCION_INFO) as Funcion[]).map((f) => (
+                  <p key={f} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{FUNCION_INFO[f].label} ({FUNCION_INFO[f].descripcion}).</strong>{" "}
+                    {FRASES.filter((x) => x.funcion === f).map((x) => x.texto).join(" · ")}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_INGLES}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={PRESENTACIONES_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+const css = (accent: string, rgba: string) => `
+  @keyframes enShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes enPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  @keyframes enBob { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+  .en-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; padding:11px 16px; border-radius:999px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:15px; font-weight:800; user-select:none;
+    transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+  .en-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+  .en-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
+  .en-chip:active { cursor:grabbing; }
+  .en-bin { border-radius:16px; border:2px dashed ${T.lineStrong}; padding:16px; min-height:140px; transition:all .16s; }
+  .en-bin[data-shake="true"] { animation:enShake .4s; }
+  .en-slot { border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-width:74px; min-height:48px; padding:0 12px;
+    display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; gap:6px; transition:all .16s; }
+  .en-slot[data-active="true"] { border-color:${accent}; background:rgba(${rgba},0.1); cursor:pointer; }
+  .en-slot[data-shake="true"] { animation:enShake .4s; border-color:${NO}; }
+  .en-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .en-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .en-q:disabled{ cursor:default; }
+  .en-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14.5px; font-weight:800; transition:all .14s; }
+  .en-btn:hover { border-color:${T.lineStrong}; }
+  .en-prob { cursor:pointer; padding:9px 14px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
+    color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
+  .en-prob:hover { border-color:${T.lineStrong}; color:#fff; }
+  .en-prob[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); color:#fff; }
+  .en-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
+
+  /* Simulador: Club day */
+  .en-pasos { display:flex; gap:6px; }
+  .en-paso { flex:1; height:10px; border-radius:6px; background:${T.inset}; border:1px solid ${T.line}; }
+  .en-paso[data-on="true"] { border-color:${accent}; }
+  .en-paso[data-p="2"] { background:${OK}; border-color:${OK}; }
+  .en-paso[data-p="1"] { background:#FFC75A; border-color:#FFC75A; }
+  .en-paso[data-p="0"] { background:${NO}; border-color:${NO}; }
+  .en-escena { position:relative; border-radius:16px; overflow:hidden; border:1.5px solid ${T.line}; min-height:190px;
+    background:linear-gradient(135deg, rgba(${rgba},0.3), rgba(8,18,36,0.95)); display:flex; flex-direction:column; justify-content:flex-end; }
+  .en-escena-fondo { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .en-escena-fondo > i { font-size:54px; color:rgba(255,255,255,0.18); }
+  .en-escena-fondo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .en-escena-tit { position:absolute; left:10px; top:10px; padding:5px 11px; border-radius:999px; background:rgba(2,12,28,.8); color:#fff; font-size:14px; font-weight:800; }
+  .en-elenco { position:relative; display:flex; justify-content:space-evenly; gap:8px; padding:46px 8px 10px; flex-wrap:wrap;
+    background:linear-gradient(180deg, transparent, rgba(2,10,24,.78) 60%); }
+  .en-pj { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; }
+  .en-retrato { position:relative; width:84px; height:84px; border-radius:50%; overflow:hidden; border:3px solid var(--ac,#8FA3BF);
+    background:linear-gradient(135deg, rgba(${rgba},0.4), rgba(8,18,36,0.95)); display:flex; align-items:center; justify-content:center; }
+  .en-retrato > i { font-size:36px; color:var(--ac,#8FA3BF); }
+  .en-retrato img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .en-retrato[data-animo="confuso"] { animation:enShake .5s 1; }
+  .en-retrato[data-animo="feliz"] { animation:enBob 1.2s ease-in-out infinite; }
+  .en-pj-nombre { padding:2px 9px; border-radius:999px; background:rgba(2,12,28,.82); color:#fff; font-size:14px; font-weight:800; }
+  .en-pj-animo { display:inline-flex; align-items:center; gap:5px; padding:2px 9px; border-radius:999px; background:rgba(2,12,28,.82); font-size:14px; font-weight:700; color:var(--ac,#8FA3BF); }
+  .en-burbuja { border-radius:16px; padding:12px 16px; background:${T.glass}; border:1.5px solid ${T.line}; }
+  .en-burbuja strong { display:block; font-size:14px; color:${T.text3}; margin-bottom:3px; }
+  .en-burbuja .en-ing { font-size:18px; font-weight:800; color:#fff; line-height:1.35; }
+  .en-burbuja .en-esp { font-size:14px; color:${T.text3}; margin-top:3px; }
+  .en-opciones { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:10px; }
+  .en-op { cursor:pointer; text-align:left; padding:13px 15px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glassSoft};
+    color:#fff; font-size:16px; font-weight:700; line-height:1.35; transition:all .14s; }
+  .en-op:hover:not(:disabled) { border-color:${accent}; transform:translateY(-2px); }
+  .en-op:disabled { cursor:default; }
+  .en-op[data-estado="elegida-2"] { border-color:${OK}; background:${OK}18; }
+  .en-op[data-estado="elegida-1"] { border-color:#FFC75A; background:#FFC75A18; }
+  .en-op[data-estado="elegida-0"] { border-color:${NO}; background:${NO}14; }
+  .en-op[data-estado="otra"] { opacity:.45; }
+  .en-retro { display:flex; flex-direction:column; gap:8px; align-items:flex-start; padding:13px 15px; border-radius:13px; font-size:14.5px; line-height:1.5; color:${T.text2};
+    border:1.5px solid var(--rc); background:${T.glass}; }
+  .en-retro strong { color:#fff; font-size:15px; }
+  .en-amistad { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; font-size:14px; font-weight:800; color:${T.text2}; }
+  .en-amistad-barra { height:12px; border-radius:8px; background:${T.inset}; border:1px solid ${T.line}; overflow:hidden; }
+  .en-amistad-barra > div { height:100%; background:linear-gradient(90deg, #FF8FAB, #FFC75A); transition:width .35s; }
+  .en-op:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+
+  /* Identidad del tablero */
+  .en-bin { --tono:188; position:relative;
+    background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+  .en-bin:nth-of-type(6n+1) { --tono:188; }
+  .en-bin:nth-of-type(6n+2) { --tono:262; }
+  .en-bin:nth-of-type(6n+3) { --tono:44; }
+  .en-bin:nth-of-type(6n+4) { --tono:152; }
+  .en-bin:nth-of-type(6n+5) { --tono:330; }
+  .en-bin:nth-of-type(6n+6) { --tono:18; }
+  .en-bin::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+    background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+  .en-bin[data-done="true"] {
+    background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+  @media (prefers-reduced-motion: reduce){
+    .en-slot[data-shake="true"], .en-bin[data-shake="true"], .en-retrato[data-animo="confuso"], .en-retrato[data-animo="feliz"] { animation:none; }
+    .en-chip, .en-chip:hover, .en-chip[data-sel="true"], .en-op:hover:not(:disabled) { transform:none; transition:none; }
+    .en-amistad-barra > div { transition:none; }
+  }
+`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Imagen con respaldo: si el archivo aún no existe se oculta y queda el degradado + ícono.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function ImgSim({ src }: { src: string }) {
+  const [rota, setRota] = useState(false);
+  if (rota) return null;
+  return <img src={src} alt="" loading="lazy" onError={() => setRota(true)} />;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Panel «Club day» (situación social ramificada)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function ClubPanel({
+  accent,
+  nodoIdx,
+  nodo,
+  enFinal,
+  resp,
+  ptsPorNodo,
+  totalPts,
+  reaccion,
+  onOpcion,
+  onSiguiente,
+  onReiniciar,
+}: {
+  accent: string;
+  nodoIdx: number;
+  nodo: NodoSim;
+  enFinal: boolean;
+  resp: Record<string, string>;
+  ptsPorNodo: Record<string, number>;
+  totalPts: number;
+  reaccion: boolean;
+  onOpcion: (id: string) => void;
+  onSiguiente: () => void;
+  onReiniciar: () => void;
+}) {
+  const esc = ESCENAS[nodo.escena];
+  const opElegida = nodo.opciones.find((o) => o.id === resp[nodo.id]);
+  const animos: Record<string, Animo> = reaccion && opElegida ? animosDe(nodo, opElegida) : {};
+  const fin = finalDe(totalPts);
+  const hablante = PERSONAJES[nodo.habla];
+  return (
+    <>
+      <div className="en-pasos" aria-label="Progreso de la conversación">
+        {NODOS.map((n, i) => (
+          <span key={n.id} className="en-paso" data-on={i === nodoIdx && !enFinal} data-p={ptsPorNodo[n.id] !== undefined && (i < nodoIdx || enFinal || (i === nodoIdx && reaccion)) ? String(ptsPorNodo[n.id]) : undefined} />
+        ))}
+      </div>
+
+      <div className="en-escena">
+        <div className="en-escena-fondo">
+          <i className={`fa-solid ${esc.icono}`} aria-hidden />
+          <ImgSim key={esc.foto} src={`${RUTA_FOTOS}/${esc.foto}.webp`} />
+        </div>
+        <span className="en-escena-tit">
+          <i className={`fa-solid ${esc.icono}`} style={{ marginRight: 7, color: accent }} />
+          {esc.titulo}
+        </span>
+        <div className="en-elenco">
+          {(enFinal ? (["torres", "valeria", "diego"] as PersonajeId[]) : nodo.presentes).map((id) => {
+            const p = PERSONAJES[id];
+            const animo: Animo = enFinal ? (totalPts >= 11 ? "feliz" : totalPts >= 7 ? "neutral" : "confuso") : (animos[id] ?? "neutral");
+            const ai = ANIMO_INFO[animo];
+            return (
+              <div key={id} className="en-pj" style={{ ["--ac" as string]: ai.color }}>
+                <div className="en-retrato" data-animo={animo}>
+                  <i className={`fa-solid ${ai.icono}`} aria-hidden />
+                  <ImgSim key={p.foto} src={`${RUTA_FOTOS}/${p.foto}.webp`} />
+                </div>
+                <span className="en-pj-nombre">{p.nombre}</span>
+                <span className="en-pj-animo">
+                  <i className={`fa-solid ${ai.icono}`} aria-hidden /> {ai.etiqueta}
+                </span>
               </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "Great job! You did it!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "construir" && (
-                <>Lee la traducción y arrastra las palabras una por una. El orden básico en inglés es <strong style={{ color: T.text }}>sujeto + verbo + complemento</strong>.</>
-              )}
-              {modo === "tobe" && (
-                <>El verbo <strong style={{ color: T.text }}>to be</strong>: <strong style={{ color: T.text }}>I am</strong>, <strong style={{ color: T.text }}>he/she/it is</strong>, <strong style={{ color: T.text }}>you/we/they are</strong>.</>
-              )}
-              {modo === "funciones" && (
-                <>Un <strong style={{ color: T.text }}>greeting</strong> abre la conversación, una <strong style={{ color: T.text }}>introduction</strong> presenta a alguien y un <strong style={{ color: T.text }}>farewell</strong> la cierra.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_INGLES}</span>
-          </div>
+            );
+          })}
         </div>
       </div>
 
-      <QuizCard
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-      />
-    </div>
+      {!enFinal && (
+        <>
+          <div className="en-burbuja" aria-live="polite">
+            <strong>{hablante.nombre} dice:</strong>
+            <div className="en-ing">“{nodo.linea(ptsPorNodo)}”</div>
+            <div className="en-esp">{nodo.traduccion}</div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 8 }}>¿Qué respondes tú (Ana)?</div>
+            <div className="en-opciones">
+              {nodo.opciones.map((o) => {
+                const elegida = reaccion && opElegida?.id === o.id;
+                const estado = reaccion ? (elegida ? `elegida-${o.puntos}` : "otra") : undefined;
+                return (
+                  <button key={o.id} type="button" className="en-op" data-estado={estado} disabled={reaccion} onClick={() => onOpcion(o.id)}>
+                    {o.texto}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {reaccion && opElegida && (
+            <div className="en-retro" style={{ ["--rc" as string]: opElegida.puntos === 2 ? OK : opElegida.puntos === 1 ? "#FFC75A" : NO }}>
+              <strong>
+                <i className={`fa-solid ${ANIMO_INFO[opElegida.animo].icono}`} style={{ marginRight: 8, color: ANIMO_INFO[opElegida.animo].color }} />
+                {hablante.nombre}: {ANIMO_INFO[opElegida.animo].etiqueta} · {opElegida.puntos}/2
+              </strong>
+              <span>{opElegida.porque}</span>
+              <button type="button" className="en-btn" style={{ background: accent, color: "#04121f", border: "none" }} onClick={onSiguiente}>
+                <i className="fa-solid fa-arrow-right" /> {nodoIdx + 1 >= NODOS.length ? "Terminar el día" : "Siguiente escena"}
+              </button>
+            </div>
+          )}
+        </>
+      )}
+
+      {enFinal && (
+        <div className="en-retro" style={{ ["--rc" as string]: fin.color }}>
+          <strong>
+            <i className={`fa-solid ${fin.icono}`} style={{ marginRight: 8, color: fin.color }} />
+            {fin.titulo} · {totalPts}/{PUNTOS_MAX}
+          </strong>
+          <span>{fin.texto}</span>
+          <button type="button" className="en-btn" onClick={onReiniciar}>
+            <i className="fa-solid fa-rotate-left" /> Volver a empezar el día
+          </button>
+        </div>
+      )}
+
+      <div className="en-amistad">
+        <span><i className="fa-solid fa-heart" style={{ color: "#FF8FAB", marginRight: 6 }} />Amistad</span>
+        <div className="en-amistad-barra"><div style={{ width: `${(totalPts / PUNTOS_MAX) * 100}%` }} /></div>
+        <span>{totalPts}/{PUNTOS_MAX} · simulación</span>
+      </div>
+    </>
   );
 }
 
@@ -601,13 +839,33 @@ function ConstruirPanel({
         ))}
       </div>
 
+      <Mesa>
+        <div>
+      <div style={{ ...card, padding: "18px 22px" }}>
+        <Eyebrow>Palabras — arrástralas en orden</Eyebrow>
+        {libresIdx.length === 0 ? (
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+            <i className="fa-solid fa-circle-check" /> Well done! Cambia de oración arriba para armar otra.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            {libresIdx.map((w) => (
+              <button key={w.idx} className="en-chip" data-sel={selWord === w.idx} onClick={() => onSelWord(w.idx)} {...dragProps(String(w.idx))}>
+                {w.palabra}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+        </div>
+        <div>
       <div style={{ ...card, padding: "20px 24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, gap: 10, flexWrap: "wrap" }}>
           <Eyebrow>
             <i className="fa-solid fa-language" style={{ marginRight: 8, color: accent }} />
             Traducción
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: completado ? OK : T.text3 }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: completado ? OK : T.text3 }}>
             {completado ? "Sentence complete ✓" : `${placed.length}/${oracion.palabras.length} words`}
           </span>
         </div>
@@ -642,22 +900,8 @@ function ConstruirPanel({
         </div>
       </div>
 
-      <div style={{ ...card, padding: "18px 22px" }}>
-        <Eyebrow>Palabras — arrástralas en orden</Eyebrow>
-        {libresIdx.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-            <i className="fa-solid fa-circle-check" /> Well done! Cambia de oración arriba para armar otra.
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {libresIdx.map((w) => (
-              <button key={w.idx} className="en-chip" data-sel={selWord === w.idx} onClick={() => onSelWord(w.idx)} {...dragProps(String(w.idx))}>
-                {w.palabra}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      </Mesa>
     </>
   );
 }
@@ -697,13 +941,15 @@ function BinsPanel<K extends string>({
 }) {
   return (
     <>
+      <Mesa>
+        <div>
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
           <Eyebrow>{titulo}</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: colocados >= total ? OK : T.text3 }}>{colocados}/{total}</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: colocados >= total ? OK : T.text3 }}>{colocados}/{total}</span>
         </div>
         {items.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> {hechoMsg}
           </div>
         ) : (
@@ -711,14 +957,16 @@ function BinsPanel<K extends string>({
             {items.map((it) => (
               <button key={it.id} className="en-chip" data-sel={sel === it.id} onClick={() => onSel(it.id)} {...dragProps(it.id)}>
                 {it.texto}
-                {it.sub && <span style={{ marginLeft: 7, fontSize: 11, fontWeight: 600, color: T.text3 }}>· {it.sub}</span>}
+                {it.sub && <span style={{ marginLeft: 7, fontSize: 14, fontWeight: 600, color: T.text3 }}>· {it.sub}</span>}
               </button>
             ))}
           </div>
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }} className="en-bins">
+        </div>
+        <div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 14 }}>
         {bins.map((bin) => (
           <div
             key={bin.key}
@@ -729,25 +977,27 @@ function BinsPanel<K extends string>({
             style={{ borderColor: `${bin.info.color}66`, background: `${bin.info.color}0d`, cursor: sel ? "pointer" : "default" }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
-              <span style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#fff", background: `${bin.info.color}33` }}>
+              <span style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff", background: `${bin.info.color}33` }}>
                 <i className={`fa-solid ${bin.info.icono}`} />
               </span>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{bin.info.label}</div>
-                <div style={{ fontSize: 10, color: T.text3, lineHeight: 1.3 }}>{bin.info.descripcion}</div>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.3 }}>{bin.info.descripcion}</div>
               </div>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
               {bin.dentro.map((d) => (
-                <span key={d.id} style={{ animation: "enPop .25s ease", fontSize: 13, fontWeight: 800, color: "#fff", padding: "6px 12px", borderRadius: 999, background: `${bin.info.color}26`, border: `1px solid ${bin.info.color}55` }}>
+                <span key={d.id} style={{ animation: "enPop .25s ease", fontSize: 14, fontWeight: 800, color: "#fff", padding: "6px 12px", borderRadius: 999, background: `${bin.info.color}26`, border: `1px solid ${bin.info.color}55` }}>
                   {d.texto}
                 </span>
               ))}
-              {bin.dentro.length === 0 && <span style={{ fontSize: 11.5, color: T.text3, fontStyle: "italic" }}>Empty</span>}
+              {bin.dentro.length === 0 && <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>Empty</span>}
             </div>
           </div>
         ))}
       </div>
+        </div>
+      </Mesa>
     </>
   );
 }
@@ -792,19 +1042,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Check your English
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco preguntas sobre saludos, el verbo «to be» y presentaciones. Responde y pulsa «Comprobar».
       </div>
 
@@ -817,7 +1067,7 @@ function QuizCard({
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -839,7 +1089,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="en-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -848,7 +1098,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -871,7 +1121,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

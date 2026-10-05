@@ -325,14 +325,14 @@ function BuretaArrastrable({
           <sphereGeometry args={[0.2, 24, 24]} />
           <meshStandardMaterial color={knobCol} emissive={knobCol} emissiveIntensity={hover ? 0.7 : 0.4} roughness={0.25} metalness={0.2} toneMapped={false} />
         </mesh>
-        <Html center distanceFactor={11} position={[0, 0.42, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 13, color: "#fff", background: "rgba(3,12,28,0.82)", border: `1px solid ${accent}88`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap", textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
+        <Html center position={[0, 0.42, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 14, color: "#fff", background: "rgba(3,12,28,0.82)", border: `1px solid ${accent}88`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap", textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
             {gotas} gotas
           </div>
         </Html>
         {arrastrable && (
-          <Html center distanceFactor={13} position={[0, -0.42, 0]} style={{ pointerEvents: "none" }}>
-            <div style={{ fontSize: 10.5, fontWeight: 800, color: "#cfe8ff", whiteSpace: "nowrap", opacity: hover ? 0 : 0.85 }}>
+          <Html center position={[0, -0.42, 0]} style={{ pointerEvents: "none" }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#cfe8ff", whiteSpace: "nowrap", opacity: hover ? 0 : 0.85 }}>
               <i className="fa-solid fa-arrows-up-down" style={{ marginRight: 5 }} />
               arrastra para titular
             </div>
@@ -340,8 +340,8 @@ function BuretaArrastrable({
         )}
       </group>
       {/* etiqueta del riel */}
-      <Html center distanceFactor={13} position={[0, Y_TOP + 0.5, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.08em", color: accent, whiteSpace: "nowrap" }}>BURETA · NaOH</div>
+      <Html center position={[0, Y_TOP + 0.5, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: accent, whiteSpace: "nowrap" }}>BURETA · NaOH</div>
       </Html>
     </group>
   );
@@ -476,7 +476,7 @@ function Contenido({ ph, colorLiquido, accent, modo, goteando, gotas, gotasMax, 
         maxDistance={16}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.7}
-        target={[-0.3, 0, 0]}
+        target={[-0.3, -0.3, 0]}
       />
 
       <EffectComposer enableNormalPass={false}>

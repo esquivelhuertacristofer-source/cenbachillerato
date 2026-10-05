@@ -18,7 +18,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -54,6 +54,19 @@ const MAGENTA = "#f0a6ff";
 const EJE = "#9fb2c8";
 
 const rad = (g: number) => (g * Math.PI) / 180;
+
+/* Etiqueta fija en píxeles (≥ 14 px), con fondo propio: se lee sobre cualquier cosa. */
+function Etiqueta({ pos, color, children, dx = 0, dy = 0 }: { pos: Punto3; color: string; children: React.ReactNode; dx?: number; dy?: number }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: `translate(${dx}px, ${dy}px)` }}>
+        <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
+}
 
 /* ════════════════════ MODO SECCIÓN: cono + plano ════════════════════════ */
 function ConoDoble({ accent }: { accent: string }) {
@@ -120,15 +133,13 @@ function Seccion({ gammaDeg, accent, pausado }: { gammaDeg: number; accent: stri
     <group>
       <ConoDoble accent={accent} />
       <PlanoDeCorte gammaDeg={gammaDeg} pausado={pausado} />
+      {/* generatriz de referencia: cuando el plano queda paralelo a ella, la curva se abre (parábola) */}
+      <Line points={[[0, 0, 0], [-Math.sin(rad(ALPHA_DEG)) * CONO_H * 1.15, Math.cos(rad(ALPHA_DEG)) * CONO_H * 1.15, 0]]} color={ORO} lineWidth={2.2} dashed dashSize={0.22} gapSize={0.14} />
       {/* curva de intersección — el resultado estrella */}
       {segmentos.map((seg, i) => (
         <CurvaTubo key={`seg${i}`} puntos={seg} color={clase.color} grosor={0.072} />
       ))}
-      <Html position={etiquetaPos} center distanceFactor={16} pointerEvents="none">
-        <div style={{ color: clase.color, fontSize: 12, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
-          {clase.nombre}
-        </div>
-      </Html>
+      <Etiqueta pos={etiquetaPos} color={clase.color} dy={-26}>{clase.nombre}</Etiqueta>
     </group>
   );
 }
@@ -210,28 +221,16 @@ function Antena({ pausado }: { pausado: boolean }) {
         <sphereGeometry args={[0.17, 24, 24]} />
         <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={1.1} toneMapped={false} />
       </mesh>
-      <Html position={[foco[0] + 0.55, foco[1], 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: VERDE, fontSize: 11.5, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
-          Foco (0, 1)
-        </div>
-      </Html>
+      <Etiqueta pos={foco} color={VERDE} dx={62} dy={-4}>Foco (0, 1)</Etiqueta>
 
       {/* punto dato (1, 0.25) */}
       <mesh position={[PARABOLA.puntoDato[0] * PAR_S, PARABOLA.puntoDato[1] * PAR_S, 0]}>
         <sphereGeometry args={[0.12, 18, 18]} />
         <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.6} toneMapped={false} />
       </mesh>
-      <Html position={[PARABOLA.puntoDato[0] * PAR_S + 0.5, PARABOLA.puntoDato[1] * PAR_S - 0.1, 0]} center distanceFactor={16} pointerEvents="none">
-        <div style={{ color: ORO, fontSize: 10.5, fontWeight: 800, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
-          (1, 0.25)
-        </div>
-      </Html>
+      <Etiqueta pos={[PARABOLA.puntoDato[0] * PAR_S, PARABOLA.puntoDato[1] * PAR_S, 0]} color={ORO} dx={50} dy={22}>(1, 0.25)</Etiqueta>
 
-      <Html position={[0, (focoY + 1.4) * PAR_S, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: "#fff", fontSize: 12, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
-          y = 0.25·x²
-        </div>
-      </Html>
+      <Etiqueta pos={[0, (focoY + 1.1) * PAR_S, 0]} color="#fff">y = 0.25·x²</Etiqueta>
 
       <ContactShadows position={[0, -0.3, 0]} opacity={0.2} scale={14} blur={2.4} far={6} />
     </group>
@@ -245,6 +244,7 @@ function Cobertura({ pausado }: { pausado: boolean }) {
   const reloj = useRef(0);
   const onda = useRef<THREE.Mesh>(null);
   const r = COBERTURA.radio;
+  const angosto = useThree((st) => st.size.width) < 640;
 
   const circulo = useMemo<Punto3[]>(() => {
     const pts: Punto3[] = [];
@@ -305,19 +305,11 @@ function Cobertura({ pausado }: { pausado: boolean }) {
       {/* casa (3,4) — en el borde */}
       <mesh position={[casa[0], casa[1], 0.15]}>
         <boxGeometry args={[0.5, 0.5, 0.5]} />
-        <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.5} metalness={0.2} roughness={0.5} toneMapped={false} />
+        <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.35} metalness={0.2} roughness={0.5} />
       </mesh>
-      <Html position={[casa[0], casa[1] + 0.7, 0.2]} center distanceFactor={14} pointerEvents="none">
-        <div style={{ color: VERDE, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap", textAlign: "center" }}>
-          Casa (3, 4)<br />3²+4² = 25 = r² · en el borde
-        </div>
-      </Html>
+      <Etiqueta pos={[casa[0], casa[1], 0.3]} color={VERDE} dy={-34}>Casa (3, 4)</Etiqueta>
 
-      <Html position={[r * COB_S * 0.72, r * COB_S * 0.72, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: AZUL, fontSize: 11.5, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
-          x² + y² = 25
-        </div>
-      </Html>
+      {!angosto && <Etiqueta pos={[-r * COB_S * 0.72, r * COB_S * 0.72, 0]} color={AZUL}>x² + y² = 25</Etiqueta>}
 
       <ContactShadows position={[0, 0, -0.05]} opacity={0.2} scale={14} blur={2.2} far={6} />
     </group>
@@ -327,7 +319,7 @@ function Cobertura({ pausado }: { pausado: boolean }) {
 /* ════════════════════ CANVAS ════════════════════════════════════════════ */
 export default function ModeladoConicasScene(props: ModeladoConicasSceneProps) {
   const camPos: [number, number, number] =
-    props.modo === "seccion" ? [10, 4, 12] : props.modo === "parabola" ? [0, 1.5, 13] : [0, 2, 15];
+    props.modo === "seccion" ? [10, 4, 13.5] : props.modo === "parabola" ? [0, 1.6, 12.5] : [0, 3, 14];
   return (
     <Canvas
       shadows
@@ -347,7 +339,7 @@ function Contenido(props: ModeladoConicasSceneProps) {
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={-CONO_H - 0.1} />
+      <Escenario acento={accent} suelo={modo === "seccion" ? -CONO_H - 0.1 : modo === "parabola" ? -1.75 : -1} />
 
 
       <group key={`${resetNonce}`}>
@@ -363,7 +355,7 @@ function Contenido(props: ModeladoConicasSceneProps) {
         maxDistance={26}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.85}
-        target={[0, modo === "seccion" ? 1 : 0, 0]}
+        target={[0, modo === "seccion" ? 0.4 : modo === "parabola" ? 1.5 : 0, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

@@ -15,13 +15,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { EppGate, type EppItem } from "./_epp-gate";
 import { FichaTeorica } from "./_ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import { ALGEBRA_TILES_FICHA } from "./algebra-tiles-ficha";
 import {
   VARIANTES,
@@ -87,7 +86,6 @@ function LabAlgebraTilesBase({ color, varianteInicial }: PracticaLabProps & { va
 
   const [eppListo, setEppListo] = useState(false);
   const [aprobados, setAprobados] = useState<Record<Variante, boolean>>({ lenguaje: false, clasificacion: false, operaciones: false });
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -137,6 +135,7 @@ function LabAlgebraTilesBase({ color, varianteInicial }: PracticaLabProps & { va
 
   const modoActual = VARIANTES.find((v) => v.id === modo) ?? VARIANTES[0]!;
   const retoActual = RETO_POR_VARIANTE[modo];
+  const maxFrase = evalTerminos(frase.terminos, 10);
 
   // props para la escena según el modo
   const sceneProps = useMemo(() => {
@@ -147,23 +146,13 @@ function LabAlgebraTilesBase({ color, varianteInicial }: PracticaLabProps & { va
 
   const objetivos = [
     { txt: "Equípate con la mesa de álgebra con mosaicos", done: eppListo },
+    { txt: "Sube x hasta 8 o más y mira cómo crecen las tiras y los cuadrados, pero no el 1", done: evaluo && xValue >= 8 },
     { txt: "Traduce una frase al lenguaje algebraico", done: vioLenguaje },
     { txt: "Clasifica una expresión (monomio…polinomio)", done: vioClasificacion },
     { txt: "Multiplica binomios con el modelo de área", done: vioOperaciones },
     { txt: "Evalúa una expresión para un valor de x", done: evaluo },
     { txt: "Resuelve el reto evaluable", done: aprobados.lenguaje || aprobados.clasificacion || aprobados.operaciones },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
-
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
       <div style={{ width: 74, height: 74, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, color: "#fff", background: accent, boxShadow: `0 10px 30px -6px ${accent}` }}>
@@ -176,446 +165,312 @@ function LabAlgebraTilesBase({ color, varianteInicial }: PracticaLabProps & { va
     </div>
   );
 
+  const valorTxt = Number.isInteger(valorFrase) ? `${valorFrase}` : valorFrase.toFixed(2);
+  const lecturaCorta = modo === "lenguaje"
+    ? <>x = {xValue} → {frase.expresion} = {valorTxt}</>
+    : modo === "clasificacion"
+      ? <>{expr.expresion}: {clasifica(expr.terminos.length)}, grado {expr.grado}</>
+      : <>{prod.ecuacion} = {prod.expandido}</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes atlPulse { 0%,100%{ box-shadow:0 0 0 0 var(--atl); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .atl-live-dot { animation: atlPulse 1.6s ease-in-out infinite; }
-        .atl-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .atl-grid { grid-template-columns: 1fr; } }
-        .atl-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .atl-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .atl-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .atl-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .atl-modgrid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; }
-        @media (max-width: 560px){ .atl-modgrid { grid-template-columns: 1fr; } }
-        .atl-modbtn { cursor:pointer; text-align:center; display:flex; flex-direction:column; align-items:center; gap:5px;
-          padding:11px 8px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; transition:all .15s; }
-        .atl-modbtn:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .atl-modbtn[data-on="true"] { border-color:var(--atl); background:rgba(${color.rgba},0.14); color:#fff; box-shadow:0 4px 16px -8px var(--atl); }
-        .atl-cards { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
-        @media (max-width: 560px){ .atl-cards { grid-template-columns: 1fr; } }
-        .atl-card { cursor:pointer; text-align:left; display:flex; flex-direction:column; gap:2px;
-          padding:10px 12px; border-radius:11px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; transition:all .15s; }
-        .atl-card:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .atl-card[data-on="true"] { border-color:var(--atl); background:rgba(${color.rgba},0.14); color:#fff; box-shadow:0 4px 16px -8px var(--atl); }
-        .atl-steps { display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; }
-        @media (max-width: 760px){ .atl-steps { grid-template-columns: 1fr 1fr; } }
-        .atl-step { display:flex; gap:10px; align-items:flex-start; padding:11px 12px; border-radius:13px;
-          border:1px solid ${T.line}; background:${T.inset}; transition:all .18s; }
-        .atl-step[data-on="true"] { border-color:var(--atl); background:rgba(${color.rgba},0.12); box-shadow:0 4px 16px -8px var(--atl); }
-        .atl-step-n { flex-shrink:0; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-          font-size:12px; font-weight:900; color:${T.text3}; background:${T.glass}; border:1px solid ${T.line}; }
-        .atl-step[data-on="true"] .atl-step-n { color:#04121f; background:var(--atl); border-color:var(--atl); }
-        .atl-step-tx { font-size:11.5px; line-height:1.4; color:${T.text2}; }
-        .atl-step[data-on="true"] .atl-step-tx { color:#fff; }
-        .atl-step-tx strong { display:block; font-size:12px; color:${T.text}; margin-bottom:1px; }
-        .atl-slider { width:100%; accent-color:${accent}; cursor:pointer; }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <>
+          <SceneBoundary fallback={sceneFallback}>
+            <AlgebraTilesScene
+              modo={modo}
+              terminos={sceneProps.terminos}
+              exprLabel={sceneProps.exprLabel}
+              claseLabel={sceneProps.claseLabel}
+              a={sceneProps.a}
+              b={sceneProps.b}
+              expandLabel={sceneProps.expandLabel}
+              xValor={xValue}
+              accent={accent}
+              pausado={pausado}
+              autoRotate={autoRotate}
+              resetNonce={resetNonce}
+            />
+          </SceneBoundary>
+          {!eppListo && (
+            <EppGate
+              accent={accent}
+              rgba={color.rgba}
+              items={INSTRUMENTOS}
+              titulo="Prepara tu mesa de álgebra con mosaicos"
+              subtitulo="Antes de operar con expresiones, equípate con lo correcto"
+              intro={`Para representar cada término como una pieza geométrica y agruparlos necesitas el material adecuado. Selecciona solo las ${INSTRUMENTOS.filter((i) => i.ok).length} piezas que sirven (deja fuera lo que mide otra cosa).`}
+              verbo="modelado algebraico"
+              onEntrar={() => {
+                setEppListo(true);
+                if (sonido) audioRef.current?.blip();
+              }}
+            />
+          )}
+        </>
+      }
+      modos={{
+        opciones: VARIANTES.map((v) => ({ id: v.id, etiqueta: v.nombre, icono: v.icon })),
+        valor: modo,
+        cambiar: (id) => elegirModo(id as Variante),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={pausado ? "fa-play" : "fa-pause"} titulo={pausado ? "Reanudar" : "Pausar"} activo={!pausado} onClick={() => setPausado((p) => !p)} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar la cámara" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={
+        <>
+          <span className="atl-tilekey"><span className="atl-swatch" style={{ background: AZUL }} /> x²</span>
+          <span className="atl-tilekey"><span className="atl-swatch" style={{ background: VERDE }} /> x</span>
+          <span className="atl-tilekey"><span className="atl-swatch" style={{ background: ORO }} /> 1</span>
+          <span className="atl-tilekey"><span className="atl-swatch" style={{ background: "#f0667d" }} /> negativo</span>
+          {modo === "lenguaje" && <MedidorValor valor={valorFrase} max={maxFrase} x={xValue} compacto />}
+          <style>{`.atl-tilekey{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:#dce6f5}.atl-swatch{width:14px;height:14px;border-radius:4px;display:inline-block}`}</style>
+        </>
+      }
+      lectura={lecturaCorta}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={modoActual.nombre} icono={modoActual.icon}>
+                <p style={{ margin: 0, color: T.text2 }}>{modoActual.desc}</p>
 
-        .atl-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .atl-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .atl-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .atl-drawer[data-open="true"] { transform:translateX(0); }
-        .atl-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .atl-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .atl-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .atl-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .atl-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .atl-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 1000px){ .atl-bottom { grid-template-columns: 1fr !important; } }
-        .atl-tilekey { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:${T.text2}; }
-        .atl-swatch { width:13px; height:13px; border-radius:4px; display:inline-block; }
-      `}</style>
-
-      {/* ── Pasos guiados ──────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "16px 20px", marginBottom: 18 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-list-check" style={{ marginRight: 8, color: accent }} />
-          Sigue los pasos del experimento
-        </Eyebrow>
-        <div className="atl-steps" style={{ ["--atl" as string]: accent }}>
-          {[
-            { n: 1, done: eppListo, t: "Equípate", d: "Elige la mesa de álgebra con mosaicos." },
-            { n: 2, done: vioLenguaje, t: "Lenguaje", d: "Traduce una frase a una expresión." },
-            { n: 3, done: vioClasificacion, t: "Clasifica", d: "Monomio, binomio, trinomio o polinomio." },
-            { n: 4, done: vioOperaciones, t: "Opera", d: "Multiplica binomios con áreas." },
-            { n: 5, done: aprobados.lenguaje || aprobados.clasificacion || aprobados.operaciones, t: "Resuelve", d: "Aprueba el reto evaluable." },
-          ].map((s) => (
-            <div key={s.n} className="atl-step" data-on={s.done}>
-              <span className="atl-step-n">{s.done ? <i className="fa-solid fa-check" /> : s.n}</span>
-              <span className="atl-step-tx">
-                <strong>{s.t}</strong>
-                {s.d}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="atl-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <AlgebraTilesScene
-                modo={modo}
-                terminos={sceneProps.terminos}
-                exprLabel={sceneProps.exprLabel}
-                claseLabel={sceneProps.claseLabel}
-                a={sceneProps.a}
-                b={sceneProps.b}
-                expandLabel={sceneProps.expandLabel}
-                accent={accent}
-                pausado={pausado}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {!eppListo && (
-              <EppGate
-                accent={accent}
-                rgba={color.rgba}
-                items={INSTRUMENTOS}
-                titulo="Prepara tu mesa de álgebra con mosaicos"
-                subtitulo="Antes de operar con expresiones, equípate con lo correcto"
-                intro={`Para representar cada término como una pieza geométrica y agruparlos necesitas el material adecuado. Selecciona solo las ${INSTRUMENTOS.filter((i) => i.ok).length} piezas que sirven (deja fuera lo que mide otra cosa).`}
-                verbo="modelado algebraico"
-                onEntrar={() => {
-                  setEppListo(true);
-                  if (sonido) audioRef.current?.blip();
-                }}
-              />
-            )}
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="atl-live-dot" style={{ ["--atl" as string]: `${accent}aa`, width: 9, height: 9, borderRadius: "50%", background: accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 14, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>
-                <i className={`fa-solid ${modoActual.icon}`} style={{ marginRight: 8 }} />
-                {modoActual.nombre}
-              </span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="atl-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="atl-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="atl-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
-                <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
-              </button>
-              <button className="atl-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar la cámara">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="atl-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Leyenda de mosaicos */}
-            <div style={{ position: "absolute", bottom: 14, left: 16, display: "flex", gap: 14, padding: "8px 13px", borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <span className="atl-tilekey"><span className="atl-swatch" style={{ background: AZUL }} /> x²</span>
-              <span className="atl-tilekey"><span className="atl-swatch" style={{ background: VERDE }} /> x</span>
-              <span className="atl-tilekey"><span className="atl-swatch" style={{ background: ORO }} /> 1</span>
-              <span className="atl-tilekey"><span className="atl-swatch" style={{ background: "#f0667d" }} /> negativo</span>
-            </div>
-
-            <button className="atl-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          {/* Controles: modo + panel del modo */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: accent }} />
-              ¿Qué quieres explorar?
-            </Eyebrow>
-            <div className="atl-modgrid">
-              {VARIANTES.map((v) => (
-                <button
-                  key={v.id}
-                  className="atl-modbtn"
-                  data-on={modo === v.id}
-                  onClick={() => elegirModo(v.id)}
-                  style={{ ["--atl" as string]: accent }}
-                >
-                  <i className={`fa-solid ${v.icon}`} style={{ fontSize: 17, color: modo === v.id ? accent : T.text3 }} />
-                  <span style={{ fontSize: 12, fontWeight: 800, color: modo === v.id ? accent : T.text }}>{v.nombre}</span>
-                </button>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, marginTop: 10 }}>{modoActual.desc}</div>
-
-            {/* Panel del modo LENGUAJE */}
-            {modo === "lenguaje" && (
-              <div style={{ marginTop: 16, ["--atl" as string]: accent }}>
-                <span style={{ fontSize: 11.5, fontWeight: 700, color: T.text3, letterSpacing: "0.04em" }}>ELIGE UNA FRASE</span>
-                <div className="atl-cards" style={{ marginTop: 8 }}>
-                  {FRASES.map((f, i) => (
-                    <button key={f.id} className="atl-card" data-on={fraseIdx === i} onClick={() => { setFraseIdx(i); if (sonido) audioRef.current?.blip(); }}>
-                      <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.35 }}>{f.frase}</span>
-                      <span style={{ fontSize: 13, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>{f.expresion}</span>
-                    </button>
-                  ))}
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 14, marginBottom: 7 }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: T.text3, letterSpacing: "0.04em" }}>EVALÚA PARA x =</span>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: VERDE, fontFamily: "ui-monospace, monospace" }}>
-                    x = {xValue} → {Number.isInteger(valorFrase) ? valorFrase : valorFrase.toFixed(2)}
-                  </span>
-                </div>
-                <input className="atl-slider" type="range" min={-5} max={10} step={1} value={xValue} onChange={(e) => { setXValue(Number(e.target.value)); setEvaluo(true); }} />
-              </div>
-            )}
-
-            {/* Panel del modo CLASIFICACION */}
-            {modo === "clasificacion" && (
-              <div style={{ marginTop: 16, ["--atl" as string]: accent }}>
-                <span style={{ fontSize: 11.5, fontWeight: 700, color: T.text3, letterSpacing: "0.04em" }}>ELIGE UNA EXPRESIÓN</span>
-                <div className="atl-cards" style={{ marginTop: 8 }}>
-                  {EXPRESIONES.map((ex, i) => {
-                    const c = clasifica(ex.terminos.length);
-                    return (
-                      <button key={ex.id} className="atl-card" data-on={exprIdx === i} onClick={() => { setExprIdx(i); if (sonido) audioRef.current?.blip(); }}>
-                        <span style={{ fontSize: 13, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>{ex.expresion}</span>
-                        <span style={{ fontSize: 11, color: T.text3 }}>{c} · {ex.terminos.length} {ex.terminos.length === 1 ? "término" : "términos"} · grado {ex.grado}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Panel del modo OPERACIONES */}
-            {modo === "operaciones" && (
-              <div style={{ marginTop: 16, ["--atl" as string]: accent }}>
-                <span style={{ fontSize: 11.5, fontWeight: 700, color: T.text3, letterSpacing: "0.04em" }}>MULTIPLICA DOS BINOMIOS</span>
-                <div className="atl-cards" style={{ marginTop: 8 }}>
-                  {PRODUCTOS_PRESET.map((p) => (
-                    <button key={p.etiqueta} className="atl-card" data-on={ab.a === p.a && ab.b === p.b} onClick={() => { setAb({ a: p.a, b: p.b }); if (sonido) audioRef.current?.blip(); }}>
-                      <span style={{ fontSize: 13, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>{p.etiqueta}</span>
-                    </button>
-                  ))}
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 14 }}>
-                  <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: T.text3 }}>a (en x + a)</span>
-                      <span style={{ fontSize: 12.5, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>{ab.a >= 0 ? `+${ab.a}` : ab.a}</span>
+                {modo === "lenguaje" && (
+                  <>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 8 }}>
+                      {FRASES.map((f, i) => (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => { setFraseIdx(i); if (sonido) audioRef.current?.blip(); }}
+                          style={{ cursor: "pointer", textAlign: "left", display: "grid", gap: 2, padding: "10px 12px", borderRadius: 11, border: `1px solid ${fraseIdx === i ? accent : T.line}`, background: fraseIdx === i ? `rgba(${color.rgba},0.14)` : T.inset, color: T.text2, fontSize: 14 }}
+                        >
+                          <span>{f.frase}</span>
+                          <span style={{ fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>{f.expresion}</span>
+                        </button>
+                      ))}
                     </div>
-                    <input className="atl-slider" type="range" min={-4} max={4} step={1} value={ab.a} onChange={(e) => setAb((s) => ({ ...s, a: Number(e.target.value) }))} />
+                  </>
+                )}
+
+                {modo === "clasificacion" && (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 8 }}>
+                    {EXPRESIONES.map((ex, i) => {
+                      const c = clasifica(ex.terminos.length);
+                      return (
+                        <button
+                          key={ex.id}
+                          type="button"
+                          onClick={() => { setExprIdx(i); if (sonido) audioRef.current?.blip(); }}
+                          style={{ cursor: "pointer", textAlign: "left", display: "grid", gap: 2, padding: "10px 12px", borderRadius: 11, border: `1px solid ${exprIdx === i ? accent : T.line}`, background: exprIdx === i ? `rgba(${color.rgba},0.14)` : T.inset, color: T.text2, fontSize: 14 }}
+                        >
+                          <span style={{ fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>{ex.expresion}</span>
+                          <span>{c} · {ex.terminos.length} {ex.terminos.length === 1 ? "término" : "términos"} · grado {ex.grado}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: T.text3 }}>b (en x + b)</span>
-                      <span style={{ fontSize: 12.5, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>{ab.b >= 0 ? `+${ab.b}` : ab.b}</span>
+                )}
+
+                {modo === "operaciones" && (
+                  <>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 8 }}>
+                      {PRODUCTOS_PRESET.map((p) => {
+                        const on = ab.a === p.a && ab.b === p.b;
+                        return (
+                          <button
+                            key={p.etiqueta}
+                            type="button"
+                            onClick={() => { setAb({ a: p.a, b: p.b }); if (sonido) audioRef.current?.blip(); }}
+                            style={{ cursor: "pointer", textAlign: "left", padding: "10px 12px", borderRadius: 11, border: `1px solid ${on ? accent : T.line}`, background: on ? `rgba(${color.rgba},0.14)` : T.inset, color: accent, fontSize: 14, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}
+                          >
+                            {p.etiqueta}
+                          </button>
+                        );
+                      })}
                     </div>
-                    <input className="atl-slider" type="range" min={-4} max={4} step={1} value={ab.b} onChange={(e) => setAb((s) => ({ ...s, b: Number(e.target.value) }))} />
+                    <Deslizador label="a (en x + a)" icon="fa-plus-minus" colr={VERDE} valor={ab.a >= 0 ? `+${ab.a}` : `${ab.a}`} min={-4} max={4} step={1} value={ab.a} onChange={(v) => setAb((s) => ({ ...s, a: v }))} />
+                    <Deslizador label="b (en x + b)" icon="fa-plus-minus" colr={ORO} valor={ab.b >= 0 ? `+${ab.b}` : `${ab.b}`} min={-4} max={4} step={1} value={ab.b} onChange={(v) => setAb((s) => ({ ...s, b: v }))} />
+                  </>
+                )}
+              </Bloque>
+
+              {modo === "lenguaje" && (
+                <Bloque titulo="El experimento: ¿cuánto vale x?" icono="fa-ruler-horizontal">
+                  <MedidorValor valor={valorFrase} max={maxFrase} x={xValue} />
+                  <Deslizador
+                    label="valor de x"
+                    icon="fa-x"
+                    colr={VERDE}
+                    valor={`${xValue}`}
+                    min={1}
+                    max={10}
+                    step={1}
+                    value={xValue}
+                    hintL="x corto"
+                    hintR="x largo"
+                    onChange={(v) => { setXValue(v); setEvaluo(true); }}
+                  />
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    Al cambiar x, las tiras verdes y los cuadrados azules cambian de tamaño; los cuadritos dorados (el 1) no.
+                  </p>
+                </Bloque>
+              )}
+
+              <Bloque titulo={modo === "lenguaje" ? "Del lenguaje al símbolo" : modo === "clasificacion" ? "Anatomía de la expresión" : "El producto como área"} icono="fa-magnifying-glass-chart">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  {modo === "lenguaje" ? (
+                    <>
+                      <Dato label="expresión" value={frase.expresion} col={accent} />
+                      <Dato label={`valor en x = ${xValue}`} value={valorTxt} col={VERDE} />
+                    </>
+                  ) : modo === "clasificacion" ? (
+                    <>
+                      <Dato label="clase" value={clasifica(expr.terminos.length)} col={accent} />
+                      <Dato label="términos" value={`${expr.terminos.length}`} col={AZUL} />
+                      <Dato label="grado" value={`${expr.grado}`} col={VERDE} />
+                    </>
+                  ) : (
+                    <>
+                      <Dato label="producto" value={prod.ecuacion} col={accent} />
+                      <Dato label="coef. de x" value={`${prod.coefX >= 0 ? "+" : ""}${prod.coefX}`} col={VERDE} />
+                      <Dato label="constante" value={`${prod.constante >= 0 ? "+" : ""}${prod.constante}`} col={ORO} />
+                    </>
+                  )}
+                </div>
+                {modo === "lenguaje" ? (
+                  <p style={{ margin: 0, color: T.text2 }}>{frase.explica}</p>
+                ) : modo === "clasificacion" ? (
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    {CLASE_DESC[clasifica(expr.terminos.length)]} En el primer término el <strong style={{ color: ORO }}>coeficiente</strong> es {expr.anatomia.coeficiente}, la <strong style={{ color: VERDE }}>variable</strong> es {expr.anatomia.variable} y el <strong style={{ color: AZUL }}>exponente</strong> es {expr.anatomia.exponente}.
+                  </p>
+                ) : (
+                  <>
+                    <p style={{ margin: 0, color: T.text2 }}>
+                      Área total = <strong style={{ color: accent }}>{prod.expandido}</strong>. El cuadrado azul es x²; las tiras verdes suman (a + b)x = {prod.coefX}x; los cuadritos dorados son a·b = {prod.constante}.
+                    </p>
+                    <p style={{ margin: 0, padding: "10px 12px", borderRadius: 11, background: T.inset, border: `1px solid ${T.line}`, color: T.text2 }}>
+                      <strong style={{ color: T.text }}>Términos semejantes: </strong>{SEMEJANTES.entrada} = <strong style={{ color: accent }}>{SEMEJANTES.resultado}</strong>. {SEMEJANTES.pasos}: solo se suman los que tienen la misma variable y exponente.
+                    </p>
+                  </>
+                )}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              key={modo}
+              reto={retoActual}
+              accent={accent}
+              aprobado={aprobados[modo]}
+              onAprobado={() => setAprobados((s) => ({ ...s, [modo]: true }))}
+              playSfx={() => {
+                if (sonido) audioRef.current?.correcto();
+              }}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Qué es el lenguaje algebraico" icono="fa-language">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  El <strong style={{ color: T.text }}>álgebra</strong> usa letras para representar cantidades que no conocemos o que cambian. Cada término es una pieza: <strong style={{ color: AZUL }}>x²</strong> un cuadrado de lado x, <strong style={{ color: VERDE }}>x</strong> una tira y <strong style={{ color: ORO }}>1</strong> un cuadrito. Verlos como mosaicos hace tangible el lenguaje, su clasificación y sus operaciones.
+                </p>
+              </Bloque>
+              <Bloque titulo="Las cuatro clases" icono="fa-layer-group">
+                <Parte col={ORO} icon="fa-1" titulo="Monomio — 1 término">7x³, 5x², −4. Un solo bloque de mosaicos.</Parte>
+                <Parte col={VERDE} icon="fa-2" titulo="Binomio — 2 términos">3x + 7, x² − 9. Dos grupos.</Parte>
+                <Parte col={AZUL} icon="fa-3" titulo="Trinomio — 3 términos">x² + 4x − 2. Tres grupos.</Parte>
+                <Parte col="#f0a6ff" icon="fa-list-ol" titulo="Polinomio — 4 o más">2x³ + x² − 5x + 1. Muchos grupos.</Parte>
+              </Bloque>
+              <Bloque titulo="En la vida real (México)" icono="fa-location-dot">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Un arquitecto del <strong>INFONAVIT</strong> escribe el área de un lote como <strong style={{ color: ORO }}>x·(2x + 5) = 2x² + 5x</strong> para ajustar la vivienda; una hoja de cálculo evalúa fórmulas algebraicas; los patrones de costo de n productos se generalizan con expresiones.
+                </p>
+              </Bloque>
+              <Bloque titulo="Para multiplicar binomios" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: VERDE }}>(x + a)(x + b) = x² + (a + b)x + a·b</strong>. Los signos importan: en (x + 3)(x − 2), a + b = 1 y a·b = −6, así que el resultado es <strong style={{ color: accent }}>x² + x − 6</strong>.
+                </p>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-flask-vial">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((idea, i) => <li key={i}>{idea}</li>)}
+                </ul>
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, background: `rgba(${color.rgba},0.08)`, border: `1px solid rgba(${color.rgba},0.28)`, color: T.text }}>
+                  <strong style={{ color: accent }}>Contexto. </strong>{CONTEXTO}
+                </p>
+              </Bloque>
+              <Bloque titulo="Glosario" icono="fa-spell-check">
+                {GLOSARIO.map((g) => (
+                  <div key={g.termino} style={{ padding: "10px 12px", borderRadius: 11, background: T.inset, border: `1px solid ${T.line}` }}>
+                    <div style={{ fontWeight: 800, color: T.text }}>{g.termino}</div>
+                    <div style={{ color: T.text2 }}>{g.definicion}</div>
+                    <div style={{ color: T.text3, marginTop: 4 }}><i className="fa-solid fa-angle-right" style={{ marginRight: 5, color: accent }} aria-hidden />{g.ejemplo}</div>
                   </div>
-                </div>
-              </div>
-            )}
-          </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ALGEBRA_TILES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                <i className="fa-solid fa-book" style={{ marginRight: 6 }} aria-hidden />{FUENTE}
+              </p>
+              {/* objetivos verbatim (referencia para lectura) */}
+              <div style={{ display: "none" }} aria-hidden>{OBJETIVOS.join(" · ")}</div>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* Lectura del modelo */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />
-              {modo === "lenguaje" ? "Del lenguaje al símbolo" : modo === "clasificacion" ? "Anatomía de la expresión" : "El producto como área"}
-            </Eyebrow>
-            {modo === "lenguaje" ? (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 12 }}>
-                  <Readout label="Expresión" value={frase.expresion} col={accent} size={15} />
-                  <Readout label={`Valor en x = ${xValue}`} value={`${Number.isInteger(valorFrase) ? valorFrase : valorFrase.toFixed(2)}`} col={VERDE} size={15} />
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{frase.explica}</div>
-              </>
-            ) : modo === "clasificacion" ? (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 12 }}>
-                  <Readout label="Clase" value={clasifica(expr.terminos.length)} col={accent} size={15} />
-                  <Readout label="Términos" value={`${expr.terminos.length}`} col={AZUL} size={15} />
-                  <Readout label="Grado" value={`${expr.grado}`} col={VERDE} size={15} />
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-                  {CLASE_DESC[clasifica(expr.terminos.length)]} En el primer término el <strong style={{ color: ORO }}>coeficiente</strong> es {expr.anatomia.coeficiente}, la <strong style={{ color: VERDE }}>variable</strong> es {expr.anatomia.variable} y el <strong style={{ color: AZUL }}>exponente</strong> es {expr.anatomia.exponente}.
-                </div>
-              </>
-            ) : (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 12 }}>
-                  <Readout label="Producto" value={prod.ecuacion} col={accent} size={14} />
-                  <Readout label="Coef. de x" value={`${prod.coefX >= 0 ? "+" : ""}${prod.coefX}`} col={VERDE} size={15} />
-                  <Readout label="Constante" value={`${prod.constante >= 0 ? "+" : ""}${prod.constante}`} col={ORO} size={15} />
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-                  Área total = <strong style={{ color: accent }}>{prod.expandido}</strong>. El cuadrado azul es x²; las tiras verdes suman (a + b)x = {prod.coefX}x; los cuadritos dorados son a·b = {prod.constante}.
-                </div>
-                <div style={{ marginTop: 12, padding: "11px 13px", borderRadius: 11, background: T.inset, border: `1px solid ${T.line}`, fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
-                  <strong style={{ color: T.text }}>Términos semejantes: </strong>{SEMEJANTES.entrada} = <strong style={{ color: accent }}>{SEMEJANTES.resultado}</strong>. {SEMEJANTES.pasos}: solo se suman los que tienen la misma variable y exponente.
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>Qué es el lenguaje algebraico</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            El <strong style={{ color: T.text }}>álgebra</strong> usa letras para representar cantidades que no conocemos o que cambian. Cada término es una pieza: <strong style={{ color: AZUL }}>x²</strong> un cuadrado de lado x, <strong style={{ color: VERDE }}>x</strong> una tira y <strong style={{ color: ORO }}>1</strong> un cuadrito. Verlos como mosaicos hace tangible el lenguaje, su clasificación y sus operaciones.
-          </div>
-
-          <div className="atl-divider" />
-
-          <Eyebrow>Las cuatro clases</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <Parte col={ORO} icon="fa-1" titulo="Monomio — 1 término">7x³, 5x², −4. Un solo bloque de mosaicos.</Parte>
-            <Parte col={VERDE} icon="fa-2" titulo="Binomio — 2 términos">3x + 7, x² − 9. Dos grupos.</Parte>
-            <Parte col={AZUL} icon="fa-3" titulo="Trinomio — 3 términos">x² + 4x − 2. Tres grupos.</Parte>
-            <Parte col="#f0a6ff" icon="fa-list-ol" titulo="Polinomio — 4 o más">2x³ + x² − 5x + 1. Muchos grupos.</Parte>
-          </div>
-
-          <div className="atl-divider" />
-
-          <Eyebrow>En la vida real (México)</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            Un arquitecto del <strong>INFONAVIT</strong> escribe el área de un lote como <strong style={{ color: ORO }}>x·(2x + 5) = 2x² + 5x</strong> para ajustar la vivienda; una hoja de cálculo evalúa fórmulas algebraicas; los patrones de costo de n productos se generalizan con expresiones.
-          </div>
-        </div>
+/* ── Medidor: el valor de la expresión crece con x ────────────────────── */
+function MedidorValor({ valor, max, x, compacto = false }: { valor: number; max: number; x: number; compacto?: boolean }) {
+  const pct = Math.max(2, Math.min(100, (Math.abs(valor) / Math.max(1, Math.abs(max))) * 100));
+  return (
+    <div style={{ display: "grid", gap: 6, width: compacto ? 176 : undefined, marginTop: compacto ? 4 : 0 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+        <span>valor con x = {x}</span>
+        <span style={{ fontFamily: "ui-monospace, monospace", color: VERDE }}>{Number.isInteger(valor) ? valor : valor.toFixed(2)}</span>
       </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="atl-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            Para multiplicar binomios: <strong style={{ color: VERDE }}>(x + a)(x + b) = x² + (a + b)x + a·b</strong>. Los signos importan: en (x + 3)(x − 2), a + b = 1 y a·b = −6, así que el resultado es <strong style={{ color: accent }}>x² + x − 6</strong>.
-          </span>
-        </div>
+      <div style={{ height: compacto ? 8 : 12, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: valor < 0 ? "#f0667d" : VERDE, transition: "width 120ms linear" }} />
       </div>
-
-      {/* ── Ideas + glosario ────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "20px 22px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-flask-vial" style={{ marginRight: 8, color: accent }} />
-          Ideas clave
-        </Eyebrow>
-        <ul style={{ margin: "4px 0 4px", paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6 }}>
-          {IDEAS.map((idea, i) => (
-            <li key={i} style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>{idea}</li>
-          ))}
-        </ul>
-
-        <div style={{ marginTop: 12, padding: "11px 14px", borderRadius: 11, background: `rgba(${color.rgba},0.08)`, border: `1px solid rgba(${color.rgba},0.28)`, fontSize: 12.5, color: T.text, lineHeight: 1.5 }}>
-          <strong style={{ color: accent }}>Contexto. </strong>{CONTEXTO}
-        </div>
-
-        <div className="atl-divider" />
-
-        <Eyebrow>Glosario</Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          {GLOSARIO.map((g) => (
-            <div key={g.termino} style={{ padding: "10px 12px", borderRadius: 11, background: T.inset, border: `1px solid ${T.line}` }}>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: T.text, marginBottom: 3 }}>{g.termino}</div>
-              <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
-              <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}><i className="fa-solid fa-angle-right" style={{ marginRight: 5, color: accent }} />{g.ejemplo}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ marginTop: 14, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
-          <i className="fa-solid fa-book" style={{ marginRight: 6 }} />{FUENTE}
-        </div>
-      </div>
-
-      {/* ── Reto evaluable (según el modo) ───────────────────────────── */}
-      <RetoNumericoCard
-        key={modo}
-        reto={retoActual}
-        accent={accent}
-        aprobado={aprobados[modo]}
-        onAprobado={() => setAprobados((s) => ({ ...s, [modo]: true }))}
-        playSfx={() => {
-          if (sonido) audioRef.current?.correcto();
-        }}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="atl-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="atl-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="atl-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="atl-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="atl-drawer-body">
-          <FichaTeorica data={ALGEBRA_TILES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      {/* objetivos verbatim (referencia para lectura) */}
-      <div style={{ display: "none" }} aria-hidden>{OBJETIVOS.join(" · ")}</div>
     </div>
   );
 }
 
-/* ── Tarjeta de "parte" en el panel lateral ──────────────────────────── */
+/* ── Tarjeta de "parte" en la teoría ──────────────────────────────────── */
 function Parte({ col, icon, titulo, children }: { col: string; icon: string; titulo: string; children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-      <div style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: col, background: `${col}1f` }}>
-        <i className={`fa-solid ${icon}`} />
+      <div style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: col, background: `${col}1f` }}>
+        <i className={`fa-solid ${icon}`} aria-hidden />
       </div>
-      <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
+      <div style={{ color: T.text2 }}>
         <strong style={{ color: T.text, display: "block", marginBottom: 2 }}>{titulo}</strong>
         {children}
       </div>

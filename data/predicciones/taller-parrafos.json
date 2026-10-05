@@ -1,0 +1,12 @@
+{
+  "escena": "Un lector ficticio lee un párrafo sobre cuidar el agua armado con tarjetas de oraciones",
+  "pregunta": "Si metes una oración que no habla del tema dentro del párrafo, ¿qué hace el lector?",
+  "opciones": [
+    { "id": "a", "texto": "La ignora y entiende igual", "icono": "fa-eye-slash" },
+    { "id": "b", "texto": "Pierde el hilo y comprende menos", "icono": "fa-face-dizzy" },
+    { "id": "c", "texto": "Comprende mejor por tener más datos", "icono": "fa-lightbulb" }
+  ],
+  "correcta": "b",
+  "porque": "Un párrafo se sostiene en una sola idea. Una oración ajena rompe esa unidad y el lector ya no sabe qué es lo importante.",
+  "comoComprobarlo": "En «Taller del párrafo», arma tema, apoyos y cierre; luego cambia un apoyo por la tarjeta del futbol y observa el medidor."
+}

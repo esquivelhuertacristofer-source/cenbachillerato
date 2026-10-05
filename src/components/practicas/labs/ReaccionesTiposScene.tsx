@@ -20,7 +20,7 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS, type Elem, type RAtom, type RBond, type V } from "./reacciones-tipos-data";
 import { Escenario } from "./_escenario";
@@ -34,6 +34,9 @@ export interface ReaccionesTiposSceneProps {
   progreso: number;
   accent: string;
   girar: boolean;
+  /** Texto de la ecuación a cada lado, para la etiqueta que acompaña al avance. */
+  reactivos: string;
+  productos: string;
   resetNonce: number;
 }
 
@@ -50,6 +53,19 @@ function lerp(a: number, b: number, t: number): number {
 }
 function lerpV(a: V, b: V, t: number): V {
   return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+}
+
+/* ── Etiqueta única: dice de qué lado de la flecha estamos ───────────────── */
+function EtiquetaLado({ progreso, reactivos, productos }: { progreso: number; reactivos: string; productos: string }) {
+  const enProductos = progreso > 0.5;
+  const col = enProductos ? NEW_COLOR : "#C9D6E6";
+  return (
+    <Html position={[0, 2.1, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ whiteSpace: "nowrap", padding: "3px 10px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${col}`, color: col, fontWeight: 900, fontSize: 15, fontFamily: "ui-monospace, monospace", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+        {enProductos ? `Productos: ${productos}` : `Reactivos: ${reactivos}`}
+      </div>
+    </Html>
+  );
 }
 
 /* ── Átomo (esfera CPK) ───────────────────────────────────────────────────── */
@@ -136,7 +152,7 @@ function Sistema({ atoms, rbonds, pbonds, progreso, girar }: { atoms: RAtom[]; r
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ reaccionId, atoms, rbonds, pbonds, progreso, accent, girar, resetNonce }: ReaccionesTiposSceneProps) {
+function Contenido({ reaccionId, atoms, rbonds, pbonds, progreso, accent, girar, resetNonce, reactivos, productos }: ReaccionesTiposSceneProps) {
   const sig = `${reaccionId}-${resetNonce}`;
   return (
     <>
@@ -149,6 +165,7 @@ function Contenido({ reaccionId, atoms, rbonds, pbonds, progreso, accent, girar,
       <group key={sig} position={[0, 0.1, 0]}>
         <Sistema atoms={atoms} rbonds={rbonds} pbonds={pbonds} progreso={progreso} girar={girar} />
       </group>
+      <EtiquetaLado progreso={progreso} reactivos={reactivos} productos={productos} />
 
 
       <OrbitControls

@@ -1,0 +1,12 @@
+{
+  "escena": "Un vaso con vinagre (ácido débil) y una bureta de NaOH cuya perilla se arrastra gota a gota, junto a una escala de pH.",
+  "pregunta": "Si añades NaOH al vinagre hasta neutralizarlo justo, ¿en qué pH queda?",
+  "opciones": [
+    { "id": "a", "texto": "Exactamente en 7", "icono": "fa-equals" },
+    { "id": "b", "texto": "Arriba de 7, en zona básica", "icono": "fa-arrow-up" },
+    { "id": "c", "texto": "Abajo de 7, sigue ácido", "icono": "fa-arrow-down" }
+  ],
+  "correcta": "b",
+  "porque": "Al neutralizar, el acetato que se forma reacciona con el agua y libera un poco de OH⁻. Por eso la equivalencia de un ácido débil cae cerca de pH 8.7, no en 7.",
+  "comoComprobarlo": "En Neutralizar elige el ácido débil, arrastra la bureta hasta la equivalencia (20 gotas) y compara con el ácido fuerte."
+}

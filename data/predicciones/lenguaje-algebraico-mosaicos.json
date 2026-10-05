@@ -1,0 +1,12 @@
+{
+  "escena": "Mosaicos que representan 2x + 3: dos tiras verdes de x y tres cuadritos dorados de 1.",
+  "pregunta": "Si subes x de 3 a 8, ¿qué mosaicos cambian de tamaño?",
+  "opciones": [
+    { "id": "a", "texto": "Todos, también los cuadritos de 1", "icono": "fa-expand" },
+    { "id": "b", "texto": "Solo las tiras de x", "icono": "fa-ruler-horizontal" },
+    { "id": "c", "texto": "Ninguno; solo cambia el resultado", "icono": "fa-ban" }
+  ],
+  "correcta": "b",
+  "porque": "x es una longitud desconocida: al cambiarla, las tiras de x (y los cuadrados x²) se estiran. El 1 es una cantidad fija, por eso su cuadrito mide lo mismo con cualquier x.",
+  "comoComprobarlo": "Mueve el deslizador de x en el panel y compara el largo de las tiras verdes con el de los cuadritos dorados."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Una máquina de funciones: el tiempo de un café se mueve en minutos y la gráfica marca la temperatura que sale.",
+  "pregunta": "Si el café lleva 5 minutos en reposo, ¿qué temperatura sale de la máquina?",
+  "opciones": [
+    { "id": "a", "texto": "85 °C", "icono": "fa-temperature-high" },
+    { "id": "b", "texto": "60 °C", "icono": "fa-temperature-half" },
+    { "id": "c", "texto": "30 °C", "icono": "fa-temperature-low" }
+  ],
+  "correcta": "b",
+  "porque": "El café sale a 90 °C y pierde 6 °C por minuto. En 5 minutos pierde 30 °C y queda en 90 − 30 = 60 °C. A cada entrada le toca una sola salida.",
+  "comoComprobarlo": "Mueve el deslizador de entrada x hasta 5 min y lee el valor de «sale» junto al punto de la gráfica."
+}

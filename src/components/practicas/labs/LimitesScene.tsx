@@ -21,7 +21,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -59,12 +59,14 @@ function hacerMapa(v: Vista) {
 
 /* ── Etiqueta flotante ────────────────────────────────────────────────────── */
 function Etiqueta({
-  pos, color, children, size = 11.5, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, size = 14, bg = "rgba(6,16,31,0.82)",
 }: {
   pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
 }) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={15} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
         whiteSpace: "nowrap", padding: "4px 9px", borderRadius: 9, background: bg,
         border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
@@ -94,8 +96,6 @@ function Plano({ v }: { v: Vista }) {
   const ejeX: Pt[] = [S(v.xmin, ax0), S(v.xmax, ax0)];
   const ejeY: Pt[] = [S(ay0, v.ymin), S(ay0, v.ymax)];
 
-  const fmtTick = (n: number) => n.toLocaleString("es-MX", { maximumFractionDigits: 1 }).replace("-", "−");
-
   return (
     <group>
       <lineSegments geometry={geo}>
@@ -104,15 +104,6 @@ function Plano({ v }: { v: Vista }) {
 
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={[BX + 0.5, sy(ax0), 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.xlabel}</Etiqueta>
-      <Etiqueta pos={[sx(ay0), BY + 0.5, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.ylabel}</Etiqueta>
-
-      {v.xticks.filter((t) => t !== ay0).map((t) => (
-        <Etiqueta key={`tx${t}`} pos={[sx(t), sy(ax0) - 0.34, 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
-      {v.yticks.filter((t) => t !== ax0).map((t) => (
-        <Etiqueta key={`ty${t}`} pos={[sx(ay0) - 0.42, sy(t), 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
     </group>
   );
 }
@@ -164,13 +155,8 @@ function Objetivo({ casoId, v }: { casoId: CasoId; v: Vista }) {
       {dentroX && <Line points={vertical} color={X_COL} lineWidth={1.6} dashed dashSize={0.16} gapSize={0.12} transparent opacity={0.6} />}
       {dentroY && <Line points={horizontal} color={LIM_COL} lineWidth={1.6} dashed dashSize={0.16} gapSize={0.12} transparent opacity={0.6} />}
 
-      {dentroX && (
-        <Etiqueta pos={[sx(c.a), -BY - 0.42, 0]} color={X_COL} size={11} bg="rgba(6,16,31,0.85)">
-          x → {c.a.toLocaleString("es-MX", { maximumFractionDigits: 1 })}
-        </Etiqueta>
-      )}
       {dentroY && (
-        <Etiqueta pos={[-BX - 0.7, sy(c.L), 0]} color={LIM_COL} size={11.5} bg="rgba(6,16,31,0.92)">
+        <Etiqueta pos={[-BX - 0.7, sy(c.L), 0]} color={LIM_COL} size={14} bg="rgba(6,16,31,0.92)">
           L = {c.L.toLocaleString("es-MX", { maximumFractionDigits: 2 })}
         </Etiqueta>
       )}
@@ -180,14 +166,14 @@ function Objetivo({ casoId, v }: { casoId: CasoId; v: Vista }) {
         c.hueco ? (
           <>
             <CurvaTubo puntos={anillo} color={HOLE_COL} grosor={0.054} />
-            <Etiqueta pos={[S(c.a, c.L)[0] + 0.25, S(c.a, c.L)[1] + 0.5, 0.05]} color={HOLE_COL} size={11} bg="rgba(6,16,31,0.92)">
+            <Etiqueta pos={[S(c.a, c.L)[0] + 0.25, S(c.a, c.L)[1] + 0.5, 0.05]} color={HOLE_COL} size={14} bg="rgba(6,16,31,0.92)">
               f({c.a.toLocaleString("es-MX", { maximumFractionDigits: 1 })}) no existe (0/0)
             </Etiqueta>
           </>
         ) : (
           <mesh position={S(c.a, c.L)}>
             <sphereGeometry args={[0.15, 22, 22]} />
-            <meshStandardMaterial color="#fff" emissive={LIM_COL} emissiveIntensity={1.6} toneMapped={false} />
+            <meshStandardMaterial color="#fff" emissive={LIM_COL} emissiveIntensity={1.6} />
           </mesh>
         )
       )}
@@ -222,20 +208,20 @@ function Movil({ casoId, v, xPos }: { casoId: CasoId; v: Vista; xPos: number }) 
 
       <mesh position={baseX}>
         <sphereGeometry args={[0.1, 16, 16]} />
-        <meshStandardMaterial color={X_COL} emissive={X_COL} emissiveIntensity={0.7} toneMapped={false} />
+        <meshStandardMaterial color={X_COL} emissive={X_COL} emissiveIntensity={0.7} />
       </mesh>
 
       {/* punto P pulsante sobre la curva */}
       <group ref={pulso} position={P}>
         <mesh>
           <sphereGeometry args={[0.15, 22, 22]} />
-          <meshStandardMaterial color="#fff" emissive={c.color} emissiveIntensity={1.8} toneMapped={false} />
+          <meshStandardMaterial color="#fff" emissive={c.color} emissiveIntensity={1.8} />
         </mesh>
       </group>
-      <Etiqueta pos={[P[0] + 0.15, P[1] + 0.5, 0.05]} color={c.color} size={12} bg="rgba(6,16,31,0.92)">
+      <Etiqueta pos={[P[0] + 0.15, P[1] + 0.5, 0.05]} color={c.color} size={14} bg="rgba(6,16,31,0.92)">
         f(x) = {conUnidad(y, c.unidadY, 2)}
       </Etiqueta>
-      <Etiqueta pos={[baseX[0], baseX[1] - 0.4, 0]} color={X_COL} size={10.5}>
+      <Etiqueta pos={[baseX[0], baseX[1] - 0.4, 0]} color={X_COL} size={14}>
         x = {conUnidad(xPos, c.unidadX, 3)} · |x−a| = {cercania(casoId, xPos)}
       </Etiqueta>
     </group>
@@ -268,10 +254,10 @@ function Contenido({ casoId, xPos, accent, resetNonce }: LimitesSceneProps) {
         makeDefault
         enablePan={false}
         minDistance={7}
-        maxDistance={26}
+        maxDistance={30}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[0, 0, 0]}
+        target={[0, -0.7, 0]}
       />
 
       <EffectComposer enableNormalPass={false}>
@@ -284,7 +270,7 @@ function Contenido({ casoId, xPos, accent, resetNonce }: LimitesSceneProps) {
 
 export default function LimitesScene(props: LimitesSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.2, 2.4, 13], fov: 44 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.2, 1.8, 15.5], fov: 44 }}>
       <Contenido {...props} />
     </Canvas>
   );

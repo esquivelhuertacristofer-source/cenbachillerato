@@ -17,8 +17,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Html, RoundedBox } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -50,19 +50,39 @@ export interface AlgebraTilesSceneProps {
   pausado: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** Solo lenguaje: valor de x. Las tiras y los cuadrados x² crecen con x (la unidad no cambia). */
+  xValor?: number;
 }
 
 const GAP = 0.22; // separación entre mosaicos de un mismo término
 const GAP_TERM = 0.9; // separación entre términos
-const BLANCO = "#eaf2ff";
 
 const colorDe = (tipo: TipoTile, coef: number) => (coef < 0 ? COLOR_NEG : COLOR_TILE[tipo]);
 
+/** Medidas de los mosaicos: la unidad es fija y "x" puede escalar con el valor de x. */
+interface Medidas { xl: number; u: number }
+const MEDIDAS_BASE: Medidas = { xl: X_LEN, u: U_LEN };
+/** En el modo lenguaje la longitud de x es el valor de x (en unidades de 0,55). */
+const medidasDeX = (x: number): Medidas => ({ u: 0.55, xl: 0.55 * Math.max(1, x) });
+
 /** Footprint sobre el eje X (ancho de cada copia) y profundidad sobre Z. */
-function footprint(tipo: TipoTile): { w: number; d: number } {
-  if (tipo === "x2") return { w: X_LEN, d: X_LEN };
-  if (tipo === "x") return { w: U_LEN, d: X_LEN }; // tira parada en profundidad
-  return { w: U_LEN, d: U_LEN };
+function footprint(tipo: TipoTile, m: Medidas = MEDIDAS_BASE): { w: number; d: number } {
+  if (tipo === "x2") return { w: m.xl, d: m.xl };
+  if (tipo === "x") return { w: m.u, d: m.xl }; // tira parada en profundidad
+  return { w: m.u, d: m.u };
+}
+
+/* Etiqueta fija en píxeles (≥ 14 px) con fondo propio: se lee sobre cualquier cosa. */
+function Etiqueta({ pos, color = "#fff", children, dy = 0 }: { pos: [number, number, number]; color?: string; children: React.ReactNode; dy?: number }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: `translateY(${dy}px)` }}>
+        <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
 }
 
 /* ════════════════════ Mosaico individual ═════════════════════════════════ */
@@ -73,6 +93,7 @@ function Tile({
   color,
   label,
   flotar,
+  alto = TILE_H,
   fase,
   pausado,
 }: {
@@ -81,6 +102,7 @@ function Tile({
   d: number;
   color: string;
   label?: string;
+  alto?: number;
   flotar?: boolean;
   fase?: number;
   pausado?: boolean;
@@ -94,7 +116,7 @@ function Tile({
   });
   return (
     <group ref={ref} position={[pos[0], 0, pos[1]]}>
-      <RoundedBox args={[w - 0.08, TILE_H, d - 0.08]} radius={0.06} smoothness={3} position={[0, TILE_H / 2, 0]}>
+      <RoundedBox args={[w - 0.08, alto, d - 0.08]} radius={0.06} smoothness={3} position={[0, alto / 2, 0]}>
         {/* `toneMapped={false}` sacaba el mosaico del tono de la escena: salía
             como color plano, sin responder a la luz, y el conjunto se leía como
             un diagrama en vez de como piezas sobre una mesa. */}
@@ -110,11 +132,7 @@ function Tile({
         />
       </RoundedBox>
       {label && (
-        <Html position={[0, TILE_H + 0.02, 0]} center distanceFactor={13} pointerEvents="none">
-          <div style={{ color: "#06121f", fontSize: 11, fontWeight: 900, textShadow: "0 1px 2px rgba(255,255,255,.5)", whiteSpace: "nowrap" }}>
-            {label}
-          </div>
-        </Html>
+        <Etiqueta pos={[0, alto + 0.02, 0]} color="#ffffff" dy={-20}>{label}</Etiqueta>
       )}
     </group>
   );
@@ -130,14 +148,14 @@ interface Plano {
   fase: number;
 }
 
-function disponerTerminos(terminos: Termino[], etiquetar: boolean): { tiles: Plano[]; ancho: number; grupos: { cx: number; texto: string }[] } {
+function disponerTerminos(terminos: Termino[], etiquetar: boolean, m: Medidas): { tiles: Plano[]; ancho: number; grupos: { cx: number; texto: string }[] } {
   const tiles: Plano[] = [];
   const grupos: { cx: number; texto: string }[] = [];
   let cursor = 0;
   let fase = 0;
   terminos.forEach((term, ti) => {
     const n = Math.abs(term.coef);
-    const { w, d } = footprint(term.tipo);
+    const { w, d } = footprint(term.tipo, m);
     const inicioTerm = cursor;
     for (let k = 0; k < n; k++) {
       const cx = cursor + w / 2;
@@ -163,18 +181,17 @@ function disponerTerminos(terminos: Termino[], etiquetar: boolean): { tiles: Pla
   return { tiles, ancho, grupos };
 }
 
-function FilaTerminos({ terminos, etiquetar, mostrarGrupos, pausado }: { terminos: Termino[]; etiquetar: boolean; mostrarGrupos?: boolean; pausado?: boolean }) {
-  const { tiles, grupos } = useMemo(() => disponerTerminos(terminos, etiquetar), [terminos, etiquetar]);
+function FilaTerminos({ terminos, etiquetar, mostrarGrupos, pausado, m = MEDIDAS_BASE }: { terminos: Termino[]; etiquetar: boolean; mostrarGrupos?: boolean; pausado?: boolean; m?: Medidas }) {
+  const { tiles, grupos } = useMemo(() => disponerTerminos(terminos, etiquetar, m), [terminos, etiquetar, m]);
+  const alto = Math.min(TILE_H, m.u * 0.5);
   return (
     <group>
       {tiles.map((t, i) => (
-        <Tile key={i} pos={t.pos} w={t.w} d={t.d} color={t.color} label={t.label} flotar fase={t.fase} pausado={pausado} />
+        <Tile key={i} pos={t.pos} w={t.w} d={t.d} alto={alto} color={t.color} label={t.label} flotar fase={t.fase} pausado={pausado} />
       ))}
       {mostrarGrupos &&
         grupos.map((g, i) => (
-          <Html key={`g${i}`} position={[g.cx, 0.02, X_LEN / 2 + 0.7]} center distanceFactor={14} pointerEvents="none">
-            <div style={{ color: BLANCO, fontSize: 12, fontWeight: 900, textShadow: "0 2px 6px #000", whiteSpace: "nowrap" }}>{g.texto}</div>
-          </Html>
+          <Etiqueta key={`g${i}`} pos={[g.cx, 0.02, m.xl / 2 + 0.7]} color="#eaf2ff">{g.texto}</Etiqueta>
         ))}
     </group>
   );
@@ -190,17 +207,17 @@ function ModeloArea({ a, b, expandLabel, accent }: { a: number; b: number; expan
   const nb = Math.abs(b);
 
   // x² en [0..X_LEN] × [0..X_LEN]
-  tiles.push({ pos: [X_LEN / 2, X_LEN / 2], w: X_LEN, d: X_LEN, color: COLOR_TILE.x2, label: "x²", fase: 0 });
+  tiles.push({ pos: [X_LEN / 2, X_LEN / 2], w: X_LEN, d: X_LEN, color: COLOR_TILE.x2, fase: 0 });
 
   // a tiras horizontales (largo X_LEN sobre X, ancho 1 sobre Z) a la DERECHA del x²: representan a·x
   for (let i = 0; i < na; i++) {
     const cx = X_LEN + 0.18 + U_LEN / 2 + i * (U_LEN + 0.12);
-    tiles.push({ pos: [cx, X_LEN / 2], w: U_LEN, d: X_LEN, color: a < 0 ? COLOR_NEG : COLOR_TILE.x, label: i === 0 ? "x" : undefined, fase: 0.5 + i });
+    tiles.push({ pos: [cx, X_LEN / 2], w: U_LEN, d: X_LEN, color: a < 0 ? COLOR_NEG : COLOR_TILE.x, fase: 0.5 + i });
   }
   // b tiras debajo del x²: representan b·x
   for (let i = 0; i < nb; i++) {
     const cz = X_LEN + 0.18 + U_LEN / 2 + i * (U_LEN + 0.12);
-    tiles.push({ pos: [X_LEN / 2, cz], w: X_LEN, d: U_LEN, color: b < 0 ? COLOR_NEG : COLOR_TILE.x, label: i === 0 ? "x" : undefined, fase: 1 + i });
+    tiles.push({ pos: [X_LEN / 2, cz], w: X_LEN, d: U_LEN, color: b < 0 ? COLOR_NEG : COLOR_TILE.x, fase: 1 + i });
   }
   // a·b unidades en la esquina inferior-derecha
   const unidNeg = sa * sb < 0;
@@ -231,15 +248,9 @@ function ModeloArea({ a, b, expandLabel, accent }: { a: number; b: number; expan
       ))}
 
       {/* etiquetas de los lados del rectángulo */}
-      <Html position={[0, 0.02, -offZ - 0.6]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: accent, fontSize: 12.5, fontWeight: 900, textShadow: "0 2px 6px #000", whiteSpace: "nowrap" }}>{`x ${sg(a)}  (largo)`}</div>
-      </Html>
-      <Html position={[-offX - 0.7, 0.02, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: accent, fontSize: 12.5, fontWeight: 900, textShadow: "0 2px 6px #000", whiteSpace: "nowrap" }}>{`x ${sg(b)} (ancho)`}</div>
-      </Html>
-      <Html position={[0, 0.02, offZ + 0.7]} center distanceFactor={13} pointerEvents="none">
-        <div style={{ color: BLANCO, fontSize: 13, fontWeight: 900, textShadow: "0 2px 6px #000", whiteSpace: "nowrap" }}>{`= ${expandLabel}`}</div>
-      </Html>
+      <Etiqueta pos={[0, 0.02, -offZ - 0.6]} color={accent}>{`x ${sg(a)}`}</Etiqueta>
+      <Etiqueta pos={[-offX - 0.5, 0.02, 0]} color={accent}>{`x ${sg(b)}`}</Etiqueta>
+      <Etiqueta pos={[0, 0.02, offZ + 0.7]} color="#eaf2ff">{`= ${expandLabel}`}</Etiqueta>
 
       <ContactShadows position={[0, 0, 0]} opacity={0.22} scale={14} blur={2.4} far={6} />
     </group>
@@ -275,10 +286,27 @@ export default function AlgebraTilesScene(props: AlgebraTilesSceneProps) {
   );
 }
 
+/** Aleja o acerca la cámara según lo ancho que sea el contenido (una vez por cambio). */
+function AjusteCamara({ dist }: { dist: number }) {
+  const camera = useThree((st) => st.camera);
+  useEffect(() => {
+    camera.position.setLength(dist);
+  }, [camera, dist]);
+  return null;
+}
+
 function Contenido(props: AlgebraTilesSceneProps) {
-  const { accent, autoRotate, resetNonce, modo, terminos, exprLabel, claseLabel, a, b, expandLabel, pausado } = props;
+  const { accent, autoRotate, resetNonce, modo, terminos, exprLabel, claseLabel, a, b, expandLabel, pausado, xValor } = props;
+  const angosto = useThree((st) => st.size.width) < 640;
+  const anchoContenido = useMemo(() => {
+    if (modo === "operaciones") return X_LEN + 0.18 + (Math.abs(a) + 1) * (U_LEN + 0.12) + 1.5;
+    const m = modo === "lenguaje" ? medidasDeX(xValor ?? 3) : MEDIDAS_BASE;
+    return disponerTerminos(terminos, false, m).ancho + 1.5;
+  }, [modo, terminos, a, xValor]);
+  const dist = Math.min(24, Math.max(10, anchoContenido * (angosto ? 1.25 : 0.95) + 4));
   return (
     <>
+      <AjusteCamara dist={Math.round(dist * 2) / 2} />
       <color attach="background" args={["#04111f"]} />
       <fog attach="fog" args={["#04111f", 24, 54]} />
 
@@ -298,31 +326,16 @@ function Contenido(props: AlgebraTilesSceneProps) {
       <Tablero accent={accent} />
 
       <group key={`${resetNonce}-${modo}`}>
-        {modo === "lenguaje" && <FilaTerminos terminos={terminos} etiquetar pausado={pausado} />}
-        {modo === "clasificacion" && <FilaTerminos terminos={terminos} etiquetar mostrarGrupos pausado={pausado} />}
+        {modo === "lenguaje" && <FilaTerminos terminos={terminos} etiquetar pausado={pausado} m={medidasDeX(xValor ?? 3)} />}
+        {modo === "clasificacion" && <FilaTerminos terminos={terminos} etiquetar={false} mostrarGrupos pausado={pausado} />}
         {modo === "operaciones" && <ModeloArea a={a} b={b} expandLabel={expandLabel} accent={accent} />}
       </group>
 
       {/* etiqueta principal de la expresión */}
-      <Html position={[0, 2.6, 0]} center distanceFactor={17} pointerEvents="none">
-        <div
-          style={{
-            color: "#fff",
-            fontSize: 15,
-            fontWeight: 900,
-            letterSpacing: 0.3,
-            textShadow: "0 2px 10px #000",
-            whiteSpace: "nowrap",
-            background: "rgba(4,17,31,.55)",
-            border: `1px solid ${accent}55`,
-            borderRadius: 10,
-            padding: "5px 12px",
-          }}
-        >
-          {modo === "operaciones" ? exprLabel : exprLabel}
-          {modo === "clasificacion" && claseLabel ? <span style={{ color: accent, marginLeft: 10 }}>· {claseLabel}</span> : null}
-        </div>
-      </Html>
+      <Etiqueta pos={[0, modo === "operaciones" ? 1.6 : 1.9, 0]} color={accent} dy={-34}>
+        {exprLabel}
+        {modo === "clasificacion" && claseLabel ? <span style={{ color: "#fff", marginLeft: 10 }}>· {claseLabel}</span> : null}
+      </Etiqueta>
 
       <Environment resolution={256}>
         <Lightformer intensity={1.3} position={[0, 8, 6]} scale={[16, 5, 1]} color="#ffffff" />
@@ -332,8 +345,8 @@ function Contenido(props: AlgebraTilesSceneProps) {
 
       <OrbitControls
         enablePan={false}
-        minDistance={7}
-        maxDistance={22}
+        minDistance={6}
+        maxDistance={28}
         minPolarAngle={Math.PI / 9}
         maxPolarAngle={Math.PI / 2.15}
         target={[0, 0, 0]}

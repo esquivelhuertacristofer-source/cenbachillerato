@@ -16,8 +16,8 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 
@@ -191,7 +191,21 @@ function Globo({ volCO2mL, progreso, colorGlobo }: { volCO2mL: number; progreso:
           <meshStandardMaterial color={colorGlobo} roughness={0.4} />
         </mesh>
       </group>
+      <Etiqueta ancho x={r + 0.95} y={0.12 + r * 0.9} titulo="Globo" valor={`CO₂ ${volCO2mL * progreso >= 1000 ? (volCO2mL * progreso / 1000).toFixed(2) + " L" : Math.round(volCO2mL * progreso) + " mL"}`} color={colorGlobo} />
     </group>
+  );
+}
+
+/** Rótulo en la punta de lo que nombra (≥14 px); en pantalla angosta se oculta. */
+function Etiqueta({ x, y, titulo, valor, color, ancho }: { x: number; y: number; titulo: string; valor?: string; color: string; ancho?: boolean }) {
+  const w = useThree((st) => st.size.width);
+  if (w < 640 && !ancho) return null;
+  return (
+    <Html position={[x, y, 0]} center style={{ pointerEvents: "none" }}>
+      <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", background: "rgba(3,12,28,0.82)", border: `1px solid ${color}99`, borderRadius: 8, padding: "3px 9px", whiteSpace: "nowrap", lineHeight: 1.3 }}>
+        {titulo}{valor && <span style={{ color, marginLeft: 6, fontFamily: "ui-monospace, monospace" }}>{valor}</span>}
+      </div>
+    </Html>
   );
 }
 
@@ -210,10 +224,11 @@ function Contenido({ volCO2mL, progreso, reaccionando, colorGlobo, accent, reset
         <Frasco />
         <Burbujas activo={reaccionando} />
         <Globo volCO2mL={volCO2mL} progreso={progreso} colorGlobo={colorGlobo} />
+        <Etiqueta x={R_BOT + 1.1} y={-0.45} titulo="Vinagre + NaHCO₃" color={accent} />
       </group>
 
 
-      <OrbitControls makeDefault enablePan={false} minDistance={5} maxDistance={16} minPolarAngle={Math.PI / 6} maxPolarAngle={Math.PI / 1.7} target={[0, 0.6, 0]} />
+      <OrbitControls makeDefault enablePan={false} minDistance={5} maxDistance={16} minPolarAngle={Math.PI / 6} maxPolarAngle={Math.PI / 1.7} target={[0, 1.3, 0]} />
 
       <EffectComposer enableNormalPass={false}>
         <Bloom intensity={0.5} luminanceThreshold={0.6} luminanceSmoothing={0.3} mipmapBlur />
@@ -225,7 +240,7 @@ function Contenido({ volCO2mL, progreso, reaccionando, colorGlobo, accent, reset
 
 export default function Co2Scene(props: Co2SceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0.4, 1.8, 9.5], fov: 44 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0.4, 2.0, 11.5], fov: 44 }}>
       <Contenido {...props} />
     </Canvas>
   );

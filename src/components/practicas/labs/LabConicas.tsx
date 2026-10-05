@@ -17,7 +17,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { CONICAS_FICHA } from "./conicas-lugares-geometricos-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
@@ -25,14 +26,13 @@ import { QUIZ_A2 } from "./conicas-lugares-geometricos-data";
 import { LabSfx } from "./lab-audio";
 import {
   type Modo,
-  calcCirc, calcParab, distanciasParab, puntoParab,
+  calcCirc, calcParab, distanciasParab,
   ESCENARIOS_CIRC, ESCENARIOS_PARAB, IDEAS, DATOS,
   H_MIN, H_MAX, K_MIN, K_MAX, R_MIN, R_MAX, C_STEP, H_DEF, K_DEF, R_DEF, QX_DEF, QY_DEF,
   P_MIN, P_MAX, P_STEP, P_DEF, PARAB_HALF,
   fmtNum2, fmtInt, fmtPar, ecCircunferencia, ecParabFoco, ecParabAbierta,
   type EscenarioCirc, type EscenarioParab,
 } from "./conicas-data";
-import { TableroObjetivos } from "./_objetivos";
 
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-conicas-lugares-geometricos-reto";
@@ -75,7 +75,6 @@ export function LabConicas({ color }: PracticaLabProps) {
   const [resetNonce, setResetNonce] = useState(0);
   // tratamiento A+B+C
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -112,7 +111,6 @@ export function LabConicas({ color }: PracticaLabProps) {
   // medio-ancho efectivo (mismo cálculo que la escena) y punto P de la parábola
   const halfEff = Math.min(PARAB_HALF, Math.sqrt(4 * p * 7.4));
   const tP = halfEff * Math.sin(fase * Math.PI * 2);
-  const Pparab = puntoParab(tP, p);
   const dParab = distanciasParab(tP, p);
 
   const bump = () => setResetNonce((n) => n + 1);
@@ -142,413 +140,296 @@ export function LabConicas({ color }: PracticaLabProps) {
     </div>
   );
 
+  const colEstadoQ = c.estadoQ === "dentro" ? RADIO_COL : c.estadoQ === "sobre" ? "#fbbf24" : DIR_COL;
+  const lectura = esCirc
+    ? <>Q está <strong style={{ color: colEstadoQ }}>{c.estadoQ}</strong>: dist {fmtNum2(c.distQ)} {c.distQ < r ? "<" : c.distQ > r ? ">" : "="} r {fmtNum2(r)}</>
+    : <>d(P, foco) = d(P, directriz) = {fmtNum2(dParab.aFoco)}</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulseCon { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulseCon 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-chip { cursor:pointer; padding:8px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; text-align:left; }
-        .ex-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .ex-chip[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.18); color:#fff; }
-        .ex-modo { cursor:pointer; flex:1; padding:11px 12px; border-radius:13px; border:1px solid ${T.line};
-          background:${T.inset}; color:${T.text2}; font-size:13px; font-weight:900; transition:all .15s; display:flex;
-          align-items:center; justify-content:center; gap:8px; }
-        .ex-modo[data-on="true"] { border-color:rgba(${color.rgba},0.8); background:rgba(${color.rgba},0.2); color:#fff; }
-        .ex-tog { cursor:pointer; display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 62vh, 720px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#0b2233 0%,#08131f 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <ConicasScene
-                modo={modo}
-                h={h} k={k} r={r} qx={qx} qy={qy}
-                p={p}
-                fase={fase}
-                mostrarFocal={mostrarFocal}
-                accent={accent}
-                autoRotate={autoRotate}
-                pausado={false}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${accent}aa`, width: 9, height: 9, borderRadius: "50%", background: accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{liveEq}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={reproduciendo} onClick={() => setReproduciendo((v) => !v)} title={reproduciendo ? "Pausar el punto móvil" : "Animar el punto P"}>
-                <i className={`fa-solid ${reproduciendo ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar la cámara">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura en vivo del lugar geométrico */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              {esCirc ? (
-                <>
-                  <div style={{ fontSize: 13, color: "#eaf0fb", fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>
-                    <i className="fa-solid fa-ruler-combined" style={{ color: RADIO_COL, marginRight: 7 }} />
-                    todo punto de la curva está a distancia r = <span style={{ color: RADIO_COL }}>{fmtNum2(r)}</span> del centro {fmtPar(h, k)}
-                  </div>
-                  <div style={{ fontSize: 12.5, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>
-                    Q {fmtPar(qx, qy)}: dist al centro = <strong>{fmtNum2(c.distQ)}</strong> {c.distQ < r ? "<" : c.distQ > r ? ">" : "="} r = {fmtNum2(r)} → <strong style={{ color: c.estadoQ === "dentro" ? RADIO_COL : c.estadoQ === "sobre" ? "#fbbf24" : DIR_COL }}>{c.estadoQ}</strong>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div style={{ fontSize: 13, color: "#eaf0fb", fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>
-                    d(P, foco) = <span style={{ color: DFOCO_COL }}>{fmtNum2(dParab.aFoco)}</span> = d(P, directriz) = <span style={{ color: DDIR_COL }}>{fmtNum2(dParab.aDirectriz)}</span>
-                  </div>
-                  <div style={{ fontSize: 12.5, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>
-                    <i className="fa-solid fa-bullseye" style={{ color: FOCO_COL, marginRight: 6 }} />
-                    P {fmtPar(Pparab[0]!, Pparab[1]!)} sobre la parábola · foco {fmtPar(0, par.focoY)} · directriz y = {fmtNum2(par.directrizY)}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Selector de modo */}
-          <div style={{ display: "flex", gap: 10 }}>
-            <button className="ex-modo" data-on={esCirc} onClick={() => cambiarModo("circunferencia")}>
-              <i className="fa-solid fa-circle-dot" style={{ color: esCirc ? accent : T.text3 }} /> Circunferencia
-            </button>
-            <button className="ex-modo" data-on={!esCirc} onClick={() => cambiarModo("parabola")}>
-              <i className="fa-solid fa-bullseye" style={{ color: !esCirc ? accent : T.text3 }} /> Parábola
-            </button>
-          </div>
-
-          {/* Controles */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: accent }} />
-              {esCirc ? "Ajusta la circunferencia y el punto de prueba" : "Ajusta la parábola"}
-            </Eyebrow>
-
-            {esCirc ? (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
-                  <Deslizador label="Centro h" icon="fa-arrows-left-right" colr={CENTRO_COL}
-                    valor={fmtInt(h)} min={H_MIN} max={H_MAX} step={C_STEP} value={h} onChange={setH} hintL={`${H_MIN}`} hintR={`${H_MAX}`} />
-                  <Deslizador label="Centro k" icon="fa-arrows-up-down" colr={CENTRO_COL}
-                    valor={fmtInt(k)} min={K_MIN} max={K_MAX} step={C_STEP} value={k} onChange={setK} hintL={`${K_MIN}`} hintR={`${K_MAX}`} />
-                  <Deslizador label="Radio r" icon="fa-ruler" colr={RADIO_COL}
-                    valor={fmtInt(r)} min={R_MIN} max={R_MAX} step={C_STEP} value={r} onChange={setR} hintL={`${R_MIN}`} hintR={`${R_MAX}`} />
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px" }}>PUNTO DE PRUEBA Q</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                  <Deslizador label="Q · x" icon="fa-arrows-left-right" colr="#fbbf24"
-                    valor={fmtInt(qx)} min={H_MIN} max={H_MAX} step={C_STEP} value={qx} onChange={setQx} hintL={`${H_MIN}`} hintR={`${H_MAX}`} />
-                  <Deslizador label="Q · y" icon="fa-arrows-up-down" colr="#fbbf24"
-                    valor={fmtInt(qy)} min={K_MIN} max={K_MAX} step={C_STEP} value={qy} onChange={setQy} hintL={`${K_MIN}`} hintR={`${K_MAX}`} />
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px" }}>EJEMPLOS</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {ESCENARIOS_CIRC.map((e) => (
-                    <button key={e.label} className="ex-chip" title={e.desc}
-                      data-on={h === e.h && k === e.k && r === e.r}
-                      onClick={() => aplicarCirc(e)} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <i className={`fa-solid ${e.icono}`} style={{ color: accent }} /> {e.label}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <>
+        <style>{CSS_CON}</style>
+        <SceneBoundary fallback={sceneFallback}>
+          <ConicasScene
+            modo={modo}
+            h={h} k={k} r={r} qx={qx} qy={qy}
+            p={p}
+            fase={fase}
+            mostrarFocal={mostrarFocal}
+            accent={accent}
+            autoRotate={autoRotate}
+            pausado={false}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+        </>
+      }
+      modos={{
+        opciones: [
+          { id: "circunferencia", etiqueta: "Circunferencia", icono: "fa-circle-dot" },
+          { id: "parabola", etiqueta: "Parábola", icono: "fa-bullseye" },
+        ],
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={reproduciendo ? "fa-pause" : "fa-play"} titulo={reproduciendo ? "Pausar el punto móvil" : "Animar el punto P"} activo={reproduciendo} onClick={() => setReproduciendo((v) => !v)} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar la cámara" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={
+        esCirc ? (
+          <>
+            <div style={{ color: T.text2, fontWeight: 800 }}>{liveEq}</div>
+            <MedidorDist modo="circ" a={c.distQ} b={r} compacto />
+          </>
+        ) : (
+          <>
+            <div style={{ color: T.text2, fontWeight: 800 }}>{liveEq}</div>
+            <MedidorDist modo="parab" a={dParab.aFoco} b={dParab.aDirectriz} compacto />
+          </>
+        )
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Deja el punto Q justo SOBRE la curva: su distancia al centro debe ser igual a r", done: esCirc && c.estadoQ === "sobre" },
+        { txt: "Mueve el centro (h, k) de la circunferencia y mira cómo cambia su ecuación", done: h !== H_DEF || k !== K_DEF },
+        { txt: "Cambia el radio y comprueba que todos los puntos siguen equidistando del centro", done: r !== R_DEF },
+        { txt: "Pasa a la parábola y localiza su foco y su directriz", done: modo === "parabola" },
+        { txt: "Cambia p y comprueba que d(P, foco) y d(P, directriz) siempre son iguales", done: modo === "parabola" && p !== P_DEF },
+        { txt: "Mueve el punto Q sobre la curva y compara sus dos distancias", done: qx !== QX_DEF || qy !== QY_DEF },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={esCirc ? "Ajusta la circunferencia y el punto de prueba" : "Ajusta la parábola"} icono="fa-sliders">
+                {esCirc ? (
+                  <>
+                    <Deslizador label="Centro h" icon="fa-arrows-left-right" colr={CENTRO_COL}
+                      valor={fmtInt(h)} min={H_MIN} max={H_MAX} step={C_STEP} value={h} onChange={setH} hintL={`${H_MIN}`} hintR={`${H_MAX}`} />
+                    <Deslizador label="Centro k" icon="fa-arrows-up-down" colr={CENTRO_COL}
+                      valor={fmtInt(k)} min={K_MIN} max={K_MAX} step={C_STEP} value={k} onChange={setK} hintL={`${K_MIN}`} hintR={`${K_MAX}`} />
+                    <Deslizador label="Radio r" icon="fa-ruler" colr={RADIO_COL}
+                      valor={fmtInt(r)} min={R_MIN} max={R_MAX} step={C_STEP} value={r} onChange={setR} hintL={`${R_MIN}`} hintR={`${R_MAX}`} />
+                    <Deslizador label="Punto Q · x" icon="fa-arrows-left-right" colr="#fbbf24"
+                      valor={fmtInt(qx)} min={H_MIN} max={H_MAX} step={C_STEP} value={qx} onChange={setQx} hintL={`${H_MIN}`} hintR={`${H_MAX}`} />
+                    <Deslizador label="Punto Q · y" icon="fa-arrows-up-down" colr="#fbbf24"
+                      valor={fmtInt(qy)} min={K_MIN} max={K_MAX} step={C_STEP} value={qy} onChange={setQy} hintL={`${K_MIN}`} hintR={`${K_MAX}`} />
+                    <div style={{ fontSize: 14, fontWeight: 800, color: T.text3 }}>Ejemplos</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {ESCENARIOS_CIRC.map((e) => (
+                        <button key={e.label} className="ex-chip" title={e.desc}
+                          data-on={h === e.h && k === e.k && r === e.r}
+                          onClick={() => aplicarCirc(e)} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                          <i className={`fa-solid ${e.icono}`} style={{ color: accent }} /> {e.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Deslizador label="Parámetro p (vértice → foco)" icon="fa-up-down" colr={FOCO_COL}
+                      valor={fmtNum2(p)} min={P_MIN} max={P_MAX} step={P_STEP} value={p} onChange={setP} hintL={`${P_MIN}`} hintR={`${P_MAX}`} />
+                    <button className="ex-tog" onClick={() => setMostrarFocal((v) => !v)} style={{ borderColor: mostrarFocal ? "#7dd3fc88" : T.line, background: mostrarFocal ? "#7dd3fc1a" : T.inset, color: mostrarFocal ? "#fff" : T.text2 }}>
+                      <i className={`fa-solid ${mostrarFocal ? "fa-eye" : "fa-eye-slash"}`} style={{ color: "#7dd3fc" }} /> Propiedad focal (rayos)
                     </button>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: T.text3 }}>Ejemplos</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {ESCENARIOS_PARAB.map((e) => (
+                        <button key={e.label} className="ex-chip" title={e.desc}
+                          data-on={p === e.p}
+                          onClick={() => aplicarParab(e)} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                          <i className={`fa-solid ${e.icono}`} style={{ color: accent }} /> {e.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </Bloque>
+
+              <Bloque titulo={esCirc ? "¿Q está dentro, sobre o fuera?" : "Las dos distancias"} icono="fa-scale-balanced">
+                <MedidorDist modo={esCirc ? "circ" : "parab"} a={esCirc ? c.distQ : dParab.aFoco} b={esCirc ? r : dParab.aDirectriz} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  {esCirc ? (
+                    <>
+                      <Dato label="centro (h,k)" value={fmtPar(h, k)} col={CENTRO_COL} />
+                      <Dato label="radio r" value={fmtNum2(r)} col={RADIO_COL} />
+                      <Dato label="dist Q→centro" value={fmtNum2(c.distQ)} col="#fbbf24" />
+                      <Dato label="Q está" value={c.estadoQ} col={colEstadoQ} />
+                    </>
+                  ) : (
+                    <>
+                      <Dato label="foco (0,p)" value={fmtPar(0, par.focoY)} col={FOCO_COL} />
+                      <Dato label="directriz" value={`y=${fmtNum2(par.directrizY)}`} col={DIR_COL} />
+                      <Dato label="d(P,foco)" value={fmtNum2(dParab.aFoco)} col={DFOCO_COL} />
+                      <Dato label="d(P,directriz)" value={fmtNum2(dParab.aDirectriz)} col={DDIR_COL} />
+                    </>
+                  )}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={sonido ? (ok) => { if (ok) audioRef.current?.correcto(); else audioRef.current?.incorrecto(); } : undefined}
+              playPick={sonido ? () => audioRef.current?.blip() : undefined}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo={esCirc ? "La circunferencia, paso a paso" : "La parábola, paso a paso"} icono={esCirc ? "fa-circle-dot" : "fa-bullseye"}>
+                {esCirc ? (
+                  <>
+                    <PasoRow n={1} texto="Identifico centro (h, k) y radio r:" valor={`C = ${fmtPar(h, k)},  r = ${fmtNum2(r)}`} col={CENTRO_COL} />
+                    <PasoRow n={2} texto="Escribo la ecuación canónica:" valor={ecCircunferencia(h, k, r)} col={accent} />
+                    <PasoRow n={3} texto="Distancia del punto Q al centro:" valor={`√((${fmtInt(qx)}−${fmtInt(h)})² + (${fmtInt(qy)}−${fmtInt(k)})²) = ${fmtNum2(c.distQ)}`} col="#fbbf24" />
+                    <PasoRow n={4} texto={`Comparo con r = ${fmtNum2(r)}:`} valor={`${fmtNum2(c.distQ)} ${c.distQ < r ? "<" : c.distQ > r ? ">" : "="} ${fmtNum2(r)} → ${c.estadoQ}`} col={colEstadoQ} />
+                  </>
+                ) : (
+                  <>
+                    <PasoRow n={1} texto="Identifico el parámetro p (vértice → foco):" valor={`p = ${fmtNum2(p)}`} col={FOCO_COL} />
+                    <PasoRow n={2} texto="Ecuación canónica (vértice en el origen):" valor={`${ecParabFoco(p)}   ·   ${ecParabAbierta(p)}`} col={accent} />
+                    <PasoRow n={3} texto="Ubico foco y directriz:" valor={`F = ${fmtPar(0, par.focoY)},  directriz y = ${fmtNum2(par.directrizY)}`} col={VERT_COL} />
+                    <PasoRow n={4} texto="Compruebo la definición en P:" valor={`d(P,F) = ${fmtNum2(dParab.aFoco)} = d(P, directriz) = ${fmtNum2(dParab.aDirectriz)}`} col={DFOCO_COL} />
+                  </>
+                )}
+              </Bloque>
+              <Bloque titulo="Anatomía" icono="fa-vector-square">
+                {esCirc ? (
+                  <>
+                    <LadoRow label="Centro (h, k)" valor={fmtPar(h, k)} col={CENTRO_COL} icon="fa-crosshairs" />
+                    <LadoRow label="Radio r" valor={fmtNum2(r)} col={RADIO_COL} icon="fa-ruler" />
+                    <LadoRow label="Perímetro 2πr" valor={fmtNum2(c.perimetro)} col="#fbbf24" icon="fa-circle-notch" />
+                    <LadoRow label="Área πr²" valor={fmtNum2(c.area)} col="#c4b5fd" icon="fa-circle" />
+                  </>
+                ) : (
+                  <>
+                    <LadoRow label="Vértice" valor="(0, 0)" col={VERT_COL} icon="fa-location-dot" />
+                    <LadoRow label="Foco (0, p)" valor={fmtPar(0, par.focoY)} col={FOCO_COL} icon="fa-bullseye" />
+                    <LadoRow label="Directriz" valor={`y = ${fmtNum2(par.directrizY)}`} col={DIR_COL} icon="fa-ruler-horizontal" />
+                    <LadoRow label="Coeficiente a = 1/4p" valor={ecParabAbierta(p).replace("y = ", "").replace(" x²", "")} col="#c4b5fd" icon="fa-superscript" />
+                  </>
+                )}
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {esCirc
+                    ? <>La circunferencia es el <strong style={{ color: RADIO_COL }}>lugar geométrico</strong> de los puntos que están a la <strong>misma distancia</strong> (el radio) de un centro fijo.</>
+                    : <>La parábola es el <strong style={{ color: DFOCO_COL }}>lugar geométrico</strong> de los puntos que <strong>equidistan</strong> del foco y de la directriz. Esa igualdad <em>es</em> la definición.</>}
+                </p>
+              </Bloque>
+              <Bloque titulo={esCirc ? "Por qué importa" : "Propiedad focal"} icono="fa-satellite-dish">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {esCirc
+                    ? <>La circunferencia aparece en ruedas, rotondas, fuentes y plazas circulares. Saber su centro y radio permite ubicar un punto de interés <strong>dentro, sobre o fuera</strong> de ella — base de mapas y diseño urbano.</>
+                    : <>Todo rayo paralelo al eje se refleja exactamente hacia el <strong style={{ color: FOCO_COL }}>foco</strong>. Por eso el <strong>GTM del INAOE</strong> (reflector parabólico de 50 m) y las antenas satelitales domésticas concentran la señal en el receptor, colocado justo en el foco.</>}
+                </p>
+              </Bloque>
+              <Bloque titulo="Datos" icono="fa-gauge-high">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 10 }}>
+                  {DATOS.map((dd, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
+                      <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                      <div>
+                        <div style={{ fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
+                        <div style={{ color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </>
-            ) : (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 16 }}>
-                  <Deslizador label="Parámetro p (vértice → foco)" icon="fa-up-down" colr={FOCO_COL}
-                    valor={fmtNum2(p)} min={P_MIN} max={P_MAX} step={P_STEP} value={p} onChange={setP} hintL={`${P_MIN}`} hintR={`${P_MAX}`} />
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
-                  <button className="ex-tog" onClick={() => setMostrarFocal((v) => !v)} style={{ borderColor: mostrarFocal ? "#7dd3fc88" : T.line, background: mostrarFocal ? "#7dd3fc1a" : T.inset, color: mostrarFocal ? "#fff" : T.text2 }}>
-                    <i className={`fa-solid ${mostrarFocal ? "fa-eye" : "fa-eye-slash"}`} style={{ color: "#7dd3fc" }} /> Propiedad focal (rayos)
-                  </button>
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px" }}>EJEMPLOS</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {ESCENARIOS_PARAB.map((e) => (
-                    <button key={e.label} className="ex-chip" title={e.desc}
-                      data-on={p === e.p}
-                      onClick={() => aplicarParab(e)} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <i className={`fa-solid ${e.icono}`} style={{ color: accent }} /> {e.label}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={CONICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                Cálculo <strong>exacto</strong>: la circunferencia es (x−h)²+(y−k)²=r² y la clasificación de Q sale de comparar su distancia al centro con r; la parábola es x²=4py con foco (0, p) y directriz y=−p, y la igualdad d(P,foco)=d(P,directriz) se cumple para cada punto. El plano se dibuja a <strong>escala fija</strong>, así que las posiciones son reales; los <strong>valores numéricos</strong> de las etiquetas y lecturas son los exactos.
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* El cálculo paso a paso */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}55`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className={`fa-solid ${esCirc ? "fa-circle-dot" : "fa-bullseye"}`} />
-              </div>
-              <div>
-                <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>{esCirc ? "La circunferencia, paso a paso" : "La parábola, paso a paso"}</div>
-                <div style={{ fontSize: 11.5, color: accent, fontWeight: 800 }}>Lugar geométrico</div>
-              </div>
-            </div>
-            <div style={{ display: "grid", gap: 9 }}>
-              {esCirc ? (
-                <>
-                  <PasoRow n={1} texto="Identifico centro (h, k) y radio r:" valor={`C = ${fmtPar(h, k)},  r = ${fmtNum2(r)}`} col={CENTRO_COL} />
-                  <PasoRow n={2} texto="Escribo la ecuación canónica:" valor={ecCircunferencia(h, k, r)} col={accent} />
-                  <PasoRow n={3} texto="Distancia del punto Q al centro:" valor={`√((${fmtInt(qx)}−${fmtInt(h)})² + (${fmtInt(qy)}−${fmtInt(k)})²) = ${fmtNum2(c.distQ)}`} col="#fbbf24" />
-                  <PasoRow n={4} texto={`Comparo con r = ${fmtNum2(r)}:`} valor={`${fmtNum2(c.distQ)} ${c.distQ < r ? "<" : c.distQ > r ? ">" : "="} ${fmtNum2(r)} → ${c.estadoQ}`} col={c.estadoQ === "dentro" ? RADIO_COL : c.estadoQ === "sobre" ? "#fbbf24" : DIR_COL} />
-                </>
-              ) : (
-                <>
-                  <PasoRow n={1} texto="Identifico el parámetro p (vértice → foco):" valor={`p = ${fmtNum2(p)}`} col={FOCO_COL} />
-                  <PasoRow n={2} texto="Ecuación canónica (vértice en el origen):" valor={`${ecParabFoco(p)}   ·   ${ecParabAbierta(p)}`} col={accent} />
-                  <PasoRow n={3} texto="Ubico foco y directriz:" valor={`F = ${fmtPar(0, par.focoY)},  directriz y = ${fmtNum2(par.directrizY)}`} col={VERT_COL} />
-                  <PasoRow n={4} texto="Compruebo la definición en P:" valor={`d(P,F) = ${fmtNum2(dParab.aFoco)} = d(P, directriz) = ${fmtNum2(dParab.aDirectriz)}`} col={DFOCO_COL} />
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Anatomía */}
-          <div style={{ ...card, padding: "20px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-vector-square" style={{ marginRight: 8, color: accent }} />
-              Anatomía
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {esCirc ? (
-                <>
-                  <LadoRow label="Centro (h, k)" valor={fmtPar(h, k)} col={CENTRO_COL} icon="fa-crosshairs" />
-                  <LadoRow label="Radio r" valor={fmtNum2(r)} col={RADIO_COL} icon="fa-ruler" />
-                  <LadoRow label="Perímetro 2πr" valor={fmtNum2(c.perimetro)} col="#fbbf24" icon="fa-circle-notch" />
-                  <LadoRow label="Área πr²" valor={fmtNum2(c.area)} col="#c4b5fd" icon="fa-circle" />
-                </>
-              ) : (
-                <>
-                  <LadoRow label="Vértice" valor="(0, 0)" col={VERT_COL} icon="fa-location-dot" />
-                  <LadoRow label="Foco (0, p)" valor={fmtPar(0, par.focoY)} col={FOCO_COL} icon="fa-bullseye" />
-                  <LadoRow label="Directriz" valor={`y = ${fmtNum2(par.directrizY)}`} col={DIR_COL} icon="fa-ruler-horizontal" />
-                  <LadoRow label="Coeficiente a = 1/4p" valor={ecParabAbierta(p).replace("y = ", "").replace(" x²", "")} col="#c4b5fd" icon="fa-superscript" />
-                </>
-              )}
-            </div>
-            <div style={{ fontSize: 11.8, color: T.text2, lineHeight: 1.5, marginTop: 11 }}>
-              {esCirc
-                ? <>La circunferencia es el <strong style={{ color: RADIO_COL }}>lugar geométrico</strong> de los puntos que están a la <strong>misma distancia</strong> (el radio) de un centro fijo.</>
-                : <>La parábola es el <strong style={{ color: DFOCO_COL }}>lugar geométrico</strong> de los puntos que <strong>equidistan</strong> del foco y de la directriz. Esa igualdad <em>es</em> la definición.</>}
-            </div>
-          </div>
-
-          {/* Aplicación real */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: `1px solid ${accent}40`, background: `rgba(${color.rgba},0.08)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-satellite-dish" style={{ marginRight: 8, color: accent }} />
-              {esCirc ? "Por qué importa" : "Propiedad focal"}
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-              {esCirc
-                ? <>La circunferencia aparece en ruedas, rotondas, fuentes y plazas circulares. Saber su centro y radio permite ubicar un punto de interés <strong>dentro, sobre o fuera</strong> de ella — base de mapas y diseño urbano.</>
-                : <>Todo rayo paralelo al eje se refleja exactamente hacia el <strong style={{ color: FOCO_COL }}>foco</strong>. Por eso el <strong>GTM del INAOE</strong> (reflector parabólico de 50 m) y las antenas satelitales domésticas concentran la señal en el receptor, colocado justo en el foco.</>}
-            </div>
-          </div>
-        </div>
+/* ── Medidor: dos distancias frente a frente ─────────────────────────────── */
+function MedidorDist({ modo, a, b, compacto = false }: { modo: "circ" | "parab"; a: number; b: number; compacto?: boolean }) {
+  const tope = Math.max(a, b, 1) * 1.1;
+  const igual = Math.abs(a - b) < 0.005;
+  const rotA = modo === "circ" ? "dist Q → centro" : "d(P, foco)";
+  const rotB = modo === "circ" ? "radio r" : "d(P, directriz)";
+  const colA = modo === "circ" ? "#fbbf24" : DFOCO_COL;
+  const colB = modo === "circ" ? RADIO_COL : DDIR_COL;
+  const estado = modo === "circ"
+    ? (igual ? "Q está SOBRE la curva" : a < b ? "Q está DENTRO" : "Q está FUERA")
+    : "Siempre iguales: es la definición";
+  const colEst = modo === "circ" ? (igual ? "#fbbf24" : a < b ? RADIO_COL : DIR_COL) : "#34D399";
+  const barra = (txt: string, val: number, c: string) => (
+    <div style={{ display: "grid", gap: 3 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+        <span>{txt}</span><span style={{ fontFamily: "ui-monospace, monospace" }}>{fmtNum2(val)}</span>
       </div>
-
-      {/* ── Objetivo evaluable ─────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <TableroObjetivos
-          retoKey={RETO_KEY}
-          accent={accent}
-          objetivos={[
-            { txt: "Mueve el centro (h, k) de la circunferencia y mira cómo cambia su ecuación", done: h !== H_DEF || k !== K_DEF },
-            { txt: "Cambia el radio y comprueba que todos los puntos siguen equidistando del centro", done: r !== R_DEF },
-            { txt: "Pasa a la parábola y localiza su foco y su directriz", done: modo === "parabola" },
-            { txt: "Mueve el punto Q sobre la curva y compara sus dos distancias", done: qx !== QX_DEF || qy !== QY_DEF },
-            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ]}
-        />
+      <div style={{ height: compacto ? 8 : 12, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+        <div style={{ width: `${Math.min(100, (val / tope) * 100)}%`, height: "100%", background: c, transition: "width 120ms linear" }} />
       </div>
-
-      {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-gauge-high" style={{ marginRight: 8, color: accent }} />
-            Lecturas
-          </Eyebrow>
-          {esCirc ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="centro (h,k)" value={fmtPar(h, k)} col={CENTRO_COL} size={15} />
-              <Readout label="radio r" value={fmtNum2(r)} col={RADIO_COL} size={18} />
-              <Readout label="dist Q→centro" value={fmtNum2(c.distQ)} col="#fbbf24" size={18} />
-              <Readout label="Q está" value={c.estadoQ} col={c.estadoQ === "dentro" ? RADIO_COL : c.estadoQ === "sobre" ? "#fbbf24" : DIR_COL} size={15} />
-            </div>
-          ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="foco (0,p)" value={fmtPar(0, par.focoY)} col={FOCO_COL} size={15} />
-              <Readout label="directriz" value={`y=${fmtNum2(par.directrizY)}`} col={DIR_COL} size={15} />
-              <Readout label="d(P,foco)" value={fmtNum2(dParab.aFoco)} col={DFOCO_COL} size={18} />
-              <Readout label="d(P,directriz)" value={fmtNum2(dParab.aDirectriz)} col={DDIR_COL} size={18} />
-            </div>
-          )}
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Cálculo <strong>exacto</strong>: la circunferencia es (x−h)²+(y−k)²=r² y la clasificación de Q sale de comparar su distancia al centro con r; la parábola es x²=4py con foco (0, p) y directriz y=−p, y la igualdad d(P,foco)=d(P,directriz) se cumple para cada punto. El plano se dibuja a <strong>escala fija</strong>, así que las posiciones son reales; los <strong>valores numéricos</strong> de las etiquetas y lecturas son los exactos.
-        </span>
-      </div>
-
-      {/* ── Reto evaluable: el quiz verbatim del ancla A2 ─────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
-        }
-        playPick={sonido ? () => audioRef.current?.blip() : undefined}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={CONICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
+    </div>
+  );
+  return (
+    <div style={{ display: "grid", gap: compacto ? 6 : 10, width: compacto ? 190 : undefined, marginTop: compacto ? 4 : 0 }}>
+      {barra(rotA, a, colA)}
+      {barra(rotB, b, colB)}
+      <div style={{ fontSize: 14, fontWeight: 900, color: colEst }}>{estado}</div>
     </div>
   );
 }
+
+const CSS_CON = `
+  .ex-chip { cursor:pointer; padding:9px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
+    color:${T.text2}; font-size:14px; font-weight:800; transition:all .15s; text-align:left; }
+  .ex-chip:hover { border-color:rgba(255,255,255,0.4); color:#fff; }
+  .ex-chip[data-on="true"] { border-color:var(--lsa); background:rgba(255,255,255,0.1); color:#fff; }
+  .ex-tog { cursor:pointer; display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:11px;
+    border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .15s; }
+`;
 
 /* ── Fila de un paso del cálculo ─────────────────────────────────────────── */
 function PasoRow({ n, texto, valor, col }: { n: number; texto: string; valor: string; col: string }) {
   return (
     <div style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${col}30` }}>
-      <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: col, flexShrink: 0 }}>{n}</div>
+      <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: col, flexShrink: 0 }}>{n}</div>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.35 }}>{texto}</div>
-        <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", marginTop: 2 }}>{valor}</div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.35 }}>{texto}</div>
+        <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", marginTop: 2 }}>{valor}</div>
       </div>
     </div>
   );
@@ -558,40 +439,11 @@ function PasoRow({ n, texto, valor, col }: { n: number; texto: string; valor: st
 function LadoRow({ label, valor, col, icon }: { label: string; valor: string; col: string; icon: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 13px", borderRadius: 11, background: "rgba(4,10,22,0.45)", border: `1px solid ${col}33` }}>
-      <div style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: col, background: `${col}1e`, flexShrink: 0 }}>
+      <div style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: col, background: `${col}1e`, flexShrink: 0 }}>
         <i className={`fa-solid ${icon}`} />
       </div>
-      <span style={{ fontSize: 12.5, fontWeight: 800, color: T.text2 }}>{label}</span>
+      <span style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>{label}</span>
       <span style={{ marginLeft: "auto", fontSize: 15, fontWeight: 900, color: col, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-    </div>
-  );
-}
-
-/* ── Deslizador reutilizable ─────────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  const fill = `${((Math.min(max, Math.max(min, value)) - min) / (max - min)) * 100}%`;
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-      </div>
-      <input type="range" className="ex-range" min={min} max={max} step={step} value={Math.min(max, Math.max(min, value))}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--exc" as string]: colr, ["--exfill" as string]: fill }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
     </div>
   );
 }

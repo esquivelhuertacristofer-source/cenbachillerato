@@ -1,0 +1,12 @@
+{
+  "escena": "Un monómero de glucosa girando en 3D y un deslizador de uniones en cero.",
+  "pregunta": "Si subes las uniones y se juntan más glucosas, ¿qué se libera en cada unión?",
+  "opciones": [
+    { "id": "a", "texto": "Una molécula de agua", "icono": "fa-droplet" },
+    { "id": "b", "texto": "Una molécula de oxígeno", "icono": "fa-wind" },
+    { "id": "c", "texto": "No se libera nada", "icono": "fa-ban" }
+  ],
+  "correcta": "a",
+  "porque": "Al unir dos monómeros se pierde un OH de uno y un H del otro: juntos forman H₂O. Por eso se llama condensación y ocurre en cada enlace nuevo del polímero.",
+  "comoComprobarlo": "Sube el deslizador de uniones formadas y mira el dato «H₂O liberadas» y los enlaces verdes."
+}

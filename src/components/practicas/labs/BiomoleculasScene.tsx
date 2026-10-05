@@ -15,9 +15,9 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { useMemo, useRef, type CSSProperties } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS_B, type Elem, type AtomLocal, type BondLocal } from "./biomoleculas-data";
 import { Escenario } from "./_escenario";
@@ -30,6 +30,8 @@ export interface BiomoleculasSceneProps {
   resaltar: boolean;
   girar: boolean;
   resetNonce: number;
+  /** Enlaces nuevos (verdes) formados; los demás se ocultan. Infinity = todos. */
+  unidos?: number;
 }
 
 type Pt = [number, number, number];
@@ -110,25 +112,50 @@ function Bond({ start, end, orden, nuevo, fg, resaltar }: { start: Pt; end: Pt; 
 }
 
 /* ── Biomolécula completa, girando sobre su eje ──────────────────────────── */
-function Biomolecula({ atoms, bonds, resaltar, girar }: { atoms: AtomLocal[]; bonds: BondLocal[]; resaltar: boolean; girar: boolean }) {
+const ETIQ: CSSProperties = {
+  padding: "4px 10px", borderRadius: 999, fontSize: 14, fontWeight: 800, whiteSpace: "nowrap",
+  background: "rgba(4,10,22,0.82)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)",
+};
+
+function Biomolecula({ atoms, bonds, resaltar, girar, unidos }: { atoms: AtomLocal[]; bonds: BondLocal[]; resaltar: boolean; girar: boolean; unidos: number }) {
   const grp = useRef<THREE.Group>(null);
+  const ancho = useThree((st) => st.size.width);
   useFrame((_, dt) => {
     if (grp.current && girar) grp.current.rotation.y += dt * 0.5;
   });
+  // Los enlaces nuevos se numeran en orden; solo se dibujan los primeros `unidos`.
+  let k = 0;
+  const visibles = bonds.map((b) => (b.nuevo ? k++ < unidos : true));
+  const primerNuevo = bonds.findIndex((b, i) => b.nuevo && visibles[i]);
+  const fgAt = atoms.find((a) => a.fg);
+  const mostrarEtiquetas = ancho >= 640;
+  const pNuevo = primerNuevo >= 0
+    ? ([(atoms[bonds[primerNuevo]!.a]!.p[0] + atoms[bonds[primerNuevo]!.b]!.p[0]) / 2, (atoms[bonds[primerNuevo]!.a]!.p[1] + atoms[bonds[primerNuevo]!.b]!.p[1]) / 2 + 0.9, (atoms[bonds[primerNuevo]!.a]!.p[2] + atoms[bonds[primerNuevo]!.b]!.p[2]) / 2] as Pt)
+    : null;
   return (
     <group ref={grp}>
       {atoms.map((a, i) => (
         <Atomo key={`a${i}`} el={a.el} pos={a.p} fg={!!a.fg} resaltar={resaltar} />
       ))}
-      {bonds.map((b, i) => (
+      {bonds.map((b, i) => visibles[i] ? (
         <Bond key={`b${i}`} start={atoms[b.a]!.p} end={atoms[b.b]!.p} orden={b.orden} nuevo={!!b.nuevo} fg={!!b.fg} resaltar={resaltar} />
-      ))}
+      ) : null)}
+      {mostrarEtiquetas && pNuevo && (
+        <Html position={pNuevo} center pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ ...ETIQ, borderColor: NEW_COLOR, color: NEW_COLOR }}>enlace nuevo</div>
+        </Html>
+      )}
+      {mostrarEtiquetas && resaltar && fgAt && (
+        <Html position={[fgAt.p[0], fgAt.p[1] + 1.1, fgAt.p[2]]} center pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={ETIQ}>parte característica</div>
+        </Html>
+      )}
     </group>
   );
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ sigId, atoms, bonds, accent, resaltar, girar, resetNonce }: BiomoleculasSceneProps) {
+function Contenido({ sigId, atoms, bonds, accent, resaltar, girar, resetNonce, unidos = Infinity }: BiomoleculasSceneProps) {
   const sig = `${sigId}-${resetNonce}`;
   return (
     <>
@@ -138,8 +165,8 @@ function Contenido({ sigId, atoms, bonds, accent, resaltar, girar, resetNonce }:
       <Escenario acento={accent} suelo={-3.2} />
 
 
-      <group key={sig} position={[0, 0.1, 0]}>
-        <Biomolecula atoms={atoms} bonds={bonds} resaltar={resaltar} girar={girar} />
+      <group key={sig} position={[0, 0.5, 0]}>
+        <Biomolecula atoms={atoms} bonds={bonds} resaltar={resaltar} girar={girar} unidos={unidos} />
       </group>
 
 
@@ -163,7 +190,7 @@ function Contenido({ sigId, atoms, bonds, accent, resaltar, girar, resetNonce }:
 
 export default function BiomoleculasScene(props: BiomoleculasSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 1.4, 10], fov: 46 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 1.4, 11.5], fov: 46 }}>
       <Contenido {...props} />
     </Canvas>
   );

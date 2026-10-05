@@ -75,12 +75,12 @@ const SL = (pts: [number, number][]): Pt[] => pts.map(([x, y]) => S(x, y));
 
 /* ── Etiqueta flotante reutilizable ──────────────────────────────────────── */
 function Etiqueta({
-  pos, color, children, size = 12, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, size = 14, bg = "rgba(6,16,31,0.82)",
 }: {
   pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
 }) {
   return (
-    <Html position={pos} center distanceFactor={13} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none">
       <div style={{
         whiteSpace: "nowrap", padding: "4px 10px", borderRadius: 9, background: bg,
         border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
@@ -127,8 +127,6 @@ function Ejes() {
     <>
       <Line points={[S(-G, 0), S(G, 0)]} color={AXIS_COL} lineWidth={2.2} />
       <Line points={[S(0, -G), S(0, G)]} color={AXIS_COL} lineWidth={2.2} />
-      <Etiqueta pos={S(G, 0)} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">x</Etiqueta>
-      <Etiqueta pos={S(0, G)} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">y</Etiqueta>
       <mesh position={S(0, 0)}>
         <sphereGeometry args={[0.07, 12, 12]} />
         <meshStandardMaterial color={AXIS_COL} emissive={AXIS_COL} emissiveIntensity={0.8} toneMapped={false} />
@@ -158,19 +156,19 @@ function EscenaCirc({ h, k, r, qx, qy, fase, accent }: {
       <CurvaTubo puntos={curva} color={accent} grosor={0.072} />
       {/* centro */}
       <Marcador p={C} color={CENTRO_COL} radio={0.13} />
-      <Etiqueta pos={[C[0], C[1] - 0.42, 0.05]} color={CENTRO_COL} size={12} bg="rgba(6,16,31,0.9)">
+      <Etiqueta pos={[C[0], C[1] - 0.42, 0.05]} color={CENTRO_COL} bg="rgba(6,16,31,0.9)">
         <strong>C</strong>&nbsp;{fmtPar(h, k)}
       </Etiqueta>
       {/* radio: centro → P (siempre = r) */}
       <CurvaTubo puntos={[C, P]} color={RADIO_COL} grosor={0.061} />
-      <Etiqueta pos={[(C[0] + P[0]) / 2, (C[1] + P[1]) / 2 + 0.32, 0.05]} color={RADIO_COL} size={11.5}>
+      <Etiqueta pos={[(C[0] + P[0]) / 2, (C[1] + P[1]) / 2 + 0.32, 0.05]} color={RADIO_COL}>
         r = {fmtNum2(r)}
       </Etiqueta>
       <Marcador p={P} color={RADIO_COL} radio={0.13} />
       {/* punto de prueba Q: dentro / sobre / fuera */}
       <Line points={[C, Q]} color={qCol} lineWidth={2.4} dashed dashSize={0.16} gapSize={0.12} />
       <Marcador p={Q} color={qCol} radio={0.15} />
-      <Etiqueta pos={[Q[0], Q[1] + 0.44, 0.05]} color={qCol} size={12} bg="rgba(6,16,31,0.92)">
+      <Etiqueta pos={[Q[0], Q[1] + 0.44, 0.05]} color={qCol} bg="rgba(6,16,31,0.92)">
         <strong>Q</strong> {fmtPar(qx, qy)} · {c.estadoQ}
       </Etiqueta>
     </group>
@@ -208,7 +206,7 @@ function EscenaParab({ p, fase, mostrarFocal, accent }: {
     <group>
       {/* directriz y = −p */}
       <Line points={[S(-G, par.directrizY), S(G, par.directrizY)]} color={DIR_COL} lineWidth={2.6} dashed dashSize={0.22} gapSize={0.14} />
-      <Etiqueta pos={[S(G, par.directrizY)[0] - 0.7, S(0, par.directrizY)[1] - 0.34, 0.05]} color={DIR_COL} size={11} bg="rgba(6,16,31,0.85)">
+      <Etiqueta pos={[S(G, par.directrizY)[0] - 0.7, S(0, par.directrizY)[1] - 0.34, 0.05]} color={DIR_COL} bg="rgba(6,16,31,0.85)">
         directriz y = {fmtNum2(par.directrizY)}
       </Etiqueta>
 
@@ -225,23 +223,20 @@ function EscenaParab({ p, fase, mostrarFocal, accent }: {
 
       {/* vértice */}
       <Marcador p={V} color={VERT_COL} radio={0.12} />
-      <Etiqueta pos={[V[0] - 0.55, V[1] - 0.4, 0.05]} color={VERT_COL} size={11.5} bg="rgba(6,16,31,0.9)">
-        <strong>V</strong> (0, 0)
-      </Etiqueta>
 
       {/* foco */}
       <Marcador p={F} color={FOCO_COL} radio={0.14} />
-      <Etiqueta pos={[F[0] + 0.55, F[1] + 0.1, 0.05]} color={FOCO_COL} size={12} bg="rgba(6,16,31,0.92)">
+      <Etiqueta pos={[F[0] + 0.55, F[1] + 0.1, 0.05]} color={FOCO_COL} bg="rgba(6,16,31,0.92)">
         <strong>F</strong> {fmtPar(0, par.focoY)}
       </Etiqueta>
 
       {/* las dos distancias iguales: P→foco y P→directriz */}
       <CurvaTubo puntos={[P, F]} color={DFOCO_COL} grosor={0.058} />
-      <Etiqueta pos={[(P[0] + F[0]) / 2 + 0.3, (P[1] + F[1]) / 2, 0.06]} color={DFOCO_COL} size={11}>
+      <Etiqueta pos={[(P[0] + F[0]) / 2 + 0.3, (P[1] + F[1]) / 2, 0.06]} color={DFOCO_COL}>
         d₁ = {fmtNum2(d.aFoco)}
       </Etiqueta>
       <CurvaTubo puntos={[P, foot]} color={DDIR_COL} grosor={0.058} />
-      <Etiqueta pos={[(P[0] + foot[0]) / 2 - 0.45, (P[1] + foot[1]) / 2, 0.06]} color={DDIR_COL} size={11}>
+      <Etiqueta pos={[(P[0] + foot[0]) / 2 - 0.45, (P[1] + foot[1]) / 2, 0.06]} color={DDIR_COL}>
         d₂ = {fmtNum2(d.aDirectriz)}
       </Etiqueta>
       <Marcador p={P} color={accent} radio={0.14} />
@@ -276,7 +271,7 @@ function Contenido({ modo, h, k, r, qx, qy, p, fase, mostrarFocal, accent, autoR
         maxDistance={26}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[0, 0, 0]}
+        target={[0, -0.5, 0]}
         autoRotate={autoRotate && !pausado}
         autoRotateSpeed={0.45}
       />
@@ -291,7 +286,7 @@ function Contenido({ modo, h, k, r, qx, qy, p, fase, mostrarFocal, accent, autoR
 
 export default function ConicasScene(props: ConicasSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.5, 3, 11.5], fov: 46 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.5, 3, 14.5], fov: 46 }}>
       <Contenido {...props} />
     </Canvas>
   );

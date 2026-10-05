@@ -1,0 +1,12 @@
+{
+  "escena": "Ana conoce a Valeria en el patio del club de inglés y debe responder cuando ella se presenta",
+  "pregunta": "Valeria dice «Hi! I'm Valeria». Si respondes «See you later», ¿cómo reacciona ella?",
+  "opciones": [
+    { "id": "a", "texto": "Sonríe y se alegra", "icono": "fa-face-smile" },
+    { "id": "b", "texto": "Se confunde", "icono": "fa-face-dizzy" },
+    { "id": "c", "texto": "Reacciona igual que con un saludo", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "«See you later» es una despedida. Al conocer a alguien se responde con «Nice to meet you», y una despedida a destiempo desconcierta a quien te escucha.",
+  "comoComprobarlo": "En «Club day», avanza hasta la escena del patio y compara la cara de Valeria al elegir cada una de las tres respuestas."
+}

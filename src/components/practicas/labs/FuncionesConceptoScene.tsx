@@ -22,7 +22,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -62,12 +62,14 @@ function hacerMapa(v: Vista) {
 
 /* ── Etiqueta flotante ────────────────────────────────────────────────────── */
 function Etiqueta({
-  pos, color, children, size = 11.5, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, size = 14, bg = "rgba(6,16,31,0.82)",
 }: {
   pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
 }) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={15} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
         whiteSpace: "nowrap", padding: "4px 9px", borderRadius: 9, background: bg,
         border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
@@ -98,8 +100,6 @@ function Plano({ v }: { v: Vista }) {
   const ejeX: Pt[] = [S(v.xmin, ax0), S(v.xmax, ax0)];
   const ejeY: Pt[] = [S(ay0, v.ymin), S(ay0, v.ymax)];
 
-  const fmtTick = (n: number) => n.toLocaleString("es-MX", { maximumFractionDigits: 1 }).replace("-", "−");
-
   return (
     <group>
       <lineSegments geometry={geo}>
@@ -108,17 +108,6 @@ function Plano({ v }: { v: Vista }) {
 
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={[BX + 0.5, sy(ax0), 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.xlabel}</Etiqueta>
-      <Etiqueta pos={[sx(ay0), BY + 0.5, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.ylabel}</Etiqueta>
-
-      {/* ticks del eje X */}
-      {v.xticks.filter((t) => t !== ay0).map((t) => (
-        <Etiqueta key={`tx${t}`} pos={[sx(t), sy(ax0) - 0.34, 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
-      {/* ticks del eje Y */}
-      {v.yticks.filter((t) => t !== ax0).map((t) => (
-        <Etiqueta key={`ty${t}`} pos={[sx(ay0) - 0.42, sy(t), 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
     </group>
   );
 }
@@ -190,9 +179,9 @@ function Maquina({ relId, v, xPos, color }: { relId: RelId; v: Vista; xPos: numb
       {/* marcador de entrada en el eje X */}
       <mesh position={baseX}>
         <sphereGeometry args={[0.11, 16, 16]} />
-        <meshStandardMaterial color={IN_COL} emissive={IN_COL} emissiveIntensity={0.7} toneMapped={false} />
+        <meshStandardMaterial color={IN_COL} emissive={IN_COL} emissiveIntensity={0.7} />
       </mesh>
-      <Etiqueta pos={[baseX[0], baseX[1] - 0.4, 0]} color={IN_COL} size={11}>
+      <Etiqueta pos={[baseX[0], baseX[1] - 0.4, 0]} color={IN_COL} size={14}>
         entra x = {entradaTxt(relId, xPos)}
       </Etiqueta>
 
@@ -200,10 +189,10 @@ function Maquina({ relId, v, xPos, color }: { relId: RelId; v: Vista; xPos: numb
       <group ref={out} position={P}>
         <mesh>
           <sphereGeometry args={[0.15, 22, 22]} />
-          <meshStandardMaterial color="#fff" emissive={OUT_COL} emissiveIntensity={1.8} toneMapped={false} />
+          <meshStandardMaterial color="#fff" emissive={OUT_COL} emissiveIntensity={1.8} />
         </mesh>
       </group>
-      <Etiqueta pos={[P[0] + 0.15, P[1] + 0.5, 0.05]} color={OUT_COL} size={12.5} bg="rgba(6,16,31,0.92)">
+      <Etiqueta pos={[P[0] + 0.15, P[1] + 0.5, 0.05]} color={OUT_COL} size={14} bg="rgba(6,16,31,0.92)">
         <strong>sale</strong>&nbsp;{salidaTxt(relId, xPos)}
       </Etiqueta>
     </group>
@@ -234,11 +223,11 @@ function Test({ relId, v, xPos }: { relId: RelId; v: Vista; xPos: number }) {
       {ys.map((y, i) => (
         <mesh key={i} position={S(xPos, y)}>
           <sphereGeometry args={[0.16, 22, 22]} />
-          <meshStandardMaterial color="#fff" emissive={col} emissiveIntensity={1.8} toneMapped={false} />
+          <meshStandardMaterial color="#fff" emissive={col} emissiveIntensity={1.8} />
         </mesh>
       ))}
 
-      <Etiqueta pos={[sx(xPos), BY + 0.45, 0]} color={col} size={12} bg="rgba(6,16,31,0.92)">
+      <Etiqueta pos={[sx(xPos), BY + 0.45, 0]} color={col} size={14} bg="rgba(6,16,31,0.92)">
         {corta === 0 ? "no corta aquí" : corta === 1 ? "corta en 1 punto ✓" : `corta en ${corta} puntos ✗`}
       </Etiqueta>
     </group>
@@ -283,10 +272,10 @@ function Contenido({ relId, modo, xPos, accent, resetNonce }: FuncionesConceptoS
         makeDefault
         enablePan={false}
         minDistance={7}
-        maxDistance={26}
+        maxDistance={30}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[0, 0, 0]}
+        target={[0, -0.7, 0]}
       />
 
       <EffectComposer enableNormalPass={false}>
@@ -299,7 +288,7 @@ function Contenido({ relId, modo, xPos, accent, resetNonce }: FuncionesConceptoS
 
 export default function FuncionesConceptoScene(props: FuncionesConceptoSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.2, 2.4, 13], fov: 44 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.2, 1.8, 15.5], fov: 44 }}>
       <Contenido {...props} />
     </Canvas>
   );

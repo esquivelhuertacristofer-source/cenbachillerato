@@ -19,7 +19,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { REACCION_CO2_FICHA } from "./reaccion-co2-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
@@ -33,8 +34,6 @@ import {
   ECUACION, TIPO_REACCION, DATOS, IDEAS,
   fmt0, fmt1, fmtVol, type PuntoG,
 } from "./co2-data";
-
-import { TableroObjetivos } from "./_objetivos";
 
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-reaccion-co2-reto";
@@ -73,7 +72,6 @@ export function LabCo2({ color }: PracticaLabProps) {
 
   // evaluable, teoría (cajón deslizable) y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -157,380 +155,210 @@ export function LabCo2({ color }: PracticaLabProps) {
     </div>
   );
 
+  const lectura = control
+    ? <>Control con agua: no hay ácido, no hay gas</>
+    : <>CO₂ {fmtVol(volVivo)} · {limTxt}</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes co2Pulse { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .co2-live-dot { animation: co2Pulse 1.6s ease-in-out infinite; }
-        .co2-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .co2-grid { grid-template-columns: 1fr; } }
-        .co2-chip { cursor:pointer; padding:9px 11px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; text-align:left; display:flex; align-items:center; gap:9px; }
-        .co2-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .co2-chip[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.16); color:#fff; }
-        .co2-pill { cursor:pointer; padding:8px 14px; border-radius:10px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12.5px; font-weight:900; transition:all .15s; }
-        .co2-pill[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.2); color:#fff; }
-        .co2-pill:hover { color:#fff; }
-        .co2-solve { cursor:pointer; flex:1; padding:11px 14px; border-radius:11px; border:none; font-size:13px; font-weight:900;
-          display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; }
-        .co2-ghost { cursor:pointer; padding:11px 14px; border-radius:11px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:13px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; }
-        .co2-ghost:hover { border-color:rgba(255,255,255,0.3); color:#fff; }
-        .co2-range { -webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:6px;
-          background:linear-gradient(90deg, rgba(${color.rgba},0.6), rgba(${color.rgba},0.2)); outline:none; }
-        .co2-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:22px; height:22px; border-radius:50%;
-          background:#fff; border:3px solid ${accent}; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .co2-range::-moz-range-thumb { width:22px; height:22px; border-radius:50%; background:#fff; border:3px solid ${accent}; cursor:pointer; }
-        @media (max-width: 1000px){ .co2-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Toolbar icon buttons */
-        .co2-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .co2-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .co2-icobtn:hover { background:rgba(255,255,255,0.12); }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="co2-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 62vh, 720px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#0b2233 0%,#08131f 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <Co2Scene volCO2mL={control ? 0 : res.volCO2mL} progreso={progreso} reaccionando={reaccionando && hayReaccion} colorGlobo={colorGlobo} accent={accent} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO: CO₂ que infla el globo */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="co2-live-dot" style={{ ["--exc" as string]: `${accent}aa`, width: 9, height: 9, borderRadius: "50%", background: accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 14, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>CO₂ {fmtVol(control ? 0 : volVivo)}</span>
-            </div>
-
-            {/* Badge reactivo limitante */}
-            <div style={{ position: "absolute", top: 58, left: 16, display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${limCol}88`, backdropFilter: "blur(10px)" }}>
-              <i className="fa-solid fa-flask-vial" style={{ color: limCol, fontSize: 11 }} />
-              <span style={{ fontSize: 11.5, fontWeight: 900, color: limCol }}>{limTxt}</span>
-            </div>
-
-            {/* Toolbar: teoría + sonido */}
-            <div
-              style={{
-                position: "absolute",
-                top: 14,
-                right: 14,
-                display: "flex",
-                gap: 2,
-                padding: 4,
-                borderRadius: 12,
-                background: "rgba(2,12,28,0.74)",
-                border: `1px solid ${T.line}`,
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <button className="co2-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="co2-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 14, height: 14, borderRadius: 4, background: colorGlobo, border: "1px solid rgba(255,255,255,0.4)" }} />
-                El globo se infla con el <strong>CO₂</strong> producido
-                <span style={{ color: T.text3, fontWeight: 600 }}>· su tamaño = volumen de gas</span>
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>
-                <i className="fa-solid fa-spoon" style={{ color: accent, marginRight: 7 }} />
-                {control ? "Agua (control)" : `${volMl} mL de vinagre ${pct}%`} + {fmt1(gBicarb)} g de NaHCO₃
-              </div>
-            </div>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <>
+          <style>{CSS_CO2}</style>
+          <SceneBoundary fallback={sceneFallback}>
+            <Co2Scene volCO2mL={control ? 0 : res.volCO2mL} progreso={progreso} reaccionando={reaccionando && hayReaccion} colorGlobo={colorGlobo} accent={accent} resetNonce={resetNonce} />
+          </SceneBoundary>
+        </>
+      }
+      modos={{
+        opciones: FOCOS.map((f) => ({ id: f.id, etiqueta: f.label, icono: f.icono })),
+        valor: foco,
+        cambiar: (id) => setFoco(id as Foco),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={reaccionando ? "fa-spinner" : "fa-play"} titulo="¡Reaccionar!" activo={reaccionando} onClick={() => { if (!reaccionando) reaccionar(); }} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      leyenda={
+        <>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 900 }}>
+            <span style={{ width: 14, height: 14, borderRadius: 4, background: colorGlobo, border: "1px solid rgba(255,255,255,0.4)" }} />
+            tamaño del globo = CO₂
           </div>
-
-          {/* ── Diseña el experimento ───────────────────────────── */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-vials" style={{ marginRight: 8, color: accent }} />
-              Diseña el experimento
-            </Eyebrow>
-
-            {/* Variable independiente */}
-            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, margin: "2px 0 9px" }}>
-              VARIABLE INDEPENDIENTE (la que vas a cambiar)
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 18 }}>
-              {FOCOS.map((f) => (
-                <button key={f.id} className="co2-chip" data-on={f.id === foco} onClick={() => setFoco(f.id)} style={{ justifyContent: "center", textAlign: "center" }}>
-                  <i className={`fa-solid ${f.icono}`} style={{ color: accent }} /> {f.label}
+          <div style={{ color: limCol, fontWeight: 800 }}>{limTxt}</div>
+          <div style={{ color: T.text2 }}>{control ? "Agua (control)" : `${volMl} mL de vinagre ${pct}%`} + {fmt1(gBicarb)} g NaHCO₃</div>
+        </>
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Diseña el experimento eligiendo una variable independiente", done: progreso > 0 },
+        { txt: "Pasa del punto exacto de bicarbonato y reacciona: ¿el globo sigue creciendo?", done: !control && hayReaccion && progreso >= 1 && gBicarb >= gEstq * 1.1 },
+        { txt: "Activa el control con agua para comprobar el origen del CO₂", done: control },
+        { txt: "Observa el reactivo limitante en la reacción", done: progreso >= 1 && hayReaccion },
+        { txt: "Aprueba el cuestionario de la actividad A4", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo="Diseña el experimento" icono="fa-vials">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Variable independiente: <strong style={{ color: "#fff" }}>{FOCOS.find((f) => f.id === foco)!.label}</strong>. Elígela arriba, sobre la escena.
+                </p>
+                <Deslizador label="Bicarbonato de sodio" icon="fa-spoon" colr={accent} valor={`${fmt1(gBicarb)} g`} min={BICARB_MIN} max={BICARB_MAX} step={BICARB_PASO} value={gBicarb} onChange={cambiarBic} hintL={aprox} hintR={`punto exacto ≈ ${fmt1(gEstq)} g`} />
+                <div className="co2-fila">
+                  <div>
+                    <div style={{ fontWeight: 800, color: T.text2, marginBottom: 8 }}>Concentración del vinagre</div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {VINAGRES.map((v) => (
+                        <button key={v.pct} className="co2-pill" data-on={pct === v.pct && !control} disabled={control} onClick={() => cambiarPct(v.pct)} style={{ flex: 1, opacity: control ? 0.4 : 1, cursor: control ? "not-allowed" : "pointer" }}>{v.pct}%</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, color: T.text2, marginBottom: 8 }}>Volumen de vinagre (mL)</div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {VOLUMENES.map((v) => (
+                        <button key={v} className="co2-pill" data-on={volMl === v} onClick={() => cambiarVol(v)} style={{ flex: 1 }}>{v}</button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <button className="co2-chip" data-on={control} onClick={toggleControl} style={{ justifyContent: "center", textAlign: "center" }}>
+                  <i className="fa-solid fa-vial-circle-check" style={{ color: control ? accent : T.text3 }} />
+                  Usar agua como control (debe NO reaccionar)
                 </button>
-              ))}
-            </div>
-
-            {/* Slider bicarbonato */}
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={{ fontSize: 12.5, fontWeight: 800, color: foco === "bicarbonato" ? "#fff" : T.text2 }}>
-                Bicarbonato de sodio {foco === "bicarbonato" && <span style={{ color: accent }}>· independiente</span>}
-              </span>
-              <span style={{ fontSize: 13, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>{fmt1(gBicarb)} g <span style={{ color: T.text3, fontWeight: 600, fontSize: 11 }}>{aprox}</span></span>
-            </div>
-            <input className="co2-range" type="range" min={BICARB_MIN} max={BICARB_MAX} step={BICARB_PASO} value={gBicarb} onChange={(e) => cambiarBic(parseFloat(e.target.value))} />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: T.text3, marginTop: 4 }}>
-              <span>0 g</span>
-              <span>punto exacto ≈ {fmt1(gEstq)} g</span>
-              <span>{BICARB_MAX} g</span>
-            </div>
-
-            {/* Concentración + volumen del vinagre */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 18 }}>
-              <div>
-                <div style={{ fontSize: 12.5, fontWeight: 800, color: foco === "concentracion" ? "#fff" : T.text2, marginBottom: 8 }}>
-                  Concentración {foco === "concentracion" && <span style={{ color: accent }}>· indep.</span>}
+                <div className="co2-fila">
+                  <button className="co2-solve" onClick={reaccionar} disabled={reaccionando}
+                    style={{ background: reaccionando ? "rgba(255,255,255,0.06)" : accent, color: reaccionando ? T.text3 : "#04121f", cursor: reaccionando ? "default" : "pointer" }}>
+                    <i className={`fa-solid ${reaccionando ? "fa-spinner fa-spin" : "fa-play"}`} />
+                    {reaccionando ? "Reaccionando…" : "¡Reaccionar!"}
+                  </button>
+                  <button className="co2-ghost" onClick={reiniciar}>
+                    <i className="fa-solid fa-rotate-left" /> Reiniciar
+                  </button>
                 </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  {VINAGRES.map((v) => (
-                    <button key={v.pct} className="co2-pill" data-on={pct === v.pct && !control} disabled={control} onClick={() => cambiarPct(v.pct)} style={{ flex: 1, opacity: control ? 0.4 : 1, cursor: control ? "not-allowed" : "pointer" }}>{v.pct}%</button>
+              </Bloque>
+
+              <Bloque titulo="Lo que mides" icono="fa-wind">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="CO₂ producido" value={fmtVol(control ? 0 : res.volCO2mL)} col={colorGlobo} />
+                  <Dato label="CO₂ (mmol)" value={control ? "0" : fmt0(res.nCO2)} col={colorGlobo} />
+                  <Dato label="ácido (mmol)" value={control ? "0" : fmt0(res.nAcido)} col="#FB7185" />
+                  <Dato label="bicarb. (mmol)" value={fmt0(res.nBicarb)} col="#34D399" />
+                  <Dato label="masa CO₂ (g)" value={control ? "0" : fmt1(res.masaCO2)} col="#bfe8ff" />
+                  <Dato label="tiempo aprox. (s)" value={control ? "—" : `~${tiempo}`} col="#bfe8ff" />
+                </div>
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${limCol}55`, background: `${limCol}12` }}>
+                  {control
+                    ? <>El agua no tiene ácido, así que <strong style={{ color: "#fff" }}>no se produce CO₂</strong>: es el control que confirma que el gas viene del vinagre.</>
+                    : res.limitante === "bicarbonato"
+                      ? <>Sobra ácido: el <strong style={{ color: "#34D399" }}>bicarbonato se agota</strong> primero y limita el CO₂. Añadir más vinagre no daría más gas.</>
+                      : res.limitante === "acido"
+                        ? <>Sobra bicarbonato ({fmt0(res.sobranteMmol)} mmol sin reaccionar): el <strong style={{ color: "#FB7185" }}>ácido se agota</strong> y limita el CO₂. <strong>Echar más bicarbonato no produce más gas.</strong></>
+                        : <>Cantidades <strong style={{ color: "#A78BFA" }}>estequiométricas</strong>: ambos reactivos se consumen por completo.</>}
+                </p>
+              </Bloque>
+
+              <Bloque titulo="CO₂ producido vs gramos de bicarbonato" icono="fa-chart-line">
+                <CurvaCO2 curva={curva} gActual={gBicarb} gEstq={gEstq} accent={accent} />
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={sonido ? (ok) => { if (ok) audioRef.current?.correcto(); else audioRef.current?.incorrecto(); } : undefined}
+              playPick={sonido ? () => audioRef.current?.blip() : undefined}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Método científico" icono="fa-microscope">
+                <MetVar etiqueta="Variable independiente" valor={FOCOS.find((f) => f.id === foco)!.label} sub="la que tú cambias" col={accent} />
+                <MetVar etiqueta="Variable dependiente" valor="Volumen de CO₂ y tiempo" sub="lo que mides" col="#bfe8ff" />
+                <MetVar etiqueta="Variables controladas" valor={controladas(foco)} sub="lo que mantienes igual" col={T.text2} />
+                <MetVar etiqueta="Control" valor={control ? "Activo: agua sin ácido" : "Agua sin ácido (actívalo)"} sub="muestra que no debe reaccionar" col={control ? "#34D399" : T.text3} />
+              </Bloque>
+              <Bloque titulo="La reacción" icono="fa-atom">
+                <div style={{ padding: "12px 14px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}`, fontWeight: 800, color: "#fff", fontFamily: "ui-monospace, monospace", textAlign: "center", lineHeight: 1.5 }}>
+                  {ECUACION}
+                </div>
+                <p style={{ margin: 0, color: T.text2 }}><strong style={{ color: "#fff" }}>Tipo:</strong> {TIPO_REACCION}.</p>
+                <p style={{ margin: 0, color: T.text3 }}>
+                  <strong style={{ color: accent }}>Conservación de la masa:</strong> los átomos no se crean ni se destruyen. El CO₂ escapa como gas, por eso un frasco abierto pesa menos al terminar.
+                </p>
+              </Bloque>
+              <Bloque titulo="Datos clave" icono="fa-gauge-high">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 10 }}>
+                  {DATOS.map((d, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
+                      <i className={`fa-solid ${d.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                      <div>
+                        <div style={{ fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{d.valor}</div>
+                        <div style={{ color: T.text2, lineHeight: 1.4 }}>{d.texto}</div>
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </div>
-              <div>
-                <div style={{ fontSize: 12.5, fontWeight: 800, color: foco === "volumen" ? "#fff" : T.text2, marginBottom: 8 }}>
-                  Volumen {foco === "volumen" && <span style={{ color: accent }}>· indep.</span>}
-                </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  {VOLUMENES.map((v) => (
-                    <button key={v} className="co2-pill" data-on={volMl === v} onClick={() => cambiarVol(v)} style={{ flex: 1 }}>{v}</button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Control + acciones */}
-            <button className="co2-chip" data-on={control} onClick={toggleControl} style={{ width: "100%", marginTop: 16, justifyContent: "center", textAlign: "center" }}>
-              <i className="fa-solid fa-vial-circle-check" style={{ color: control ? accent : T.text3 }} />
-              Usar agua como control (debe NO reaccionar)
-            </button>
-
-            <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-              <button className="co2-solve" onClick={reaccionar} disabled={reaccionando}
-                style={{ background: reaccionando ? "rgba(255,255,255,0.06)" : accent, color: reaccionando ? T.text3 : "#04121f", cursor: reaccionando ? "default" : "pointer" }}>
-                <i className={`fa-solid ${reaccionando ? "fa-spinner fa-spin" : "fa-play"}`} />
-                {reaccionando ? "Reaccionando…" : "¡Reaccionar!"}
-              </button>
-              <button className="co2-ghost" onClick={reiniciar}>
-                <i className="fa-solid fa-rotate-left" /> Reiniciar
-              </button>
-            </div>
-
-            {/* Curva CO₂ vs bicarbonato */}
-            <div style={{ marginTop: 18 }}>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, marginBottom: 8 }}>CO₂ PRODUCIDO vs GRAMOS DE BICARBONATO</div>
-              <CurvaCO2 curva={curva} gActual={gBicarb} gEstq={gEstq} accent={accent} />
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Lecturas en vivo */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${limCol}55`, background: `rgba(${color.rgba},0.08)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#04121f", background: colorGlobo, boxShadow: `0 6px 18px -6px ${colorGlobo}` }}>
-                <i className="fa-solid fa-wind" />
-              </div>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", lineHeight: 1, fontFamily: "ui-monospace, monospace" }}>{fmtVol(control ? 0 : res.volCO2mL)}</div>
-                <div style={{ fontSize: 12, color: T.text2, fontWeight: 800 }}>de CO₂ ({control ? "0" : fmt0(res.nCO2)} mmol)</div>
-              </div>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
-              <Readout label="ácido (mmol)" value={control ? "0" : fmt0(res.nAcido)} col="#FB7185" size={15} />
-              <Readout label="bicarb. (mmol)" value={fmt0(res.nBicarb)} col="#34D399" size={15} />
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4 }}>
-              <Readout label="masa CO₂" value={control ? "0" : fmt1(res.masaCO2)} unit="g" col="#bfe8ff" size={15} />
-              <Readout label="tiempo aprox." value={control ? "—" : `~${tiempo}`} unit="s" col="#bfe8ff" size={15} />
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.5, marginTop: 13, paddingTop: 13, borderTop: `1px solid ${T.line}` }}>
-              {control
-                ? <>El agua no tiene ácido, así que <strong style={{ color: "#fff" }}>no se produce CO₂</strong>: es el control que confirma que el gas viene del vinagre.</>
-                : res.limitante === "bicarbonato"
-                  ? <>Sobra ácido: el <strong style={{ color: "#34D399" }}>bicarbonato se agota</strong> primero y limita el CO₂. Añadir más vinagre no daría más gas.</>
-                  : res.limitante === "acido"
-                    ? <>Sobra bicarbonato ({fmt0(res.sobranteMmol)} mmol sin reaccionar): el <strong style={{ color: "#FB7185" }}>ácido se agota</strong> y limita el CO₂. <strong>Echar más bicarbonato no produce más gas.</strong></>
-                    : <>Cantidades <strong style={{ color: "#A78BFA" }}>estequiométricas</strong>: ambos reactivos se consumen por completo.</>}
-            </div>
-          </div>
-
-          {/* Método científico */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-microscope" style={{ marginRight: 8, color: accent }} />
-              Método científico
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 10 }}>
-              <MetVar etiqueta="Variable independiente" valor={FOCOS.find((f) => f.id === foco)!.label} sub="la que tú cambias" col={accent} />
-              <MetVar etiqueta="Variable dependiente" valor="Volumen de CO₂ y tiempo" sub="lo que mides" col="#bfe8ff" />
-              <MetVar etiqueta="Variables controladas" valor={controladas(foco)} sub="lo que mantienes igual" col={T.text2} />
-              <MetVar etiqueta="Control" valor={control ? "Activo: agua sin ácido" : "Agua sin ácido (actívalo)"} sub="muestra que no debe reaccionar" col={control ? "#34D399" : T.text3} />
-            </div>
-          </div>
-
-          {/* La reacción */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-atom" style={{ marginRight: 8, color: accent }} />
-              La reacción
-            </Eyebrow>
-            <div style={{ padding: "12px 14px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}`, fontSize: 13, fontWeight: 800, color: "#fff", fontFamily: "ui-monospace, monospace", textAlign: "center", lineHeight: 1.5 }}>
-              {ECUACION}
-            </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 12 }}>
-              <strong style={{ color: "#fff" }}>Tipo:</strong> {TIPO_REACCION}.
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginTop: 10, paddingTop: 10, borderTop: `1px solid ${T.line}` }}>
-              <strong style={{ color: accent }}>Conservación de la masa:</strong> los átomos no se crean ni se destruyen. El CO₂ escapa como gas, por eso un frasco abierto pesa menos al terminar.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos ──────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <TableroObjetivos
-          retoKey={RETO_KEY}
-          accent={accent}
-          objetivos={[
-            { txt: "Diseña el experimento eligiendo una variable independiente", done: progreso > 0 },
-            { txt: "Activa el control con agua para comprobar el origen del CO₂", done: control },
-            { txt: "Observa el reactivo limitante en la reacción", done: progreso >= 1 && hayReaccion },
-            { txt: "Aprueba el cuestionario de la actividad A4", done: ejercicioAprobado },
-          ]}
-        />
-      </div>
-
-      {/* ── Datos + ideas clave ────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="co2-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-gauge-high" style={{ marginRight: 8, color: accent }} />
-            Datos clave
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((d, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{d.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{d.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          El volumen de CO₂ se calcula con <strong>estequiometría real</strong> (relación molar 1:1 y reactivo limitante) usando el volumen molar de un gas a 25 °C y 1 atm (24.45 L/mol). Los valores caseros son <strong>aproximados</strong> (1 cucharada ≈ 14 g; 1 cucharadita ≈ 4 g) y el tiempo de reacción es <strong>cualitativo/didáctico</strong> (mayor concentración → más rápido), no una medición. El globo y las burbujas ilustran el gas; su tamaño es proporcional al volumen calculado.
-        </span>
-      </div>
-
-      {/* ── Reto evaluable: quiz verbatim A4 ─────────────────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
-        }
-        playPick={sonido ? () => audioRef.current?.blip() : undefined}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={REACCION_CO2_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={REACCION_CO2_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                El volumen de CO₂ se calcula con <strong>estequiometría real</strong> (relación molar 1:1 y reactivo limitante) usando el volumen molar de un gas a 25 °C y 1 atm (24.45 L/mol). Los valores caseros son <strong>aproximados</strong> (1 cucharada ≈ 14 g; 1 cucharadita ≈ 4 g) y el tiempo de reacción es <strong>cualitativo/didáctico</strong> (mayor concentración → más rápido), no una medición. El globo y las burbujas ilustran el gas; su tamaño es proporcional al volumen calculado.
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
+
+const CSS_CO2 = `
+  .co2-chip { cursor:pointer; padding:10px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
+    color:${T.text2}; font-size:14px; font-weight:800; transition:all .15s; display:flex; align-items:center; gap:9px; }
+  .co2-chip:hover { border-color:rgba(255,255,255,0.4); color:#fff; }
+  .co2-chip[data-on="true"] { border-color:var(--lsa); background:rgba(255,255,255,0.1); color:#fff; }
+  .co2-pill { cursor:pointer; padding:9px 12px; border-radius:10px; border:1px solid ${T.line}; background:${T.inset};
+    color:${T.text2}; font-size:14px; font-weight:900; transition:all .15s; }
+  .co2-pill[data-on="true"] { border-color:var(--lsa); background:rgba(255,255,255,0.12); color:#fff; }
+  .co2-pill:hover { color:#fff; }
+  .co2-fila { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap:12px; }
+  .co2-solve { cursor:pointer; flex:1; padding:11px 14px; border-radius:11px; border:none; font-size:14px; font-weight:900;
+    display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; }
+  .co2-ghost { cursor:pointer; padding:11px 14px; border-radius:11px; border:1px solid ${T.line}; background:${T.inset};
+    color:${T.text2}; font-size:14px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; }
+  .co2-ghost:hover { border-color:rgba(255,255,255,0.3); color:#fff; }
+`;
 
 /* ── Texto de variables controladas según el foco ────────────────────────── */
 function controladas(foco: Foco): string {
@@ -543,9 +371,9 @@ function controladas(foco: Foco): string {
 function MetVar({ etiqueta, valor, sub, col }: { etiqueta: string; valor: string; sub: string; col: string }) {
   return (
     <div style={{ padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
-      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.06em", color: T.text3, textTransform: "uppercase" }}>{etiqueta}</div>
-      <div style={{ fontSize: 12.5, fontWeight: 800, color: col, marginTop: 2 }}>{valor}</div>
-      <div style={{ fontSize: 10.5, color: T.text3 }}>{sub}</div>
+      <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.06em", color: T.text3, textTransform: "uppercase" }}>{etiqueta}</div>
+      <div style={{ fontSize: 14, fontWeight: 800, color: col, marginTop: 2 }}>{valor}</div>
+      <div style={{ fontSize: 14, color: T.text3 }}>{sub}</div>
     </div>
   );
 }
@@ -563,20 +391,20 @@ function CurvaCO2({ curva, gActual, gEstq, accent }: { curva: PuntoG[]; gActual:
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       {/* eje Y (volumen) */}
-      <text x={4} y={y(vMax) + 3} fontSize={8.5} fill="rgba(255,255,255,0.5)">{fmtVol(vMax)}</text>
-      <text x={4} y={H - PB + 3} fontSize={8.5} fill="rgba(255,255,255,0.5)">0</text>
+      <text x={4} y={y(vMax) + 3} fontSize={11} fill="rgba(255,255,255,0.5)">{fmtVol(vMax)}</text>
+      <text x={4} y={H - PB + 3} fontSize={11} fill="rgba(255,255,255,0.5)">0</text>
       <line x1={PL} y1={PT} x2={PL} y2={H - PB} stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
       <line x1={PL} y1={H - PB} x2={W - PR} y2={H - PB} stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
       {/* línea del punto estequiométrico (donde deja de subir) */}
       <line x1={x(gEstq)} y1={PT} x2={x(gEstq)} y2={H - PB} stroke={`${accent}66`} strokeWidth={1} strokeDasharray="4 3" />
-      <text x={x(gEstq)} y={H - 9} textAnchor="middle" fontSize={8} fill={accent} fontWeight={700}>punto exacto</text>
+      <text x={x(gEstq)} y={H - 9} textAnchor="middle" fontSize={11} fill={accent} fontWeight={700}>punto exacto</text>
       {/* curva (sube y luego se aplana = reactivo limitante) */}
       <polyline points={pts} fill="none" stroke={accent} strokeWidth={2.2} strokeLinejoin="round" strokeLinecap="round" />
       {/* punto actual */}
       <circle cx={x(vActual.g)} cy={y(vActual.volCO2mL)} r={4.5} fill="#fff" stroke={accent} strokeWidth={2} />
-      <text x={x(vActual.g)} y={y(vActual.volCO2mL) - 8} textAnchor="middle" fontSize={9} fill="#fff" fontWeight={800}>{fmtVol(vActual.volCO2mL)}</text>
+      <text x={x(vActual.g)} y={y(vActual.volCO2mL) - 8} textAnchor="middle" fontSize={11} fill="#fff" fontWeight={800}>{fmtVol(vActual.volCO2mL)}</text>
       {/* eje x */}
-      <text x={(PL + W - PR) / 2} y={H - 1} textAnchor="middle" fontSize={8.5} fill="rgba(255,255,255,0.4)">gramos de bicarbonato →</text>
+      <text x={(PL + W - PR) / 2} y={H - 1} textAnchor="middle" fontSize={11} fill="rgba(255,255,255,0.4)">gramos de bicarbonato →</text>
     </svg>
   );
 }

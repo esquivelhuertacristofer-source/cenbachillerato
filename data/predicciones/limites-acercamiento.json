@@ -1,0 +1,12 @@
+{
+  "escena": "Una curva con un hueco en x = 3 y un punto que se desliza sobre ella cuando acercas x al hueco.",
+  "pregunta": "Si acercas x a 3 por la izquierda, ¿hacia qué valor se dirige f(x)?",
+  "opciones": [
+    { "id": "a", "texto": "Hacia 0", "icono": "fa-circle-minus" },
+    { "id": "b", "texto": "Hacia 6", "icono": "fa-bullseye" },
+    { "id": "c", "texto": "Hacia un valor enorme", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "b",
+  "porque": "Para x distinto de 3, (x² − 9)/(x − 3) equivale a x + 3. Al acercarse a 3 vale casi 6. Aunque f(3) no exista (0/0), el límite sí existe.",
+  "comoComprobarlo": "Elige el caso indeterminado, arrastra el deslizador de x hacia 3 y mira f(x) y el medidor de distancia."
+}
