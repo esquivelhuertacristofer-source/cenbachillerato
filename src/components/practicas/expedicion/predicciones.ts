@@ -33,7 +33,11 @@ export interface Prediccion {
   comoComprobarlo: string;
 }
 
+import { PREDICCIONES_LABS } from "./predicciones-labs.generated";
+
 export const PREDICCIONES: Record<string, Prediccion> = {
+  // Las de la migración general (docs/ESTANDAR-LABS.md §7); las de abajo, escritas a mano, mandan.
+  ...PREDICCIONES_LABS,
   "dcl-leyes-newton": {
     escena: "Una caja de 2 kg reposa sobre una rampa de madera casi plana.",
     pregunta: "Si levantas la rampa poco a poco, ¿qué le pasa a la caja?",
