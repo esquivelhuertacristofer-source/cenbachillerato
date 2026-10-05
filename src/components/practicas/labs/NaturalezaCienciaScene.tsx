@@ -18,8 +18,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -80,9 +80,24 @@ const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Mat
 const OK = "#34d399";
 const NO = "#f87171";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Aleja la cámara si la escena no cabe a lo ancho (celular). */
+function Encuadre({ ancho, pos, target }: { ancho: number; pos: Pt; target: Pt }) {
+  const camera = useThree((st) => st.camera);
+  const w = useThree((st) => st.size.width);
+  const h = useThree((st) => st.size.height);
+  useEffect(() => {
+    const aspect = w / Math.max(1, h);
+    const d0 = Math.hypot(pos[0] - target[0], pos[1] - target[1], pos[2] - target[2]);
+    const dNec = (ancho * 1.12) / (2 * Math.tan((42 / 2) * (Math.PI / 180)) * aspect);
+    const k = Math.min(2.4, Math.max(1, dNec / d0));
+    camera.position.set(target[0] + (pos[0] - target[0]) * k, target[1] + (pos[1] - target[1]) * k, target[2] + (pos[2] - target[2]) * k);
+  }, [camera, w, h, ancho, pos, target]);
+  return null;
+}
+
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -133,7 +148,7 @@ function posLab(i: number): Pt {
   return [-Math.cos(a) * RADIO_LABS, 0, Math.sin(a) * RADIO_LABS * 0.62 + 0.4];
 }
 
-function BarraReplica({ i, valor, reportado, unidad, visible }: { i: number; valor: number; reportado: number; unidad: string; visible: boolean }) {
+function BarraReplica({ i, valor, reportado, visible }: { i: number; valor: number; reportado: number; visible: boolean }) {
   const barra = useRef<THREE.Mesh>(null);
   const papel = useRef<THREE.Mesh>(null);
   const t = useRef(0);
@@ -179,11 +194,6 @@ function BarraReplica({ i, valor, reportado, unidad, visible }: { i: number; val
         <mesh ref={barra} material={mat} visible={false}>
           <boxGeometry args={[0.34, 1, 0.34]} />
         </mesh>
-        {visible && (
-          <Etiqueta pos={[0, 0.62 + Math.max(destino, 0) + 0.32, 0]} df={10} col={`${color}aa`} fs={11}>
-            {num(valor, unidad === "°C" ? 2 : 1)} {unidad}
-          </Etiqueta>
-        )}
       </group>
     </>
   );
@@ -204,6 +214,7 @@ function EscenaRevision({
 }) {
   const m = MANUSCRITOS.find((x) => x.id === manuscritoId) ?? MANUSCRITOS[0]!;
   const hoja = useRef<THREE.Group>(null);
+  const angosto = useThree((st) => st.size.width) < 640;
   useFrame(({ clock }) => {
     if (hoja.current) {
       hoja.current.position.y = 1.75 + Math.sin(clock.elapsedTime * 1.4) * 0.05;
@@ -211,7 +222,6 @@ function EscenaRevision({
     }
   });
   const colDictamen = dictamen === "aceptar" ? OK : dictamen === "cambios" ? "#fbbf24" : dictamen === "rechazar" ? NO : "#475569";
-  const promedio = medidos ? medidos.reduce((a, b) => a + b, 0) / medidos.length : 0;
 
   return (
     <group position={[0, -1.4, 0]}>
@@ -247,12 +257,12 @@ function EscenaRevision({
             </mesh>
           </group>
         ))}
-        <Etiqueta pos={[0, -0.72, 0.4]} col={`${modoColor}aa`} df={10}>
+        <Etiqueta pos={[0, -0.72, 0.4]} col={`${modoColor}aa`}>
           <i className="fa-solid fa-file-lines" style={{ color: modoColor }} />
           {m.titulo}
         </Etiqueta>
-        {marcados.length > 0 && (
-          <Html position={[0.7, -0.2, 0.1]} distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        {marcados.length > 0 && !angosto && (
+          <Html position={[0.7, -0.2, 0.1]} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
             <div style={{ display: "grid", gap: 4, transform: "translateY(-50%)" }}>
               {marcados.map((d) => (
                 <div
@@ -263,7 +273,7 @@ function EscenaRevision({
                     background: "rgba(127,29,29,0.85)",
                     border: `1px solid ${NO}`,
                     color: "#fff",
-                    fontSize: 10.5,
+                    fontSize: 14,
                     fontWeight: 800,
                     whiteSpace: "nowrap",
                   }}
@@ -291,11 +301,10 @@ function EscenaRevision({
           </mesh>
         </group>
       ))}
-      {!medidos && (
-        <Etiqueta pos={[0, 2.05, -2.7]} df={11} col={`${colDictamen}aa`}>
+      {!medidos && dictamen && (
+        <Etiqueta pos={[0, 2.05, -2.7]} col={`${colDictamen}aa`}>
           <i className="fa-solid fa-user-pen" style={{ color: colDictamen }} />
-          Revisión por pares
-          {dictamen ? ` · ${dictamen === "aceptar" ? "aceptado" : dictamen === "cambios" ? "pide cambios" : "rechazado"}` : ""}
+          {dictamen === "aceptar" ? "Aceptado" : dictamen === "cambios" ? "Pide cambios" : "Rechazado"}
         </Etiqueta>
       )}
 
@@ -318,22 +327,14 @@ function EscenaRevision({
                 <boxGeometry args={[0.7, 0.02, 0.02]} />
                 <meshBasicMaterial color="#e2e8f0" transparent opacity={0.8} />
               </mesh>
-              <Etiqueta pos={[0, -0.02, 0.62]} df={11} fs={10.5}>
-                <i className="fa-solid fa-flask" style={{ color: modoColor }} />
-                {nombre}
-              </Etiqueta>
             </group>
-            <BarraReplica i={i} valor={medidos?.[i] ?? 0} reportado={m.efectoReportado} unidad={m.unidad} visible={medidos !== null} />
+            <BarraReplica i={i} valor={medidos?.[i] ?? 0} reportado={m.efectoReportado} visible={medidos !== null} />
           </group>
         );
       })}
-      <Etiqueta pos={[posLab(0)[0] - 1.25, 0.62 + ALTO_REPORTADO, posLab(0)[2]]} df={11} fs={10.5}>
-        — lo que dice el artículo: {num(m.efectoReportado, m.unidad === "°C" ? 1 : 0)} {m.unidad}
-      </Etiqueta>
       {medidos && (
-        <Etiqueta pos={[0, 2.05, -2.7]} df={10} col={`${modoColor}aa`}>
-          <i className="fa-solid fa-chart-simple" style={{ color: modoColor }} />
-          Promedio de las réplicas: {num(promedio, m.unidad === "°C" ? 2 : 1)} {m.unidad}
+        <Etiqueta pos={[posLab(0)[0] - 1.3, 0.62 + ALTO_REPORTADO, posLab(0)[2]]}>
+          Artículo: {num(m.efectoReportado, m.unidad === "°C" ? 1 : 0)} {m.unidad}
         </Etiqueta>
       )}
     </group>
@@ -422,10 +423,6 @@ function BancoMetal({ metalId, tempC }: { metalId: MetalId; tempC: number }) {
             <meshBasicMaterial color="#dc2626" />
           </mesh>
         </group>
-        <Etiqueta pos={[0, 0.85, 0]} df={9} fs={11}>
-          <i className="fa-solid fa-gauge" style={{ color: "#f472b6" }} />
-          Comparador: 1 vuelta = 10 mm
-        </Etiqueta>
       </group>
       {/* Mecheros */}
       {[-1, 0, 1].map((x) => (
@@ -444,12 +441,9 @@ function BancoMetal({ metalId, tempC }: { metalId: MetalId; tempC: number }) {
           </mesh>
         ))}
       </group>
-      <Etiqueta pos={[0, 2.25, 0]} df={9} col="#f472b6aa" fs={13}>
+      <Etiqueta pos={[0, 2.25, 0]} col="#f472b6aa">
         <i className="fa-solid fa-temperature-half" style={{ color: "#fca5a5" }} />
         <span ref={lectura}>20 °C · ΔL = 0.00 mm</span>
-      </Etiqueta>
-      <Etiqueta pos={[0, -0.25, 0.8]} df={10} fs={10.5}>
-        Barra de {metal.etq.toLowerCase()} de 1 m · el alargamiento se dibuja ampliado 10×
       </Etiqueta>
     </group>
   );
@@ -543,7 +537,7 @@ function BancoHervir({ lugarId, fuego }: { lugarId: LugarId; fuego: boolean }) {
           </group>
         );
       })}
-      <Etiqueta pos={[-3.4, Math.min(alturaMonte + 0.35, 2.4), -3.6]} df={11} fs={11}>
+      <Etiqueta pos={[-3.4, Math.min(alturaMonte + 0.35, 2.4), -3.6]}>
         <i className="fa-solid fa-mountain" style={{ color: "#94a3b8" }} />
         {lugar.etq} · {num(lugar.altitud)} m
       </Etiqueta>
@@ -595,10 +589,10 @@ function BancoHervir({ lugarId, fuego }: { lugarId: LugarId; fuego: boolean }) {
           <boxGeometry args={[0.32, 0.018, 0.02]} />
           <meshBasicMaterial color="#fbbf24" />
         </mesh>
-        <Etiqueta pos={[0.62, 0.3 + (100 / 110) * 2.2, 0]} df={10} fs={10} col="#fbbf24aa">
+        <Etiqueta pos={[0.62, 0.3 + (100 / 110) * 2.2, 0]} col="#fbbf24aa">
           100 °C
         </Etiqueta>
-        <Etiqueta pos={[0, 3.05, 0]} df={9} col="#f472b6aa" fs={13}>
+        <Etiqueta pos={[0, 3.05, 0]} col="#f472b6aa">
           <i className="fa-solid fa-temperature-half" style={{ color: "#fca5a5" }} />
           <span ref={lectura}>22.0 °C</span>
         </Etiqueta>
@@ -680,7 +674,7 @@ function BancoCisnes({ regionId }: { regionId: RegionId }) {
       {POS_CISNES.map((p, k) => (
         <Cisne key={`${regionId}-${k}`} pos={p} negro={k < region.negros} fase={k * 1.3} />
       ))}
-      <Etiqueta pos={[0, 2.1, -2.2]} df={10} col="#f472b6aa" fs={12}>
+      <Etiqueta pos={[0, 2.1, -2.2]} col="#f472b6aa">
         <i className="fa-solid fa-earth-americas" style={{ color: "#67e8f9" }} />
         {region.etq} · {region.fuente}
       </Etiqueta>
@@ -689,6 +683,7 @@ function BancoCisnes({ regionId }: { regionId: RegionId }) {
 }
 
 function BancoDragon({ dragonPrueba }: { dragonPrueba: PruebaDragonId | null }) {
+  const angosto = useThree((st) => st.size.width) < 640;
   const pintura = useRef<THREE.InstancedMesh>(null);
   const obj = useMemo(() => new THREE.Object3D(), []);
   const semillas = useMemo(
@@ -756,7 +751,7 @@ function BancoDragon({ dragonPrueba }: { dragonPrueba: PruebaDragonId | null }) 
           </mesh>
         );
       })}
-      <Etiqueta pos={[0, 0.35, 0]} df={10} col="#f472b6aa" fs={11}>
+      <Etiqueta pos={[0, 0.35, 0]} col="#f472b6aa">
         <i className="fa-solid fa-dragon" style={{ color: "#f472b6" }} />
         «Aquí está el dragón»
       </Etiqueta>
@@ -767,16 +762,17 @@ function BancoDragon({ dragonPrueba }: { dragonPrueba: PruebaDragonId | null }) 
             <boxGeometry args={[0.5, 0.35, 0.3]} />
             <meshStandardMaterial color="#1f2937" />
           </mesh>
-          <Html position={[0, 0.55, 0]} center distanceFactor={9} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+          {!angosto && (
+          <Html position={[0, 0.55, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
             <div
               style={{
-                width: 150,
-                height: 92,
+                width: 170,
+                height: 100,
                 borderRadius: 8,
                 border: "2px solid #1f2937",
                 background: "linear-gradient(180deg,#1e1b4b,#1e3a8a 60%,#312e81)",
                 color: "#c7d2fe",
-                fontSize: 10,
+                fontSize: 14,
                 fontWeight: 800,
                 display: "flex",
                 alignItems: "flex-end",
@@ -784,9 +780,10 @@ function BancoDragon({ dragonPrueba }: { dragonPrueba: PruebaDragonId | null }) 
                 paddingBottom: 6,
               }}
             >
-              Pantalla infrarroja: todo frío
+              Infrarrojo: todo frío
             </div>
           </Html>
+          )}
         </group>
       )}
       {dragonPrueba === "bascula" && (
@@ -795,7 +792,7 @@ function BancoDragon({ dragonPrueba }: { dragonPrueba: PruebaDragonId | null }) 
             <boxGeometry args={[1.4, 0.08, 1]} />
             <meshStandardMaterial color="#cbd5e1" metalness={0.5} roughness={0.3} />
           </mesh>
-          <Etiqueta pos={[0, 0.5, 0.6]} df={9} fs={13} col="#cbd5e1aa">
+          <Etiqueta pos={[0, 0.5, 0.6]} col="#cbd5e1aa">
             <i className="fa-solid fa-weight-scale" />
             0.0 kg
           </Etiqueta>
@@ -808,7 +805,8 @@ function BancoDragon({ dragonPrueba }: { dragonPrueba: PruebaDragonId | null }) 
       {prueba && (
         <>
           <Persona pos={[-2.2, 0, 1.2]} color="#f472b6" />
-          <Html position={[-2.2, 2.05, 1.2]} center distanceFactor={9} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+          {!angosto && (
+          <Html position={[-2.2, 2.05, 1.2]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
             <div
               style={{
                 maxWidth: 220,
@@ -816,7 +814,7 @@ function BancoDragon({ dragonPrueba }: { dragonPrueba: PruebaDragonId | null }) 
                 borderRadius: 12,
                 background: "#fff",
                 color: "#0f172a",
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 800,
                 lineHeight: 1.35,
                 boxShadow: "0 8px 20px -8px #000",
@@ -826,6 +824,7 @@ function BancoDragon({ dragonPrueba }: { dragonPrueba: PruebaDragonId | null }) 
               {prueba.excusa}
             </div>
           </Html>
+          )}
         </>
       )}
     </group>
@@ -857,6 +856,7 @@ function EscenaHistoria({ casoId, hito, modoColor }: { casoId: "ulcera" | "deriv
   const colNuevo = useMemo(() => new THREE.Color(modoColor), [modoColor]);
   const tmp = useMemo(() => new THREE.Color(), []);
   const cabezas = useRef<THREE.InstancedMesh>(null);
+  const angosto = useThree((st) => st.size.width) < 640;
   const lugares = useMemo(
     () =>
       Array.from({ length: N_PERSONAS }, (_, i) => {
@@ -929,22 +929,6 @@ function EscenaHistoria({ casoId, hito, modoColor }: { casoId: "ulcera" | "deriv
           <boxGeometry args={[0.9 - b.k * 0.03, b.alto, 0.7]} />
           <meshStandardMaterial color={col} roughness={0.45} emissive={b.k === hito ? col : "#000"} emissiveIntensity={b.k === hito ? 0.35 : 0} />
         </mesh>
-        <Html position={[lado === "izq" ? -0.55 : 0.55, 0, 0.36]} center distanceFactor={10} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-          <div
-            style={{
-              padding: "2px 7px",
-              borderRadius: 6,
-              background: "rgba(4,10,22,0.85)",
-              color: "#fff",
-              fontSize: 10,
-              fontWeight: 900,
-              whiteSpace: "nowrap",
-              border: `1px solid ${col}`,
-            }}
-          >
-            {b.anio}
-          </div>
-        </Html>
       </group>
     );
   };
@@ -998,7 +982,8 @@ function EscenaHistoria({ casoId, hito, modoColor }: { casoId: "ulcera" | "deriv
           </group>
         </group>
       ))}
-      <Html position={[-BRAZO - 0.2, 4.1, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      {!angosto && (
+      <Html position={[-BRAZO - 0.2, 4.1, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
             width: 190,
@@ -1007,17 +992,19 @@ function EscenaHistoria({ casoId, hito, modoColor }: { casoId: "ulcera" | "deriv
             background: "rgba(4,10,22,0.88)",
             border: "1px solid #64748b",
             color: "#e2e8f0",
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: 800,
             lineHeight: 1.3,
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: 9, letterSpacing: "0.1em", color: "#94a3b8" }}>IDEA ESTABLECIDA</div>
+          <div style={{ fontSize: 14, letterSpacing: "0.06em", color: "#94a3b8" }}>IDEA ESTABLECIDA</div>
           {caso.vieja}
         </div>
       </Html>
-      <Html position={[BRAZO + 0.2, 4.1, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      )}
+      {!angosto && (
+      <Html position={[BRAZO + 0.2, 4.1, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
             width: 190,
@@ -1026,17 +1013,18 @@ function EscenaHistoria({ casoId, hito, modoColor }: { casoId: "ulcera" | "deriv
             background: "rgba(4,10,22,0.88)",
             border: `1px solid ${modoColor}`,
             color: "#fff",
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: 800,
             lineHeight: 1.3,
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: 9, letterSpacing: "0.1em", color: modoColor }}>IDEA NUEVA</div>
+          <div style={{ fontSize: 14, letterSpacing: "0.06em", color: modoColor }}>IDEA NUEVA</div>
           {caso.nueva}
         </div>
       </Html>
-      <Etiqueta pos={[0, 5.0, 0]} df={9} col={`${modoColor}aa`} fs={15}>
+      )}
+      <Etiqueta pos={[0, 5.0, 0]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-calendar" style={{ color: modoColor }} />
         {h.anio}
       </Etiqueta>
@@ -1066,12 +1054,12 @@ function EscenaHistoria({ casoId, hito, modoColor }: { casoId: "ulcera" | "deriv
 export default function NaturalezaCienciaScene(p: NaturalezaSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "revision") return { pos: [0, 6.4, 10.6], target: [0, -0.2, 0.2] };
-    if (vista === "historia") return { pos: [0, 2.9, 9.2], target: [0, 0.9, 0] };
-    if (p.prueba === "metal") return { pos: [1.3, 3.4, 8.4], target: [1.0, 0.8, 0] };
-    if (p.prueba === "hervir") return { pos: [1.5, 3.6, 6.4], target: [0.2, 0.9, 0] };
-    if (p.prueba === "cisnes") return { pos: [0, 5.2, 7.0], target: [0, 0, 0] };
-    return { pos: [1.2, 3.4, 7.4], target: [0, 1.0, 0] };
+    if (vista === "revision") return { pos: [0, 6.6, 11.4], target: [0, -0.5, 0.2] };
+    if (vista === "historia") return { pos: [0, 3.3, 10.4], target: [0, 0.4, 0] };
+    if (p.prueba === "metal") return { pos: [1.3, 3.4, 9.0], target: [1.0, 0.4, 0] };
+    if (p.prueba === "hervir") return { pos: [1.5, 3.6, 7.0], target: [0.2, 0.5, 0] };
+    if (p.prueba === "cisnes") return { pos: [0, 5.6, 7.6], target: [0, -0.3, 0] };
+    return { pos: [1.2, 3.4, 8.0], target: [0, 0.6, 0] };
   }, [vista, p.prueba]);
 
   return (
@@ -1081,6 +1069,7 @@ export default function NaturalezaCienciaScene(p: NaturalezaSceneProps) {
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
       <Escenario acento="#38bdf8" />
+      <Encuadre ancho={vista === "historia" ? 12 : vista === "revision" ? 9 : p.prueba === "cisnes" ? 9 : 8} pos={cam.pos} target={cam.target} />
       <pointLight position={[-6, 3, 5]} intensity={0.4} color={modoColor} />
 
       {vista === "revision" && <EscenaRevision manuscritoId={p.manuscritoId} marcados={p.marcados} dictamen={p.dictamen} medidos={p.medidos} modoColor={modoColor} />}

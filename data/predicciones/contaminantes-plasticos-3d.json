@@ -1,0 +1,12 @@
+{
+  "escena": "Una costa en corte: playa, agua de mar y fondo. Un plástico cae desde arriba y una barra de tiempo lo va rompiendo en pedazos.",
+  "pregunta": "Tiras al mar un trozo de PET, el plástico de las botellas. ¿Qué le pasa en el agua?",
+  "opciones": [
+    { "id": "a", "texto": "Flota en la superficie", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se hunde al fondo", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se disuelve en el agua", "icono": "fa-droplet" }
+  ],
+  "correcta": "b",
+  "porque": "Flotar depende de la densidad. El PET (1.38 g/cm³) es más denso que el agua de mar (1.025 g/cm³), así que se hunde. Solo el PE y el PP, menos densos, quedan flotando.",
+  "comoComprobarlo": "Elige PET con el código 1, escoge «Al mar» y pulsa Tirar. Después prueba con PE y compara dónde termina cada uno."
+}

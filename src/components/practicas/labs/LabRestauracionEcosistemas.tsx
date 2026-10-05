@@ -21,7 +21,9 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, NUM, OK, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Deslizador, BotonHerramienta } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -175,23 +177,23 @@ function ContrarrelojCard({ accent, rgba, mejor, onResultado, playSfx }: { accen
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-stopwatch" style={{ marginRight: 8, color: accent }} />
           Contrarreloj: ¿qué instrumento usarías?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         !activo ? (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, maxWidth: 560 }}>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, maxWidth: "100%" }}>
               Seis situaciones reales, {SEGUNDOS_POR_SITUACION} segundos cada una (como el reto contrarreloj A10). Elige el instrumento que mejor resuelve cada caso: sin errores ganas tres estrellas.
             </div>
             <button className="re-opt re-empezar" data-on="true" onClick={empezar} style={{ ["--rec" as string]: accent, background: `rgba(${rgba},0.16)` }}>
@@ -202,13 +204,13 @@ function ContrarrelojCard({ accent, rgba, mejor, onResultado, playSfx }: { accen
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-              <span style={{ fontSize: 11, color: T.text3, fontWeight: 800 }}>
+              <span style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>
                 Situación {pos + 1} de {ronda.length}
               </span>
               <div style={{ flex: 1, height: 6, borderRadius: 99, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
                 <div style={{ width: `${(restante / SEGUNDOS_POR_SITUACION) * 100}%`, height: "100%", background: restante < 5 ? WARN : accent, transition: "width .2s linear" }} />
               </div>
-              <span style={{ fontSize: 12, fontWeight: 900, color: restante < 5 ? WARN : "#fff", width: 34, textAlign: "right", ...NUM }}>{Math.ceil(restante)} s</span>
+              <span style={{ fontSize: 14, fontWeight: 900, color: restante < 5 ? WARN : "#fff", width: 34, textAlign: "right", ...NUM }}>{Math.ceil(restante)} s</span>
             </div>
             <div className="re-situacion" style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>
               «{sit.texto}»
@@ -221,20 +223,20 @@ function ContrarrelojCard({ accent, rgba, mejor, onResultado, playSfx }: { accen
                 </button>
               ))}
             </div>
-            {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso}</div>}
+            {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso}</div>}
           </>
         )
       ) : (
         <>
-          {aviso && <div style={{ marginBottom: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso}</div>}
+          {aviso && <div style={{ marginBottom: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso}</div>}
           <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
               {[1, 2, 3].map((k) => (
                 <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
               ))}
-              <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+              <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
             </span>
-            <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+            <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
               <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
               Otra ronda
             </button>
@@ -251,7 +253,7 @@ function Medidor({ etq, valor, meta, icono, col }: { etq: string; valor: number;
   return (
     <div style={{ padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.45)", border: `1px solid ${ok ? `${OK}55` : T.line}` }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 800, color: T.text2 }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>
           <i className={`fa-solid ${icono}`} style={{ marginRight: 6, color: col }} />
           {etq}
         </span>
@@ -261,10 +263,29 @@ function Medidor({ etq, valor, meta, icono, col }: { etq: string; valor: number;
         <div style={{ width: `${Math.min(100, valor)}%`, height: "100%", borderRadius: 99, background: ok ? OK : col, transition: "width .15s linear" }} />
         <div title={`Meta ${meta}`} style={{ position: "absolute", left: `${meta}%`, top: -3, width: 2, height: 13, background: "#fff" }} />
       </div>
-      <div style={{ fontSize: 10, color: T.text3, marginTop: 4 }}>Meta: {meta} o más</div>
+      <div style={{ fontSize: 14, color: T.text3, marginTop: 4 }}>Meta: {meta} o más</div>
     </div>
   );
 }
+
+const CSS_RE = `
+  .re-opts { display:flex; flex-wrap:wrap; gap:7px; }
+  .re-opt { cursor:pointer; border:1px solid var(--rec); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; text-align:left; }
+  .re-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+  .re-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+  .re-opt:disabled { cursor:default; }
+  .re-opt:disabled[data-on="false"] { opacity:0.55; }
+  .re-toggle { width:100%; cursor:pointer; border:1px solid var(--rec); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+  .re-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+  .re-toggle:disabled { cursor:default; opacity:0.75; }
+  .re-linea { display:flex; align-items:center; gap:0; }
+  .re-punto { cursor:pointer; flex:1; height:18px; border:none; background:transparent; position:relative; padding:0; }
+  .re-punto::before { content:""; position:absolute; left:0; right:0; top:8px; height:2px; background:rgba(255,255,255,0.14); }
+  .re-punto::after { content:""; position:absolute; left:50%; top:3px; width:12px; height:12px; margin-left:-6px; border-radius:50%; border:2px solid var(--rec); background:#06121e; transition:all .2s; }
+  .re-punto[data-estado="hecho"]::after { background:var(--rec); }
+  .re-punto[data-estado="actual"]::after { background:var(--rec); box-shadow:0 0 0 4px rgba(255,255,255,0.12); transform:scale(1.25); }
+  .re-opt:focus-visible, .re-toggle:focus-visible, .re-punto:focus-visible { outline:2px solid #22c55e; outline-offset:2px; }
+`;
 
 /* ════════════════════════════════════════════════════════════════════════
  * Shell
@@ -312,7 +333,6 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -520,18 +540,19 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Simular 30 años un plan con instrumento en las ocho zonas", done: planCompleto },
-    { t: "Cumplir las tres metas de la cuenca sin pasarte del presupuesto", done: metasOk },
-    { t: "Unir la sierra y la selva con un corredor biológico", done: conecto },
-    { t: "Descubrir un instrumento caro o mal ubicado y entender por qué", done: vioMalUbicado },
-    { t: "Llevar a acahual un potrero cercano al bosque solo con regeneración natural", done: acahualNatural },
-    { t: "Ver estancarse la regeneración natural lejos del bosque y rescatarla con nucleación o plantación", done: vioEstancada && rescato },
-    { t: "Predecir qué se recupera primero en la sucesión", done: prediccionOk },
-    { t: "Diagnosticar bien los tres casos de México", done: diagnosticados.size === CASOS.length },
-    { t: "Completar el contrarreloj de instrumentos y ganar estrellas", done: contrarreloj },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Simular 30 años un plan con instrumento en las ocho zonas", done: planCompleto },
+    { txt: "Cumplir las tres metas de la cuenca sin pasarte del presupuesto", done: metasOk },
+    { txt: "Unir la sierra y la selva con un corredor biológico", done: conecto },
+    { txt: "Descubrir un instrumento caro o mal ubicado y entender por qué", done: vioMalUbicado },
+    { txt: "Mueve la distancia al bosque y mira cuántas semillas llegan y cómo crece la parcela", done: distancia !== 100 },
+    { txt: "Llevar a acahual un potrero cercano al bosque solo con regeneración natural", done: acahualNatural },
+    { txt: "Ver estancarse la regeneración natural lejos del bosque y rescatarla con nucleación o plantación", done: vioEstancada && rescato },
+    { txt: "Predecir qué se recupera primero en la sucesión", done: prediccionOk },
+    { txt: "Diagnosticar bien los tres casos de México", done: diagnosticados.size === CASOS.length },
+    { txt: "Completar el contrarreloj de instrumentos y ganar estrellas", done: contrarreloj },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -562,9 +583,9 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -577,11 +598,11 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
     control = (
       <>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 11, fontWeight: 800, color: T.text3, whiteSpace: "nowrap" }}>PRESUPUESTO</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, whiteSpace: "nowrap" }}>PRESUPUESTO</span>
           <div style={{ flex: 1, height: 9, borderRadius: 99, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
             <div style={{ width: `${pct}%`, height: "100%", background: costo > 90 ? WARN : modoCol, transition: "width .2s" }} />
           </div>
-          <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 900, color: "#fff", ...NUM }}>
             {costo} / {PRESUPUESTO}
           </span>
         </div>
@@ -599,13 +620,13 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
         </div>
         <div style={{ marginTop: 10, padding: "12px 14px", borderRadius: 12, background: "rgba(248,250,252,0.05)", border: `1px solid ${T.line}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 13.5, color: "#fff", fontWeight: 900 }}>{zona.etq}</span>
-            <span style={{ fontSize: 11, color: T.text3, fontWeight: 800 }}>
+            <span style={{ fontSize: 14, color: "#fff", fontWeight: 900 }}>{zona.etq}</span>
+            <span style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>
               {zona.tenencia}
               {zona.ha > 0 ? ` · ${num(zona.ha)} ha` : ""}
             </span>
           </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 5 }}>{zona.ficha}</div>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 5 }}>{zona.ficha}</div>
         </div>
         {sub("2 · Asígnale un instrumento")}
         <div style={{ display: "grid", gap: 7 }}>
@@ -617,9 +638,9 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
                 <i className={`fa-solid ${ins.icono}`} style={{ color: ins.color, width: 16, textAlign: "center" }} />
                 <span style={{ flex: 1 }}>
                   {ins.etq}
-                  <span style={{ display: "block", fontSize: 10.5, fontWeight: 700, color: T.text3, marginTop: 2 }}>{ins.quien}</span>
+                  <span style={{ display: "block", fontSize: 14, fontWeight: 700, color: T.text3, marginTop: 2 }}>{ins.quien}</span>
                 </span>
-                <span style={{ fontSize: 12, fontWeight: 900, ...NUM }}>{ins.costo}</span>
+                <span style={{ fontSize: 14, fontWeight: 900, ...NUM }}>{ins.costo}</span>
               </button>
             );
           })}
@@ -639,7 +660,7 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
             </button>
           )}
         </div>
-        <div className="re-medidores" style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 8, marginTop: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 8, marginTop: 12 }}>
           <Medidor etq="Cobertura forestal %" valor={ind.cobertura} meta={META_COB} icono="fa-tree" col="#22c55e" />
           <Medidor etq="Biodiversidad" valor={ind.biodiversidad} meta={META_BIO} icono="fa-dove" col="#a3e635" />
           <Medidor etq="Comunidades" valor={ind.comunidades} meta={META_COM} icono="fa-people-roof" col="#fbbf24" />
@@ -654,11 +675,11 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
                 const q = CALIDAD_DEF[o.calidad];
                 return (
                   <div key={z.id} className="re-resultado" style={{ padding: "9px 12px", borderRadius: 10, border: `1px solid ${q.color}44`, background: "rgba(4,10,22,0.4)" }}>
-                    <div style={{ fontSize: 12, fontWeight: 900, color: "#fff" }}>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>
                       <i className={`fa-solid ${q.icono}`} style={{ marginRight: 7, color: q.color }} />
                       {z.etq} · {INSTRUMENTOS[i].corto} <span style={{ color: q.color, fontWeight: 800 }}>— {q.etq}</span>
                     </div>
-                    <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45, marginTop: 3 }}>{o.porque}</div>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, marginTop: 3 }}>{o.porque}</div>
                   </div>
                 );
               })}
@@ -672,14 +693,14 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
             )}
           </>
         )}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>La cuenca, sus zonas, los costos y los resultados son un modelo didáctico; los instrumentos, las instituciones y los principios que lo explican son reales.</div>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>La cuenca, sus zonas, los costos y los resultados son un modelo didáctico; los instrumentos, las instituciones y los principios que lo explican son reales.</div>
       </>
     );
   } else if (modo === "sucesion") {
     control = (
       <>
         {sub("1 · Predice antes de empezar")}
-        <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, marginBottom: 8 }}>Si un potrero junto a la selva se deja regenerar solo, ¿qué llega primero al 90 % del bosque maduro?</div>
+        <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, marginBottom: 8 }}>Si un potrero junto a la selva se deja regenerar solo, ¿qué llega primero al 90 % del bosque maduro?</div>
         <div className="re-opts">
           {PREDICCION_OPCIONES.map((o) => {
             const on = prediccion === o.id;
@@ -711,18 +732,8 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
         </div>
         {nota(ESTRATEGIAS.find((e) => e.id === estrategia)!.explica, T.text2, "fa-book")}
         {sub("3 · Condiciones del sitio")}
-        <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <i className="fa-solid fa-tree" style={{ color: "#4ade80", width: 16 }} />
-          <input type="range" aria-label="Distancia al bosque maduro (m)" className="re-range" min={DIST_MIN} max={DIST_MAX} step={DIST_PASO} value={distancia} onChange={(e) => setDistancia(Number(e.target.value))} style={{ ["--rec" as string]: "#4ade80" }} />
-          <span style={{ width: 84, textAlign: "right", fontSize: 12.5, color: "#fff", fontWeight: 800, ...NUM }}>{num(distancia)} m</span>
-        </label>
-        <div style={{ fontSize: 10.5, color: T.text3, margin: "2px 0 8px 26px" }}>Distancia al bosque maduro más cercano</div>
-        <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <i className="fa-solid fa-cow" style={{ color: "#d4a373", width: 16 }} />
-          <input type="range" aria-label="Años de uso como potrero (años)" className="re-range" min={0} max={USO_MAX} step={5} value={uso} onChange={(e) => setUso(Number(e.target.value))} style={{ ["--rec" as string]: "#d4a373" }} />
-          <span style={{ width: 84, textAlign: "right", fontSize: 12.5, color: "#fff", fontWeight: 800, ...NUM }}>{uso} años</span>
-        </label>
-        <div style={{ fontSize: 10.5, color: T.text3, margin: "2px 0 8px 26px" }}>Años que fue potrero: más uso, suelo más compactado y más pasto invasor</div>
+        <Deslizador label="Distancia al bosque maduro" icon="fa-tree" colr="#4ade80" valor={`${num(distancia)} m`} min={DIST_MIN} max={DIST_MAX} step={DIST_PASO} value={distancia} onChange={setDistancia} hintL="pegado al bosque" hintR="lejos: llegan pocas semillas" />
+        <Deslizador label="Años como potrero" icon="fa-cow" colr="#d4a373" valor={`${uso} años`} min={0} max={USO_MAX} step={5} value={uso} onChange={setUso} hintL="suelo sano" hintR="compactado y con pasto invasor" />
         <button className="re-toggle re-fuego" onClick={() => { setFuego((f) => !f); blip(); }} style={{ ["--rec" as string]: fuego ? "#fb923c" : "rgba(255,255,255,0.2)" }}>
           <i className={`fa-solid ${fuego ? "fa-fire" : "fa-fire-extinguisher"}`} style={{ marginRight: 9, color: fuego ? "#fb923c" : T.text3 }} />
           {fuego ? "Quemas recurrentes: SÍ (toca para evitarlas)" : "Quemas recurrentes: NO (toca para permitirlas)"}
@@ -733,16 +744,15 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
             <i className={`fa-solid ${corriendo ? "fa-pause" : "fa-play"}`} style={{ marginRight: 9, color: accent }} />
             {corriendo ? "Pausar" : anioSuc >= ANIOS_SUC ? "Volver a empezar" : "Correr 60 años"}
           </button>
-          <input type="range" aria-label="Año de la sucesión (años)" className="re-range" min={0} max={ANIOS_SUC} step={1} value={Math.round(anioSuc)} onChange={(e) => { setCorriendo(false); setAnioSuc(Number(e.target.value)); }} style={{ ["--rec" as string]: accent }} />
-          <span style={{ width: 60, textAlign: "right", fontSize: 12.5, color: "#fff", fontWeight: 800, ...NUM }}>año {num(anioSuc)}</span>
         </div>
+        <Deslizador label="Año de la sucesión" icon="fa-hourglass-half" colr={accent} valor={`año ${num(anioSuc)}`} min={0} max={ANIOS_SUC} step={1} value={Math.round(anioSuc)} onChange={(v) => { setCorriendo(false); setAnioSuc(v); }} />
         <div style={{ display: "grid", gap: 7, marginTop: 12 }}>
           {ATRIBUTOS.map((a) => {
             const v = est[a];
             const t90 = aniosHasta(condiciones, a, 0.9);
             return (
               <div key={a}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: T.text2, fontWeight: 800 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: T.text2, fontWeight: 800 }}>
                   <span>
                     <i className={`fa-solid ${ATRIBUTO_DEF[a].icono}`} style={{ marginRight: 6, color: ATRIBUTO_DEF[a].color }} />
                     {ATRIBUTO_DEF[a].etq}
@@ -752,7 +762,7 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
                 <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,0.08)", marginTop: 4, overflow: "hidden" }}>
                   <div style={{ width: `${v * 100}%`, height: "100%", background: ATRIBUTO_DEF[a].color, transition: "width .12s linear" }} />
                 </div>
-                <div style={{ fontSize: 10.5, color: T.text3, marginTop: 2 }}>
+                <div style={{ fontSize: 14, color: T.text3, marginTop: 2 }}>
                   Con estas condiciones llega al 90 % {t90 === null ? "en más de 200 años (o nunca)" : `en ≈ ${num(t90)} años`} · referencia: {ATRIBUTO_DEF[a].ref}
                 </div>
               </div>
@@ -773,7 +783,7 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
           "fa-lightbulb",
         )}
         {fuego && nota("Las quemas recurrentes matan plántulas y rebrotes y empobrecen el suelo: la parcela no pasa de un matorral pobre.", WARN, "fa-fire")}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Los tiempos de referencia (selva neotropical que se regenera junto a bosque maduro) son publicados; el efecto de la distancia, el uso previo, el fuego y la técnica es ilustrativo, basado en tendencias reportadas.</div>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Los tiempos de referencia (selva neotropical que se regenera junto a bosque maduro) son publicados; el efecto de la distancia, el uso previo, el fuego y la técnica es ilustrativo, basado en tendencias reportadas.</div>
       </>
     );
   } else {
@@ -789,7 +799,7 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 8, lineHeight: 1.45 }}>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 8, lineHeight: 1.45 }}>
           <i className="fa-solid fa-location-dot" style={{ marginRight: 6 }} />
           {caso.lugar} · {caso.instrumentos}
         </div>
@@ -800,10 +810,10 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
           ))}
         </div>
         <div style={{ marginTop: 10, padding: "12px 14px", borderRadius: 12, border: `1px solid ${hitoActual.tipo === "politica" ? modoCol : hitoActual.tipo === "amenaza" ? "#f87171" : "#fbbf24"}55`, background: "rgba(4,10,22,0.45)" }}>
-          <div style={{ fontSize: 12, fontWeight: 900, color: hitoActual.tipo === "politica" ? modoCol : hitoActual.tipo === "amenaza" ? "#f87171" : "#fbbf24", marginBottom: 4 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: hitoActual.tipo === "politica" ? modoCol : hitoActual.tipo === "amenaza" ? "#f87171" : "#fbbf24", marginBottom: 4 }}>
             {hitoActual.anio} · {hitoActual.tipo === "politica" ? "política o instrumento" : hitoActual.tipo === "amenaza" ? "amenaza" : "dato medido"}
           </div>
-          <div style={{ fontSize: 13, color: "#fff", lineHeight: 1.5 }}>{hitoActual.texto}</div>
+          <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5 }}>{hitoActual.texto}</div>
         </div>
         <div className="re-opts" style={{ marginTop: 10 }}>
           <button className="re-opt" data-on="false" onClick={() => irHito(hito - 1)} disabled={hito === 0} style={{ ["--rec" as string]: modoCol }}>
@@ -822,15 +832,15 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
             const visto = k <= hito;
             return (
               <div key={k} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minWidth: 0 }}>
-                <span style={{ fontSize: 9.5, fontWeight: 900, color: visto ? "#fff" : T.text3, ...NUM }}>{visto ? (h.valorTxt ?? num(h.valor!, caso.id === "vaquita" ? 0 : 2)) : "?"}</span>
+                <span style={{ fontSize: 14, fontWeight: 900, color: visto ? "#fff" : T.text3, ...NUM }}>{visto ? (h.valorTxt ?? num(h.valor!, caso.id === "vaquita" ? 0 : 2)) : "?"}</span>
                 <div style={{ width: "100%", height: visto ? alto : 3, borderRadius: 4, background: k === hito ? modoCol : visto ? `${modoCol}88` : "rgba(255,255,255,0.1)", transition: "height .3s" }} />
-                <span style={{ fontSize: 9, color: T.text3, whiteSpace: "nowrap" }}>{h.anio}</span>
+                <span style={{ fontSize: 14, color: T.text3, whiteSpace: "nowrap" }}>{h.anio}</span>
               </div>
             );
           })}
         </div>
         {sub("Diagnóstico")}
-        <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 8 }}>{caso.pregunta}</div>
+        <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 8 }}>{caso.pregunta}</div>
         {!alFinal ? (
           nota("Recorre la línea de tiempo hasta el último hito para diagnosticar con todos los datos.", T.text3, "fa-lock")
         ) : (
@@ -848,325 +858,155 @@ export function LabRestauracionEcosistemas({ color }: PracticaLabProps) {
         )}
         {diagElegido && nota(diagElegido.porque, diagElegido.correcto ? OK : WARN, diagElegido.correcto ? "fa-circle-check" : "fa-circle-xmark")}
         {diagElegido?.correcto && nota(caso.leccion, "#fff", "fa-lightbulb")}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Fuente: {caso.fuente}</div>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Fuente: {caso.fuente}</div>
       </>
     );
   }
 
+  const bloqueVivo = (
+    <Bloque titulo="Qué está pasando" icono={def.icono}>
+      <style>{CSS_RE}</style>
+      <p style={{ margin: 0, ...NUM }}>{pie}</p>
+    </Bloque>
+  );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes rePulse { 0%,100%{ box-shadow:0 0 0 0 var(--red); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .re-live-dot { animation: rePulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .re-live-dot { animation:none; } }
-        .re-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .re-grid { grid-template-columns: 1fr; } }
-        .re-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .re-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .re-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .re-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .re-tab { cursor:pointer; border:1px solid var(--rec); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .re-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .re-tab:hover { background:rgba(255,255,255,0.06); }
-        .re-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .re-opt { cursor:pointer; border:1px solid var(--rec); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .re-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .re-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .re-opt:disabled { cursor:default; }
-        .re-opt:disabled[data-on="false"] { opacity:0.55; }
-        .re-toggle { width:100%; cursor:pointer; border:1px solid var(--rec); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .re-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .re-toggle:disabled { cursor:default; opacity:0.75; }
-        .re-range { flex:1; min-width:120px; accent-color: var(--rec); }
-        .re-linea { display:flex; align-items:center; gap:0; }
-        .re-punto { cursor:pointer; flex:1; height:12px; border:none; background:transparent; position:relative; padding:0; }
-        .re-punto::before { content:""; position:absolute; left:0; right:0; top:5px; height:2px; background:rgba(255,255,255,0.14); }
-        .re-punto::after { content:""; position:absolute; left:50%; top:0; width:12px; height:12px; margin-left:-6px; border-radius:50%; border:2px solid var(--rec); background:#06121e; transition:all .2s; }
-        .re-punto[data-estado="hecho"]::after { background:var(--rec); }
-        .re-punto[data-estado="actual"]::after { background:var(--rec); box-shadow:0 0 0 4px rgba(255,255,255,0.12); transform:scale(1.25); }
-        .re-opt:focus-visible, .re-tab:focus-visible, .re-toggle:focus-visible, .re-icobtn:focus-visible, .re-range:focus-visible, .re-punto:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .re-bottom { grid-template-columns: 1fr !important; } }
-        @media (max-width: 560px){ .re-medidores { grid-template-columns: 1fr !important; } }
-        .re-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .re-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .re-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .re-drawer[data-open="true"] { transform:translateX(0); }
-        .re-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .re-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .re-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .re-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .re-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .re-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="re-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="re-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--rec" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <RestauracionScene
+            vista={modo}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            plan={plan}
+            anio={anio}
+            zonaSel={zonaSel}
+            onZona={elegirZona}
+            condiciones={condiciones}
+            anioSuc={anioSuc}
+            casoId={casoId}
+            hito={hito}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={`${def.etq}: ${def.subtitulo}`} icono={def.icono}>
+                {control}
+              </Bloque>
+              {bloqueVivo}
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <Bloque titulo="Contrarreloj de instrumentos" icono="fa-stopwatch">
+                <ContrarrelojCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              </Bloque>
+              <Bloque titulo="Quiz evaluable (A2)" icono="fa-circle-question">
+                <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Conoces las políticas de conservación de México." />
+              </Bloque>
+              <Bloque titulo="Completa el texto (A6)" icono="fa-keyboard">
+                <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Qué instrumento, dónde y para qué?" icono="fa-scale-balanced">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((t, n) => <li key={n}>{t}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo={`Lectura A1: ${TITULO_A1}`} icono="fa-book-open">
+                <div style={{ display: "grid", gap: 9 }}>
+                  {LECTURA_A1.map((t, n) => <p key={n} style={{ margin: 0, color: T.text2 }}>{t}</p>)}
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="re-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <RestauracionScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                plan={plan}
-                anio={anio}
-                zonaSel={zonaSel}
-                onZona={elegirZona}
-                condiciones={condiciones}
-                anioSuc={anioSuc}
-                casoId={casoId}
-                hito={hito}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="re-live-dot" style={{ ["--red" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="re-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="re-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="re-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="re-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-scale-balanced" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Qué instrumento, dónde y para qué?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
+                <p style={{ margin: 0, color: "#7dd3fc", fontStyle: "italic" }}>{NOTA_A1}</p>
+                <strong style={{ color: T.text3, letterSpacing: "0.06em" }}>PARA REFLEXIONAR</strong>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, n) => <li key={n}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Para pensar (autoevaluación A7)" icono="fa-landmark">
+                <p style={{ margin: 0, color: "#fff", fontWeight: 700 }}>{REFLEXION_A7}</p>
+                <p style={{ margin: 0, color: T.text3, fontStyle: "italic" }}>Pista del laboratorio: compara la vaquita marina con Cabo Pulmo, y el costo social de decretar un área sin acuerdo con quienes viven en ella.</p>
+              </Bloque>
+              <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, n) => <li key={n}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {GLOSARIO.map((gi, n) => (
+                    <div key={n} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                      <strong style={{ color: accent }}>{gi.termino}. </strong>
+                      <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                      <div style={{ color: T.text3, marginTop: 4 }}>
+                        <i className="fa-solid fa-leaf" style={{ marginRight: 6, color: accent }} aria-hidden />
+                        {gi.ejemplo}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, color: "#7dd3fc", lineHeight: 1.45, marginBottom: 12, fontStyle: "italic" }}>{NOTA_A1}</div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="re-objetivos" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="re-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-landmark" style={{ marginRight: 8, color: accent }} />
-              Para pensar (autoevaluación A7)
-            </Eyebrow>
-            <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.55, fontWeight: 700 }}>{REFLEXION_A7}</div>
-            <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.45, marginTop: 6, fontStyle: "italic" }}>Pista del laboratorio: compara la vaquita marina con Cabo Pulmo, y el costo social de decretar un área sin acuerdo con quienes viven en ella.</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-leaf" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas, los hechos del quiz A4, el glosario A5, el quiz A2, el texto A6 y la reflexión A7 son <strong>verbatim</strong> del material de la plataforma; la nota de
-          actualización de las ANP es de la CONANP (2025). La cuenca del modo «Plan de conservación» es un <strong>modelo didáctico</strong>: sus zonas, costos y resultados son ilustrativos, aunque
-          los instrumentos, las instituciones y los principios (adicionalidad, participación, conectividad, distancia a la fuente de semillas) son reales. En «Restaurar una parcela», los tiempos de
-          referencia son de Poorter et al. (2016, Nature; 2021, Science) y Rozendaal et al. (2019, Science Advances), y la comparación con la plantación sigue a Crouzeilles et al. (2017); el efecto
-          de la distancia, el uso previo, el fuego y la técnica es ilustrativo. Los datos de los casos son publicados (NOAA Fisheries, CIRVA y cruceros 2024–2025; Aburto-Oropeza et al. 2011; WWF
-          México y CONANP); las lanchas y los tocones de sus escenas son ilustrativos. Fuente del material: {FUENTE}
-        </span>
-      </div>
-
-      <ContrarrelojCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Conoces las políticas de conservación de México." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="re-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="re-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="re-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="re-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="re-drawer-body">
-          <FichaTeorica data={RESTAURACION_ECOSISTEMAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                </p>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, n) => <li key={n}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={RESTAURACION_ECOSISTEMAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                La lectura A1 con sus preguntas, los hechos del quiz A4, el glosario A5, el quiz A2, el texto A6 y la reflexión A7 son <strong>verbatim</strong> del material de la plataforma; la nota de
+                actualización de las ANP es de la CONANP (2025). La cuenca del modo «Plan de conservación» es un <strong>modelo didáctico</strong>: sus zonas, costos y resultados son ilustrativos, aunque
+                los instrumentos, las instituciones y los principios (adicionalidad, participación, conectividad, distancia a la fuente de semillas) son reales. En «Restaurar una parcela», los tiempos de
+                referencia son de Poorter et al. (2016, Nature; 2021, Science) y Rozendaal et al. (2019, Science Advances), y la comparación con la plantación sigue a Crouzeilles et al. (2017); el efecto
+                de la distancia, el uso previo, el fuego y la técnica es ilustrativo. Los datos de los casos son publicados (NOAA Fisheries, CIRVA y cruceros 2024–2025; Aburto-Oropeza et al. 2011; WWF
+                México y CONANP); las lanchas y los tocones de sus escenas son ilustrativos. Fuente del material: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

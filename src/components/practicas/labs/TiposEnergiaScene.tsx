@@ -20,7 +20,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode, type RefObject } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -94,9 +94,11 @@ const GEO_CAJA = new THREE.BoxGeometry(1, 1, 1);
 const GEO_CONO = new THREE.ConeGeometry(0.5, 1, 8);
 const GEO_HEX = new THREE.CylinderGeometry(1, 1, 0.5, 6);
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -107,7 +109,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -317,7 +319,6 @@ function EscenaTormenta({ etapa, distanciaKm, rayoNonce }: { etapa: number; dist
   const ultimo = useRef(rayoNonce);
   const delay = retrasoTrueno(distanciaKm);
   const radioOyente = Math.hypot(OBSERVADOR[0] - RAYO_SUELO[0], OBSERVADOR[2] - RAYO_SUELO[2]);
-  const f = FENOMENOS[0]!;
 
   useFrame((_, dt) => {
     escalaNube.current += ((etapa >= 3 ? 1 : 0.001) - escalaNube.current) * suave(dt, 0.04);
@@ -393,7 +394,7 @@ function EscenaTormenta({ etapa, distanciaKm, rayoNonce }: { etapa: number; dist
           o.set(-4 + (x + 4) * p, 4.6 - 4.6 * p, -2.2 + (z + 2.2) * p);
         }}
       />
-      <EtapaChip pos={[-3.2, 3.7, -2]} k={1} forma="luminosa" activa={etapa >= 1} />
+      <EtapaChip pos={[-3.2, 3.7, -2]} k={1} forma="luminosa" activa={etapa >= 1 && etapa <= 2} />
       <Particulas
         n={40}
         color="#fb923c"
@@ -408,7 +409,7 @@ function EscenaTormenta({ etapa, distanciaKm, rayoNonce }: { etapa: number; dist
         }}
         escalaFn={(p) => 1 - p * 0.6}
       />
-      <EtapaChip pos={[-1.6, 0.7, 0.4]} k={2} forma="termica" activa={etapa >= 2} />
+      <EtapaChip pos={[-1.6, 0.7, 0.4]} k={2} forma="termica" activa={etapa >= 2 && etapa <= 3} />
       <group ref={nube} position={[0.6, 2.85, -0.6]} scale={0.001}>
         {NUBE.map((b, k) => (
           <mesh key={k} position={b.p} castShadow>
@@ -435,7 +436,7 @@ function EscenaTormenta({ etapa, distanciaKm, rayoNonce }: { etapa: number; dist
           o.set(x, 2.3 + p * 1.9, -0.1 + (((i * 0.59) % 1) - 0.5) * 0.3);
         }}
       />
-      <EtapaChip pos={[2.6, 3.9, -0.6]} k={3} forma="cinetica" activa={etapa >= 3} />
+      <EtapaChip pos={[2.6, 3.9, -0.6]} k={3} forma="cinetica" activa={etapa >= 3 && etapa <= 4} />
       {etapa >= 4 && (
         <group>
           {Array.from({ length: 8 }, (_, k) => (
@@ -450,15 +451,9 @@ function EscenaTormenta({ etapa, distanciaKm, rayoNonce }: { etapa: number; dist
               <meshStandardMaterial color="#3b82f6" emissive="#3b82f6" emissiveIntensity={1.4} />
             </mesh>
           ))}
-          <Etiqueta pos={[-0.9, 4.6, 0.3]} df={11} fs={10.5} col="#ef4444aa">
-            + cima de la nube
-          </Etiqueta>
-          <Etiqueta pos={[-1.1, 2.0, 0.3]} df={11} fs={10.5} col="#3b82f6aa">
-            − base de la nube
-          </Etiqueta>
         </group>
       )}
-      <EtapaChip pos={[2.7, 2.1, 0.3]} k={4} forma="electrica" activa={etapa >= 4} />
+      <EtapaChip pos={[2.7, 2.1, 0.3]} k={4} forma="electrica" activa={etapa >= 4 && etapa <= 5} />
       <group ref={rayo} visible={false}>
         {RAYO_SEG.map((s, k) => (
           <mesh key={k} position={s.pos} quaternion={s.q}>
@@ -472,12 +467,6 @@ function EscenaTormenta({ etapa, distanciaKm, rayoNonce }: { etapa: number; dist
         <ringGeometry args={[0.94, 1, 64]} />
         <meshBasicMaterial color="#f472b6" transparent opacity={0.6} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
-      {etapa > f.pasos.length && (
-        <Etiqueta pos={[-0.3, 0.3, 2.1]} df={10} fs={11} col="#f472b6aa">
-          <i className="fa-solid fa-sun" style={{ color: FORMA_DEF.luminosa.color }} /> luz · <i className="fa-solid fa-temperature-high" style={{ color: FORMA_DEF.termica.color }} /> calor ·{" "}
-          <i className="fa-solid fa-volume-high" style={{ color: FORMA_DEF.sonora.color }} /> trueno
-        </Etiqueta>
-      )}
     </group>
   );
 }
@@ -566,7 +555,6 @@ function Olas({ fuerza }: { fuerza: number }) {
 }
 
 function EscenaBrisa({ etapa, noche }: { etapa: number; noche: boolean }) {
-  const f = FENOMENOS[1]!;
   const tArena = noche ? 18 : 38;
   const tMar = noche ? 24 : 26;
   return (
@@ -608,7 +596,7 @@ function EscenaBrisa({ etapa, noche }: { etapa: number; noche: boolean }) {
           o.set(-0.5 + (x + 0.5) * p, 5 - 4.9 * p, -2.4 + (z + 2.4) * p);
         }}
       />
-      <EtapaChip pos={[0.9, 4.6, -2.2]} k={1} forma="luminosa" activa={etapa >= 1} />
+      <EtapaChip pos={[0.9, 4.6, -2.2]} k={1} forma="luminosa" activa={etapa >= 1 && etapa <= 2} />
       <Particulas
         n={24}
         color="#fb923c"
@@ -634,20 +622,9 @@ function EscenaBrisa({ etapa, noche }: { etapa: number; noche: boolean }) {
           </Etiqueta>
         </>
       )}
-      <EtapaChip pos={[noche ? 2.2 : -2.2, 2.7, 0.6]} k={2} forma="termica" activa={etapa >= 2} />
+      <EtapaChip pos={[noche ? 2.2 : -2.2, 2.7, 0.6]} k={2} forma="termica" activa={etapa >= 2 && etapa <= 3} />
       <FlechasBrisa noche={noche} activo={etapa >= 3} />
-      {etapa >= 3 && (
-        <Etiqueta pos={[0.2, 1.05, 0.6]} df={10} fs={11.5} col="#60a5faaa">
-          <i className="fa-solid fa-wind" style={{ color: "#60a5fa" }} />
-          {noche ? "Brisa terrestre: de la tierra al mar" : "Brisa marina: del mar a la tierra"}
-        </Etiqueta>
-      )}
-      <EtapaChip pos={[0.2, 3.55, 0.6]} k={3} forma="cinetica" activa={etapa >= 3} />
-      {etapa > f.pasos.length && (
-        <Etiqueta pos={[noche ? -1.5 : 1.5, 2.15, -1.0]} df={10} fs={11} col="#f472b6aa">
-          olas y hojas en movimiento · fricción → calor
-        </Etiqueta>
-      )}
+      <EtapaChip pos={[0.2, 3.55, 0.6]} k={3} forma="cinetica" activa={etapa >= 3 && etapa <= 4} />
     </group>
   );
 }
@@ -678,7 +655,6 @@ function lavaLadera(p: number, i: number, out: THREE.Vector3) {
 }
 
 function EscenaVolcan({ etapa, magma }: { etapa: number; magma: Magma }) {
-  const f = FENOMENOS[2]!;
   const camara = useRef<THREE.MeshStandardMaterial>(null);
   const conducto = useRef<THREE.Mesh>(null);
   const brillo = useRef(0);
@@ -741,8 +717,8 @@ function EscenaVolcan({ etapa, magma }: { etapa: number; magma: Magma }) {
         camino={(p, i, o) => o.set(-4 + ((i * 0.37) % 1) * 8, -2.1 + ((i * 0.53) % 1) * 0.55, 0.03)}
         escalaFn={(p) => (p < 0.18 ? 1 + p * 4 : 0.001)}
       />
-      <EtapaChip pos={[-3.3, -1.45, 0.4]} k={1} forma="nuclear" activa={etapa >= 1} />
-      <EtapaChip pos={[1.9, -1.2, 0.4]} k={2} forma="termica" activa={etapa >= 2} />
+      <EtapaChip pos={[-3.3, -1.45, 0.4]} k={1} forma="nuclear" activa={etapa >= 1 && etapa <= 2} />
+      <EtapaChip pos={[1.9, -1.2, 0.4]} k={2} forma="termica" activa={etapa >= 2 && etapa <= 3} />
       {etapa >= 2 && (
         <Etiqueta pos={[1.9, -0.75, 0.4]} df={11} fs={10.5} col="#f97316aa">
           magma {fluido ? "≈ 1 150 °C" : "≈ 850 °C"}
@@ -771,12 +747,7 @@ function EscenaVolcan({ etapa, magma }: { etapa: number; magma: Magma }) {
       />
       <Particulas n={24} color="#f97316" tam={0.09} nivel={erupcion && fluido ? 1 : 0} vel={0.12} emisivo={1.8} camino={lavaLadera} />
       {erupcion && <pointLight position={[0, V_ALTO + 0.4, 0.5]} intensity={fluido ? 8 : 3} distance={7} color="#fb923c" />}
-      <EtapaChip pos={[-2.2, V_ALTO + 1.2, 0.3]} k={3} forma="cinetica" activa={etapa >= 3} />
-      {etapa > f.pasos.length && (
-        <Etiqueta pos={[2.6, V_ALTO + 1.6, 0.3]} df={10} fs={11} col="#f472b6aa">
-          {fluido ? "lava incandescente · calor" : "ceniza a km de altura · luz · calor"}
-        </Etiqueta>
-      )}
+      <EtapaChip pos={[-2.2, V_ALTO + 1.2, 0.3]} k={3} forma="cinetica" activa={etapa >= 3 && etapa <= 4} />
     </group>
   );
 }
@@ -881,7 +852,7 @@ function EscenaFotosintesis({ etapa, luzPct }: { etapa: number; luzPct: number }
           o.set(-3.6 + (h.p[0] + 3.6) * p, 4.6 + (h.p[1] - 4.6) * p, -1.2 + (h.p[2] + 1.2) * p + (((i * 0.37) % 1) - 0.5) * 0.3 * p);
         }}
       />
-      <EtapaChip pos={[-2.4, 3.9, -1]} k={1} forma="luminosa" activa={etapa >= 1} />
+      <EtapaChip pos={[-2.4, 3.9, -1]} k={1} forma="luminosa" activa={etapa >= 1 && etapa <= 2} />
       {/* CO₂ entra, O₂ sale, glucosa baja por el tallo */}
       <Particulas n={12} color="#475569" tam={0.07} nivel={etapa >= 2 ? tasa : 0} vel={0.25} emisivo={0.1} camino={(p, i, o) => o.set(3 - p * 2.4, 1.9 + Math.sin(i + p * 6) * 0.25, 0.8 - p * 0.7)} />
       <Particulas n={12} color="#bae6fd" tam={0.07} nivel={etapa >= 2 ? tasa : 0} vel={0.25} emisivo={0.6} camino={(p, i, o) => o.set(-0.6 - p * 2.3, 1.7 + p * 1.6, 0.4 + Math.sin(i * 2 + p * 5) * 0.3)} />
@@ -912,7 +883,7 @@ function EscenaFotosintesis({ etapa, luzPct }: { etapa: number; luzPct: number }
           </Etiqueta>
         </>
       )}
-      <EtapaChip pos={[-1.5, 1.05, 0.6]} k={2} forma="quimica" activa={etapa >= 2} />
+      <EtapaChip pos={[-1.5, 1.05, 0.6]} k={2} forma="quimica" activa={etapa >= 2 && etapa <= 3} />
       {etapa >= f.pasos.length && <Venado pos={[2.5, 0, 1.2]} />}
       <Particulas
         n={16}
@@ -924,11 +895,6 @@ function EscenaFotosintesis({ etapa, luzPct }: { etapa: number; luzPct: number }
         camino={(p, i, o) => o.set(2.5 + (((i * 0.37) % 1) - 0.5) * 0.8, 1.1 + p * 1.3, 1.2 + (((i * 0.61) % 1) - 0.5) * 0.8)}
         escalaFn={(p) => 1 - p * 0.8}
       />
-      {etapa > f.pasos.length && (
-        <Etiqueta pos={[2.8, 2.85, 1.3]} df={10} fs={11} col="#f472b6aa">
-          respiración → movimiento y calor corporal
-        </Etiqueta>
-      )}
     </group>
   );
 }
@@ -979,7 +945,8 @@ function layoutSankey(fl: FlujoSankey, x0: number, x1: number, top: number, alto
 
 function Sankey({ flujo, x0, x1, top, alto, titulo, leyendaX }: { flujo: FlujoSankey; x0: number; x1: number; top: number; alto: number; titulo: string; leyendaX: number }) {
   const piso = top - alto - 0.55;
-  const { rects, anclas } = layoutSankey(flujo, x0, x1, top, alto, piso);
+  const ancho = useThree((st) => st.size.width);
+  const { rects } = layoutSankey(flujo, x0, x1, top, alto, piso);
   const mesh = useRef<THREE.InstancedMesh>(null);
   const puntos = useRef<THREE.InstancedMesh>(null);
   const actual = useRef<number[]>([]);
@@ -1048,15 +1015,10 @@ function Sankey({ flujo, x0, x1, top, alto, titulo, leyendaX }: { flujo: FlujoSa
         <boxGeometry args={[x1 - x0 + 0.4, 0.04, PROF + 0.4]} />
         <meshStandardMaterial color="#0f1b2d" roughness={0.9} />
       </mesh>
-      {anclas.map((a, i) => (
-        <Etiqueta key={i} pos={[a.x, top + 0.3 + (i % 2) * 0.42, 0]} df={10} fs={10.5} col={`${FORMA_DEF[a.forma].color}aa`}>
-          <i className={`fa-solid ${FORMA_DEF[a.forma].icono}`} style={{ color: FORMA_DEF[a.forma].color }} />
-          {a.etq} · {entrada > 0 ? `${num((a.w / entrada) * 100, a.w / entrada < 0.1 && a.w > 0 ? 1 : 0)} %` : "—"}
-        </Etiqueta>
-      ))}
-      <Html position={[leyendaX, top - alto / 2, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ width: 210, padding: "8px 10px", borderRadius: 10, background: "rgba(4,10,22,0.88)", border: "1px solid rgba(255,255,255,0.18)", color: "#fff", fontSize: 10.5, lineHeight: 1.35 }}>
-          <div style={{ fontSize: 9, letterSpacing: "0.1em", color: "#94a3b8", fontWeight: 900, marginBottom: 4 }}>{titulo.toUpperCase()}</div>
+      {ancho >= 900 && (
+      <Html position={[leyendaX, top - alto / 2, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ width: 250, padding: "8px 10px", borderRadius: 10, background: "rgba(4,10,22,0.88)", border: "1px solid rgba(255,255,255,0.18)", color: "#fff", fontSize: 14, lineHeight: 1.35 }}>
+          <div style={{ fontSize: 14, letterSpacing: "0.1em", color: "#94a3b8", fontWeight: 900, marginBottom: 4 }}>{titulo.toUpperCase()}</div>
           <div style={{ fontWeight: 900, marginBottom: 4 }}>Entra: {potencia(entrada)}</div>
           {perdidas.map((p, i) => {
             const idx = flujo.perdidas.findIndex((ps) => ps.includes(p));
@@ -1072,6 +1034,7 @@ function Sankey({ flujo, x0, x1, top, alto, titulo, leyendaX }: { flujo: FlujoSa
           })}
         </div>
       </Html>
+      )}
     </group>
   );
 }
@@ -1379,8 +1342,8 @@ function Mesa({ children }: { children: ReactNode }) {
 
 function Pantalla({ pos, refSpan, inicial, col }: { pos: Pt; refSpan: RefObject<HTMLSpanElement | null>; inicial: string; col: string }) {
   return (
-    <Html position={pos} center distanceFactor={9} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ padding: "7px 12px", borderRadius: 9, background: "#020617", border: `2px solid ${col}`, color: col, fontFamily: "ui-monospace, monospace", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap", boxShadow: `0 0 18px -6px ${col}` }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ padding: "7px 12px", borderRadius: 9, background: "#020617", border: `2px solid ${col}`, color: col, fontFamily: "ui-monospace, monospace", fontSize: 15, fontWeight: 800, whiteSpace: "nowrap", boxShadow: `0 0 18px -6px ${col}` }}>
         <span ref={refSpan}>{inicial}</span>
       </div>
     </Html>

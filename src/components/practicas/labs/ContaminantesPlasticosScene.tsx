@@ -17,8 +17,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -33,7 +33,6 @@ import {
   RESINAS,
   estadoPlastico,
   CLASE_DEF,
-  DENS_MAR,
   MALLA_MM,
   CADENAS,
   ppmNivel,
@@ -79,9 +78,12 @@ const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Mat
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const NO = "#f87171";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Etiqueta fija de 14 px; en pantallas angostas se oculta (la info ya está en el panel). */
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
+  const angosto = useThree((st) => st.size.width < 640);
+  if (angosto) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -283,6 +285,7 @@ function EscenaOceano({ resinaId, lugar, tirado, tAnios, bio, redNonce, modoColo
   const tRed = useRef(99);
   const nVis = useRef(0);
   const etqRed = useRef<HTMLDivElement>(null);
+  const angosto = useThree((st) => st.size.width < 640);
 
   const nFrag = e.pedazos < 2 ? 0 : Math.min(MAX_FRAG, Math.round(30 * Math.log10(e.pedazos)));
   const tamVis = Math.min(0.2, Math.max(0.02, 0.02 + 0.18 * clamp01((Math.log10(e.L) + 3) / (Math.log10(r.L0) + 3)) ** 1.6));
@@ -432,40 +435,39 @@ function EscenaOceano({ resinaId, lugar, tirado, tAnios, bio, redNonce, modoColo
           </mesh>
         ))}
       </group>
-      <Etiqueta pos={[-3.9, 3.55, -2.2]} df={11} col="#c084fcaa" fs={11}>
-        <i className="fa-solid fa-sun" style={{ color: "#fde047" }} />
-        Radiación UV
-      </Etiqueta>
 
       {/* Zonas */}
-      <Etiqueta pos={[-5.6, 1.15, 1.9]} df={11} col={e.zona === "playa" && tirado ? `${modoColor}cc` : undefined} fs={11}>
+      {lugar === "playa" && (
+      <Etiqueta pos={[-5.6, 1.15, 1.9]} col={e.zona === "playa" && tirado ? `${modoColor}cc` : undefined} fs={14}>
         <i className="fa-solid fa-umbrella-beach" style={{ color: "#fbbf24" }} />
         Playa · sol, calor y arena
       </Etiqueta>
-      <Etiqueta pos={[5.2, 0.62, 1.9]} df={11} col={e.zona === "superficie" && tirado ? `${modoColor}cc` : undefined} fs={11}>
+      )}
+      {lugar === "mar" && (
+      <Etiqueta pos={[5.2, 0.62, 1.9]} col={e.zona === "superficie" && tirado ? `${modoColor}cc` : undefined} fs={14}>
         <i className="fa-solid fa-water" style={{ color: "#38bdf8" }} />
         Superficie
       </Etiqueta>
-      <Etiqueta pos={[5.2, Y_FONDO + 0.55, 1.9]} df={11} col={e.zona === "fondo" && tirado ? `${modoColor}cc` : undefined} fs={11}>
+      )}
+      {lugar === "mar" && (
+      <Etiqueta pos={[5.2, Y_FONDO + 0.55, 1.9]} col={e.zona === "fondo" && tirado ? `${modoColor}cc` : undefined} fs={14}>
         <i className="fa-solid fa-moon" style={{ color: "#94a3b8" }} />
         Fondo · oscuro y frío
       </Etiqueta>
-      <Etiqueta pos={[5.2, -1.3, 1.9]} df={11} fs={10.5}>
-        Agua de mar · {num(DENS_MAR, 3)} g/cm³
-      </Etiqueta>
+      )}
 
       {/* El plástico */}
       <group ref={objeto}>
         <ObjetoPlastico id={r.id} color={r.color} />
       </group>
       <group ref={etiqueta}>
-        <Html center distanceFactor={10} zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.88)", border: `1px solid ${clase.color}`, color: "#fff", fontSize: 11.5, fontWeight: 800, whiteSpace: "nowrap" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: 4, border: `1.5px solid ${r.color}`, fontSize: 10.5 }}>{r.codigo}</span>
+        {!angosto && <Html center zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.88)", border: `1px solid ${clase.color}`, color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 4, border: `1.5px solid ${r.color}`, fontSize: 14 }}>{r.codigo}</span>
             {r.sigla} · {num(r.densidad, 2)} g/cm³
             {tirado && <span style={{ color: clase.color }}>· {clase.etq.toLowerCase()}</span>}
           </div>
-        </Html>
+        </Html>}
       </group>
       <instancedMesh ref={frag} args={[GEO_FRAG, undefined, MAX_FRAG]} frustumCulled={false}>
         <meshStandardMaterial color={r.color} roughness={0.5} emissive={r.color} emissiveIntensity={0.18} flatShading />
@@ -488,12 +490,12 @@ function EscenaOceano({ resinaId, lugar, tirado, tAnios, bio, redNonce, modoColo
           <coneGeometry args={[0.55, 1.8, 16, 4, true]} />
           <meshBasicMaterial color="#f8fafc" wireframe transparent opacity={0.55} />
         </mesh>
-        <Html position={[0, 0.72, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          <div ref={etqRed} style={{ opacity: 0, display: "flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.86)", border: `1px solid ${modoColor}aa`, color: "#fff", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>
+        {!angosto && <Html position={[0, 0.72, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+          <div ref={etqRed} style={{ opacity: 0, display: "flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.86)", border: `1px solid ${modoColor}aa`, color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap" }}>
             <i className="fa-solid fa-border-all" style={{ color: modoColor }} />
             Red de manta · malla {num(MALLA_MM, 3)} mm
           </div>
-        </Html>
+        </Html>}
       </group>
     </group>
   );
@@ -686,6 +688,7 @@ function PuntosNivel({ i, n, ppm, revelado }: { i: number; n: number; ppm: numbe
 const N_VUELO = 26;
 
 function EscenaCadena({ contamId, paso, edadAtun, ingesta, modoColor }: { contamId: ContamId; paso: number; edadAtun: number; ingesta: number; modoColor: string }) {
+  const angosto = useThree((st) => st.size.width < 640);
   const c = CADENAS[contamId];
   const niveles = c.niveles;
   const vuelo = useRef<THREE.InstancedMesh>(null);
@@ -748,7 +751,7 @@ function EscenaCadena({ contamId, paso, edadAtun, ingesta, modoColor }: { contam
         <meshStandardMaterial color="#0f1b2d" roughness={0.9} />
       </mesh>
       <PuntosNivel i={0} n={puntosPara(niveles[0]!.ppm!)} ppm={niveles[0]!.ppm!} revelado />
-      <Etiqueta pos={[-3.9, Y_POZA + 0.75, 2.2]} df={11} fs={11} col={`${hexConc(niveles[0]!.ppm!)}aa`}>
+      <Etiqueta pos={[-3.9, Y_POZA + 0.75, 2.2]} fs={14} col={`${hexConc(niveles[0]!.ppm!)}aa`}>
         <i className="fa-solid fa-droplet" style={{ color: "#38bdf8" }} />
         {niveles[0]!.etq} · {ppmTxt(niveles[0]!.ppm!)} ppm
       </Etiqueta>
@@ -810,7 +813,7 @@ function EscenaCadena({ contamId, paso, edadAtun, ingesta, modoColor }: { contam
               </group>
             )}
             {ppm !== null && <PuntosNivel i={i} n={puntosPara(ppm)} ppm={ppm} revelado={revelado} />}
-            <Html position={[r * 0.72 + 1.15, y + 0.28, r * 0.55]} center distanceFactor={11} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+            {i === paso && !angosto && <Html position={[r * 0.72 + 1.15, y + 0.28, r * 0.55]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
               <div
                 style={{
                   display: "flex",
@@ -821,7 +824,7 @@ function EscenaCadena({ contamId, paso, edadAtun, ingesta, modoColor }: { contam
                   background: "rgba(4,10,22,0.88)",
                   border: `1px solid ${revelado ? (ppm !== null ? hexConc(ppm) : ingesta > LIMITE_HG ? NO : "#34d399") : "rgba(255,255,255,0.18)"}`,
                   color: revelado ? "#fff" : "rgba(255,255,255,0.55)",
-                  fontSize: 11.5,
+                  fontSize: 14,
                   fontWeight: 800,
                   whiteSpace: "nowrap",
                 }}
@@ -830,13 +833,13 @@ function EscenaCadena({ contamId, paso, edadAtun, ingesta, modoColor }: { contam
                 {revelado && ppm !== null && (
                   <>
                     <span style={{ color: hexConc(ppm) }}>· {ppmTxt(ppm)} ppm</span>
-                    {previo !== null && <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10.5 }}>×{factorTxt(ppm / previo)}</span>}
+                    {previo !== null && <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 14 }}>×{factorTxt(ppm / previo)}</span>}
                   </>
                 )}
                 {revelado && ppm === null && <span style={{ color: ingesta > LIMITE_HG ? NO : "#34d399" }}>· {num(ingesta, 2)} µg/kg por semana</span>}
                 {!revelado && <span>· ?</span>}
               </div>
-            </Html>
+            </Html>}
           </group>
         );
       })}
@@ -844,7 +847,7 @@ function EscenaCadena({ contamId, paso, edadAtun, ingesta, modoColor }: { contam
         <meshBasicMaterial color="#fb7185" toneMapped={false} />
       </instancedMesh>
       {paso >= 1 && factorTotal > 0 && (
-        <Etiqueta pos={[-3.6, yNivel(Math.min(paso, cima)) + 0.9, 0.4]} df={10} fs={12.5} col={`${modoColor}cc`}>
+        <Etiqueta pos={[-3.6, yNivel(Math.min(paso, cima)) + 0.9, 0.4]} fs={14} col={`${modoColor}cc`}>
           <i className="fa-solid fa-arrow-trend-up" style={{ color: modoColor }} />
           {c.etq}: ×{factorTxt(factorTotal)} desde el agua
         </Etiqueta>
@@ -1056,7 +1059,6 @@ function EscenaDestino({ objetoId, destinoId, envioNonce, tempComposta, modoColo
   });
 
   const colHojuela = des?.tipo === "degrada" ? "#78350f" : OBJETOS.find((o) => o.id === objetoId)!.color;
-  const llegada = destinoId ? ESTACION[destinoId] : null;
 
   return (
     <group position={[0, -1.3, 0]}>
@@ -1087,7 +1089,7 @@ function EscenaDestino({ objetoId, destinoId, envioNonce, tempComposta, modoColo
               <torusGeometry args={[1.25, 0.035, 8, 64]} />
               <meshStandardMaterial color={d.color} emissive={d.color} emissiveIntensity={activo ? 1.2 : 0.25} toneMapped={false} />
             </mesh>
-            <Etiqueta pos={[x, 2.35, z]} df={11} fs={11.5} col={activo ? `${d.color}` : `${d.color}66`}>
+            <Etiqueta pos={[x, 2.35, z]} fs={14} col={activo ? `${d.color}` : `${d.color}66`}>
               <i className={`fa-solid ${d.icono}`} style={{ color: d.color }} />
               {d.etq}
             </Etiqueta>
@@ -1134,10 +1136,6 @@ function EscenaDestino({ objetoId, destinoId, envioNonce, tempComposta, modoColo
             <meshStandardMaterial color={k === 1 ? "#65a30d" : "#a16207"} roughness={0.8} />
           </mesh>
         ))}
-        <Etiqueta pos={[0.95, 1.2, 0.2]} df={10} fs={11} col={tempComposta >= 55 ? "#fb923caa" : "#94a3b8aa"}>
-          <i className="fa-solid fa-temperature-half" style={{ color: tempComposta >= 55 ? "#fb923c" : "#cbd5e1" }} />
-          {num(tempComposta, 0)} °C
-        </Etiqueta>
       </group>
       <instancedMesh ref={vapor} args={[GEO_PUNTO, undefined, 14]} frustumCulled={false}>
         <meshBasicMaterial color="#f1f5f9" transparent opacity={0.16} depthWrite={false} />
@@ -1191,18 +1189,21 @@ function EscenaDestino({ objetoId, destinoId, envioNonce, tempComposta, modoColo
         <meshStandardMaterial color={colHojuela} roughness={0.6} />
       </instancedMesh>
 
-      {des && res && llegada && (
-        <Etiqueta pos={[llegada[0], 3.0, llegada[2]]} df={10} fs={12} col={res.color}>
-          <i className={`fa-solid ${res.icono}`} style={{ color: res.color }} />
-          {res.etq} · {des.plazo}
-        </Etiqueta>
-      )}
-      <Etiqueta pos={[INICIO[0] + 1.35, 0.3, INICIO[2] + 0.2]} df={10} fs={11}>
-        <i className={`fa-solid ${OBJETOS.find((o) => o.id === objetoId)!.icono}`} style={{ color: modoColor }} />
-        {OBJETOS.find((o) => o.id === objetoId)!.etq}
-      </Etiqueta>
     </group>
   );
+}
+
+/** En pantallas más altas que anchas, aleja la cámara para que el contenido quepa. */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const aspecto = useThree((st) => st.size.width / Math.max(1, st.size.height));
+  const base = useRef<THREE.Vector3 | null>(null);
+  useEffect(() => {
+    base.current ??= camera.position.clone();
+    const f = aspecto >= 1.15 ? 1 : Math.min(2, 1.15 / Math.max(0.4, aspecto));
+    camera.position.copy(base.current).multiplyScalar(f);
+  }, [camera, aspecto]);
+  return null;
 }
 
 /* ── Escena ───────────────────────────────────────────────────────────── */
@@ -1210,9 +1211,9 @@ function EscenaDestino({ objetoId, destinoId, envioNonce, tempComposta, modoColo
 export default function ContaminantesPlasticosScene(p: ContaminantesSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "oceano") return { pos: [0.2, 2.3, 14.2], target: [-0.4, -0.9, 0] };
-    if (vista === "cadena") return { pos: [0, 2.8, 12.4], target: [0.4, 0.6, 0] };
-    return { pos: [0, 7.4, 9.2], target: [0, -0.9, -0.9] };
+    if (vista === "oceano") return { pos: [0.2, 1.3, 14.2], target: [-0.4, -1.9, 0] };
+    if (vista === "cadena") return { pos: [0, 1.8, 12.4], target: [0.4, -0.4, 0] };
+    return { pos: [0, 7.4, 10.7], target: [0, -0.9, 0.6] };
   }, [vista]);
 
   return (
@@ -1228,6 +1229,7 @@ export default function ContaminantesPlasticosScene(p: ContaminantesSceneProps) 
       {vista === "cadena" && <EscenaCadena contamId={p.contamId} paso={p.paso} edadAtun={p.edadAtun} ingesta={p.ingesta} modoColor={modoColor} />}
       {vista === "destino" && <EscenaDestino objetoId={p.objetoId} destinoId={p.destinoId} envioNonce={p.envioNonce} tempComposta={p.tempComposta} modoColor={modoColor} />}
 
+      <Encuadre />
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={22} maxPolarAngle={Math.PI * 0.52} minPolarAngle={Math.PI * 0.05} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.32} luminanceThreshold={0.62} luminanceSmoothing={0.85} mipmapBlur />

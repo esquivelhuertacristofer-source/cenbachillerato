@@ -1,0 +1,12 @@
+{
+  "escena": "Una mesa con un microscopio óptico moderno y, a la derecha, el campo del ocular con bacterias. Se puede cambiar el aumento de 40× hasta 2000×.",
+  "pregunta": "Pasas de 1000× a 2000× en un microscopio óptico. ¿Aparecen detalles más pequeños que antes?",
+  "opciones": [
+    { "id": "a", "texto": "Sí, el doble de detalle", "icono": "fa-magnifying-glass-plus" },
+    { "id": "b", "texto": "No, solo se agranda", "icono": "fa-expand" },
+    { "id": "c", "texto": "Sí, pero solo con más luz", "icono": "fa-lightbulb" }
+  ],
+  "correcta": "b",
+  "porque": "El detalle mínimo lo fija la luz: d = λ/(2·AN) ≈ 0.2 µm con el objetivo de 100×. Más aumento solo agranda la imagen borrosa; eso se llama aumento vacío.",
+  "comoComprobarlo": "Elige «Óptico», la muestra de bacterias y mueve el aumento hasta 1000×; luego a 2000× y compara el detalle mínimo visible."
+}

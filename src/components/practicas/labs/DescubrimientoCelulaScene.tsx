@@ -20,8 +20,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { VIDRIO_FINO } from "./_vidrio";
@@ -46,7 +46,6 @@ import {
   HITOS,
   PILARES,
   PILAR_DEF,
-  CIMIENTOS,
   DIAS_REPOSO,
   DIAS_ROTO,
   T_REPOSO,
@@ -82,9 +81,12 @@ type Pt = [number, number, number];
 
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Etiqueta fija de 14 px; en pantallas angostas se oculta (la info ya está en el panel). */
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
+  const angosto = useThree((st) => st.size.width < 640);
+  if (angosto) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -786,7 +788,7 @@ function Campo({ pos, opts, modoColor, calibradorMm, titulo }: { pos: Pt; opts: 
         <torusGeometry args={[R_CAMPO + 0.08, 0.1, 16, 96]} />
         <meshStandardMaterial color="#b08d57" metalness={0.85} roughness={0.28} />
       </mesh>
-      <Etiqueta pos={[0, R_CAMPO + 0.48, 0]} df={10} col={`${modoColor}aa`} fs={12.5}>
+      <Etiqueta pos={[0, R_CAMPO + 0.48, 0]} col={`${modoColor}aa`} fs={14}>
         <i className="fa-solid fa-eye" style={{ color: modoColor }} />
         {titulo}
       </Etiqueta>
@@ -802,7 +804,7 @@ function Campo({ pos, opts, modoColor, calibradorMm, titulo }: { pos: Pt; opts: 
             <meshBasicMaterial color="#f8fafc" toneMapped={false} />
           </mesh>
         ))}
-        <Etiqueta pos={[0, -0.32, 0]} df={10} fs={11}>
+        <Etiqueta pos={[0, -0.32, 0]} fs={14}>
           {longitud(barra)} · campo de {longitud(campo)}
         </Etiqueta>
       </group>
@@ -839,7 +841,7 @@ function Calibrador({ mm }: { mm: number }) {
         <boxGeometry args={[1, 0.012, 0.01]} />
         <meshBasicMaterial color="#ef4444" toneMapped={false} />
       </mesh>
-      <Etiqueta pos={[0, R_CAMPO - 0.32, 0.02]} df={8} col="#ef4444aa" fs={11}>
+      <Etiqueta pos={[0, R_CAMPO - 0.32, 0.02]} col="#ef4444aa" fs={14}>
         <i className="fa-solid fa-ruler-horizontal" style={{ color: "#fca5a5" }} />
         <span ref={lectura}>{num(mm, 1)} mm en la imagen</span>
       </Etiqueta>
@@ -919,7 +921,7 @@ function OjoModelo() {
         <meshStandardMaterial color="#334155" roughness={0.6} />
       </mesh>
       <Portaobjetos pos={[1.0, 0.51, 0.2]} rot={0.3} />
-      <Etiqueta pos={[-0.4, 2.95, 0]} df={10} fs={10.5}>
+      <Etiqueta pos={[-0.4, 2.95, 0]} fs={14}>
         El ojo distingue ≈ 0.1 mm a 25 cm
       </Etiqueta>
     </group>
@@ -1017,7 +1019,7 @@ function MicroHooke() {
         <coneGeometry args={[0.08, 0.6, 16, 1, true]} />
         <meshBasicMaterial color="#fde68a" transparent opacity={0.25} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
-      <Etiqueta pos={[0.9, 1.35, 0.1]} df={10} fs={10}>
+      <Etiqueta pos={[0.9, 1.35, 0.1]} fs={14}>
         Lámpara y globo de agua
       </Etiqueta>
     </group>
@@ -1086,7 +1088,7 @@ function MicroLeeuwenhoek() {
           <meshStandardMaterial color="#9ca3af" metalness={0.85} />
         </mesh>
       </group>
-      <Etiqueta pos={[0, 2.85, 0.3]} df={10} fs={10.5}>
+      <Etiqueta pos={[0, 2.85, 0.3]} fs={14}>
         <i className="fa-solid fa-circle-dot" style={{ color: "#7dd3fc" }} />
         Una sola lente de ≈ 1 mm
       </Etiqueta>
@@ -1280,15 +1282,9 @@ function MicroElectronico() {
         <cylinderGeometry args={[0.04, 0.04, 0.9, 10]} />
         <meshStandardMaterial color="#111827" roughness={0.6} />
       </mesh>
-      <Etiqueta pos={[0.95, 3.95, 0]} df={10} fs={10}>
+      <Etiqueta pos={[0.95, 3.95, 0]} fs={14}>
         <i className="fa-solid fa-bolt" style={{ color: "#fde047" }} />
         Cañón de electrones
-      </Etiqueta>
-      <Etiqueta pos={[-1.2, 2.2, 0.2]} df={10} fs={10}>
-        Lentes magnéticas
-      </Etiqueta>
-      <Etiqueta pos={[0, 0.2, 0.9]} df={10} fs={10}>
-        Pantalla fluorescente
       </Etiqueta>
     </group>
   );
@@ -1337,7 +1333,7 @@ function EscenaMedicion({ objetivo, ocular, misionId, calibradorMm, modoColor }:
       <group position={[-2.5, 0, 0.3]} scale={1.15}>
         <MicroCompuesto moderno objetivo={objetivo} ocular={ocular} />
       </group>
-      <Etiqueta pos={[-2.5, 3.55, 0.3]} df={10} col={`${modoColor}aa`} fs={11.5}>
+      <Etiqueta pos={[-2.5, 3.55, 0.3]} col={`${modoColor}aa`} fs={14}>
         <i className="fa-solid fa-microscope" style={{ color: modoColor }} />
         Ocular {ocular}× · objetivo {objetivo}× (AN {rev.na})
       </Etiqueta>
@@ -1386,17 +1382,11 @@ function Tambor({ id, slot }: { id: string; slot: number }) {
           <meshStandardMaterial color="#f8fafc" roughness={0.3} />
         </mesh>
       ))}
-      <Html position={[0, 0, 0.4]} center distanceFactor={10} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ padding: "2px 7px", borderRadius: 6, background: "rgba(4,10,22,0.86)", border: `1px solid ${col}`, color: "#fff", fontSize: 10, fontWeight: 900, whiteSpace: "nowrap" }}>
-          {h.etqAnio} · {h.quien.split(" ").slice(-1)[0]}
-        </div>
-      </Html>
     </group>
   );
 }
 
-function Flotante({ id, errorNonce }: { id: string; errorNonce: number }) {
-  const h = HITOS.find((x) => x.id === id)!;
+function Flotante({ errorNonce }: { errorNonce: number }) {
   const ref = useRef<THREE.Group>(null);
   const nonce = useRef(errorNonce);
   const sacude = useRef(0);
@@ -1422,22 +1412,16 @@ function Flotante({ id, errorNonce }: { id: string; errorNonce: number }) {
           <meshStandardMaterial ref={mat} color="#e2e8f0" roughness={0.35} emissive="#a78bfa" emissiveIntensity={0.35} />
         </mesh>
       </group>
-      <Html position={[FLOTA[0], FLOTA[1] + 0.9, FLOTA[2]]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ width: 170, padding: "7px 10px", borderRadius: 10, background: "rgba(4,10,22,0.9)", border: "1px solid #a78bfa", color: "#fff", fontSize: 11, fontWeight: 800, lineHeight: 1.3, textAlign: "center" }}>
-          <div style={{ fontSize: 9.5, color: "#c4b5fd", letterSpacing: "0.08em" }}>¿QUÉ POSTULADO SOSTIENE?</div>
-          {h.etqAnio} · {h.quien}
-        </div>
-      </Html>
     </group>
   );
 }
 
-function Pin({ x, nivel, color, texto }: { x: number; nivel: number; color: string; texto: string }) {
+function Pin({ x, nivel, color, texto, conEtiqueta }: { x: number; nivel: number; color: string; texto: string; conEtiqueta: boolean }) {
   const ref = useRef<THREE.Group>(null);
   useFrame((_, dt) => {
     if (ref.current) ref.current.position.y += (0 - ref.current.position.y) * suave(dt, 0.1);
   });
-  const alto = 0.22 + nivel * 0.27;
+  const alto = 0.22 + nivel * 0.45;
   return (
     <group ref={ref} position={[x, 1.6, 0]}>
       <mesh position={[0, alto / 2, 0]}>
@@ -1448,15 +1432,18 @@ function Pin({ x, nivel, color, texto }: { x: number; nivel: number; color: stri
         <sphereGeometry args={[0.07, 14, 10]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
       </mesh>
-      <Html position={[0, alto + 0.08, 0]} center distanceFactor={7} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ padding: "2px 6px", borderRadius: 6, background: "rgba(4,10,22,0.88)", border: `1px solid ${color}`, color: "#fff", fontSize: 10, fontWeight: 900, whiteSpace: "nowrap" }}>{texto}</div>
-      </Html>
+      {conEtiqueta && (
+        <Etiqueta pos={[0, alto + 0.2, 0]} col={color}>
+          {texto}
+        </Etiqueta>
+      )}
     </group>
   );
 }
 
 function EscenaTeoria({ ordenados, colocados, seleccionado, errorNonce, modoColor }: { ordenados: string[]; colocados: string[]; seleccionado: string | null; errorNonce: number; modoColor: string }) {
   const completo = colocados.length === HITOS.length;
+  const ordenListo = ordenados.length >= 4;
   const techo = useRef<THREE.Group>(null);
   useFrame((_, dt) => {
     if (!techo.current) return;
@@ -1512,16 +1499,6 @@ function EscenaTeoria({ ordenados, colocados, seleccionado, errorNonce, modoColo
         <boxGeometry args={[6.8, 0.24, 2.3]} />
         <meshStandardMaterial color="#475569" roughness={0.7} />
       </mesh>
-      <Html position={[0, 0.14, 1.36]} center distanceFactor={10} zIndexRange={[16, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ display: "flex", gap: 5, alignItems: "center", whiteSpace: "nowrap" }}>
-          <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.1em", color: "#94a3b8" }}>CIMIENTOS:</span>
-          {CIMIENTOS.map((c) => (
-            <span key={c.anio} style={{ padding: "2px 6px", borderRadius: 6, background: "rgba(4,10,22,0.85)", border: "1px solid #64748b", color: "#e2e8f0", fontSize: 9, fontWeight: 800 }}>
-              {c.anio} {c.etq}
-            </span>
-          ))}
-        </div>
-      </Html>
       {PILARES.map((p) => {
         const x = X_PILAR[p]!;
         const def = PILAR_DEF[p];
@@ -1541,12 +1518,12 @@ function EscenaTeoria({ ordenados, colocados, seleccionado, errorNonce, modoColo
               <boxGeometry args={[1.0, 0.14, 1.0]} />
               <meshStandardMaterial color="#cbd5e1" roughness={0.5} />
             </mesh>
-            <Html position={[x, 0.56, 0.62]} center distanceFactor={10} zIndexRange={[17, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ padding: "3px 8px", borderRadius: 8, background: "rgba(4,10,22,0.9)", border: `1px solid ${def.color}`, color: "#fff", fontSize: 10.5, fontWeight: 900, whiteSpace: "nowrap" }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: def.color, marginRight: 5 }} />
+            {ordenListo && (
+              <Etiqueta pos={[x, 0.56, 0.62]} col={def.color}>
+                <i className={`fa-solid ${def.icono}`} style={{ color: def.color }} />
                 {def.etq} · {porPilar[p]!.length}/3
-              </div>
-            </Html>
+              </Etiqueta>
+            )}
             {porPilar[p]!.map((id, slot) => (
               <Tambor key={id} id={id} slot={slot} />
             ))}
@@ -1565,12 +1542,12 @@ function EscenaTeoria({ ordenados, colocados, seleccionado, errorNonce, modoColo
             <meshStandardMaterial color="#f1f5f9" roughness={0.45} />
           </mesh>
         </group>
-        <Etiqueta pos={[0, BASE_Y + 3 * ALTO + 0.62, 0.7]} df={9} col={`${modoColor}`} fs={13}>
+        <Etiqueta pos={[0, BASE_Y + 3 * ALTO + 0.62, 0.7]} col={`${modoColor}`} fs={14}>
           <i className="fa-solid fa-landmark" style={{ color: modoColor }} />
           TEORÍA CELULAR
         </Etiqueta>
       </group>
-      {seleccionado && !colocados.includes(seleccionado) && <Flotante id={seleccionado} errorNonce={errorNonce} />}
+      {seleccionado && !colocados.includes(seleccionado) && <Flotante errorNonce={errorNonce} />}
 
       {/* Línea del tiempo, detrás y arriba del templo */}
       <group position={[0, T_Y, T_Z]}>
@@ -1584,13 +1561,10 @@ function EscenaTeoria({ ordenados, colocados, seleccionado, errorNonce, modoColo
               <boxGeometry args={[0.02, 0.14, 0.05]} />
               <meshBasicMaterial color="#94a3b8" />
             </mesh>
-            <Html position={[0, -0.2, 0]} center distanceFactor={7} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ color: "#94a3b8", fontSize: 10, fontWeight: 800 }}>{an}</div>
-            </Html>
           </group>
         ))}
         {marcas.map((mm) => (
-          <Pin key={mm.id} x={anioX(mm.anio)} nivel={niveles.get(mm.id) ?? 0} color={mm.color} texto={mm.texto} />
+          <Pin key={mm.id} x={anioX(mm.anio)} nivel={niveles.get(mm.id) ?? 0} color={mm.color} texto={mm.texto} conEtiqueta={!ordenListo} />
         ))}
       </group>
     </group>
@@ -1781,12 +1755,12 @@ function Matraz({ x, tipo, fase }: { x: number; tipo: "recto" | "cisne"; fase: F
         <sphereGeometry args={[1, 6, 5]} />
         <meshStandardMaterial color="#a8a29e" emissive="#78716c" emissiveIntensity={0.3} />
       </instancedMesh>
-      <Etiqueta pos={[0, 0.98, 0.85]} df={9} col={tipo === "recto" ? "#f87171aa" : "#34d399aa"} fs={11.5}>
+      <Etiqueta pos={[0, 0.98, 0.85]} col={tipo === "recto" ? "#f87171aa" : "#34d399aa"} fs={14}>
         <i className="fa-solid fa-flask" style={{ color: tipo === "recto" ? "#fca5a5" : "#6ee7b7" }} />
         {tipo === "recto" ? "Cuello recto" : roto ? "Cuello de cisne roto" : "Cuello de cisne"} · <span ref={estado}>caldo sin hervir</span>
       </Etiqueta>
       {tipo === "cisne" && !roto && (fase === "reposo" || fase === "fin") && (
-        <Etiqueta pos={[U_BAJO[0] - 0.2, Y_MATRAZ + R_MATRAZ + 1.25, 0.2]} df={10} fs={10}>
+        <Etiqueta pos={[U_BAJO[0] - 0.2, Y_MATRAZ + R_MATRAZ + 1.25, 0.2]} fs={14}>
           El polvo queda atrapado en la curva
         </Etiqueta>
       )}
@@ -1833,7 +1807,7 @@ function EscenaPasteur({ fase }: { fase: FasePasteur }) {
       )}
       <Matraz x={-1.45} tipo="recto" fase={fase} />
       <Matraz x={1.05} tipo="cisne" fase={fase} />
-      <Etiqueta pos={[-0.2, 4.0, -0.4]} df={9} col="#a78bfaaa" fs={14}>
+      <Etiqueta pos={[-0.2, 4.0, -0.4]} col="#a78bfaaa" fs={14}>
         <i className="fa-solid fa-calendar-day" style={{ color: "#c4b5fd" }} />
         <span ref={contador}>Caldo nutritivo listo</span>
       </Etiqueta>
@@ -1841,14 +1815,27 @@ function EscenaPasteur({ fase }: { fase: FasePasteur }) {
   );
 }
 
+/** En pantallas más altas que anchas, aleja la cámara para que el contenido quepa. */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const aspecto = useThree((st) => st.size.width / Math.max(1, st.size.height));
+  const base = useRef<THREE.Vector3 | null>(null);
+  useEffect(() => {
+    base.current ??= camera.position.clone();
+    const f = aspecto >= 1.15 ? 1 : Math.min(2, 1.15 / Math.max(0.4, aspecto));
+    camera.position.copy(base.current).multiplyScalar(f);
+  }, [camera, aspecto]);
+  return null;
+}
+
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
 export default function DescubrimientoCelulaScene(p: DescubrimientoSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "teoria") return { pos: [0, 4.0, 10.8], target: [0, 0.8, 0.2] };
-    if (vista === "pasteur") return { pos: [0.2, 2.8, 7.2], target: [-0.1, 1.1, 0] };
-    return { pos: [0.1, 1.9, 9.6], target: [0, 0.95, 0] };
+    if (vista === "teoria") return { pos: [0, 3.3, 10.8], target: [0, 0.1, 0.2] };
+    if (vista === "pasteur") return { pos: [0.2, 2.1, 7.2], target: [-0.1, 0.4, 0] };
+    return { pos: [0.1, 1.0, 9.6], target: [0, 0.05, 0] };
   }, [vista]);
 
   return (
@@ -1868,6 +1855,7 @@ export default function DescubrimientoCelulaScene(p: DescubrimientoSceneProps) {
       {vista === "teoria" && <EscenaTeoria ordenados={p.ordenados} colocados={p.colocados} seleccionado={p.seleccionado} errorNonce={p.errorNonce} modoColor={modoColor} />}
       {vista === "pasteur" && <EscenaPasteur fase={p.fasePasteur} />}
 
+      <Encuadre />
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={3.5} maxDistance={18} maxPolarAngle={Math.PI * 0.5} minPolarAngle={Math.PI * 0.08} minAzimuthAngle={-Math.PI * 0.45} maxAzimuthAngle={Math.PI * 0.45} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.25} luminanceThreshold={0.96} luminanceSmoothing={0.5} mipmapBlur />

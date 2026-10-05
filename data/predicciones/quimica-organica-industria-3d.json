@@ -1,0 +1,12 @@
+{
+  "escena": "Un reactor con tres probetas de moles: dos de reactivos (ácido salicílico y anhídrido acético) y una para la aspirina que se formará.",
+  "pregunta": "Hay 2 g de ácido salicílico y 5.4 g de anhídrido acético. ¿Qué reactivo se agota primero?",
+  "opciones": [
+    { "id": "a", "texto": "El anhídrido acético: pesa más", "icono": "fa-weight-hanging" },
+    { "id": "b", "texto": "El ácido salicílico", "icono": "fa-flask" },
+    { "id": "c", "texto": "Los dos se agotan a la vez", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "La reacción consume los reactivos mol a mol, no gramo a gramo. 2 g de ácido salicílico son 0.0145 mol y 5.4 g de anhídrido son 0.0529 mol: el ácido salicílico es el limitante.",
+  "comoComprobarlo": "Elige Aspirina, pulsa Reaccionar y mira qué probeta llega a cero. Luego sube los gramos de ácido salicílico y repite."
+}

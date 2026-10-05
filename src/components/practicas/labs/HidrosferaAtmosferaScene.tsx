@@ -21,7 +21,7 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -78,9 +78,12 @@ type Pt = [number, number, number];
 
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Rótulo en la punta de lo que nombra. 14 px fijos; los anchos se ocultan en pantallas angostas (la info vive en el panel). */
+function Etiqueta({ pos, children, col, ancha = false }: { pos: Pt; children: ReactNode; col?: string; ancha?: boolean }) {
+  const angosto = useThree((s) => s.size.width < 640);
+  if (angosto && ancha) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -91,7 +94,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -102,6 +105,18 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
       </div>
     </Html>
   );
+}
+
+/** Encuadre responsivo: en pantallas angostas aleja la cámara (zoom) para que quepa todo el contenido. */
+function AjusteAncho({ zoomAngosto }: { zoomAngosto: number }) {
+  useFrame(({ camera, size }) => {
+    const z = size.width < 640 ? zoomAngosto : 1;
+    if (camera.zoom !== z) {
+      camera.zoom = z;
+      camera.updateProjectionMatrix();
+    }
+  });
+  return null;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -198,6 +213,7 @@ function Moleculas({ zRef }: { zRef: RefObject<number> }) {
 }
 
 function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo" | "subiendo" | "reventado"; modoColor: string }) {
+  const angosto = useThree((st) => st.size.width < 640);
   const zRef = useRef(zKm);
   const cursor = useRef<THREE.Group>(null);
   const globo = useRef<THREE.Mesh>(null);
@@ -269,10 +285,6 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
           <coneGeometry args={[0.3, 0.72, 9]} />
           <meshStandardMaterial color="#f8fafc" roughness={0.8} flatShading />
         </mesh>
-        <Etiqueta pos={[0, yAtm(5.636) + 0.35, 0]} df={16} fs={11}>
-          <i className="fa-solid fa-mountain" style={{ color: "#cbd5e1" }} />
-          Pico de Orizaba · 5 636 m
-        </Etiqueta>
       </group>
 
       {/* Capas */}
@@ -292,37 +304,28 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
                   <boxGeometry args={[ANCHO_COL + 0.08, 0.025, FONDO_COL + 0.08]} />
                   <meshBasicMaterial color="#e2e8f0" transparent opacity={0.55} />
                 </mesh>
-                <Html position={[ANCHO_COL / 2 + 0.08, yb, 0.8]} distanceFactor={17} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-                  <div style={{ transform: "translate(0,-50%)", color: "#e2e8f0", fontSize: 10, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 1px 4px #000" }}>
-                    {c.id === "troposfera" ? "Tropopausa" : c.id === "estratosfera" ? "Estratopausa" : "Mesopausa"} · {num(c.hasta)} km
-                  </div>
-                </Html>
               </>
             )}
-            <Html position={[-ANCHO_COL / 2 + 0.12, yb - (c.id === "troposfera" ? 0.95 : c.id === "termosfera" ? 0.75 : 0.3), FONDO_COL / 2 + 0.05]} distanceFactor={16} zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
+            {on && <Html position={[-ANCHO_COL / 2 + 0.12, yb - (c.id === "troposfera" ? 0.95 : c.id === "termosfera" ? 0.75 : 0.3), FONDO_COL / 2 + 0.05]} zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
               <div style={{ transform: "translate(0,-50%)", padding: "3px 9px", borderRadius: 999, background: "rgba(4,10,22,0.8)", border: `1px solid ${on ? c.color : `${c.color}77`}`, color: "#fff", fontSize: on ? 12.5 : 11, fontWeight: 900, whiteSpace: "nowrap" }}>{c.etq}</div>
-            </Html>
+            </Html>}
           </group>
         );
       })}
-      <Etiqueta pos={[-1.3, ALTO_COL + 0.4, 0]} df={17} fs={10}>
-        <i className="fa-solid fa-arrow-up" style={{ color: "#f472b6" }} />
-        Termósfera hasta ~600 km · luego exósfera
-      </Etiqueta>
 
       {/* Capa de ozono */}
       <mesh position={[0, (yOzA + yOzB) / 2, 0]}>
         <boxGeometry args={[ANCHO_COL + 0.02, yOzB - yOzA, FONDO_COL + 0.02]} />
         <meshStandardMaterial color="#a3e635" transparent opacity={0.2} emissive="#a3e635" emissiveIntensity={0.6} depthWrite={false} />
       </mesh>
-      <Etiqueta pos={[0, yAtm(OZONO.maximo) - 0.45, FONDO_COL / 2 + 0.05]} df={17} col="#a3e635aa" fs={10}>
+      <Etiqueta pos={[0, yAtm(OZONO.maximo) - 0.45, FONDO_COL / 2 + 0.05]} col="#a3e635aa">
         <i className="fa-solid fa-shield-halved" style={{ color: "#a3e635" }} />
         Capa de ozono (O₃)
       </Etiqueta>
       {/* Sol y rayos UV que el ozono absorbe */}
       <mesh position={[-5.2, ALTO_COL - 1.2, -3]}>
         <sphereGeometry args={[0.55, 24, 18]} />
-        <meshBasicMaterial color="#fde68a" toneMapped={false} />
+        <meshStandardMaterial color="#fde68a" emissive="#f59e0b" emissiveIntensity={1.2} />
       </mesh>
       {[0, 1, 2].map((k) => (
         <Line
@@ -338,9 +341,6 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
           gapSize={0.1}
         />
       ))}
-      <Etiqueta pos={[-4.2, ALTO_COL - 2.35, -2.2]} df={17} col="#c084fcaa" fs={10}>
-        Radiación UV
-      </Etiqueta>
 
       {/* Nubes y cumulonimbo con yunque en la tropopausa */}
       <Nube pos={[-0.9, yAtm(1.5), 0]} escala={0.9} />
@@ -409,7 +409,7 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
             </mesh>
           ))}
         </group>
-        <Html position={[-ANCHO_COL / 2 - 0.35, 0, 0.8]} distanceFactor={16} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
+        {!angosto && <Html position={[-ANCHO_COL / 2 - 0.35, 0, 0.8]} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
           <div
             style={{
               transform: "translate(-100%,-50%)",
@@ -418,22 +418,22 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
               background: "rgba(4,10,22,0.9)",
               border: `1px solid ${modoColor}`,
               color: "#fff",
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: 800,
               whiteSpace: "nowrap",
               lineHeight: 1.35,
               fontVariantNumeric: "tabular-nums",
             }}
           >
-            <div style={{ color: modoColor, fontSize: 10.5, letterSpacing: "0.06em" }}>
+            <div style={{ color: modoColor, fontSize: 14, letterSpacing: "0.06em" }}>
               {vuelo === "subiendo" ? "GLOBO SONDA" : vuelo === "reventado" ? "¡REVENTÓ!" : "SONDA"} · {num(zKm, zKm < 10 ? 2 : 1)} km
             </div>
             <div>
               {num(e.tC, 1)} °C · {presionTxt(e.pPa)}
             </div>
-            {vuelo === "subiendo" && <div style={{ color: "#fde68a", fontSize: 11 }}>Globo: {num(diametroGlobo(zKm), 1)} m de diámetro</div>}
+            {vuelo === "subiendo" && <div style={{ color: "#fde68a", fontSize: 14 }}>Globo: {num(diametroGlobo(zKm), 1)} m de diámetro</div>}
           </div>
-        </Html>
+        </Html>}
       </group>
 
       {/* Un litro de aire a la altura de la sonda */}
@@ -447,8 +447,8 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
           <lineBasicMaterial color="#cbd5e1" transparent opacity={0.7} />
         </lineSegments>
         <Moleculas zRef={zRef} />
-        <Html position={[0, -0.55, 0]} center distanceFactor={17} zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ color: "#e2e8f0", fontSize: 10, fontWeight: 800, whiteSpace: "nowrap", textAlign: "center", lineHeight: 1.25, textShadow: "0 1px 4px #000" }}>
+        <Html position={[0, -0.55, 0]} center zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", textAlign: "center", lineHeight: 1.25, textShadow: "0 1px 4px #000" }}>
             1 L de aire
             <br />
             {num((100 * e.rho) / AIRE_0.rho, e.rho / AIRE_0.rho < 0.1 ? 2 : 0)} % de moléculas
@@ -467,9 +467,6 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
             <boxGeometry args={[t === 0 ? 0.02 : 0.01, ALTO_COL, 0.005]} />
             <meshBasicMaterial color={t === 0 ? "#94a3b8" : "#334155"} />
           </mesh>
-          <Html position={[xTemp(t), -0.3, 0]} center distanceFactor={17} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-            <div style={{ color: "#cbd5e1", fontSize: 10, fontWeight: 800, whiteSpace: "nowrap" }}>{num(t)}°</div>
-          </Html>
         </group>
       ))}
       {[0, 11, 25, 50, 86, 120].map((z) => (
@@ -483,10 +480,6 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
         <sphereGeometry args={[0.09, 16, 12]} />
         <meshBasicMaterial color="#fff7ed" toneMapped={false} />
       </mesh>
-      <Etiqueta pos={[X_TABLERO + ANCHO_TABLERO / 2 + 0.4, ALTO_COL + 0.45, 0]} df={17} col="#fb923caa" fs={11}>
-        <i className="fa-solid fa-temperature-half" style={{ color: "#fb923c" }} />
-        Temperatura, °C · altura en escala no lineal
-      </Etiqueta>
     </group>
   );
 }
@@ -669,11 +662,7 @@ function MasaAgua({ t, s, nonce, zonaId }: { t: number; s: number; nonce: number
         <sphereGeometry args={[0.26, 24, 18]} />
         <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.5} roughness={0.2} transparent opacity={0.95} />
       </mesh>
-      <mesh>
-        <sphereGeometry args={[0.3, 20, 14]} />
-        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.45} />
-      </mesh>
-      <Etiqueta pos={[0, 0.5, 0.2]} df={12} fs={10.5} col={`${col}cc`}>
+      <Etiqueta pos={[0, 0.5, 0.2]} col={`${col}cc`}>
         {num(t, 1)} °C · {num(s, 1)} g/kg · {num(rho, 1)} kg/m³
       </Etiqueta>
     </group>
@@ -710,7 +699,7 @@ function Hielo({ nonce, rhoSup }: { nonce: number; rhoSup: number }) {
         <boxGeometry args={[LADO_HIELO + 0.02, 0.012, LADO_HIELO + 0.02]} />
         <meshBasicMaterial color="#0ea5e9" />
       </mesh>
-      <Etiqueta pos={[0, LADO_HIELO / 2 + 0.35, 0.2]} df={12} fs={10.5} col="#e0f2feaa">
+      <Etiqueta pos={[0, LADO_HIELO / 2 + 0.35, 0.2]} col="#e0f2feaa">
         <i className="fa-solid fa-cube" style={{ color: "#bae6fd" }} />
         Hielo {RHO_HIELO} kg/m³ · {num(frac * 100, 1)} % bajo el agua
       </Etiqueta>
@@ -719,6 +708,7 @@ function Hielo({ nonce, rhoSup }: { nonce: number; rhoSup: number }) {
 }
 
 function EscenaOceano(p: { zonaId: ZonaId; profCTD: number; masaT: number; masaS: number; masaNonce: number; hieloNonce: number }) {
+  const p_angosto = useThree((st) => st.size.width < 640);
   const zona = ZONAS.find((z) => z.id === p.zonaId) ?? ZONAS[0]!;
   const frente = useMemo(() => caraColoreada(W_OC, p.zonaId, "t"), [p.zonaId]);
   const lado = useMemo(() => caraColoreada(D_OC, p.zonaId, "s"), [p.zonaId]);
@@ -787,7 +777,7 @@ function EscenaOceano(p: { zonaId: ZonaId; profCTD: number; masaT: number; masaS
           gapSize={0.12}
         />
       ))}
-      <Etiqueta pos={[W_OC / 2 - 1.4, (yOc(zona.picnoclina.desde) + yOc(zona.picnoclina.hasta)) / 2, D_OC / 2 + 0.05]} df={12} fs={11} col="#fbbf24aa">
+      <Etiqueta ancha pos={[W_OC / 2 - 1.4, (yOc(zona.picnoclina.desde) + yOc(zona.picnoclina.hasta)) / 2, D_OC / 2 + 0.05]} col="#fbbf24aa">
         <i className="fa-solid fa-layer-group" style={{ color: "#fbbf24" }} />
         {zona.picnoclina.causa === "termoclina" ? "Termoclina" : "Haloclina"} = picnoclina
       </Etiqueta>
@@ -798,32 +788,12 @@ function EscenaOceano(p: { zonaId: ZonaId; profCTD: number; masaT: number; masaS
             <boxGeometry args={[0.2, 0.02, 0.02]} />
             <meshBasicMaterial color="#cbd5e1" />
           </mesh>
-          <Html position={[-W_OC / 2 - 0.25, yOc(d), D_OC / 2]} distanceFactor={12} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-            <div style={{ transform: "translate(-100%,-50%)", color: "#e2e8f0", fontSize: 11, fontWeight: 800, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{num(d)} m</div>
-          </Html>
         </group>
       ))}
       {/* Eje de temperatura de la curva blanca */}
-      {[0, 10, 20, 30].map((t) => (
-        <Html key={t} position={[-W_OC / 2 + ((t - tMin) / (tMax - tMin)) * W_OC, -H_OC - 0.42, D_OC / 2]} center distanceFactor={12} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ color: "#fff", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>{t} °C</div>
-        </Html>
-      ))}
-      <Etiqueta pos={[0, -H_OC - 1.0, D_OC / 2]} df={12} fs={10.5}>
-        <i className="fa-solid fa-temperature-half" style={{ color: "#fb923c" }} />
-        Cara frontal: temperatura (línea blanca)
-      </Etiqueta>
-      <Etiqueta pos={[W_OC / 2 + 0.05, -H_OC * 0.82, 0]} df={12} fs={10.5}>
-        <i className="fa-solid fa-droplet" style={{ color: "#4ade80" }} />
-        Lateral: salinidad
-      </Etiqueta>
-      <Etiqueta pos={[-1.6, 1.45, -1]} df={12} fs={11} col="#2dd4bfaa">
-        <i className="fa-solid fa-location-dot" style={{ color: "#2dd4bf" }} />
-        {zona.lugar} · superficie {num(sup.t, 1)} °C, {num(sup.s, 1)} g/kg
-      </Etiqueta>
 
       <Buque profCTD={p.profCTD} />
-      <Html position={[X_BUQUE + 0.45, yOc(p.profCTD) - 0.15, D_OC / 2]} distanceFactor={12} zIndexRange={[24, 0]} style={{ pointerEvents: "none" }}>
+      {!p_angosto && <Html position={[X_BUQUE + 0.45, yOc(p.profCTD) - 0.15, D_OC / 2]} zIndexRange={[24, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
             transform: "translate(0,-50%)",
@@ -832,18 +802,18 @@ function EscenaOceano(p: { zonaId: ZonaId; profCTD: number; masaT: number; masaS
             background: "rgba(4,10,22,0.9)",
             border: "1px solid #fbbf24",
             color: "#fff",
-            fontSize: 11.5,
+            fontSize: 14,
             fontWeight: 800,
             whiteSpace: "nowrap",
             lineHeight: 1.35,
             fontVariantNumeric: "tabular-nums",
           }}
         >
-          <div style={{ color: "#fbbf24", fontSize: 10 }}>CTD · {num(ctd.prof)} m</div>
+          <div style={{ color: "#fbbf24", fontSize: 14 }}>CTD · {num(ctd.prof)} m</div>
           {num(ctd.t, 1)} °C · {num(ctd.s, 2)} g/kg
           <div>ρ = {num(ctd.rho, 2)} kg/m³</div>
         </div>
-      </Html>
+      </Html>}
       <MasaAgua key={`masa-${p.masaNonce}-${p.zonaId}`} t={p.masaT} s={p.masaS} nonce={p.masaNonce} zonaId={p.zonaId} />
       <Hielo key={`hielo-${p.hieloNonce}-${p.zonaId}`} nonce={p.hieloNonce} rhoSup={sup.rho} />
     </group>
@@ -882,6 +852,7 @@ const FORMA_TERRENO = (() => {
 })();
 
 function EscenaCiclo({ t0, hr0, viaje, progreso, lanzada, modoColor }: { t0: number; hr0: number; viaje: ViajeParcela; progreso: number; lanzada: boolean; modoColor: string }) {
+  const angosto = useThree((st) => st.size.width < 640);
   const parcela = useRef<THREE.Group>(null);
   const esfera = useRef<THREE.Mesh>(null);
   const nube = useRef<THREE.InstancedMesh>(null);
@@ -1007,27 +978,17 @@ function EscenaCiclo({ t0, hr0, viaje, progreso, lanzada, modoColor }: { t0: num
           <coneGeometry args={[0.95, 1.1, 9]} />
           <meshStandardMaterial color="#f1f5f9" roughness={0.8} flatShading />
         </mesh>
-        <Etiqueta pos={[0, yCiclo(5636) + 0.9, 0]} df={15} fs={10.5}>
-          Pico de Orizaba · 5 636 m (al fondo)
-        </Etiqueta>
       </group>
-      <Etiqueta pos={[xCiclo(0.7), yCiclo(4282) + 0.2, -4]} df={15} fs={10.5}>
-        Cofre de Perote · 4 282 m
-      </Etiqueta>
 
       {/* Sol y evaporación */}
       <mesh position={[-6.6, 6.4, -3]}>
         <sphereGeometry args={[0.6, 24, 18]} />
-        <meshBasicMaterial color="#fde68a" toneMapped={false} />
+        <meshStandardMaterial color="#fde68a" emissive="#f59e0b" emissiveIntensity={1.2} />
       </mesh>
       <instancedMesh ref={vapor} args={[undefined, undefined, N_VAPOR]} frustumCulled={false}>
         <sphereGeometry args={[1, 10, 8]} />
         <meshBasicMaterial color="#e0f2fe" transparent opacity={0.3} depthWrite={false} />
       </instancedMesh>
-      <Etiqueta pos={[xCiclo(0.1), 2.7, 0.6]} df={15} fs={10.5} col="#7dd3fcaa">
-        <i className="fa-solid fa-arrow-up" style={{ color: "#7dd3fc" }} />
-        Evaporación: líquido → gas
-      </Etiqueta>
 
       {/* Pueblos */}
       {(
@@ -1045,20 +1006,12 @@ function EscenaCiclo({ t0, hr0, viaje, progreso, lanzada, modoColor }: { t0: num
               <meshStandardMaterial color={["#f5f5f4", "#fca5a5", "#fde68a"][k]!} roughness={0.7} />
             </mesh>
           ))}
-          <Etiqueta pos={[xCiclo(s) - (s === 1 ? 0.3 : 0), yCiclo(alturaTerreno(s)) - 0.45, 1.6]} df={15} fs={10.5}>
-            {etq}
-          </Etiqueta>
+          {s === 1 && <Etiqueta pos={[xCiclo(s) - 0.3, yCiclo(alturaTerreno(s)) + 0.9, 1.6]}>Perote</Etiqueta>}
         </group>
       ))}
-      <Etiqueta pos={[xCiclo(0.13), -1.25, 1.6]} df={15} fs={10.5} col="#0e7490">
+      <Etiqueta pos={[xCiclo(0.13), -1.25, 1.6]} col="#0e7490">
         <i className="fa-solid fa-water" style={{ color: "#67e8f9" }} />
         Golfo de México
-      </Etiqueta>
-      <Etiqueta pos={[xCiclo(0.42), yCiclo(3000) + 1.2, 1.4]} df={15} fs={10.5}>
-        Barlovento: el viento sube →
-      </Etiqueta>
-      <Etiqueta pos={[xCiclo(0.92), yCiclo(3000) + 1.2, 1.4]} df={15} fs={10.5}>
-        Sotavento: baja →
       </Etiqueta>
 
       {/* Nube y lluvia */}
@@ -1083,7 +1036,7 @@ function EscenaCiclo({ t0, hr0, viaje, progreso, lanzada, modoColor }: { t0: num
             dashSize={0.15}
             gapSize={0.1}
           />
-          <Etiqueta pos={[xCiclo(viaje.sNube) - 1.9, yCiclo(viaje.zNube) + 0.45, 1.55]} df={15} fs={10.5} col="#e2e8f0aa">
+          <Etiqueta pos={[xCiclo(viaje.sNube) - 1.9, yCiclo(viaje.zNube) + 0.45, 1.55]} col="#e2e8f0aa">
             Base de la nube · {num(viaje.zNube)} m
           </Etiqueta>
         </>
@@ -1095,7 +1048,7 @@ function EscenaCiclo({ t0, hr0, viaje, progreso, lanzada, modoColor }: { t0: num
           <sphereGeometry args={[0.36, 28, 20]} />
           <meshStandardMaterial color="#bae6fd" transparent opacity={0.72} roughness={0.2} emissive={modoColor} emissiveIntensity={0.15} depthWrite={false} />
         </mesh>
-        <Html position={[0, 0.75, 0]} center distanceFactor={15} zIndexRange={[26, 0]} style={{ pointerEvents: "none" }}>
+        {!angosto && <Html position={[0, 0.75, 0]} center zIndexRange={[26, 0]} style={{ pointerEvents: "none" }}>
           <div
             style={{
               padding: "5px 10px",
@@ -1103,7 +1056,7 @@ function EscenaCiclo({ t0, hr0, viaje, progreso, lanzada, modoColor }: { t0: num
               background: "rgba(4,10,22,0.9)",
               border: `1px solid ${modoColor}`,
               color: "#fff",
-              fontSize: 11.5,
+              fontSize: 14,
               fontWeight: 800,
               whiteSpace: "nowrap",
               lineHeight: 1.35,
@@ -1111,15 +1064,12 @@ function EscenaCiclo({ t0, hr0, viaje, progreso, lanzada, modoColor }: { t0: num
               fontVariantNumeric: "tabular-nums",
             }}
           >
-            <div style={{ color: modoColor, fontSize: 10 }}>PARCELA · {num(qActual.z)} m</div>
+            <div style={{ color: modoColor, fontSize: 14 }}>PARCELA · {num(qActual.z)} m</div>
             {num(qActual.tC, 1)} °C · {num(qActual.r, 1)} g/kg de vapor
-            <div style={{ fontSize: 10.5, color: qActual.nube ? "#fff" : "#bae6fd" }}>{qActual.nube ? "saturada: se condensa" : `humedad relativa ${num(qActual.hr)} %`}</div>
+            <div style={{ fontSize: 14, color: qActual.nube ? "#fff" : "#bae6fd" }}>{qActual.nube ? "saturada: se condensa" : `humedad relativa ${num(qActual.hr)} %`}</div>
           </div>
-        </Html>
+        </Html>}
       </group>
-      <Etiqueta pos={[-5.6, 5.1, -3]} df={15} fs={9.5}>
-        Corte esquemático: ≈ 100 km comprimidos, altura exagerada
-      </Etiqueta>
     </group>
   );
 }
@@ -1129,9 +1079,9 @@ function EscenaCiclo({ t0, hr0, viaje, progreso, lanzada, modoColor }: { t0: num
 export default function HidrosferaAtmosferaScene(p: HidrosferaAtmosferaSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt; min: number; max: number } => {
-    if (vista === "atmosfera") return { pos: [1.3, -0.2, 22.5], target: [1.3, -0.5, 0], min: 6, max: 32 };
-    if (vista === "oceano") return { pos: [3.4, 4.2, 16.5], target: [0, -0.6, 0], min: 5, max: 26 };
-    return { pos: [0.4, 3.4, 19.5], target: [0.2, 1.0, 0], min: 5, max: 28 };
+    if (vista === "atmosfera") return { pos: [1.3, -1.4, 25], target: [1.3, -1.6, 0], min: 6, max: 34 };
+    if (vista === "oceano") return { pos: [3.4, 3.4, 17.5], target: [0, -1.2, 0], min: 5, max: 28 };
+    return { pos: [0.4, 2.6, 20], target: [0.2, 0.2, 0], min: 5, max: 28 };
   }, [vista]);
 
   return (
@@ -1147,6 +1097,7 @@ export default function HidrosferaAtmosferaScene(p: HidrosferaAtmosferaSceneProp
       {vista === "oceano" && <EscenaOceano zonaId={p.zonaId} profCTD={p.profCTD} masaT={p.masaT} masaS={p.masaS} masaNonce={p.masaNonce} hieloNonce={p.hieloNonce} />}
       {vista === "ciclo" && <EscenaCiclo t0={p.t0} hr0={p.hr0} viaje={p.viaje} progreso={p.progreso} lanzada={p.lanzada} modoColor={modoColor} />}
 
+      <AjusteAncho zoomAngosto={vista === "atmosfera" ? 0.7 : 0.6} />
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={cam.min} maxDistance={cam.max} maxPolarAngle={Math.PI * 0.62} minPolarAngle={Math.PI * 0.2} maxAzimuthAngle={0.9} minAzimuthAngle={-0.9} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.3} luminanceThreshold={0.7} luminanceSmoothing={0.85} mipmapBlur />

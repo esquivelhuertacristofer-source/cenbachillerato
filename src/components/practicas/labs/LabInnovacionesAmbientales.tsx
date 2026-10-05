@@ -23,6 +23,7 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { RetoQuizCard } from "./_reto-quiz";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -116,7 +117,7 @@ const InnovacionesScene = dynamic(() => import("./InnovacionesAmbientalesScene")
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-earth-americas fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el paisaje en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el paisaje en 3D…</span>
     </div>
   ),
 });
@@ -167,22 +168,22 @@ function InnovacionCard({ accent, rgba, mejor, onResultado, playSfx }: { accent:
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+    <div style={{ ...card, padding: "16px", marginTop: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-star" style={{ marginRight: 8, color: accent }} />
           Diagnóstico → acción: ¿qué innovación lo resuelve?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Problema {pos + 1} de {ronda.length} · elige la innovación que ataca su causa
           </div>
           <div className="ia-problema" style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>
@@ -196,9 +197,9 @@ function InnovacionCard({ accent, rgba, mejor, onResultado, playSfx }: { accent:
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
           {acierto && !aviso && (
-            <div style={{ marginTop: 10, fontSize: 12, color: OK, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 10, fontSize: 14, color: OK, lineHeight: 1.5 }}>
               <i className="fa-solid fa-circle-check" style={{ marginRight: 7 }} />
               Bien: {acierto}
             </div>
@@ -210,9 +211,9 @@ function InnovacionCard({ accent, rgba, mejor, onResultado, playSfx }: { accent:
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -271,7 +272,6 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const timers = useRef<number[]>([]);
@@ -442,18 +442,18 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Diseñar para la Ciudad de México una cosecha de lluvia que cubra al menos 75 % del uso no potable", done: cobertura75 },
-    { t: "Simular un año en Tijuana (lluvia de invierno) y en una ciudad con lluvias de verano", done: comparoRegimenes },
-    { t: "Lograr en el humedal agua apta para reúso con contacto directo (DBO₅ ≤ 20 mg/L)", done: cumpleDirecto },
-    { t: "Medir el mismo humedal con agua fría (≤ 12 °C) y cálida (≥ 24 °C)", done: comparoFrio },
-    { t: "Plantar cada especie nativa de mangle en su zona de inundación", done: zonacionLograda },
-    { t: "Que la ola de tormenta llegue al pueblo con la mitad de su altura o menos", done: olaMitad },
-    { t: "Seguir la restauración 20 años y estimar el CO₂ capturado", done: carbono20 },
-    { t: "Relacionar problemas con innovaciones y ganar estrellas", done: clasifico },
-    { t: "Aprobar el quiz de conceptos (A9 y A8)", done: quizAprobado },
-    { t: "Resolver el reto de cálculo de la cosecha de lluvia", done: retoAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: { txt: string; done: boolean }[] = [
+    { txt: "Diseñar para la Ciudad de México una cosecha de lluvia que cubra al menos 75 % del uso no potable", done: cobertura75 },
+    { txt: "Simular un año en Tijuana (lluvia de invierno) y en una ciudad con lluvias de verano", done: comparoRegimenes },
+    { txt: "Lograr en el humedal agua apta para reúso con contacto directo (DBO₅ ≤ 20 mg/L)", done: cumpleDirecto },
+    { txt: "Medir el mismo humedal con agua fría (≤ 12 °C) y cálida (≥ 24 °C)", done: comparoFrio },
+    { txt: "Plantar cada especie nativa de mangle en su zona de inundación", done: zonacionLograda },
+    { txt: "Que la ola de tormenta llegue al pueblo con la mitad de su altura o menos", done: olaMitad },
+    { txt: "Seguir la restauración 20 años y estimar el CO₂ capturado", done: carbono20 },
+    { txt: "Relacionar problemas con innovaciones y ganar estrellas", done: clasifico },
+    { txt: "Aprobar el quiz de conceptos (A9 y A8)", done: quizAprobado },
+    { txt: "Resolver el reto de cálculo de la cosecha de lluvia", done: retoAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -482,30 +482,22 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, margin: "18px 0 8px" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
   );
-  const dato = (etq: string, valor: string, col = "#fff") => (
-    <div className="ia-dato">
-      <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.07em", color: T.text3, textTransform: "uppercase" }}>{etq}</div>
-      <div style={{ fontSize: 15, fontWeight: 900, color: col, marginTop: 3, ...NUM }}>{valor}</div>
-    </div>
-  );
+  const dato = (etq: string, valor: string, col = "#fff") => <Dato label={etq} value={valor} col={col} />;
   const rango = (label: string, min: number, max: number, paso: number, valor: number, onChange: (v: number) => void, txt: string, icono: string, col: string, disabled = false) => (
-    <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, opacity: disabled ? 0.5 : 1 }}>
-      <i className={`fa-solid ${icono}`} style={{ color: col, width: 16, textAlign: "center" }} />
-      <span style={{ fontSize: 12, color: T.text2, width: 108, flexShrink: 0 }}>{label}</span>
-      <input type="range" aria-label={label} className="ia-range" min={min} max={max} step={paso} value={valor} disabled={disabled} onChange={(e) => onChange(Number(e.target.value))} style={{ ["--iac" as string]: col }} />
-      <span style={{ width: 84, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{txt}</span>
-    </label>
+    <div style={{ opacity: disabled ? 0.5 : 1, pointerEvents: disabled ? "none" : "auto", marginTop: 12 }}>
+      <Deslizador label={label} icon={icono} colr={col} valor={txt} min={min} max={max} step={paso} value={valor} onChange={onChange} />
+    </div>
   );
 
   /* ── Panel ─────────────────────────────────────────────────────────── */
@@ -563,7 +555,7 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
           {dato("Meses cubiertos", `${bal.mesesCubiertos} de 12`)}
           {dato("Aprovechado", `${num(aprovechado)} % de lo captado`)}
         </div>
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 10, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 10, ...NUM }}>
           V = A · P · Ce = {area} m² · {num(lluviaAnual(ciudad))} mm · {techo.ce} = <strong style={{ color: "#fff" }}>{num(bal.captado)} L al año</strong>
         </div>
         {nota(
@@ -577,7 +569,7 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
         )}
         {ultimaSim && !corriendo && nota(`Última simulación: ${CIUDADES.find((c) => c.id === ultimaSim.ciudad)!.etq}, ${num(ultimaSim.cobertura * 100)} % cubierto y ${num(ultimaSim.desborde)} L desbordados.`, T.text3, "fa-clock-rotate-left")}
         {ciudadId === "cdmx" && nota(PROGRAMA_CDMX, "#7dd3fc", "fa-landmark")}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Balance mensual simplificado. Uso no potable de {USO_NO_POTABLE} L por persona al día (sanitario y lavado de ropa, valor ilustrativo). El agua de lluvia necesita filtración y desinfección antes de beberse.
         </div>
       </>
@@ -604,7 +596,7 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
           {dato("Remoción", `${num(remocion * 100)} %`)}
           {dato("Área por persona", `${num(humArea / humPersonas, 2)} m²`)}
         </div>
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 10, lineHeight: 1.6, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 10, lineHeight: 1.6, ...NUM }}>
           t = n·A·d / Q = {POROSIDAD} · {humArea} m² · {PROFUNDIDAD} m / {num(caudal(humPersonas), 1)} m³/d = {num(tRes, 2)} d
           <br />C = C₀ · e^(−K·t) = {DBO_ENTRADA} · e^(−{num(kT(tempC), 3)} · {num(tRes, 2)}) = <strong style={{ color: "#fff" }}>{num(salida, 1)} mg/L</strong>
         </div>
@@ -640,7 +632,7 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
           "fa-bacteria",
         )}
         {tempC <= 12 && nota(`Con agua a ${tempC} °C las bacterias trabajan despacio: K baja de ${K20} a ${num(kT(tempC), 2)} d⁻¹. Por eso los humedales de clima frío necesitan más área.`, "#93c5fd", "fa-snowflake")}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Modelo de primer orden para DBO₅ en flujo subsuperficial (Reed, Crites y Middlebrooks, 1995): K₂₀ = {K20} d⁻¹, θ = {THETA}. Entrada: {DBO_ENTRADA} mg/L, efluente típico de fosa séptica, y {AGUA_POR_PERSONA} L por persona al día (valores típicos). Las guías de diseño agregan margen de área para eliminar nitrógeno y patógenos y evitar que la grava se tape.
         </div>
       </>
@@ -664,7 +656,7 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
             );
           })}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>{zona.inundacion}.</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{zona.inundacion}.</div>
         {sub(`2 · Planta una especie en «${zona.etq.toLowerCase()}»`)}
         <div style={{ display: "grid", gap: 7 }}>
           {ESPECIES.map((e) => {
@@ -716,357 +708,215 @@ export function LabInnovacionesAmbientales({ color }: PracticaLabProps) {
           {dato("Equivale a", `${num(co2 / CO2_AUTO)} autos · año`)}
         </div>
         {anios === ANIOS_MAX && co2 > 0 && nota(`En 20 años este manglar capturó ${num(co2)} t de CO₂e, lo que emiten ${num(co2 / CO2_AUTO)} autos en un año. Además protege a los peces jóvenes y al pueblo: varios servicios ecosistémicos a la vez.`, OK, "fa-leaf")}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Tramo de {num(LARGO_COSTA)} m de costa. Un manglar maduro y denso reduce la ola a la mitad cada 100 m (dentro del rango medido de 13–66 % en 100 m) y captura {CAPTURA_HA} t CO₂e/ha al año (rango 6–8). La supervivencia por zona y el tiempo de maduración son ilustrativos.
         </div>
       </>
     );
   }
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes iaPulse { 0%,100%{ box-shadow:0 0 0 0 var(--iad); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ia-live-dot { animation: iaPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .ia-live-dot { animation:none; } }
-        .ia-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ia-grid { grid-template-columns: 1fr; } }
-        .ia-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ia-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ia-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ia-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .ia-tab { cursor:pointer; border:1px solid var(--iac); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .ia-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .ia-tab:hover { background:rgba(255,255,255,0.06); }
-        .ia-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .ia-opt { cursor:pointer; border:1px solid var(--iac); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .ia-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+  const estiloCSS = `
+        .ia-opts { display:flex; flex-wrap:wrap; gap:8px; }
+        .ia-opt { cursor:pointer; border:1px solid var(--iac); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+        .ia-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
         .ia-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
         .ia-opt:disabled { cursor:default; opacity:0.6; }
-        .ia-toggle { width:100%; cursor:pointer; border:1px solid var(--iac); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
+        .ia-toggle { width:100%; cursor:pointer; border:1px solid var(--iac); border-radius:11px; padding:12px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
         .ia-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
         .ia-toggle:disabled { cursor:default; opacity:0.75; }
-        .ia-range { flex:1; min-width:0; accent-color: var(--iac); }
-        .ia-datos { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:7px; }
-        .ia-dato { padding:9px 11px; border-radius:10px; background:rgba(4,10,22,0.45); border:1px solid ${T.line}; min-width:0; }
-        .ia-meses { display:grid; grid-template-columns: repeat(12, 1fr); gap:4px; height:78px; }
-        .ia-mes { cursor:pointer; position:relative; border:1px solid rgba(255,255,255,0.1); border-radius:7px; background:rgba(4,10,22,0.45); padding:0 0 16px; overflow:hidden; }
+        .ia-datos { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+        .ia-meses { display:grid; grid-template-columns: repeat(12, minmax(0,1fr)); gap:3px; height:96px; }
+        .ia-mes { cursor:pointer; position:relative; border:1px solid rgba(255,255,255,0.1); border-radius:7px; background:rgba(4,10,22,0.45); padding:0 0 22px; overflow:hidden; min-width:0; }
         .ia-mes[data-on="true"] { border-color:var(--iac); background:rgba(255,255,255,0.08); }
         .ia-mes:disabled { cursor:default; }
-        .ia-mes-barra { position:absolute; left:22%; right:22%; bottom:16px; border-radius:3px 3px 0 0; opacity:0.85; max-height:calc(100% - 16px); }
-        .ia-mes-nivel { position:absolute; left:4px; right:4px; height:2px; background:#fff; margin-bottom:16px; box-shadow:0 0 6px #fff; max-width:100%; }
-        .ia-mes-letra { position:absolute; left:0; right:0; bottom:2px; font-size:9.5px; font-weight:900; color:rgba(255,255,255,0.7); text-align:center; }
+        .ia-mes-barra { position:absolute; left:18%; right:18%; bottom:22px; border-radius:3px 3px 0 0; opacity:0.85; max-height:calc(100% - 22px); }
+        .ia-mes-nivel { position:absolute; left:2px; right:2px; height:2px; background:#fff; margin-bottom:22px; box-shadow:0 0 6px #fff; max-width:100%; }
+        .ia-mes-letra { position:absolute; left:0; right:0; bottom:2px; font-size:14px; font-weight:900; color:rgba(255,255,255,0.8); text-align:center; }
         .ia-tabla { border:1px solid ${T.line}; border-radius:10px; overflow:hidden; }
-        .ia-fila { display:grid; grid-template-columns: 1fr 1fr 1fr 1.3fr; gap:6px; padding:6px 10px; font-size:11.5px; color:${T.text2}; border-top:1px solid ${T.line}; }
-        .ia-fila.ia-cab { border-top:none; font-size:9.5px; font-weight:900; letter-spacing:0.07em; text-transform:uppercase; color:${T.text3}; background:rgba(255,255,255,0.03); }
-        .ia-sub-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-size:11.5px; font-weight:800; border:1px solid var(--iac); color:#fff; background:rgba(4,10,22,0.4); }
-        .ia-opt:focus-visible, .ia-tab:focus-visible, .ia-toggle:focus-visible, .ia-icobtn:focus-visible, .ia-range:focus-visible, .ia-mes:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .ia-bottom { grid-template-columns: 1fr !important; } }
-        .ia-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ia-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ia-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .ia-drawer[data-open="true"] { transform:translateX(0); }
-        .ia-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ia-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ia-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ia-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ia-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .ia-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
+        .ia-fila { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:6px; padding:6px 10px; font-size:14px; color:${T.text2}; border-top:1px solid ${T.line}; }
+        .ia-fila.ia-cab { border-top:none; font-weight:900; color:${T.text3}; background:rgba(255,255,255,0.03); }
+        .ia-sub-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-size:14px; font-weight:800; border:1px solid var(--iac); color:#fff; background:rgba(4,10,22,0.4); }
+        .ia-opt:focus-visible, .ia-toggle:focus-visible, .ia-mes:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  `;
 
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="ia-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="ia-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--iac" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+  const sceneEl = (
+    <SceneBoundary fallback={sceneFallback}>
+      <InnovacionesScene
+        vista={vista}
+        modoColor={modoCol}
+        resetNonce={resetNonce}
+        ciudadId={ciudadId}
+        techoId={techoId}
+        area={area}
+        capacidad={capacidad}
+        mesVista={mesVista}
+        nivel={mesB.nivel}
+        desborda={mesB.desborde > 0}
+        personas={humPersonas}
+        areaHumedal={humArea}
+        tempC={tempC}
+        muestraNonce={muestraNonce}
+        plantacion={plantacion}
+        ancho={ancho}
+        anios={anios}
+        olaNonce={olaNonce}
+      />
+    </SceneBoundary>
+  );
+
+  const parrafo = (txt: ReactNode) => <p style={{ margin: 0, color: T.text2, lineHeight: 1.55 }}>{txt}</p>;
+
+  return (
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={sceneEl}
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{estiloCSS}</style>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {def.subsistemas.map((s) => (
+                    <span key={s} className="ia-sub-chip" style={{ ["--iac" as string]: SUBSISTEMA_DEF[s].color }}>
+                      <i className={`fa-solid ${SUBSISTEMA_DEF[s].icono}`} style={{ color: SUBSISTEMA_DEF[s].color }} />
+                      {SUBSISTEMA_DEF[s].etq}
+                    </span>
+                  ))}
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="ia-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <InnovacionesScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                ciudadId={ciudadId}
-                techoId={techoId}
-                area={area}
-                capacidad={capacidad}
-                mesVista={mesVista}
-                nivel={mesB.nivel}
-                desborda={mesB.desborde > 0}
-                personas={humPersonas}
-                areaHumedal={humArea}
-                tempC={tempC}
-                muestraNonce={muestraNonce}
-                plantacion={plantacion}
-                ancho={ancho}
-                anios={anios}
-                olaNonce={olaNonce}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="ia-live-dot" style={{ ["--iad" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
+                {parrafo(def.conocimiento)}
+                {control}
+              </Bloque>
+              <Bloque titulo="Qué está pasando" icono="fa-eye">
+                {parrafo(pie)}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <InnovacionCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A9} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Dominas los conceptos de la acción ambiental." />
+              <RetoNumericoCard reto={RETO_LLUVIA} accent={accent} aprobado={retoAprobado} onAprobado={() => setRetoAprobado(true)} playSfx={sfx} />
+              <div style={{ ...card, padding: "16px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                </div>
               </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ia-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ia-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ia-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="ia-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 4 }}>
-              {def.subsistemas.map((s) => (
-                <span key={s} className="ia-sub-chip" style={{ ["--iac" as string]: SUBSISTEMA_DEF[s].color }}>
-                  <i className={`fa-solid ${SUBSISTEMA_DEF[s].icono}`} style={{ color: SUBSISTEMA_DEF[s].color }} />
-                  {SUBSISTEMA_DEF[s].etq}
-                </span>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>{def.conocimiento}</div>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-earth-americas" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Cómo ayuda la tecnología al planeta?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-play" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Video A8
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 8 }}>{VIDEO_A8.titulo}</div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 12 }}>{VIDEO_A8.descripcion}</div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA RESPONDER</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              <li style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{VIDEO_A8.abierta}</li>
-              <li style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>¿Verdadero o falso? «{VIDEO_A8.verdaderoFalso}»</li>
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Cómo ayuda la tecnología al planeta?" icono="fa-earth-americas">
+                {parrafo(PROBLEMA)}
+              </Bloque>
+              <Bloque titulo={`Video A8 · ${VIDEO_A8.titulo}`} icono="fa-circle-play">
+                {parrafo(VIDEO_A8.descripcion)}
+                <strong style={{ color: T.text3, fontSize: 14 }}>Para responder</strong>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  <li>{VIDEO_A8.abierta}</li>
+                  <li>¿Verdadero o falso? «{VIDEO_A8.verdaderoFalso}»</li>
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Hechos (verdadero o falso A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A1 y A5)" icono="fa-book">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {GLOSARIO.map((gi, i) => (
+                    <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                      <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                      <span style={{ color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+                      <span style={{ fontWeight: 900, color: T.text3, marginLeft: 6 }}>{gi.fuente}</span>
+                      <div style={{ color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
+                        <i className="fa-solid fa-leaf" style={{ marginRight: 6, color: accent }} />
+                        {gi.ejemplo}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ia-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-            Hechos (verdadero o falso A4)
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-            {HECHOS.map((h, i) => (
-              <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                {h}
-              </li>
-            ))}
-          </ul>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A1 y A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <span style={{ fontSize: 9.5, fontWeight: 900, color: T.text3, marginLeft: 6 }}>{gi.fuente}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-leaf" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad A5:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-              Ideas clave
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-people-carry-box" style={{ marginRight: 8, color: accent }} />
-              Tu propuesta (reflexión A3)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{REFLEXION_A3.intro}</div>
-            <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.5, marginTop: 8, fontWeight: 700 }}>{REFLEXION_A3.pide}</div>
-            <ol style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 5 }}>
-              {REFLEXION_A3.requisitos.map((r, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {r}
-                </li>
-              ))}
-            </ol>
-            <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.5, marginTop: 8, fontStyle: "italic" }}>{REFLEXION_A3.cierre}</div>
-            <div style={{ fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "12px 0 6px" }}>PISTAS</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 5 }}>
-              {REFLEXION_A3.pistas.map((r, i) => (
-                <li key={i} style={{ fontSize: 11, color: T.text3, lineHeight: 1.45 }}>
-                  {r}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Esta progresión no tiene lectura: son <strong>verbatim</strong> los glosarios A1 y A5, la reflexión A3, los hechos del verdadero/falso A4, el texto A6, la descripción y las
-          preguntas del video A8 y las definiciones y conceptos del relacionar columnas A9, que aquí se presentan como opción múltiple junto con la pregunta del video (sus
-          retroalimentaciones son del laboratorio). Los tres modos son <strong>modelos sencillos</strong>: lluvia mensual redondeada de la normal 1991–2020, coeficientes de la
-          guía OPS/CEPIS y balance mensual de la cisterna; modelo de primer orden de Reed et al. (1995) con límites de la NOM-003-SEMARNAT-1997; atenuación del oleaje y captura de
-          carbono dentro de los rangos publicados, con supervivencia por zona y maduración ilustrativas. El uso de agua por persona, la DBO₅ de entrada, los problemas de la tarjeta
-          de estrellas y el reto de cálculo son del laboratorio. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <InnovacionCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A9} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Dominas los conceptos de la acción ambiental." />
-
-      <RetoNumericoCard reto={RETO_LLUVIA} accent={accent} aprobado={retoAprobado} onAprobado={() => setRetoAprobado(true)} playSfx={sfx} />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="ia-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ia-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ia-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ia-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ia-drawer-body">
-          <FichaTeorica data={INNOVACIONES_AMBIENTALES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                {parrafo(<><strong style={{ color: "#fff" }}>Actividad A5:</strong> {ACTIVIDAD_A5}</>)}
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 9, color: T.text2 }}>
+                  {IDEAS.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Tu propuesta (reflexión A3)" icono="fa-people-carry-box">
+                {parrafo(REFLEXION_A3.intro)}
+                <p style={{ margin: 0, color: "#fff", fontWeight: 700, lineHeight: 1.5 }}>{REFLEXION_A3.pide}</p>
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, color: T.text2 }}>
+                  {REFLEXION_A3.requisitos.map((r, i) => (
+                    <li key={i}>{r}</li>
+                  ))}
+                </ol>
+                <p style={{ margin: 0, color: T.text2, fontStyle: "italic", lineHeight: 1.5 }}>{REFLEXION_A3.cierre}</p>
+                <strong style={{ color: T.text3, fontSize: 14 }}>Pistas</strong>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, color: T.text3 }}>
+                  {REFLEXION_A3.pistas.map((r, i) => (
+                    <li key={i}>{r}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={INNOVACIONES_AMBIENTALES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                Esta progresión no tiene lectura: son <strong>verbatim</strong> los glosarios A1 y A5, la reflexión A3, los hechos del verdadero/falso A4, el texto A6, la descripción y las
+                preguntas del video A8 y las definiciones y conceptos del relacionar columnas A9, que aquí se presentan como opción múltiple junto con la pregunta del video (sus
+                retroalimentaciones son del laboratorio). Los tres modos son <strong>modelos sencillos</strong>: lluvia mensual redondeada de la normal 1991–2020, coeficientes de la
+                guía OPS/CEPIS y balance mensual de la cisterna; modelo de primer orden de Reed et al. (1995) con límites de la NOM-003-SEMARNAT-1997; atenuación del oleaje y captura de
+                carbono dentro de los rangos publicados, con supervivencia por zona y maduración ilustrativas. El uso de agua por persona, la DBO₅ de entrada, los problemas de la tarjeta
+                de estrellas y el reto de cálculo son del laboratorio. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

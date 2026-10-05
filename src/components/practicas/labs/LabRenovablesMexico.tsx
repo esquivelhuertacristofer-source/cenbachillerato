@@ -21,6 +21,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador as DeslizadorBase, BotonHerramienta } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -95,7 +97,7 @@ const RenovablesScene = dynamic(() => import("./RenovablesMexicoScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-solar-panel fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el mapa energético de México en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el mapa energético de México en 3D…</span>
     </div>
   ),
 });
@@ -177,13 +179,13 @@ function RenovableCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
           ¿Renovable o no renovable? · contrarreloj
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
-      <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginBottom: 12 }}>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginBottom: 12 }}>
         {CRITERIO_A11} <span style={{ color: T.text3 }}>(Clasificación A11; {SEGUNDOS_POR_REACTIVO} segundos por fuente, como el reto A10.)</span>
       </div>
       {resuelto === null ? (
@@ -195,10 +197,10 @@ function RenovableCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
-              <span style={{ fontSize: 11, color: T.text3, fontWeight: 800 }}>
+              <span style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>
                 Fuente {pos + 1} de {ronda.length}
               </span>
-              <span style={{ fontSize: 12, fontWeight: 900, color: restante <= 5 ? WARN : "#fff", ...NUM }}>
+              <span style={{ fontSize: 14, fontWeight: 900, color: restante <= 5 ? WARN : "#fff", ...NUM }}>
                 <i className="fa-solid fa-stopwatch" style={{ marginRight: 6 }} />
                 {restante} s
               </span>
@@ -219,7 +221,7 @@ function RenovableCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
                 No renovable
               </button>
             </div>
-            {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso}</div>}
+            {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso}</div>}
           </>
         )
       ) : (
@@ -228,9 +230,9 @@ function RenovableCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -270,7 +272,7 @@ function GraficaDia({ red, hora }: { red: ResultadoRed; hora: number }) {
       {[0, 6, 12, 18, 24].map((h) => (
         <g key={h}>
           <line x1={X(h)} x2={X(h)} y1={0} y2={G_H} stroke="rgba(255,255,255,0.08)" />
-          <text x={Math.min(G_W - 14, Math.max(2, X(h) - 8))} y={G_H + 13} fontSize={9.5} fill="rgba(255,255,255,0.45)">
+          <text x={Math.min(G_W - 14, Math.max(2, X(h) - 8))} y={G_H + 13} fontSize={14} fill="rgba(255,255,255,0.45)">
             {String(h).padStart(2, "0")} h
           </text>
         </g>
@@ -288,18 +290,9 @@ function GraficaDia({ red, hora }: { red: ResultadoRed; hora: number }) {
   );
 }
 
-/* ── Deslizador con etiqueta y valor ─────────────────────────────────── */
+/* ── Deslizador con etiqueta y valor (envoltorio del común) ─────────── */
 function Deslizador({ etq, unidad, valor, min, max, paso, on, col, icono, fmt }: { etq: string; unidad: string; valor: number; min: number; max: number; paso: number; on: (v: number) => void; col: string; icono: string; fmt?: (v: number) => string }) {
-  return (
-    <label style={{ display: "grid", gridTemplateColumns: "18px minmax(0,1fr) 92px", alignItems: "center", gap: 10, marginTop: 10 }}>
-      <i className={`fa-solid ${icono}`} style={{ color: col }} />
-      <span style={{ display: "grid", gap: 4 }}>
-        <span style={{ fontSize: 11, color: T.text2, fontWeight: 800 }}>{etq}</span>
-        <input type="range" aria-label={`${etq} (${unidad})`} className="rm-range" min={min} max={max} step={paso} value={valor} onChange={(e) => on(Number(e.target.value))} style={{ ["--rmc" as string]: col }} />
-      </span>
-      <span style={{ textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{fmt ? fmt(valor) : `${num(valor)} ${unidad}`}</span>
-    </label>
-  );
+  return <DeslizadorBase label={etq} icon={icono} colr={col} valor={fmt ? fmt(valor) : `${num(valor)} ${unidad}`} min={min} max={max} step={paso} value={valor} onChange={on} />;
 }
 
 const fmtPct = (v: number) => `${num(v, 1)} %`;
@@ -350,7 +343,6 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -561,18 +553,18 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Consultar al menos seis centrales en el mapa", done: consultadas.size >= 6 },
-    { t: "Predecir qué central genera más en un año", done: prediccion === ganador.id },
-    { t: "Igualar con paneles solares la energía anual de Laguna Verde", done: igualado },
-    { t: "Ver un déficit de electricidad con el Sol ya puesto", done: vioDeficit },
-    { t: "Cubrir la demanda las 24 h con al menos 60 % renovable usando la batería", done: cubrio },
-    { t: "Llevar la mezcla de México hoy a la meta de 35 % limpia", done: metaOk },
-    { t: "Comparar retirar primero carbón y combustóleo contra retirar gas", done: ordenesProbadas.size === 2 },
-    { t: "Seguir la producción de petróleo de 2004 a 2023", done: agotamientoVisto },
-    { t: "Clasificar fuentes contrarreloj y ganar estrellas", done: clasifico },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Consultar al menos seis centrales en el mapa", done: consultadas.size >= 6 },
+    { txt: "Predecir qué central genera más en un año", done: prediccion === ganador.id },
+    { txt: "Igualar con paneles solares la energía anual de Laguna Verde", done: igualado },
+    { txt: "Ver un déficit de electricidad con el Sol ya puesto", done: vioDeficit },
+    { txt: "Cubrir la demanda las 24 h con al menos 60 % renovable usando la batería", done: cubrio },
+    { txt: "Llevar la mezcla de México hoy a la meta de 35 % limpia", done: metaOk },
+    { txt: "Comparar retirar primero carbón y combustóleo contra retirar gas", done: ordenesProbadas.size === 2 },
+    { txt: "Seguir la producción de petróleo de 2004 a 2023", done: agotamientoVisto },
+    { txt: "Clasificar fuentes contrarreloj y ganar estrellas", done: clasifico },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -596,10 +588,10 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
     else pie = `Las renovables dan ${num(ren)} MW de ${num(paso.demanda)} MW. ${paso.descarga > 1 ? `La batería entrega ${num(paso.descarga)} MW` : "La batería no aporta"}${paso.gas > 1 ? ` y el gas cubre ${num(paso.gas)} MW` : ""}.`;
   } else if (subMezcla === "emisiones") {
     chipVivo = `${num(mtActual, 1)} Mt CO₂e/año · ${num(pctLimpia(mezcla), 1)} % limpia`;
-    pie = `${Math.abs(agregado) < 0.05 ? preset.explica : `Partiste de «${preset.etq}» y ${agregado > 0 ? "agregaste" : "quitaste"} ${num(Math.abs(agregado), 1)} puntos de solar y eólica: ${num(pctLimpia(mezcla), 1)} % de generación limpia.`} Emisiones de ciclo de vida de ${num(TWH_MEXICO)} TWh al año: ${num(mtActual, 1)} Mt CO₂e (México hoy: ${num(mtMexico, 1)} Mt).`;
+    pie = `${Math.abs(agregado) < 0.05 ? preset.explica : `Partiste de «${preset.etq}» y ${agregado > 0 ? "agregaste" : "quitaste"} ${num(Math.abs(agregado), 1)} puntos de solar y eólica: ${num(pctLimpia(mezcla), 1)} % de generación limpia.`} Emisiones de ciclo de vida de ${num(TWH_MEXICO)} TWh al año: ${num(mtActual, 1)} Mt CO₂e (México hoy: ${num(mtMexico, 1)} Mt). Cada bola gris de la nube son 2.5 Mt; las torres más altas están rotuladas.`;
   } else {
     chipVivo = `${anio.anio} · ${num(anio.mbd, 1)} millones de barriles diarios`;
-    pie = `${anio.anio}: ${anio.nota}`;
+    pie = `${anio.anio}: ${anio.nota} Cada barril de la escena equivale a 0.2 millones de barriles diarios; la línea amarilla es el pico de 2004 (3.4).`;
   }
 
   const sceneFallback = (
@@ -608,23 +600,18 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
   );
-  const dato = (etq: string, valor: string, col = "#fff") => (
-    <div style={{ padding: "8px 10px", borderRadius: 10, background: "rgba(4,10,22,0.45)", border: `1px solid ${T.line}` }}>
-      <div style={{ fontSize: 9.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em", textTransform: "uppercase" }}>{etq}</div>
-      <div style={{ fontSize: 14, fontWeight: 900, color: col, marginTop: 3, ...NUM }}>{valor}</div>
-    </div>
-  );
+  const dato = (etq: string, valor: string, col = "#fff") => <Dato label={etq} value={valor} col={col === "#fff" ? undefined : col} />;
 
   /* ── Panel ─────────────────────────────────────────────────────────── */
   let control: ReactNode = null;
@@ -644,7 +631,7 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
         <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 12, background: "rgba(248,250,252,0.05)", border: `1px solid ${tc.color}55` }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "baseline" }}>
             <div style={{ fontSize: 14, color: "#fff", fontWeight: 900 }}>{central.nombre}</div>
-            <div style={{ fontSize: 11, color: T.text3, fontWeight: 800 }}>{central.lugar}</div>
+            <div style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>{central.lugar}</div>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", margin: "8px 0" }}>
             <span className="rm-tag" style={{ ["--rmc" as string]: tc.color }}>
@@ -654,13 +641,13 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
             <span className="rm-tag" style={{ ["--rmc" as string]: tc.renovable ? OK : WARN }}>{tc.renovable ? "Renovable" : "No renovable"}</span>
             <span className="rm-tag" style={{ ["--rmc" as string]: tc.limpia ? OK : "#94a3b8" }}>{tc.limpia ? "Limpia" : "Emite CO₂"}</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(96px,1fr))", gap: 6 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 6 }}>
             {dato("Capacidad", `${central.aprox ? "≈ " : ""}${num(central.mw)} MW`)}
             {dato("Factor de planta", revelado ? `≈ ${num(central.fp * 100)} %` : "¿?")}
             {dato("Genera al año", revelado ? `${num(genSel)} GWh` : "¿?", tc.color)}
             {dato("CO₂e ciclo de vida", revelado ? `${num(emisionesT(genSel, tc.gCO2) / 1000)} kt` : "¿?")}
           </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 8 }}>{central.nota}</div>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 8 }}>{central.nota}</div>
         </div>
         {sub(`1 · Predice: ¿cuál genera más electricidad en un año?`)}
         <div className="rm-opts">
@@ -687,7 +674,7 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
           : nota("Pista: la capacidad (MW) es lo máximo que puede dar; la energía del año depende de cuántas horas trabaja a esa potencia.", T.text3)}
         {sub("2 · Iguala Laguna Verde con paneles solares en Sonora")}
         <Deslizador etq="Paneles solares en Sonora" unidad="MW" valor={solarEquiv} min={0} max={SOLAR_MAX_MW} paso={100} on={moverPaneles} col={TEC.solar.color} icono="fa-solar-panel" />
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 8, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 8, ...NUM }}>
           {num(solarEquiv)} MW × {num(FP_SOLAR_TIPICO * 100)} % × 8 760 h = <strong style={{ color: "#fff" }}>{num(genPaneles)} GWh</strong> · Laguna Verde: <strong style={{ color: TEC.nuclear.color }}>{num(genLV)} GWh</strong>
         </div>
         {igualado
@@ -710,13 +697,13 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
             Día nublado
           </button>
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 8, lineHeight: 1.45 }}>{ESTACIONES.find((e) => e.id === estacion)!.explica}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 8, lineHeight: 1.45 }}>{ESTACIONES.find((e) => e.id === estacion)!.explica}</div>
         {sub(`1 · Instala tu mezcla (la geotermia da ${GEO_MW} MW fijos)`)}
         <Deslizador etq="Solar" unidad="MW" valor={solarMW} min={0} max={LIMITES_RED.solar} paso={100} on={(v) => cambiaRed({ solarMW: v })} col={TEC.solar.color} icono="fa-solar-panel" />
         <Deslizador etq="Eólica" unidad="MW" valor={eolicaMW} min={0} max={LIMITES_RED.eolica} paso={100} on={(v) => cambiaRed({ eolicaMW: v })} col={TEC.eolica.color} icono="fa-wind" />
         <Deslizador etq="Batería" unidad="MWh" valor={bateriaMWh} min={0} max={LIMITES_RED.bateria} paso={250} on={(v) => cambiaRed({ bateriaMWh: v })} col="#34d399" icono="fa-car-battery" />
         <Deslizador etq="Respaldo de gas" unidad="MW" valor={gasMW} min={0} max={LIMITES_RED.gas} paso={50} on={(v) => cambiaRed({ gasMW: v })} col={TEC.gas.color} icono="fa-fire-flame-simple" />
-        <div style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>
           La batería entrega hasta {num(bateriaMWh / HORAS_BATERIA)} MW durante {HORAS_BATERIA} h y devuelve el {num(EFICIENCIA_BATERIA * 100)} % de lo que guarda; solo se carga con excedente renovable.
         </div>
         {sub("2 · Recorre el día")}
@@ -726,7 +713,7 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
             {reproduciendo ? "Pausa" : "Reproducir el día"}
           </button>
           <input type="range" aria-label="Hora del día (h)" className="rm-range" min={0} max={24 - DT_H} step={DT_H} value={hora} onChange={(e) => { setReproduciendo(false); moverHora(Number(e.target.value)); }} style={{ ["--rmc" as string]: modoCol }} />
-          <span style={{ width: 46, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{horaTexto(hora)}</span>
+          <span style={{ width: 46, textAlign: "right", fontSize: 14, color: "#fff", fontWeight: 800, ...NUM }}>{horaTexto(hora)}</span>
         </div>
         <div style={{ marginTop: 12, padding: "10px 10px 6px", borderRadius: 12, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>
           <GraficaDia red={red} hora={hora} />
@@ -740,15 +727,15 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
               ["Déficit", NO],
               ["Excedente", "#fde68a88"],
             ].map(([t, c]) => (
-              <span key={t} style={{ fontSize: 10, color: T.text2, display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <span key={t} style={{ fontSize: 14, color: T.text2, display: "inline-flex", alignItems: "center", gap: 4 }}>
                 <span style={{ width: 9, height: 9, borderRadius: 2, background: c }} />
                 {t}
               </span>
             ))}
-            <span style={{ fontSize: 10, color: T.text2 }}>— línea blanca: demanda</span>
+            <span style={{ fontSize: 14, color: T.text2 }}>— línea blanca: demanda</span>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(96px,1fr))", gap: 6, marginTop: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 6, marginTop: 10 }}>
           {dato("Renovable del día", `${num(red.pctRenovable)} %`, red.pctRenovable >= 60 ? OK : "#fff")}
           {dato("Déficit", `${num(red.deficitMWh)} MWh`, red.deficitMWh > 1 ? NO : OK)}
           {dato("Gas quemado", `${num(red.gasMWh)} MWh`)}
@@ -795,7 +782,7 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
                 </button>
               ))}
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(96px,1fr))", gap: 6, marginTop: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 6, marginTop: 12 }}>
               {dato("Renovable", `${num(pctRenovable(mezcla), 1)} %`, OK)}
               {dato("Limpia", `${num(pctLimpia(mezcla), 1)} %`, pctLimpia(mezcla) >= META_LIMPIA ? OK : "#fff")}
               {dato("Emisiones", `${num(mtActual, 1)} Mt`)}
@@ -803,7 +790,7 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 10 }}>
               {TECNOLOGIAS.map((t) => (
-                <span key={t.id} style={{ fontSize: 10.5, padding: "3px 7px", borderRadius: 7, border: `1px solid ${t.color}55`, color: T.text2, ...NUM }}>
+                <span key={t.id} style={{ fontSize: 14, padding: "3px 7px", borderRadius: 7, border: `1px solid ${t.color}55`, color: T.text2, ...NUM }}>
                   <span style={{ color: t.color, fontWeight: 900 }}>{t.etq}</span> {num(mezcla[t.id], 1)} % · {t.gCO2} g/kWh
                 </span>
               ))}
@@ -831,7 +818,7 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
               ))}
             </div>
             <Deslizador etq="Avanza en el tiempo" unidad="año" valor={anioIdx} min={0} max={PRODUCCION.length - 1} paso={1} on={moverAnio} col="#f59e0b" icono="fa-calendar" fmt={fmtAnio} />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(110px,1fr))", gap: 6, marginTop: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 6, marginTop: 12 }}>
               {dato("Producción", `${num(anio.mbd, 1)} mbd`, "#f59e0b")}
               {dato("Frente a 2004", `${num((100 * anio.mbd) / PRODUCCION[0]!.mbd)} %`)}
             </div>
@@ -844,315 +831,171 @@ export function LabRenovablesMexico({ color }: PracticaLabProps) {
     );
   }
 
+  const css = `
+    .rm-opts { display:flex; flex-wrap:wrap; gap:8px; }
+    .rm-opt { cursor:pointer; border:1px solid var(--rmc); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+    .rm-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+    .rm-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+    .rm-opt:disabled { cursor:default; }
+    .rm-opt:disabled[data-on="false"] { opacity:0.55; }
+    .rm-tag { font-size:14px; font-weight:900; padding:3px 8px; border-radius:999px; border:1px solid var(--rmc); color:var(--rmc); }
+    .rm-range { width:100%; accent-color: var(--rmc); }
+    .rm-opt:focus-visible, .rm-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  `;
+
+  const caja = { padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` } as const;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes rmPulse { 0%,100%{ box-shadow:0 0 0 0 var(--rmd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .rm-live-dot { animation: rmPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .rm-live-dot { animation:none; } }
-        .rm-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .rm-grid { grid-template-columns: 1fr; } }
-        .rm-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .rm-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .rm-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .rm-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .rm-tab { cursor:pointer; border:1px solid var(--rmc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .rm-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .rm-tab:hover { background:rgba(255,255,255,0.06); }
-        .rm-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .rm-opt { cursor:pointer; border:1px solid var(--rmc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .rm-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .rm-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .rm-opt:disabled { cursor:default; }
-        .rm-opt:disabled[data-on="false"] { opacity:0.55; }
-        .rm-tag { font-size:10.5px; font-weight:900; padding:3px 8px; border-radius:999px; border:1px solid var(--rmc); color:var(--rmc); }
-        .rm-range { width:100%; accent-color: var(--rmc); }
-        .rm-opt:focus-visible, .rm-tab:focus-visible, .rm-icobtn:focus-visible, .rm-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .rm-bottom { grid-template-columns: 1fr !important; } }
-        .rm-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .rm-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .rm-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .rm-drawer[data-open="true"] { transform:translateX(0); }
-        .rm-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .rm-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .rm-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .rm-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .rm-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .rm-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="rm-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="rm-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--rmc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="rm-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <RenovablesScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                centralSel={centralSel}
-                revelado={revelado}
-                solarEquivMW={solarEquiv}
-                onSelCentral={elegirCentral}
-                params={params}
-                red={red}
-                hora={hora}
-                subMezcla={subMezcla}
-                mezcla={mezcla}
-                anioIdx={anioIdx}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="rm-live-dot" style={{ ["--rmd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="rm-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="rm-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="rm-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="rm-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-bolt" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Por qué México sigue quemando fósiles?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-map" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Infografía A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {CONTEXTO_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PUNTOS CLAVE</div>
-            <ul style={{ margin: "0 0 12px", paddingLeft: 16, display: "grid", gap: 7 }}>
-              {PUNTOS_A1.map((q, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS_A1.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="rm-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-earth-americas" style={{ marginRight: 8, color: accent }} />
-              Después de la infografía (A1)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{ACTIVIDAD_POST_A1}</div>
-            <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.45, marginTop: 6, fontStyle: "italic" }}>Fuente de la infografía: {FUENTE_A1}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-bolt" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+    <>
+      <style>{css}</style>
+      <LabShell
+        accent={accent}
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <SceneBoundary fallback={sceneFallback}>
+            <RenovablesScene
+              vista={modo}
+              subMezcla={subMezcla}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              centralSel={centralSel}
+              revelado={revelado}
+              solarEquivMW={solarEquiv}
+              onSelCentral={elegirCentral}
+              params={params}
+              red={red}
+              hora={hora}
+              mezcla={mezcla}
+              anioIdx={anioIdx}
+            />
+          </SceneBoundary>
+        }
+        modos={{
+          opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+          valor: modo,
+          cambiar: (id) => cambiarModo(id as Modo),
+        }}
+        herramientas={
+          <>
+            {modo === "red" && <BotonHerramienta icono={reproduciendo ? "fa-pause" : "fa-play"} titulo={reproduciendo ? "Pausar el día" : "Reproducir el día"} activo={reproduciendo} onClick={reproducir} />}
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+          </>
+        }
+        lectura={chipVivo}
+        objetivos={objetivos}
+        pestanas={[
+          {
+            id: "controles",
+            etiqueta: "Controles",
+            icono: "fa-sliders",
+            contenido: (
+              <>
+                <Bloque titulo={`${def.etq} — ${def.subtitulo}`} icono={def.icono}>
+                  {control}
+                </Bloque>
+                <Bloque titulo="Qué está pasando" icono="fa-eye">
+                  <p style={{ margin: 0, color: T.text2, lineHeight: 1.5, ...NUM }}>{pie}</p>
+                </Bloque>
+              </>
+            ),
+          },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-trophy",
+            contenido: (
+              <>
+                <RenovableCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+                <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Conoces el mapa energético de México." />
+                <div style={{ ...card, padding: "16px 16px 18px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el texto (A6)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
                   </div>
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
+              </>
+            ),
+          },
+          {
+            id: "teoria",
+            etiqueta: "Teoría",
+            icono: "fa-book-open",
+            contenido: (
+              <>
+                <Bloque titulo="¿Por qué México sigue quemando fósiles?" icono="fa-bolt">
+                  <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+                </Bloque>
+                <Bloque titulo={`Infografía A1 — ${TITULO_A1}`} icono="fa-map">
+                  {CONTEXTO_A1.map((p, i) => (
+                    <p key={i} style={{ margin: 0, color: T.text2 }}>{p}</p>
+                  ))}
+                  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 7, color: T.text2 }}>
+                    {PUNTOS_A1.map((q, i) => (
+                      <li key={i}>{q}</li>
+                    ))}
+                  </ul>
+                  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                    {PREGUNTAS_A1.map((q, i) => (
+                      <li key={i}>{q}</li>
+                    ))}
+                  </ul>
+                  <div style={{ ...caja, color: T.text2 }}>
+                    <strong style={{ color: "#fff" }}>Después de la infografía: </strong>
+                    {ACTIVIDAD_POST_A1}
+                    <div style={{ color: T.text3, marginTop: 6, fontStyle: "italic" }}>Fuente de la infografía: {FUENTE_A1}</div>
+                  </div>
+                </Bloque>
+                <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                  <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, color: T.text2 }}>
+                    {INSTRUCCIONES.map((x, i) => (
+                      <li key={i}>{x}</li>
+                    ))}
+                  </ol>
+                </Bloque>
+                <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, color: T.text2 }}>
+                    {HECHOS.map((h, i) => (
+                      <li key={i}>{h}</li>
+                    ))}
+                  </ul>
+                </Bloque>
+                <Bloque titulo="Glosario (A5)" icono="fa-book">
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {GLOSARIO.map((gi, i) => (
+                      <div key={i} style={caja}>
+                        <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                        <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                        <div style={{ color: T.text3, marginTop: 4 }}>{gi.ejemplo}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                  </p>
+                </Bloque>
+                <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                    {IDEAS.map((x, i) => (
+                      <li key={i}>{x}</li>
+                    ))}
+                  </ul>
+                </Bloque>
+                <Bloque titulo="Ficha teórica" icono="fa-book">
+                  <FichaTeorica data={RENOVABLES_MEXICO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+                </Bloque>
+                <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           La infografía A1 (contexto, puntos clave, preguntas, glosario y actividad), el quiz A2, los hechos del quiz A4, el glosario A5, el texto A6 y las nueve fuentes de la clasificación A11 son <strong>verbatim</strong> del material de la plataforma. Las centrales del mapa son reales; sus capacidades están redondeadas (las marcadas con ≈ son aproximadas) y los factores de planta son <strong>típicos y aproximados</strong>, no datos oficiales de un año; el ingenio azucarero es un caso ilustrativo. La red de un día es una <strong>región ilustrativa</strong>: sus perfiles de demanda, sol y viento son un modelo con la estacionalidad real, no mediciones. Las emisiones usan las medianas de ciclo de vida del IPCC (AR5, 2014), salvo el combustóleo (estimación); la generación anual de México se toma como {num(TWH_MEXICO)} TWh y el reparto entre gas, combustóleo y carbón es aproximado. La producción petrolera de 2004 y 2023 es la de A1; la de los años intermedios es aproximada (Pemex). Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <RenovableCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Conoces el mapa energético de México." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="rm-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="rm-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="rm-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="rm-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="rm-drawer-body">
-          <FichaTeorica data={RENOVABLES_MEXICO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                </p>
+              </>
+            ),
+          },
+        ]}
+      />
+    </>
   );
 }

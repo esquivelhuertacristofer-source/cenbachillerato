@@ -19,7 +19,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -74,20 +74,23 @@ const hash = (i: number, k: number) => {
   return s - Math.floor(s);
 };
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Rótulo en la punta de lo que nombra. 14 px fijos; los anchos se ocultan en pantallas angostas (la info vive en el panel). */
+function Etiqueta({ pos, children, col, ancha = false }: { pos: Pt; children: ReactNode; col?: string; ancha?: boolean }) {
+  const angosto = useThree((st) => st.size.width < 640);
+  if (angosto && ancha) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: 6,
-          padding: "5px 11px",
+          padding: "4px 10px",
           borderRadius: 999,
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -97,6 +100,18 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
       </div>
     </Html>
   );
+}
+
+/** Encuadre responsivo: en pantallas angostas aleja la cámara (zoom) para que quepa todo el contenido. */
+function AjusteAncho({ zoomAngosto }: { zoomAngosto: number }) {
+  useFrame(({ camera, size }) => {
+    const z = size.width < 640 ? zoomAngosto : 1;
+    if (camera.zoom !== z) {
+      camera.zoom = z;
+      camera.updateProjectionMatrix();
+    }
+  });
+  return null;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -287,7 +302,6 @@ function EscenaMar(p: OxigenacionSceneProps) {
   });
 
   const brillo = P / P_MAX;
-  const oxigenado = fe < 0.5 && flujoAire > 0;
   return (
     <group position={[0, -1.6, 0]}>
       {/* Cielo y sol */}
@@ -297,7 +311,7 @@ function EscenaMar(p: OxigenacionSceneProps) {
       </mesh>
       <mesh position={[6.2, 5.6, -6.8]}>
         <sphereGeometry args={[0.6, 24, 16]} />
-        <meshBasicMaterial color="#fde68a" toneMapped={false} />
+        <meshStandardMaterial color="#fde68a" emissive="#f59e0b" emissiveIntensity={1.2} />
       </mesh>
       {/* Mar abierto hacia el horizonte */}
       <mesh position={[0, H_AGUA - 0.01, -4.4]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -379,23 +393,19 @@ function EscenaMar(p: OxigenacionSceneProps) {
         <meshBasicMaterial color="#99f6e4" transparent opacity={0.7} />
       </mesh>
 
-      <Etiqueta pos={[-3.1, Y_PLAT + capas * 0.075 + 0.75, 1.6]} col="#4ade80aa" fs={11}>
+      <Etiqueta ancha pos={[-3.1, Y_PLAT + capas * 0.075 + 0.75, 1.6]} col="#4ade80aa">
         <i className="fa-solid fa-bacteria" style={{ color: "#4ade80" }} />
         Estromatolitos · cianobacterias
       </Etiqueta>
-      <Etiqueta pos={[VENTILA.x + 0.2, 2.9, 1.4]} col="#86efacaa" fs={11}>
+      <Etiqueta ancha pos={[VENTILA.x + 0.2, 2.9, 1.4]} col="#86efacaa">
         <i className="fa-solid fa-volcano" style={{ color: "#fb923c" }} />
         Fuente hidrotermal · Fe²⁺
       </Etiqueta>
-      <Etiqueta pos={[2.6, 0.55, Z_MEDIO + 0.2]} col="#f97316aa" fs={11}>
+      <Etiqueta pos={[2.6, 0.55, Z_MEDIO + 0.2]} col="#f97316aa">
         <i className="fa-solid fa-bars-staggered" style={{ color: "#fb923c" }} />
         Hierro bandeado · {Math.floor(depositado / FE_POR_BANDA)} {Math.floor(depositado / FE_POR_BANDA) === 1 ? "banda" : "bandas"}
       </Etiqueta>
-      <Etiqueta pos={[1.6, H_AGUA + 0.45, 1.6]} col={`${oxigenado ? "#38bdf8" : "#4ade80"}aa`} fs={11}>
-        <i className="fa-solid fa-droplet" style={{ color: oxigenado ? "#38bdf8" : "#4ade80" }} />
-        {fe >= 0.5 ? `Océano con Fe²⁺ disuelto · ${num(fe)} u` : oxigenado ? "Océano sin hierro: el O₂ escapa" : "Océano sin hierro disuelto"}
-      </Etiqueta>
-      <Etiqueta pos={[-2.2, H_AGUA + 1.55, 0]} col={`${modoColor}aa`} fs={13}>
+      <Etiqueta pos={[-2.2, H_AGUA + 1.55, 0]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-wind" style={{ color: aire > 0 ? "#7dd3fc" : "#a8a29e" }} />
         Aire · O₂ acumulado: {num(aire)} u
       </Etiqueta>
@@ -524,7 +534,7 @@ function EscenaHistoria({ tMa, uv, modoColor }: { tMa: number; uv: boolean; modo
       {/* Sol */}
       <mesh position={[-6.4, 0, -1.2]}>
         <sphereGeometry args={[0.95, 32, 20]} />
-        <meshBasicMaterial color="#fde68a" toneMapped={false} />
+        <meshStandardMaterial color="#fde68a" emissive="#f59e0b" emissiveIntensity={1.2} />
       </mesh>
       <mesh position={[-6.4, 0, -1.2]}>
         <sphereGeometry args={[1.35, 32, 20]} />
@@ -554,16 +564,16 @@ function EscenaHistoria({ tMa, uv, modoColor }: { tMa: number; uv: boolean; modo
         <meshBasicMaterial color="#ffffff" toneMapped={false} />
       </instancedMesh>
 
-      <Etiqueta pos={[CENTRO[0], -2.95, 0]} fs={11}>
+      <Etiqueta pos={[CENTRO[0], -2.95, 0]}>
         <i className={`fa-solid ${hito.icono}`} style={{ color: modoColor }} />
         {vidaEn(tMa)}
       </Etiqueta>
-      <Etiqueta pos={[CENTRO[0], 2.8, 0]} col="#a78bfaaa" fs={11}>
+      <Etiqueta ancha pos={[CENTRO[0], 2.8, 0]} col="#a78bfaaa">
         <i className="fa-solid fa-shield-halved" style={{ color: "#c4b5fd" }} />
         O₂ {rangoTexto(tMa)} · capa de ozono: {ozono < 0.05 ? "no existe" : ozono < 0.5 ? "delgada" : ozono < 0.9 ? "en formación" : "completa"}
       </Etiqueta>
       {uv && (
-        <Etiqueta pos={[-3.4, -1.6, 0.5]} col={llega > 50 ? "#ef4444aa" : "#a78bfaaa"} fs={11}>
+        <Etiqueta pos={[-3.4, -1.6, 0.5]} col={llega > 50 ? "#ef4444aa" : "#a78bfaaa"}>
           <i className="fa-solid fa-sun" style={{ color: "#fbbf24" }} />
           UV que llega al suelo: {llega} %
         </Etiqueta>
@@ -627,6 +637,7 @@ function Muestra({ id, material }: { id: ElementoId; material: THREE.Material })
 }
 
 function EscenaOxidos({ elementoId, fase, coefTexto, modoColor }: { elementoId: ElementoId; fase: FaseOx; coefTexto: string; modoColor: string }) {
+  const angosto = useThree((st) => st.size.width < 640);
   const el = ELEMENTOS.find((e) => e.id === elementoId) ?? ELEMENTOS[0]!;
   const combustion = el.proceso === "combustion";
   const reaccionando = fase === "reaccionando";
@@ -824,40 +835,40 @@ function EscenaOxidos({ elementoId, fase, coefTexto, modoColor }: { elementoId: 
         </mesh>
       </group>
 
-      <Etiqueta pos={[-0.1, 3.05, 0]} col={`${modoColor}aa`} fs={13} df={6}>
+      <Etiqueta pos={[-0.1, 3.05, 0]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-atom" style={{ color: modoColor }} />
         {coefTexto}
       </Etiqueta>
       {enFrasco && (
-        <Etiqueta pos={[X_FRASCO, 2.55, 0]} col={`${colorPH(el.pH)}aa`} fs={12} df={6}>
+        <Etiqueta pos={[X_FRASCO, 2.55, 0]} col={`${colorPH(el.pH)}aa`}>
           <i className="fa-solid fa-droplet" style={{ color: colorPH(el.pH) }} />
           {el.conAgua}
         </Etiqueta>
       )}
-      <Etiqueta pos={[X_MECHERO + 0.2, 0.2, 1.2]} fs={11} df={6}>
+      <Etiqueta ancha pos={[X_MECHERO + 0.2, 0.2, 1.2]}>
         <i className="fa-solid fa-vial" style={{ color: el.tipo === "metal" ? "#cbd5e1" : "#facc15" }} />
         {hecho ? el.nombreProducto : el.muestra} · {el.tipo}
       </Etiqueta>
-      <Html position={[X_FRASCO + 0.05, 0.15, 1.25]} center distanceFactor={6} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ padding: "6px 9px 7px", borderRadius: 10, background: "rgba(4,10,22,0.86)", border: "1px solid rgba(255,255,255,0.22)", color: "#fff", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>
+      {!angosto && <Html position={[X_FRASCO + 0.05, 0.15, 1.25]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ padding: "6px 9px 7px", borderRadius: 10, background: "rgba(4,10,22,0.86)", border: "1px solid rgba(255,255,255,0.22)", color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap" }}>
           <div style={{ marginBottom: 4 }}>
             Indicador universal · pH {fase === "disuelto" ? el.pHTexto : "≈ 7"}
           </div>
-          <div style={{ position: "relative", display: "flex", width: 168, height: 9, borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ position: "relative", display: "flex", width: 220, height: 9, borderRadius: 4, overflow: "hidden" }}>
             {Array.from({ length: 14 }, (_, k) => (
               <span key={k} style={{ flex: 1, background: colorPH(k + 0.5) }} />
             ))}
           </div>
-          <div style={{ position: "relative", width: 168, height: 8 }}>
+          <div style={{ position: "relative", width: 220, height: 8 }}>
             <span style={{ position: "absolute", left: `${((pHVisto - 0.5) / 14) * 100}%`, top: 0, width: 0, height: 0, borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderBottom: "7px solid #fff", transform: "translateX(-50%)" }} />
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", width: 168, fontSize: 9, color: "rgba(255,255,255,0.6)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", width: 220, fontSize: 14, color: "rgba(255,255,255,0.6)" }}>
             <span>1 ácido</span>
             <span>7</span>
             <span>básico 14</span>
           </div>
         </div>
-      </Html>
+      </Html>}
     </group>
   );
 }
@@ -867,9 +878,9 @@ function EscenaOxidos({ elementoId, fase, coefTexto, modoColor }: { elementoId: 
 export default function OxigenacionAtmosferaScene(p: OxigenacionSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "mar") return { pos: [0.4, 3.2, 11.6], target: [0, 0.7, 0] };
-    if (vista === "historia") return { pos: [-1.0, 1.4, 9.6], target: [-1.0, 0.1, 0] };
-    return { pos: [0, 2.7, 6.9], target: [0, 1.05, 0] };
+    if (vista === "mar") return { pos: [0.4, 2.8, 12], target: [0, 0.2, 0] };
+    if (vista === "historia") return { pos: [-1.0, 1.0, 11.8], target: [-1.0, -0.3, 0] };
+    return { pos: [0, 2.5, 7.2], target: [0, 0.75, 0] };
   }, [vista]);
 
   return (
@@ -888,7 +899,8 @@ export default function OxigenacionAtmosferaScene(p: OxigenacionSceneProps) {
       {vista === "historia" && <EscenaHistoria tMa={p.tMa} uv={p.uv} modoColor={modoColor} />}
       {vista === "oxidos" && <EscenaOxidos elementoId={p.elementoId} fase={p.fase} coefTexto={p.coefTexto} modoColor={modoColor} />}
 
-      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={3.5} maxDistance={20} maxPolarAngle={Math.PI * 0.52} minPolarAngle={Math.PI * 0.05} target={cam.target} />
+      <AjusteAncho zoomAngosto={vista === "historia" ? 0.55 : vista === "mar" ? 0.65 : 0.8} />
+      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={3.5} maxDistance={22} maxPolarAngle={Math.PI * 0.52} minPolarAngle={Math.PI * 0.05} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.35} luminanceThreshold={0.62} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.65} />

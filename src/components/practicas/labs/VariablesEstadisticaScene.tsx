@@ -20,7 +20,7 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, RoundedBox } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -66,9 +66,24 @@ type Pt = [number, number, number];
 
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 
-function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: ReactNode; df?: number; col?: string; izq?: boolean }) {
+/** Aleja la cámara si la escena no cabe a lo ancho (celular). */
+function Encuadre({ ancho, pos, target }: { ancho: number; pos: Pt; target: Pt }) {
+  const camera = useThree((st) => st.camera);
+  const w = useThree((st) => st.size.width);
+  const h = useThree((st) => st.size.height);
+  useEffect(() => {
+    const aspect = w / Math.max(1, h);
+    const d0 = Math.hypot(pos[0] - target[0], pos[1] - target[1], pos[2] - target[2]);
+    const dNec = (ancho * 1.12) / (2 * Math.tan((42 / 2) * (Math.PI / 180)) * aspect);
+    const k = Math.min(2.4, Math.max(1, dNec / d0));
+    camera.position.set(target[0] + (pos[0] - target[0]) * k, target[1] + (pos[1] - target[1]) * k, target[2] + (pos[2] - target[2]) * k);
+  }, [camera, w, h, ancho, pos, target]);
+  return null;
+}
+
+function Etiqueta({ pos, children, col, izq }: { pos: Pt; children: ReactNode; col?: string; izq?: boolean }) {
   return (
-    <Html position={pos} center={!izq} distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center={!izq} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -79,7 +94,7 @@ function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: Rea
           background: "rgba(4,10,22,0.84)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -92,9 +107,9 @@ function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: Rea
   );
 }
 
-function Letra({ pos, children, df = 8, col = "#94a3b8", size = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
+function Letra({ pos, children, col = "#94a3b8", size = 14 }: { pos: Pt; children: ReactNode; col?: string; size?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ color: col, fontSize: size, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
     </Html>
   );
@@ -170,7 +185,7 @@ function Contenedor({ tipo, cuenta, activo }: { tipo: TipoVar; cuenta: number; a
           <meshStandardMaterial color={d.color} emissive={d.color} emissiveIntensity={0.3} roughness={0.35} />
         </mesh>
       ))}
-      <Etiqueta pos={[0, -H / 2 - 0.42, 0.55]} col={`${d.color}aa`} df={10}>
+      <Etiqueta pos={[0, -H / 2 - 0.42, 0.55]} col={`${d.color}aa`}>
         <span style={{ width: 9, height: 9, borderRadius: 3, background: d.color }} />
         {d.etq}
         <span style={{ color: "#94a3b8" }}>· {cuenta}</span>
@@ -179,7 +194,7 @@ function Contenedor({ tipo, cuenta, activo }: { tipo: TipoVar; cuenta: number; a
   );
 }
 
-function Tarjeta({ tarjeta, envio }: { tarjeta: VariableDef | null; envio: Envio | null }) {
+function Tarjeta({ envio }: { envio: Envio | null }) {
   const grupo = useRef<THREE.Group>(null);
   const mat = useRef<THREE.MeshStandardMaterial>(null);
   const t0 = useRef<number | null>(null);
@@ -239,14 +254,6 @@ function Tarjeta({ tarjeta, envio }: { tarjeta: VariableDef | null; envio: Envio
       <RoundedBox args={[0.5, 0.5, 0.5]} radius={0.08} smoothness={3} castShadow>
         <meshStandardMaterial ref={mat} color="#e2e8f0" roughness={0.35} metalness={0.05} />
       </RoundedBox>
-      {tarjeta && !envio && (
-        <Html position={[0.45, 0.1, 0]} distanceFactor={9} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ transform: "translateY(-50%)", padding: "8px 13px", borderRadius: 12, background: "rgba(4,10,22,0.9)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", whiteSpace: "nowrap", boxShadow: "0 8px 22px -8px #000" }}>
-            <div style={{ fontSize: 15, fontWeight: 900 }}>{tarjeta.nombre}</div>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#94a3b8", marginTop: 2 }}>{tarjeta.ejemplos}</div>
-          </div>
-        </Html>
-      )}
     </group>
   );
 }
@@ -258,7 +265,7 @@ const TUBOS: [Pt, Pt][] = [
   ...TIPOS.map((t) => [t === "nominal" || t === "ordinal" ? JL : JR, [X_CONT[t], Y_BOCA + 0.05, 0]] as [Pt, Pt]),
 ];
 
-function EscenaMaquina({ tarjeta, envio, conteos, modoColor }: { tarjeta: VariableDef | null; envio: Envio | null; conteos: number[]; modoColor: string }) {
+function EscenaMaquina({ envio, conteos, modoColor }: { envio: Envio | null; conteos: number[]; modoColor: string }) {
   return (
     <group position={[0, -0.6, 0]}>
       <mesh position={[0, Y_FONDO - 0.1, 0]} receiveShadow>
@@ -274,19 +281,10 @@ function EscenaMaquina({ tarjeta, envio, conteos, modoColor }: { tarjeta: Variab
           <meshStandardMaterial color={modoColor} emissive={modoColor} emissiveIntensity={0.6} />
         </mesh>
       ))}
-      <Etiqueta pos={[J0[0] + 0.3, J0[1], 0]} col={`${modoColor}aa`} df={10} izq>
-        ¿Categorías o cantidades?
-      </Etiqueta>
-      <Etiqueta pos={[JL[0], JL[1] + 0.42, 0]} df={10}>
-        Cualitativa · ¿tiene orden?
-      </Etiqueta>
-      <Etiqueta pos={[JR[0], JR[1] + 0.42, 0]} df={10}>
-        Cuantitativa · ¿se cuenta o se mide?
-      </Etiqueta>
       {TIPOS.map((t, i) => (
         <Contenedor key={t} tipo={t} cuenta={conteos[i] ?? 0} activo={envio?.destino === t} />
       ))}
-      <Tarjeta tarjeta={tarjeta} envio={envio} />
+      <Tarjeta envio={envio} />
     </group>
   );
 }
@@ -378,6 +376,7 @@ function Estudiantes({ censoNonce, censado, seleccion }: { censoNonce: number; c
 
 function EscenaPoblacion({ censoNonce, censado, seleccion, modoColor }: { censoNonce: number; censado: boolean; seleccion: Uint8Array; modoColor: string }) {
   const n = useMemo(() => seleccion.reduce((s, v) => s + v, 0), [seleccion]);
+  const angosto = useThree((st) => st.size.width) < 640;
   return (
     <group position={[0, -0.9, 0]}>
       <mesh position={[0, -0.04, 0]} receiveShadow>
@@ -385,11 +384,13 @@ function EscenaPoblacion({ censoNonce, censado, seleccion, modoColor }: { censoN
         <meshStandardMaterial color="#0f1a2c" roughness={0.9} />
       </mesh>
       <Estudiantes censoNonce={censoNonce} censado={censado} seleccion={seleccion} />
-      <Etiqueta pos={[0, 0.5, -((ROWS * SP) / 2) - 0.45]} col={`${modoColor}aa`} df={10}>
-        <i className="fa-solid fa-people-group" style={{ color: modoColor }} />
-        Población: {num(N_POBLACION)} estudiantes
-        {n > 0 && <span style={{ color: "#fde68a" }}>· muestra de {num(n)}</span>}
-      </Etiqueta>
+      {!angosto && (
+        <Etiqueta pos={[0, 0.5, -((ROWS * SP) / 2) - 0.45]} col={`${modoColor}aa`}>
+          <i className="fa-solid fa-people-group" style={{ color: modoColor }} />
+          Población: {num(N_POBLACION)} estudiantes
+          {n > 0 && <span style={{ color: "#fde68a" }}>· muestra de {num(n)}</span>}
+        </Etiqueta>
+      )}
     </group>
   );
 }
@@ -403,10 +404,9 @@ const P_MAX = 0.5;
 const XB = (k: number) => (k - 2) * 1.55;
 const yDe = (p: number) => (Math.min(P_MAX, Math.max(0, p)) / P_MAX) * HB;
 
-function BarraFrecuencia({ k, p, me, color, n, conteo }: { k: number; p: number; me: number; color: string; n: number; conteo: number }) {
+function BarraFrecuencia({ k, p, me, color }: { k: number; p: number; me: number; color: string }) {
   const barra = useRef<THREE.Mesh>(null);
   const bigote = useRef<THREE.Group>(null);
-  const tope = useRef<THREE.Group>(null);
   const v = useRef(0);
   const m = useRef(0);
   useFrame((_, dt) => {
@@ -428,7 +428,6 @@ function BarraFrecuencia({ k, p, me, color, n, conteo }: { k: number; p: number;
       if (a) a.position.y = lo;
       if (b) b.position.y = hi;
     }
-    if (tope.current) tope.current.position.y = yDe(v.current + m.current) + 0.42;
   });
   return (
     <group position={[XB(k), 0, 0]}>
@@ -450,18 +449,11 @@ function BarraFrecuencia({ k, p, me, color, n, conteo }: { k: number; p: number;
           <meshBasicMaterial color="#f8fafc" />
         </mesh>
       </group>
-      <group ref={tope}>
-        {n > 0 && (
-          <Etiqueta pos={[0, 0, 0.5]} col={`${color}aa`} df={10}>
-            {conteo} · {num(p * 100, 1)} %
-          </Etiqueta>
-        )}
-      </group>
     </group>
   );
 }
 
-function EscenaBarras({ resumen, revelar, modoColor }: { resumen: Resumen | null; revelar: boolean; modoColor: string }) {
+function EscenaBarras({ resumen, revelar }: { resumen: Resumen | null; revelar: boolean }) {
   const n = resumen?.n ?? 0;
   return (
     <group position={[0, -1.7, 0]}>
@@ -475,18 +467,20 @@ function EscenaBarras({ resumen, revelar, modoColor }: { resumen: Resumen | null
             <boxGeometry args={[9.0, 0.008, 0.008]} />
             <meshBasicMaterial color="#334155" />
           </mesh>
-          <Letra pos={[-4.85, yDe(p), -0.62]} size={11}>
-            {Math.round(p * 100)} %
-          </Letra>
+          {(p === 0 || p === 0.5) && (
+            <Letra pos={[-4.85, yDe(p), -0.62]}>
+              {Math.round(p * 100)} %
+            </Letra>
+          )}
         </group>
       ))}
       {CATEGORIAS.map((cat, k) => {
         const p = resumen?.relativas[k] ?? 0;
         return (
           <group key={cat}>
-            <BarraFrecuencia k={k} p={p} me={n ? margen95(p, n) : 0} color={COLORES_CAT[k]!} n={n} conteo={resumen?.conteos[k] ?? 0} />
-            <Letra pos={[XB(k), -0.34, 0.9]} size={12} col="#e2e8f0">
-              {cat} {cat === "1" ? "hermano" : "hermanos"}
+            <BarraFrecuencia k={k} p={p} me={n ? margen95(p, n) : 0} color={COLORES_CAT[k]!} />
+            <Letra pos={[XB(k), -0.34, 0.9]} col="#e2e8f0">
+              {cat === "4 o más" ? "4+" : cat}
             </Letra>
             {revelar && (
               <group position={[XB(k), yDe(PARAMETRO.relativas[k]!), 0]}>
@@ -494,19 +488,11 @@ function EscenaBarras({ resumen, revelar, modoColor }: { resumen: Resumen | null
                   <boxGeometry args={[1.12, 0.05, 1.12]} />
                   <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.9} transparent opacity={0.9} />
                 </mesh>
-                <Letra pos={[0.78, 0, 0.6]} size={11} col="#fde68a">
-                  {num(PARAMETRO.relativas[k]! * 100, 0)} %
-                </Letra>
               </group>
             )}
           </group>
         );
       })}
-      {n === 0 && (
-        <Etiqueta pos={[0, 1.6, 0]} col={`${modoColor}aa`} df={10}>
-          Toma una muestra para construir la tabla
-        </Etiqueta>
-      )}
     </group>
   );
 }
@@ -514,9 +500,9 @@ function EscenaBarras({ resumen, revelar, modoColor }: { resumen: Resumen | null
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
 const CAMARAS: Record<Modo, { pos: Pt; target: Pt }> = {
-  variables: { pos: [0, 1.2, 10.2], target: [0, 0.2, 0] },
-  poblacion: { pos: [0, 5.6, 6.6], target: [0, -0.9, 0] },
-  inferencia: { pos: [0.6, 1.6, 10], target: [-0.2, 0, 0] },
+  variables: { pos: [0, 1.0, 11], target: [0, -0.1, 0] },
+  poblacion: { pos: [0, 6.2, 7.4], target: [0, -1.2, 0] },
+  inferencia: { pos: [0.6, 1.6, 10.6], target: [-0.2, -0.3, 0] },
 };
 
 export default function VariablesEstadisticaScene(p: VariablesSceneProps) {
@@ -529,11 +515,12 @@ export default function VariablesEstadisticaScene(p: VariablesSceneProps) {
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
       <Escenario acento={p.accent} />
+      <Encuadre ancho={modo === "poblacion" ? 9 : 9.6} pos={cam.pos} target={cam.target} />
       <pointLight position={[-6, 2, 5]} intensity={0.4} color={modoColor} />
 
-      {modo === "variables" && <EscenaMaquina tarjeta={p.tarjeta} envio={p.envio} conteos={p.conteos} modoColor={modoColor} />}
+      {modo === "variables" && <EscenaMaquina envio={p.envio} conteos={p.conteos} modoColor={modoColor} />}
       {modo === "poblacion" && <EscenaPoblacion censoNonce={p.censoNonce} censado={p.censado} seleccion={p.seleccion} modoColor={modoColor} />}
-      {modo === "inferencia" && <EscenaBarras resumen={p.resumen} revelar={p.revelar} modoColor={modoColor} />}
+      {modo === "inferencia" && <EscenaBarras resumen={p.resumen} revelar={p.revelar} />}
 
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={20} maxPolarAngle={Math.PI * 0.49} minPolarAngle={Math.PI * 0.05} target={cam.target} />
       <EffectComposer>

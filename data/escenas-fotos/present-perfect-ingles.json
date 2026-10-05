@@ -1,0 +1,9 @@
+{
+  "slug": "present-perfect-ingles",
+  "items": [
+    { "clave": "sam", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de un estudiante adolescente sonriente con mochila al hombro y audífonos al cuello, de pie en un pasillo luminoso de preparatoria" },
+    { "clave": "viajes", "formato": "16:9", "estilo": "ilustracion", "escena": "Dos jóvenes con mochilas esperando junto a un autobús foráneo en una terminal al amanecer, con una maleta en el suelo" },
+    { "clave": "cocina", "formato": "16:9", "estilo": "ilustracion", "escena": "Un adolescente con delantal revolviendo una olla en una cocina familiar, con verduras picadas sobre la mesa y vapor subiendo" },
+    { "clave": "voluntariado", "formato": "16:9", "estilo": "ilustracion", "escena": "Jóvenes con chalecos de colores acariciando perros y llenando platos de comida en un refugio de animales con jaulas abiertas" }
+  ]
+}

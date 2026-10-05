@@ -1,0 +1,12 @@
+{
+  "escena": "Un mar primitivo con cianobacterias que sueltan O₂ y fuentes hidrotermales que aportan hierro disuelto. Con 6 u de O₂ y 24 u de hierro por ciclo, el aire no se oxigena.",
+  "pregunta": "Si subes las cianobacterias a 12 u de O₂ por ciclo, ¿cuándo llega O₂ al aire?",
+  "opciones": [
+    { "id": "a", "texto": "Nunca: el hierro consume todo el O₂", "icono": "fa-ban" },
+    { "id": "b", "texto": "Al agotarse el hierro disuelto", "icono": "fa-hourglass-half" },
+    { "id": "c", "texto": "Desde el primer ciclo, sin esperar", "icono": "fa-bolt" }
+  ],
+  "correcta": "b",
+  "porque": "Cada O₂ oxida 4 Fe²⁺, así que primero se gasta el hierro disuelto y se forman bandas. Cuando se acaba, lo que producen las cianobacterias menos lo que consumen los sumideros sobra y sube al aire.",
+  "comoComprobarlo": "En «Mar primitivo», sube las cianobacterias a 12 u, deja las fuentes en 24 u e inicia los ciclos. Observa las bandas y el medidor de O₂ en el aire."
+}

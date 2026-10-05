@@ -1,0 +1,12 @@
+{
+  "escena": "Un circuito con dos interruptores, p y q, una compuerta y un foco. La compuerta elegida es el condicional «si p, entonces q».",
+  "pregunta": "En «si apruebas, vamos al cine», no apruebas (p falso). ¿Se enciende el foco?",
+  "opciones": [
+    { "id": "a", "texto": "No: la promesa se rompió", "icono": "fa-power-off" },
+    { "id": "b", "texto": "Sí: la promesa no se rompe", "icono": "fa-lightbulb" },
+    { "id": "c", "texto": "Depende de si hay o no cine", "icono": "fa-question" }
+  ],
+  "correcta": "b",
+  "porque": "El condicional solo es falso cuando p es verdadero y q falso. Si p es falso, la promesa no se pone a prueba y la compuesta queda verdadera, sin importar q.",
+  "comoComprobarlo": "En «Circuito de conectivos» elige el condicional, apaga el interruptor p y alterna q mientras observas el foco."
+}

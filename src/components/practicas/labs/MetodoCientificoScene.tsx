@@ -17,8 +17,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode, type RefObject } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -35,7 +35,6 @@ import {
   REPLICAS,
   AGUA_BASE,
   media,
-  desviacion,
   OBJETOS,
   num,
 } from "./metodo-cientifico-data";
@@ -65,9 +64,24 @@ type Pt = [number, number, number];
 const CM = 0.12;
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 
-function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: ReactNode; df?: number; col?: string; izq?: boolean }) {
+/** Aleja la cámara si la escena no cabe a lo ancho (celular). */
+function Encuadre({ ancho, pos, target }: { ancho: number; pos: Pt; target: Pt }) {
+  const camera = useThree((st) => st.camera);
+  const w = useThree((st) => st.size.width);
+  const h = useThree((st) => st.size.height);
+  useEffect(() => {
+    const aspect = w / Math.max(1, h);
+    const d0 = Math.hypot(pos[0] - target[0], pos[1] - target[1], pos[2] - target[2]);
+    const dNec = (ancho * 1.12) / (2 * Math.tan((42 / 2) * (Math.PI / 180)) * aspect);
+    const k = Math.min(2.4, Math.max(1, dNec / d0));
+    camera.position.set(target[0] + (pos[0] - target[0]) * k, target[1] + (pos[1] - target[1]) * k, target[2] + (pos[2] - target[2]) * k);
+  }, [camera, w, h, ancho, pos, target]);
+  return null;
+}
+
+function Etiqueta({ pos, children, col, izq }: { pos: Pt; children: ReactNode; col?: string; izq?: boolean }) {
   return (
-    <Html position={pos} center={!izq} distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center={!izq} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -78,7 +92,7 @@ function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: Rea
           background: "rgba(4,10,22,0.84)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -91,9 +105,9 @@ function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: Rea
   );
 }
 
-function Letra({ pos, children, df = 8, col = "#94a3b8", size = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
+function Letra({ pos, children, col = "#94a3b8", size = 14 }: { pos: Pt; children: ReactNode; col?: string; size?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ color: col, fontSize: size, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
     </Html>
   );
@@ -211,7 +225,7 @@ function Planta({ alturaCm, escala = 1, tenue = false }: { alturaCm: number; esc
 
 const X_GRUPO: Record<Grupo, number> = { A: -2.9, B: 0, C: 2.9 };
 
-function Lampara({ horas, color }: { horas: number; color: string }) {
+function Lampara({ horas }: { horas: number }) {
   const f = horas / LUZ_MAX;
   return (
     <group position={[0, 3.3, 0]}>
@@ -230,10 +244,6 @@ function Lampara({ horas, color }: { horas: number; color: string }) {
         </mesh>
       )}
       <pointLight position={[0, -0.4, 0]} intensity={0.2 + 2.4 * f} distance={4} color="#fde68a" />
-      <Etiqueta pos={[0, 0.48, 0]} col={`${color}aa`} df={10}>
-        <i className="fa-solid fa-lightbulb" style={{ color: "#fde68a" }} />
-        {num(horas)} h de luz
-      </Etiqueta>
     </group>
   );
 }
@@ -243,8 +253,7 @@ function EscenaInvernadero({ diseno, vigorGrupo, diaObjetivo }: { diseno: Diseno
   const alturas = useRef<Record<Grupo, number>>({ A: 2, B: 2, C: 2 });
   const etiquetaDia = useRef<HTMLSpanElement>(null);
 
-  const aguaIgual = GRUPOS.every((g) => diseno.agua[g] === diseno.agua.A);
-  const tempIgual = GRUPOS.every((g) => diseno.temperatura[g] === diseno.temperatura.A);
+  const angosto = useThree((st) => st.size.width) < 640;
 
   useFrame((_, dt) => {
     // Por tiempo real (sin tope por cuadro) para no quedarse atrás del reloj del panel.
@@ -267,7 +276,7 @@ function EscenaInvernadero({ diseno, vigorGrupo, diaObjetivo }: { diseno: Diseno
         const col = COLOR_GRUPO[g];
         return (
           <group key={g} position={[X_GRUPO[g], 0, 0]}>
-            <Lampara horas={diseno.luz[g]} color={col} />
+            <Lampara horas={diseno.luz[g]} />
             {/* Regla de fondo con marcas cada 2 cm */}
             <group position={[0.55, 0.46, -0.35]}>
               <mesh position={[0, (16 * CM) / 2, 0]}>
@@ -281,21 +290,10 @@ function EscenaInvernadero({ diseno, vigorGrupo, diaObjetivo }: { diseno: Diseno
                 </mesh>
               ))}
             </group>
-            <PlantaViva grupo={g} alturas={alturas} color={col} />
-            <Etiqueta pos={[0, -0.32, 1.1]} col={`${col}aa`} df={10}>
-              <span style={{ color: col, fontWeight: 900 }}>Grupo {g}</span>
-              <span style={{ color: aguaIgual ? "#cbd5e1" : "#f87171" }}>
-                <i className="fa-solid fa-droplet" style={{ marginRight: 4 }} />
-                {diseno.agua[g]} ml
-              </span>
-              <span style={{ color: tempIgual ? "#cbd5e1" : "#f87171" }}>
-                <i className="fa-solid fa-temperature-half" style={{ marginRight: 4 }} />
-                {diseno.temperatura[g]} °C
-              </span>
-            </Etiqueta>
-            {i === 1 && (
-              <Html position={[0, 4.35, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-                <div style={{ padding: "5px 12px", borderRadius: 999, background: "rgba(4,10,22,0.84)", border: "1px solid rgba(74,222,128,0.6)", color: "#fff", fontSize: 13, fontWeight: 900, whiteSpace: "nowrap" }}>
+            <PlantaViva grupo={g} alturas={alturas} color={col} extra={`${diseno.agua[g] !== AGUA_BASE ? ` · ${diseno.agua[g]} ml` : ""}${diseno.temperatura[g] !== 22 ? ` · ${diseno.temperatura[g]} °C` : ""}`} />
+            {i === 1 && !angosto && (
+              <Html position={[0, 4.35, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+                <div style={{ padding: "5px 12px", borderRadius: 999, background: "rgba(4,10,22,0.84)", border: "1px solid rgba(74,222,128,0.6)", color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
                   <i className="fa-solid fa-calendar-day" style={{ marginRight: 6, color: "#4ade80" }} />
                   <span ref={etiquetaDia}>Día 0 de {DIAS}</span>
                 </div>
@@ -309,7 +307,7 @@ function EscenaInvernadero({ diseno, vigorGrupo, diaObjetivo }: { diseno: Diseno
 }
 
 /** Planta cuyo alto se lee cada cuadro de `alturas` (lo escribe el padre en su useFrame). */
-function PlantaViva({ grupo, alturas, color }: { grupo: Grupo; alturas: RefObject<Record<Grupo, number>>; color: string }) {
+function PlantaViva({ grupo, alturas, color, extra }: { grupo: Grupo; alturas: RefObject<Record<Grupo, number>>; color: string; extra: string }) {
   const tallo = useRef<THREE.Mesh>(null);
   const nudos = useRef<THREE.Group>(null);
   const tope = useRef<THREE.Group>(null);
@@ -321,9 +319,10 @@ function PlantaViva({ grupo, alturas, color }: { grupo: Grupo; alturas: RefObjec
   });
   return (
     <CuerpoPlanta talloRef={tallo} nudosRef={nudos} topeRef={tope}>
-      <Html center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ padding: "4px 10px", borderRadius: 999, background: "rgba(4,10,22,0.84)", border: `1px solid ${color}aa`, color: "#fff", fontSize: 12, fontWeight: 900, whiteSpace: "nowrap" }}>
-          <span ref={texto}>2.0 cm</span>
+      <Html center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ padding: "4px 10px", borderRadius: 999, background: "rgba(4,10,22,0.84)", border: `1px solid ${extra ? "#f87171" : `${color}aa`}`, color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
+          <span style={{ color }}>{grupo}</span> · <span ref={texto}>2.0 cm</span>
+          {extra && <span style={{ color: "#f87171" }}>{extra}</span>}
         </div>
       </Html>
     </CuerpoPlanta>
@@ -371,7 +370,6 @@ function EscenaReplicas({ vigorReplicas, replicas, modoColor }: { vigorReplicas:
         const alturas = Array.from({ length: REPLICAS }, (_, k) => altura(luz, AGUA_BASE, 22, DIAS, vigorReplicas[fila * REPLICAS + k] ?? 1));
         const usadas = alturas.slice(0, replicas);
         const m = media(usadas);
-        const sd = desviacion(usadas);
         return (
           <group key={luz} position={[0, 0, z]}>
             {alturas.map((h, k) => (
@@ -382,12 +380,9 @@ function EscenaReplicas({ vigorReplicas, replicas, modoColor }: { vigorReplicas:
             <group position={[0, 0.39 + m * CM * 0.85, 0]}>
               <NivelMedia y={0} ancho={ancho + 0.8} color={modoColor} />
             </group>
-            <Etiqueta pos={[-ancho / 2 - 0.75, 0.3, 0]} df={11} col={`${modoColor}aa`}>
+            <Etiqueta pos={[-ancho / 2 - 0.75, 0.3, 0]} col={`${modoColor}aa`}>
               <i className="fa-solid fa-lightbulb" style={{ color: "#fde68a" }} />
               {luz} h
-            </Etiqueta>
-            <Etiqueta pos={[ancho / 2 + 0.6, 0.55, 0]} df={11} izq>
-              {replicas === 1 ? `${num(m, 1)} cm` : `x̄ ${num(m, 1)} · s ${num(sd, 1)} cm`}
             </Etiqueta>
           </group>
         );
@@ -460,7 +455,7 @@ function Objeto({ id, mm }: { id: string; mm: number }) {
   );
 }
 
-function EscenaMedicion({ objetoId, instrumento }: { objetoId: string; instrumento: Instrumento }) {
+function EscenaMedicion({ objetoId, instrumento, lupa }: { objetoId: string; instrumento: Instrumento; lupa: boolean }) {
   const obj = OBJETOS.find((o) => o.id === objetoId) ?? OBJETOS[0]!;
   const finObjeto = X0 + obj.mm * U_MM;
   const cmLabels = Array.from({ length: LARGO_MM / 10 + 1 }, (_, k) => k);
@@ -486,7 +481,7 @@ function EscenaMedicion({ objetoId, instrumento }: { objetoId: string; instrumen
         </>
       )}
       {cmLabels.map((k) => (
-        <Letra key={k} pos={[X0 + k * 10 * U_MM, 0.03, instrumento === "cinta" ? -0.35 : -0.42]} size={11} col="#111827" df={5}>
+        <Letra key={k} pos={[X0 + k * 10 * U_MM, 0.03, instrumento === "cinta" ? -0.35 : -0.42]} col="#111827">
           {k}
         </Letra>
       ))}
@@ -520,15 +515,19 @@ function EscenaMedicion({ objetoId, instrumento }: { objetoId: string; instrumen
             <boxGeometry args={[0.06, 0.06, 0.09]} />
             <meshStandardMaterial color="#94a3b8" metalness={0.55} roughness={0.3} />
           </mesh>
-          <Letra pos={[0, 0.05, 0.02]} size={9} col="#b91c1c" df={4}>
-            0
-          </Letra>
-          <Letra pos={[10 * 0.9 * U_MM, 0.05, 0.02]} size={9} col="#b91c1c" df={4}>
-            10
-          </Letra>
+          {lupa && (
+            <>
+              <Letra pos={[0, 0.05, 0.02]} col="#b91c1c">
+                0
+              </Letra>
+              <Letra pos={[10 * 0.9 * U_MM, 0.05, 0.02]} col="#b91c1c">
+                10
+              </Letra>
+            </>
+          )}
         </group>
       )}
-      <Etiqueta pos={[X0 + (obj.mm * U_MM) / 2, 0.55, 0.9]} col="#65a30daa" df={8}>
+      <Etiqueta pos={[X0 + (obj.mm * U_MM) / 2, 0.55, 0.9]} col="#65a30daa">
         {obj.etq}
       </Etiqueta>
     </group>
@@ -542,10 +541,10 @@ export default function MetodoCientificoScene(p: MetodoSceneProps) {
   const obj = OBJETOS.find((o) => o.id === p.objetoId) ?? OBJETOS[0]!;
   const finObjeto = X0 + obj.mm * U_MM;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "invernadero") return { pos: [0, 2.2, 9.6], target: [0, 0.2, 0] };
-    if (vista === "replicas") return { pos: [5.2, 5.0, 6.8], target: [0, -0.6, 0] };
+    if (vista === "invernadero") return { pos: [0, 2.2, 10.4], target: [0, 0.1, 0] };
+    if (vista === "replicas") return { pos: [5.6, 5.4, 7.4], target: [0, -0.9, 0] };
     if (p.lupa) return { pos: [finObjeto + 0.15, 1.5, 0.9], target: [finObjeto + 0.15, -0.6, -0.05] };
-    return { pos: [0, 6.2, 1.7], target: [0, -0.6, 0.1] };
+    return { pos: [0, 6.6, 1.8], target: [0, -0.9, 0.1] };
   }, [vista, p.lupa, finObjeto]);
 
   return (
@@ -555,11 +554,12 @@ export default function MetodoCientificoScene(p: MetodoSceneProps) {
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
       <Escenario acento={p.accent} />
+      {!(vista === "medicion" && p.lupa) && <Encuadre ancho={vista === "medicion" ? 8.8 : vista === "replicas" ? 7.2 : 9} pos={cam.pos} target={cam.target} />}
       <pointLight position={[-6, 2, 5]} intensity={0.35} color={modoColor} />
 
       {vista === "invernadero" && <EscenaInvernadero diseno={p.diseno} vigorGrupo={p.vigorGrupo} diaObjetivo={p.diaObjetivo} />}
       {vista === "replicas" && <EscenaReplicas vigorReplicas={p.vigorReplicas} replicas={p.replicas} modoColor={modoColor} />}
-      {vista === "medicion" && <EscenaMedicion objetoId={p.objetoId} instrumento={p.instrumento} />}
+      {vista === "medicion" && <EscenaMedicion objetoId={p.objetoId} instrumento={p.instrumento} lupa={p.lupa} />}
 
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={vista === "medicion" ? 0.8 : 4} maxDistance={20} maxPolarAngle={Math.PI * 0.49} minPolarAngle={Math.PI * 0.02} target={cam.target} />
       <EffectComposer>

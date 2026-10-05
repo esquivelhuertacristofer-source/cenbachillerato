@@ -1,0 +1,12 @@
+{
+  "escena": "Un aerogenerador de 90 m de diámetro con su diagrama de flujo de energía: el viento entra, la electricidad sale y el resto se pierde como calor.",
+  "pregunta": "Si el viento pasa de 5 a 10 m/s, ¿cuánta más electricidad produce el aerogenerador?",
+  "opciones": [
+    { "id": "a", "texto": "El doble (2 veces)", "icono": "fa-x" },
+    { "id": "b", "texto": "Ocho veces más", "icono": "fa-wind" },
+    { "id": "c", "texto": "Cuatro veces más", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "b",
+  "porque": "La potencia del viento depende de la velocidad al cubo (v³). Si v se duplica, 2³ = 8: la franja de electricidad del diagrama se vuelve ocho veces más ancha.",
+  "comoComprobarlo": "En «Aprovéchala», elige el aerogenerador, guarda la medición A con 5 m/s, sube el viento a 10 m/s y compara las potencias."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Una historia inventada sobre una vendedora de flores que halla una carta, lista para transformarse con tres decisiones.",
+  "pregunta": "Eliges voz de «Los personajes» y forma «Escena». ¿Qué aparece en la vista previa?",
+  "opciones": [
+    { "id": "a", "texto": "Un solo párrafo de narrador", "icono": "fa-align-left" },
+    { "id": "b", "texto": "Diálogo entre personajes", "icono": "fa-masks-theater" },
+    { "id": "c", "texto": "Versos cortos con ritmo", "icono": "fa-feather-pointed" }
+  ],
+  "correcta": "b",
+  "porque": "El género dramático se escribe para representarse: el diálogo lleva la acción, se organiza en actos y escenas y las acotaciones indican lo que ocurre en el escenario.",
+  "comoComprobarlo": "Pulsa «Los personajes», luego «Escena», y compara la vista previa con la que tenías antes."
+}

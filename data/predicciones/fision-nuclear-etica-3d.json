@@ -1,0 +1,12 @@
+{
+  "escena": "Un reactor de agua en ebullición, como el de Laguna Verde, funcionando estable. Un deslizador controla cuánto vapor hay en el núcleo.",
+  "pregunta": "En este reactor, el agua hierve y aparece más vapor. ¿Qué le pasa a la potencia?",
+  "opciones": [
+    { "id": "a", "texto": "Sube: hay más calor y más reacción", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Baja: el reactor se frena", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "No cambia, el vapor no influye", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "En un BWR el agua también modera los neutrones. Con más vapor hay menos moderador, caen las fisiones y k baja de 1. Es un freno natural; en el RBMK de Chernóbil ocurre al revés.",
+  "comoComprobarlo": "En «Reacción en cadena» con tipo BWR, sube poco a poco el deslizador «Vapor en el núcleo» y vigila k y la gráfica de potencia."
+}

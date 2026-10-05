@@ -21,7 +21,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -101,9 +101,16 @@ const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Mat
 const OK = "#34d399";
 const NO = "#f87171";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12, retraso }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; retraso?: number }) {
+/**
+ * Etiqueta fija en pantalla (14 px, sin distanceFactor): `sec` la omite (su dato
+ * vive en el panel) y en pantallas angostas solo se ven las `corta`.
+ */
+function Etiqueta({ pos, children, col, retraso, sec = false, corta = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; retraso?: number; sec?: boolean; corta?: boolean }) {
+  const ancho = useThree((st) => st.size.width);
+  if (sec || (ancho < 640 && !corta)) return null;
+  const fs = 14;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -413,7 +420,7 @@ function EscenaReactor({ p, k, barras, vacios, tipo, scram, agua, bombas, ebulli
           <meshStandardMaterial color="#1e293b" roughness={0.7} />
         </mesh>
       </group>
-      <Etiqueta pos={[5.2, 3.0, 0]} df={10} fs={11} col={`${modoColor}aa`}>
+      <Etiqueta sec pos={[5.2, 3.0, 0]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-bolt" style={{ color: modoColor }} />
         Generador · <span ref={lecturaP}>810 MW</span>
       </Etiqueta>
@@ -442,7 +449,7 @@ function EscenaReactor({ p, k, barras, vacios, tipo, scram, agua, bombas, ebulli
         {bombas ? "Bombas de enfriamiento" : "Bombas apagadas"}
       </Etiqueta>
 
-      <Etiqueta pos={[-2.9, Y_NUCLEO_0 + 1.4, 0.6]} df={10} fs={10.5} col="#f59e0baa">
+      <Etiqueta sec pos={[-2.9, Y_NUCLEO_0 + 1.4, 0.6]} col="#f59e0baa">
         <i className="fa-solid fa-circle-radiation" style={{ color: "#f59e0b" }} />
         Combustible UO₂
       </Etiqueta>
@@ -450,7 +457,7 @@ function EscenaReactor({ p, k, barras, vacios, tipo, scram, agua, bombas, ebulli
         <i className="fa-solid fa-arrow-up" style={{ color: "#cbd5e1" }} />
         Barras de control · {num(barras * 100)} %
       </Etiqueta>
-      <Etiqueta pos={[-2.9, 4.3, 0.6]} df={10} fs={10.5} col="#38bdf8aa">
+      <Etiqueta sec pos={[-2.9, 4.3, 0.6]} col="#38bdf8aa">
         <i className="fa-solid fa-droplet" style={{ color: "#38bdf8" }} />
         {esRbmk ? "Grafito modera · agua enfría" : "Agua: moderador y refrigerante"}
       </Etiqueta>
@@ -633,7 +640,7 @@ function EscenaFision({ disparo, modoColor }: { disparo: number; modoColor: stri
               <boxGeometry args={[0.8, alto(b.m), 0.6]} />
               <meshStandardMaterial color={b.col} roughness={0.4} metalness={0.2} />
             </mesh>
-            <Etiqueta pos={[b.x < 0 ? -1.75 : 1.8, alto(b.m) * 0.6, 0]} df={10} fs={11}>
+            <Etiqueta sec pos={[b.x < 0 ? -1.75 : 1.8, alto(b.m) * 0.6, 0]}>
               {b.etq}: {b.m.toFixed(4)} u
             </Etiqueta>
           </group>
@@ -792,6 +799,7 @@ const ALTO_COL = 2.4;
 
 function Columna({ i, frac, col, etq, t12, sel }: { i: number; frac: number; col: string; etq: string; t12: number; sel: boolean }) {
   // etq: símbolo corto (Pu-239) para que las etiquetas no se encimen.
+  const ancho = useThree((st) => st.size.width);
   const barra = useRef<THREE.Mesh>(null);
   const f = useRef(frac);
   const lectura = useRef<HTMLSpanElement>(null);
@@ -819,15 +827,15 @@ function Columna({ i, frac, col, etq, t12, sel }: { i: number; frac: number; col
       <mesh ref={barra} geometry={G_CILINDRO}>
         <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.9} roughness={0.3} toneMapped={false} />
       </mesh>
-      <Etiqueta pos={[0, ALTO_COL + 0.5, 0]} df={10} fs={11} col={`${col}aa`}>
+      <Etiqueta sec={!sel} corta pos={[0, ALTO_COL + 0.5, 0]} col={`${col}aa`}>
         <span ref={lectura}>100 %</span>
       </Etiqueta>
-      <Html position={[0, -0.32, 0.45]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ textAlign: "center", color: "#fff", fontSize: 10.5, fontWeight: 800, lineHeight: 1.2, whiteSpace: "nowrap", padding: "3px 7px", borderRadius: 8, background: sel ? "rgba(4,10,22,0.92)" : "rgba(4,10,22,0.7)", border: `1px solid ${sel ? col : "transparent"}` }}>
+      {sel && ancho >= 640 && <Html position={[0, -0.32, 0.45]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ textAlign: "center", color: "#fff", fontSize: 14, fontWeight: 800, lineHeight: 1.2, whiteSpace: "nowrap", padding: "3px 7px", borderRadius: 8, background: sel ? "rgba(4,10,22,0.92)" : "rgba(4,10,22,0.7)", border: `1px solid ${sel ? col : "transparent"}` }}>
           {etq}
-          <div style={{ fontSize: 9.5, color: "#cbd5e1", fontWeight: 700 }}>T½ {t12 < 1 ? `${num(t12 * 365.25, 1)} d` : t12 >= 1e6 ? `${num(t12 / 1e6, 1)} Ma` : `${num(t12, t12 < 10 ? 1 : 0)} a`}</div>
+          <div style={{ fontSize: 14, color: "#cbd5e1", fontWeight: 700 }}>T½ {t12 < 1 ? `${num(t12 * 365.25, 1)} d` : t12 >= 1e6 ? `${num(t12 / 1e6, 1)} Ma` : `${num(t12, t12 < 10 ? 1 : 0)} a`}</div>
         </div>
-      </Html>
+      </Html>}
     </group>
   );
 }
@@ -999,7 +1007,7 @@ function EscenaCobertura({ banda, torres, modoColor }: { banda: BandaId; torres:
           </group>
         );
       })}
-      <Etiqueta pos={[-1.5 * KM, 2.4, 1 * KM]} df={16} fs={12} col="#e2e8f0aa">
+      <Etiqueta sec pos={[-1.5 * KM, 2.4, 1 * KM]} col="#e2e8f0aa">
         <i className="fa-solid fa-city" /> Ciudad · 250 000 hab.
       </Etiqueta>
       {TORRES.map((t) => {
@@ -1022,7 +1030,7 @@ function EscenaCobertura({ banda, torres, modoColor }: { banda: BandaId; torres:
               </>
             )}
             {!activa && (
-              <Etiqueta pos={[t.x * KM, cima + 0.2, t.z * KM + 1.3]} df={14} fs={10.5}>
+              <Etiqueta sec pos={[t.x * KM, cima + 0.2, t.z * KM + 1.3]}>
                 <i className="fa-solid fa-plus" /> Sitio disponible
               </Etiqueta>
             )}
@@ -1086,7 +1094,7 @@ function EscenaExposicion({ banda, distanciaM, modoColor }: { banda: BandaId; di
             <boxGeometry args={[0.04, 0.05, 0.4]} />
             <meshBasicMaterial color="#e2e8f0" />
           </mesh>
-          <Etiqueta pos={[0, 0, 0.55]} df={12} fs={10}>
+          <Etiqueta sec pos={[0, 0, 0.55]}>
             {d} m
           </Etiqueta>
         </group>
@@ -1175,7 +1183,7 @@ function EscenaRastreo({ antenas, telefono, modoColor }: { antenas: number[]; te
         return (
           <group key={a.id}>
             <Torre pos={[a.x, 0, a.z]} alto={1.6} color={modoColor} fantasma={!on} />
-            <Etiqueta pos={[a.x, 2.15, a.z]} df={11} fs={10.5} col={on ? `${modoColor}aa` : undefined}>
+            <Etiqueta corta pos={[a.x, 2.15, a.z]} col={on ? `${modoColor}aa` : undefined}>
               Antena {a.id + 1}
             </Etiqueta>
           </group>
@@ -1200,7 +1208,7 @@ function EscenaRastreo({ antenas, telefono, modoColor }: { antenas: number[]; te
             <sphereGeometry args={[0.1, 14, 10]} />
             <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={1.5} toneMapped={false} />
           </mesh>
-          <Etiqueta pos={[0, 0.5, 0]} df={11} fs={10.5} col="#fbbf24aa">
+          <Etiqueta sec pos={[0, 0.5, 0]} col="#fbbf24aa">
             ¿Aquí?
           </Etiqueta>
         </group>
@@ -1218,7 +1226,7 @@ function EscenaRastreo({ antenas, telefono, modoColor }: { antenas: number[]; te
         </group>
       )}
       {circulos.length === 1 && (
-        <Etiqueta pos={[circulos[0]!.x, 1.5, circulos[0]!.z - circulos[0]!.r]} df={11} fs={10.5} col={`${modoColor}aa`}>
+        <Etiqueta sec pos={[circulos[0]!.x, 1.5, circulos[0]!.z - circulos[0]!.r]} col={`${modoColor}aa`}>
           En algún punto de este círculo
         </Etiqueta>
       )}

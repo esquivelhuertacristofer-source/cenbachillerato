@@ -1,0 +1,12 @@
+{
+  "escena": "Hay brote de dengue en la colonia y en el mes 2 debes decidir cómo responder",
+  "pregunta": "Si multas a quien tiene agua estancada, ¿qué pasa con la confianza y la conflictividad?",
+  "opciones": [
+    { "id": "a", "texto": "La confianza sube: se ve que el gobierno actúa con firmeza", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "La confianza baja y la conflictividad sube", "icono": "fa-fire" },
+    { "id": "c", "texto": "Casi nada cambia, solo se ajustan los casos", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Multar culpa a las personas por almacenar agua que el servicio no les da. Es violencia estructural: ignora la causa de fondo y rompe la confianza.",
+  "comoComprobarlo": "En «Línea de tiempo de la crisis» llega al mes 2, elige la multa y mira las barras de confianza y conflictividad; reinicia y prueba otra respuesta."
+}

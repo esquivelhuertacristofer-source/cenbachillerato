@@ -22,7 +22,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -67,9 +67,11 @@ type Pt = [number, number, number];
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 const ROJO = "#f87171";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -80,7 +82,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -601,10 +603,6 @@ function EscenaCasa({ casa, seleccionado, onSeleccionar, modoColor }: { casa: Es
       {focosOn && <pointLight position={[0, 2.1, 0]} intensity={casa.foco === "incandescente" ? 1.4 : 1.0} distance={12} color={foco.color} />}
 
       <Medidor wMedia={r.wMedia} />
-      <Etiqueta pos={[-0.9, 1.75, 4.1]} df={12} fs={10}>
-        <i className="fa-solid fa-gauge-high" style={{ color: modoColor }} />
-        Medidor · {num(r.wMedia)} W de media
-      </Etiqueta>
 
       {/* Etiqueta del aparato seleccionado */}
       <Etiqueta pos={[pSel.pos[0], pSel.pos[1] + pSel.alto, pSel.pos[2]]} df={11} col={`${modoColor}cc`} fs={11.5}>
@@ -832,7 +830,6 @@ function EscenaCadena({ plantaId, focoId, modoColor }: { plantaId: PlantaId; foc
   const planta = PLANTAS.find((p) => p.id === plantaId)!;
   const foco = FOCOS.find((f) => f.id === focoId)!;
   const fl = fraccionLuz(foco);
-  const global = planta.eta * (1 - PERDIDAS_RED) * fl;
   const kgKwh = planta.eta > 0 ? ((3.6 / planta.eta) * planta.feGJ) / 1000 : 0;
   const fosil = plantaId !== "solar";
 
@@ -974,16 +971,6 @@ function EscenaCadena({ plantaId, focoId, modoColor }: { plantaId: PlantaId; foc
         <i className={`fa-solid ${fosil ? "fa-industry" : "fa-solar-panel"}`} style={{ color: modoColor }} />
         {planta.etq} · η = {num(planta.eta * 100)} %
       </Etiqueta>
-      <Etiqueta pos={[fosil ? -10.4 : -9.4, fosil ? 7.2 : 4.4, -1.3]} df={20} col="#fb923caa" fs={11}>
-        <i className="fa-solid fa-fire" style={{ color: "#fb923c" }} />
-        {num((1 - planta.eta) * 100)} % {fosil ? "se va como calor" : "calor y reflejo"}
-      </Etiqueta>
-      {fosil && (
-        <Etiqueta pos={[-6.4, 8.3, -1.2]} df={20} col="#9ca3afaa" fs={11}>
-          <i className="fa-solid fa-smog" style={{ color: "#cbd5e1" }} />
-          {num(kgKwh, 2)} kg CO₂ por kWh generado
-        </Etiqueta>
-      )}
       <Etiqueta pos={[-0.6, Y_CABLE + 1.6, 0]} df={20} col="#ef4444aa" fs={11}>
         <i className="fa-solid fa-bolt" style={{ color: "#ef4444" }} />
         Red: se pierde {num(PERDIDAS_RED * 100, 1)} %
@@ -991,10 +978,6 @@ function EscenaCadena({ plantaId, focoId, modoColor }: { plantaId: PlantaId; foc
       <Etiqueta pos={[9.6, 4.1, 0]} df={20} col={`${foco.color}aa`} fs={11}>
         <i className="fa-solid fa-lightbulb" style={{ color: foco.color }} />
         {foco.etq}: {num(fl * 100, 1)} % luz
-      </Etiqueta>
-      <Etiqueta pos={[0.5, -0.1, 3.4]} df={20} col={`${modoColor}cc`} fs={13}>
-        <i className="fa-solid fa-route" style={{ color: modoColor }} />
-        De cada 100 unidades de energía ({planta.entrada}), {num(global * 100, 1)} llegan como luz
       </Etiqueta>
     </group>
   );
@@ -1009,6 +992,7 @@ const ANCHO_CASA = 7;
 const D_REF = diametroEsfera(1);
 
 function EscenaHuella({ huella, modoColor }: { huella: Record<CategoriaId, number>; modoColor: string }) {
+  const ancho = useThree((st) => st.size.width);
   const esferas = useRef<(THREE.Group | null)[]>([]);
   const casa = useRef<THREE.Group>(null);
   const ref1t = useRef<THREE.Group>(null);
@@ -1093,10 +1077,6 @@ function EscenaHuella({ huella, modoColor }: { huella: Record<CategoriaId, numbe
               <meshStandardMaterial color="#f1c9a5" />
             </mesh>
           </group>
-          <Etiqueta pos={[0, 0.6, 5.2]} df={45} fs={11}>
-            <i className="fa-solid fa-house" style={{ color: "#fde68a" }} />
-            Casa de 2 pisos ≈ 6 m
-          </Etiqueta>
         </group>
 
         {CATEGORIAS.map((c, k) => (
@@ -1110,7 +1090,7 @@ function EscenaHuella({ huella, modoColor }: { huella: Record<CategoriaId, numbe
               <sphereGeometry args={[0.5, 40, 28]} />
               <meshStandardMaterial color={c.color} transparent opacity={0.5} roughness={0.2} metalness={0.1} emissive={c.color} emissiveIntensity={0.18} depthWrite={false} />
             </mesh>
-            <Html position={[0, 10, 0]} center distanceFactor={45} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+            {ancho >= 640 && <Html position={[0, 10, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
               <div
                 style={{
                   padding: "6px 12px",
@@ -1123,16 +1103,16 @@ function EscenaHuella({ huella, modoColor }: { huella: Record<CategoriaId, numbe
                   boxShadow: "0 6px 18px -8px #000",
                 }}
               >
-                <div style={{ fontSize: 11, fontWeight: 800, color: c.color }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: c.color }}>
                   <i className={`fa-solid ${c.icono}`} style={{ marginRight: 6 }} />
                   {c.etq}
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 900 }}>{num(huella[c.id], 2)} t</div>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>
+                <div style={{ fontSize: 16, fontWeight: 900 }}>{num(huella[c.id], 2)} t</div>
+                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>
                   {total > 0 ? num((huella[c.id] / total) * 100) : 0} % · ⌀ {num(diametroEsfera(huella[c.id]), 1)} m
                 </div>
               </div>
-            </Html>
+            </Html>}
           </group>
         ))}
 
@@ -1141,9 +1121,6 @@ function EscenaHuella({ huella, modoColor }: { huella: Record<CategoriaId, numbe
             <sphereGeometry args={[D_REF / 2, 24, 16]} />
             <meshBasicMaterial color="#e2e8f0" wireframe transparent opacity={0.22} />
           </mesh>
-          <Etiqueta pos={[0, 0.6, D_REF / 2 + 2.4]} df={45} fs={11} col="#e2e8f0aa">
-            Referencia: 1 t de CO₂ = esfera de {num(D_REF, 1)} m
-          </Etiqueta>
         </group>
       </group>
     </group>

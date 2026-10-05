@@ -1,0 +1,9 @@
+{
+  "slug": "generos-literarios",
+  "items": [
+    { "clave": "semilla-plaza", "formato": "16:9", "estilo": "ilustracion", "escena": "Una joven vendedora de flores bajo un toldo en una plaza empedrada mientras cae la lluvia, con cubetas de rosas y una maceta con un sobre blanco asomando entre las hojas" },
+    { "clave": "forma-libro", "formato": "16:9", "estilo": "ilustracion", "escena": "Un libro grueso abierto sobre una mesa de madera junto a una taza humeante y una lámpara cálida, vista cercana" },
+    { "clave": "forma-ventana", "formato": "16:9", "estilo": "ilustracion", "escena": "Una persona sentada junto a una ventana con gotas de lluvia escribiendo en una libreta pequeña, luz suave azulada" },
+    { "clave": "forma-escenario", "formato": "16:9", "estilo": "ilustracion", "escena": "Un escenario de teatro vacío con cortinas rojas abiertas, tres reflectores encendidos y dos sillas de madera en el centro" }
+  ]
+}

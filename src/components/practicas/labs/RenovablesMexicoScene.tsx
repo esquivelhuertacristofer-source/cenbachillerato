@@ -18,7 +18,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -36,9 +36,7 @@ import {
   alturaSol,
   factorEolico,
   pasoEn,
-  horaTexto,
   TWH_MEXICO,
-  emisionesMt,
   pctLimpia,
   META_LIMPIA,
   PRODUCCION,
@@ -72,9 +70,11 @@ type Pt = [number, number, number];
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 const NO = "#f87171";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -85,7 +85,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -427,12 +427,6 @@ function EscenaMapa({ centralSel, revelado, solarEquivMW, onSelCentral }: { cent
         <ColumnaCentral key={c.id} id={c.id} sel={c.id === centralSel} revelado={revelado} onSel={onSelCentral} />
       ))}
       <GranjaSolarMapa mw={solarEquivMW} />
-      <Etiqueta pos={[proyecta(-88.5, 26.5)[0], 0.2, proyecta(-88.5, 26.5)[1]]} df={10} fs={10.5} col="#38bdf866">
-        Golfo de México
-      </Etiqueta>
-      <Etiqueta pos={[proyecta(-110, 17.2)[0], 0.2, proyecta(-110, 17.2)[1]]} df={10} fs={10.5} col="#38bdf866">
-        Océano Pacífico
-      </Etiqueta>
     </group>
   );
 }
@@ -480,7 +474,6 @@ function EscenaRed({ params, red, hora, modoColor }: { params: ParamsRed; red: R
   const gasNivel = params.gasMW > 0 ? paso.gas / params.gasMW : 0;
   const deficit = paso.deficit > 0.5;
   const sol = SOL[params.estacion];
-  const noche = paso.h < sol.sale || paso.h > sol.pone;
 
   const paneles = useRef<THREE.InstancedMesh>(null);
   const matPanel = useRef<THREE.MeshStandardMaterial>(null);
@@ -628,12 +621,6 @@ function EscenaRed({ params, red, hora, modoColor }: { params: ParamsRed; red: R
       {POS_TURBINAS.slice(0, nTurbinas).map((p, k) => (
         <Aerogenerador key={k} pos={p} alto={2} vel={0.5 + fViento * 7} />
       ))}
-      {nTurbinas > 0 && (
-        <Etiqueta pos={[-3.8, 2.75, -3.4]} df={11} col="#5eead4aa" fs={12}>
-          <i className="fa-solid fa-wind" style={{ color: "#5eead4" }} />
-          Eólica {num(params.eolicaMW)} MW → {num(paso.eolica)} MW
-        </Etiqueta>
-      )}
 
       {/* Geotermia de base */}
       <group position={[0.2, 0, 2.8]}>
@@ -646,10 +633,6 @@ function EscenaRed({ params, red, hora, modoColor }: { params: ParamsRed; red: R
           <meshStandardMaterial color="#cbd5e1" />
         </mesh>
         <Humo pos={[0.25, 0.85, 0]} color="#f8fafc" n={5} escala={2.2} altura={1.2} opacidad={0.3} />
-        <Etiqueta pos={[-0.9, 0.6, 0]} df={11} col="#f472b6aa" fs={11}>
-          <i className="fa-solid fa-volcano" style={{ color: "#f472b6" }} />
-          Geotermia {num(paso.geo)} MW · 24 h
-        </Etiqueta>
       </group>
 
       {/* Baterías */}
@@ -733,16 +716,6 @@ function EscenaRed({ params, red, hora, modoColor }: { params: ParamsRed; red: R
         <i className={`fa-solid ${deficit ? "fa-triangle-exclamation" : "fa-city"}`} style={{ color: deficit ? NO : modoColor }} />
         {deficit ? `¡Déficit de ${num(paso.deficit)} MW! Faltan ${num(paso.deficit)} de ${num(paso.demanda)} MW` : `Ciudad: demanda ${num(paso.demanda)} MW`}
       </Etiqueta>
-      <Etiqueta pos={[0, 4.2, -6]} df={11} col={`${modoColor}aa`} fs={15}>
-        <i className={`fa-solid ${noche ? "fa-moon" : "fa-sun"}`} style={{ color: noche ? "#c7d2fe" : "#fde68a" }} />
-        {horaTexto(paso.h - 0.125)} · {params.estacion}
-        {params.nublado ? " · nublado" : ""}
-      </Etiqueta>
-      {paso.vertido > 1 && (
-        <Etiqueta pos={[-3.3, 1.95, 1.4]} df={11} col="#94a3b8aa" fs={10.5}>
-          Excedente que se desperdicia: {num(paso.vertido)} MW
-        </Etiqueta>
-      )}
     </group>
   );
 }
@@ -757,7 +730,7 @@ const ESCALA_TORRE = 0.055;
 const N_NUBE = 80;
 const MT_POR_BOLA = 2.5;
 
-function Torre({ tec, pct, i }: { tec: TecId; pct: number; i: number }) {
+function Torre({ tec, pct, i, mostrar }: { tec: TecId; pct: number; i: number; mostrar: boolean }) {
   const t = TEC[tec];
   const caja = useRef<THREE.Mesh>(null);
   const alto = useRef(pct * ESCALA_TORRE);
@@ -776,27 +749,23 @@ function Torre({ tec, pct, i }: { tec: TecId; pct: number; i: number }) {
         <boxGeometry args={[0.66, 1, 0.66]} />
         <meshStandardMaterial color={t.color} roughness={0.4} emissive={t.color} emissiveIntensity={0.18} />
       </mesh>
-      <Etiqueta pos={[0, 0.12 + pct * ESCALA_TORRE + 0.32, 0]} df={10} col={`${t.color}aa`} fs={11}>
-        {num(pct, pct < 10 && pct % 1 !== 0 ? 1 : 0)} %
-      </Etiqueta>
-      <Html position={[0, 0.12, 0.62]} center distanceFactor={10} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ width: 74, textAlign: "center", color: "#e2e8f0", fontSize: 10, fontWeight: 800, lineHeight: 1.15 }}>
-          <i className={`fa-solid ${t.icono}`} style={{ color: t.color, display: "block", fontSize: 13, marginBottom: 2 }} />
-          {t.etq}
-          {tec === "nuclear" && <div style={{ color: "#a78bfa", fontSize: 9 }}>limpia, no renovable</div>}
-        </div>
-      </Html>
+      {mostrar && (
+        <Etiqueta pos={[0, 0.12 + pct * ESCALA_TORRE + 0.45, 0]} col={`${t.color}aa`}>
+          <i className={`fa-solid ${t.icono}`} style={{ color: t.color }} />
+          {t.etq} · {num(pct, pct < 10 && pct % 1 !== 0 ? 1 : 0)} %
+        </Etiqueta>
+      )}
     </group>
   );
 }
 
-function EscenaEmisiones({ mezcla, modoColor }: { mezcla: Mezcla; modoColor: string }) {
+function EscenaEmisiones({ mezcla }: { mezcla: Mezcla }) {
+  const mayores = [...ORDEN_TORRES].sort((x, y) => mezcla[y] - mezcla[x]).slice(0, 3);
   const nube = useRef<THREE.InstancedMesh>(null);
   const barra = useRef<THREE.Mesh>(null);
   const obj = useMemo(() => new THREE.Object3D(), []);
   const bolas = ORDEN_TORRES.map((t) => Math.round(((mezcla[t] / 100) * TWH_MEXICO * TEC[t].gCO2) / 1000 / MT_POR_BOLA));
   const limpia = pctLimpia(mezcla);
-  const mt = emisionesMt(mezcla);
   const limpiaSuave = useRef(limpia);
   useFrame(({ clock }, dt) => {
     const m = nube.current;
@@ -845,16 +814,8 @@ function EscenaEmisiones({ mezcla, modoColor }: { mezcla: Mezcla; modoColor: str
         <boxGeometry args={[4.3, 0.1, 2.1]} />
         <meshStandardMaterial color="#3f3f46" roughness={0.8} />
       </mesh>
-      <Etiqueta pos={[-3.1, 0.15, 1.75]} df={10} col="#34d399aa" fs={11}>
-        <i className="fa-solid fa-rotate" style={{ color: "#34d399" }} />
-        Renovables: se reponen
-      </Etiqueta>
-      <Etiqueta pos={[2.63, 0.15, 1.75]} df={10} col="#a1a1aaaa" fs={11}>
-        <i className="fa-solid fa-hourglass-end" style={{ color: "#a1a1aa" }} />
-        No renovables: se agotan
-      </Etiqueta>
       {ORDEN_TORRES.map((t, i) => (
-        <Torre key={t} tec={t} pct={mezcla[t]} i={i} />
+        <Torre key={t} tec={t} pct={mezcla[t]} i={i} mostrar={mayores.includes(t)} />
       ))}
       <instancedMesh ref={nube} args={[undefined, undefined, N_NUBE]} frustumCulled={false}>
         <sphereGeometry args={[1, 12, 10]} />
@@ -877,15 +838,7 @@ function EscenaEmisiones({ mezcla, modoColor }: { mezcla: Mezcla; modoColor: str
         <Etiqueta pos={[-5 + (META_LIMPIA / 100) * 10, 1.2, 0]} df={10} col="#fbbf24aa" fs={11}>
           Meta: {META_LIMPIA} % limpia
         </Etiqueta>
-        <Etiqueta pos={[3.6, 0.5, 0]} df={10} col={limpia >= META_LIMPIA ? "#34d399cc" : "#ffffff44"} fs={11.5}>
-          <i className="fa-solid fa-leaf" style={{ color: "#34d399" }} />
-          Generación limpia: {num(limpia, 1)} %
-        </Etiqueta>
       </group>
-      <Etiqueta pos={[-2.6, 4.3, -1.2]} df={10} col={`${modoColor}aa`} fs={14}>
-        <i className="fa-solid fa-smog" style={{ color: modoColor }} />
-        {num(mt, 1)} Mt CO₂e al año · cada bola gris = {MT_POR_BOLA} Mt
-      </Etiqueta>
     </group>
   );
 }
@@ -943,18 +896,9 @@ function EscenaAgotamiento({ anioIdx, modoColor }: { anioIdx: number; modoColor:
       <Etiqueta pos={[-4.4, 0.12 + Math.round(3.4 / MBD_POR_BARRIL) * 0.215 - 0.1, 0]} df={10} col="#fbbf24aa" fs={10.5}>
         pico de 2004: 3.4 mbd
       </Etiqueta>
-      {PRODUCCION.map((p, j) => (
-        <group key={p.anio}>
-          <Etiqueta pos={[-2.6 + j * 1.3, -0.05, 0.75]} df={10} col={j === anioIdx ? `${modoColor}cc` : undefined} fs={j === anioIdx ? 13 : 11}>
-            {p.anio}
-          </Etiqueta>
-          {j <= anioIdx && (
-            <Etiqueta pos={[-2.6 + j * 1.3, 0.12 + Math.round(p.mbd / MBD_POR_BARRIL) * 0.215 + 0.28, 0]} df={10} col={j === anioIdx ? "#f59e0bcc" : undefined} fs={11}>
-              {num(p.mbd, 1)} mbd
-            </Etiqueta>
-          )}
-        </group>
-      ))}
+      <Etiqueta pos={[-2.6 + anioIdx * 1.3, 0.12 + Math.round(PRODUCCION[anioIdx]!.mbd / MBD_POR_BARRIL) * 0.215 + 0.4, 0]} col={`${modoColor}cc`}>
+        {PRODUCCION[anioIdx]!.anio} · {num(PRODUCCION[anioIdx]!.mbd, 1)} mbd
+      </Etiqueta>
       {/* Balancín de bombeo */}
       <group position={[-4.7, 0, -0.4]}>
         <mesh position={[0, 0.55, 0]} castShadow>
@@ -975,10 +919,6 @@ function EscenaAgotamiento({ anioIdx, modoColor }: { anioIdx: number; modoColor:
           <cylinderGeometry args={[0.03, 0.03, 0.6, 8]} />
           <meshStandardMaterial color="#9ca3af" />
         </mesh>
-        <Etiqueta pos={[0.3, 2.05, 0]} df={10} col="#f59e0baa" fs={10.5}>
-          <i className="fa-solid fa-oil-well" style={{ color: "#f59e0b" }} />
-          1 barril = 0.2 millones de barriles diarios
-        </Etiqueta>
       </group>
       {/* El flujo renovable no se agota */}
       <group position={[4.6, 0, -0.8]}>
@@ -1020,7 +960,7 @@ export default function RenovablesMexicoScene(p: RenovablesSceneProps) {
 
       {vista === "mapa" && <EscenaMapa centralSel={p.centralSel} revelado={p.revelado} solarEquivMW={p.solarEquivMW} onSelCentral={p.onSelCentral} />}
       {vista === "red" && <EscenaRed params={p.params} red={p.red} hora={p.hora} modoColor={modoColor} />}
-      {vista === "mezcla" && p.subMezcla === "emisiones" && <EscenaEmisiones mezcla={p.mezcla} modoColor={modoColor} />}
+      {vista === "mezcla" && p.subMezcla === "emisiones" && <EscenaEmisiones mezcla={p.mezcla} />}
       {vista === "mezcla" && p.subMezcla === "agotamiento" && <EscenaAgotamiento anioIdx={p.anioIdx} modoColor={modoColor} />}
 
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={3.5} maxDistance={20} maxPolarAngle={Math.PI * 0.46} minPolarAngle={Math.PI * 0.05} target={cam.target} />

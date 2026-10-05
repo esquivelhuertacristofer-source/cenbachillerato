@@ -1,0 +1,12 @@
+{
+  "escena": "Una parcela de aire cálido del Golfo de México sube por la ladera de la sierra hacia Perote, con la temperatura y la humedad ajustables.",
+  "pregunta": "Si el aire del Golfo está mucho más seco, ¿dónde se forma la nube al subir?",
+  "opciones": [
+    { "id": "a", "texto": "Más abajo, casi al nivel del mar", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Más arriba, o ya no se forma", "icono": "fa-arrow-up" },
+    { "id": "c", "texto": "En el mismo lugar: la humedad no influye", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El vapor se condensa cuando el aire se enfría hasta su punto de rocío. Con aire seco el punto de rocío es bajo, así que debe subir mucho más para enfriarse tanto, o nunca lo alcanza.",
+  "comoComprobarlo": "En «Aire y agua se mezclan», baja la humedad relativa de 80 % a 30 %, suelta la parcela y compara dónde aparece la base de la nube."
+}

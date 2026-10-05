@@ -22,6 +22,8 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
+import type { ObjetivoLab } from "./_objetivos";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -81,7 +83,7 @@ const OrganicaIndustriaScene = dynamic(() => import("./OrganicaIndustriaScene"),
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-atom fa-spin" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la planta química en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la planta química en 3D…</span>
     </div>
   ),
 });
@@ -156,15 +158,15 @@ function SubproductoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
           ¿Qué más sale del reactor?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Proceso {pos + 1} de {ronda.length} · además del producto principal, ¿qué otra sustancia se forma?
           </div>
           <div className="oi-proceso" style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>
@@ -178,8 +180,8 @@ function SubproductoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Piensa si los monómeros o reactivos pierden átomos al unirse. Inténtalo de nuevo.</div>}
-          {pos > 0 && !aviso && <div style={{ marginTop: 10, fontSize: 12, color: OK, lineHeight: 1.5 }}>{PROCESOS[ronda[pos - 1] ?? 0]!.porque}</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Piensa si los monómeros o reactivos pierden átomos al unirse. Inténtalo de nuevo.</div>}
+          {pos > 0 && !aviso && <div style={{ marginTop: 10, fontSize: 14, color: OK, lineHeight: 1.5 }}>{PROCESOS[ronda[pos - 1] ?? 0]!.porque}</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -187,9 +189,9 @@ function SubproductoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -237,7 +239,6 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const timers = useRef<number[]>([]);
@@ -390,17 +391,18 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Sintetizar los dos fármacos: aspirina (éster) y paracetamol (amida)", done: hechas.has("aspirina") && hechas.has("paracetamol") },
-    { t: "Cambiar las cantidades hasta que el reactivo limitante sea el otro", done: ambosLimitantes },
-    { t: "Llevar el aroma de plátano a 85 % de conversión o más", done: esterAlto },
-    { t: "Fermentar glucosa y obtener bioetanol", done: hechas.has("fermentacion") },
-    { t: "Polimerizar etileno hasta obtener un plástico tenaz", done: metas.has("pe") },
-    { t: "Obtener PET grado botella y nylon grado fibra por condensación", done: metas.has("pet") && metas.has("nylon") },
-    { t: `Clasificar los ${PRODUCTOS.length} productos por grupo funcional e industria`, done: clasificados.length === PRODUCTOS.length },
-    { t: "Ganar estrellas en «¿Qué más sale del reactor?»", done: identifico },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Pulsa Reaccionar y mira qué probeta llega a cero: ese es el reactivo limitante", done: limitantes.size > 0 },
+    { txt: "Sintetizar los dos fármacos: aspirina (éster) y paracetamol (amida)", done: hechas.has("aspirina") && hechas.has("paracetamol") },
+    { txt: "Cambiar las cantidades hasta que el reactivo limitante sea el otro", done: ambosLimitantes },
+    { txt: "Llevar el aroma de plátano a 85 % de conversión o más", done: esterAlto },
+    { txt: "Fermentar glucosa y obtener bioetanol", done: hechas.has("fermentacion") },
+    { txt: "Polimerizar etileno hasta obtener un plástico tenaz", done: metas.has("pe") },
+    { txt: "Obtener PET grado botella y nylon grado fibra por condensación", done: metas.has("pet") && metas.has("nylon") },
+    { txt: `Clasificar los ${PRODUCTOS.length} productos por grupo funcional e industria`, done: clasificados.length === PRODUCTOS.length },
+    { txt: "Ganar estrellas en «¿Qué más sale del reactor?»", done: identifico },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -413,7 +415,7 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
         : fase === "hecho"
           ? esFerm
             ? `${num(res.gP, 1)} g de etanol · ${num(res.gQ, 1)} g de CO₂`
-            : `${num(res.gP, 2)} g de ${reac.producto}`
+            : `${res.limitante === "igual" ? "sin sobrante" : `limita ${res.limitante === "A" ? reac.a.nombre : reac.b!.nombre}`} · ${num(res.gP, 2)} g de producto`
           : `${reac.etq.toLowerCase()} · listo para reaccionar`;
     pie =
       fase === "hecho"
@@ -429,37 +431,35 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
     pie = grupoOk ? `${GRUPOS[prod.grupo].etq}: ${prod.propiedad}` : `${prod.etq}: ${prod.molEtq} (${fq(prod.formula)}). Gira la molécula y busca el grupo funcional que la define.`;
   }
 
+  const probetas = {
+    molA: res.molA,
+    molB: res.molB,
+    avance: res.avance,
+    coefP: reac.coefP,
+    hayB: !!reac.b,
+    tope: Math.max(reac.maxA / masaMolar(reac.a.formula), reac.b ? reac.maxB / masaMolar(reac.b.formula) : 0),
+  };
+
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
       <div style={{ width: 74, height: 74, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, color: "#04121f", background: accent, boxShadow: `0 10px 30px -6px ${accent}` }}>
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
   );
-  const dato = (etq: string, val: ReactNode, col = "#fff") => (
-    <div style={{ padding: "8px 10px", borderRadius: 10, background: "rgba(4,10,22,0.45)", border: `1px solid ${T.line}` }}>
-      <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.06em", color: T.text3, textTransform: "uppercase" }}>{etq}</div>
-      <div style={{ fontSize: 13.5, fontWeight: 900, color: col, marginTop: 3, ...NUM }}>{val}</div>
-    </div>
-  );
+  const dato = (etq: string, val: string, col?: string) => <Dato label={etq} value={val} col={col} />;
   const deslizador = (etq: string, aria: string, v: number, min: number, max: number, step: number, onChange: (x: number) => void, mostrar: string, col: string) => (
-    <label style={{ display: "block", marginTop: 10 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: T.text2, fontWeight: 700 }}>
-        <span>{etq}</span>
-        <span style={{ color: "#fff", fontWeight: 900, ...NUM }}>{mostrar}</span>
-      </div>
-      <input type="range" aria-label={aria} className="oi-range" min={min} max={max} step={step} value={v} onChange={(e) => onChange(Number(e.target.value))} style={{ ["--oic" as string]: col }} />
-    </label>
+    <Deslizador key={aria} label={etq} colr={col} valor={mostrar} min={min} max={max} step={step} value={v} onChange={onChange} />
   );
 
   /* ── Panel ─────────────────────────────────────────────────────────── */
@@ -499,28 +499,28 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
             {reac.coefQ > 1 ? `${reac.coefQ} ` : ""}
             <Fq f={reac.q.formula} />
           </div>
-          <div style={{ fontSize: 12, color: T.text2, marginTop: 4, lineHeight: 1.45 }}>
+          <div style={{ fontSize: 14, color: T.text2, marginTop: 4, lineHeight: 1.45 }}>
             {reac.a.nombre}
             {reac.b ? ` + ${reac.b.nombre}` : ""} → {reac.p.nombre} + {reac.q.nombre}
           </div>
-          <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6, lineHeight: 1.45 }}>
+          <div style={{ fontSize: 14, color: T.text3, marginTop: 6, lineHeight: 1.45 }}>
             <i className="fa-solid fa-fire-burner" style={{ marginRight: 6, color: "#fb923c" }} />
             {reac.condiciones}
           </div>
         </div>
         <div className="oi-2col" style={{ marginTop: 10 }}>
           <div style={{ padding: "10px 12px", borderRadius: 11, border: `1px solid ${ROJO}44`, background: "rgba(248,113,113,0.06)" }}>
-            <div style={{ fontSize: 10, fontWeight: 900, color: ROJO, letterSpacing: "0.06em", marginBottom: 5 }}>SE ROMPEN</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: ROJO, letterSpacing: "0.06em", marginBottom: 5 }}>SE ROMPEN</div>
             {reac.rompe.map((x, i) => (
-              <div key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
+              <div key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
                 ✂ {x}
               </div>
             ))}
           </div>
           <div style={{ padding: "10px 12px", borderRadius: 11, border: `1px solid ${OK}44`, background: "rgba(52,211,153,0.06)" }}>
-            <div style={{ fontSize: 10, fontWeight: 900, color: OK, letterSpacing: "0.06em", marginBottom: 5 }}>SE FORMAN</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: OK, letterSpacing: "0.06em", marginBottom: 5 }}>SE FORMAN</div>
             {reac.forma.map((x, i) => (
-              <div key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
+              <div key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
                 + {x}
               </div>
             ))}
@@ -591,7 +591,7 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
               </>
             )}
           </div>
-          <div style={{ fontSize: 12, color: T.text2, marginTop: 4, lineHeight: 1.45 }}>
+          <div style={{ fontSize: 14, color: T.text2, marginTop: 4, lineHeight: 1.45 }}>
             {pol.monomeros.map((m) => m.nombre).join(" + ")} · enlace {pol.enlace}
           </div>
         </div>
@@ -600,7 +600,7 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
           ? deslizador("Grado de polimerización (escala logarítmica)", "Grado de polimerización (unidades)", valor, 0, 5.3, 0.01, moverPolimero, `n = ${num(nEntero)}`, modoCol)
           : deslizador("Conversión p (escala logarítmica de 1 − p)", "Conversión de grupos funcionales (%)", valor, 0.3, 3, 0.005, moverPolimero, `p = ${num(pConv * 100, pConv > 0.99 ? 2 : 1)} %`, modoCol)}
         {pol.tipo === "condensacion" && (
-          <div style={{ fontSize: 12, color: T.text2, marginTop: 8, ...NUM }}>
+          <div style={{ fontSize: 14, color: T.text2, marginTop: 8, ...NUM }}>
             Ecuación de Carothers: Xₙ = 1 / (1 − p) = 1 / {num(1 - pConv, 4)} = <strong style={{ color: "#fff" }}>{num(nPol, 0)} unidades</strong>
           </div>
         )}
@@ -619,12 +619,12 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
           "fa-bullseye",
         )}
         {sub("Balance por kilogramo de polímero")}
-        <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, ...NUM }}>
           {balance.monomeros.map((m) => `${num(m.g)} g de ${m.nombre}`).join(" + ")} → 1 000 g de {pol.etq}
           {balance.agua > 0 ? ` + ${num(balance.agua)} g de agua` : ""}. Economía atómica: <strong style={{ color: "#fff" }}>{num(balance.economiaAtomica * 100, 1)} %</strong>.
         </div>
         {nota(pol.dato, T.text2, "fa-lightbulb")}
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 8, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           {pol.usos} {pol.reciclaje}
         </div>
       </>
@@ -686,351 +686,208 @@ export function LabOrganicaIndustria({ color }: PracticaLabProps) {
             </button>
           </div>
         )}
-        <div style={{ marginTop: 12, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 12, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Clasificados: {clasificados.length} de {PRODUCTOS.length}. Observa que el mismo grupo aparece en varias industrias: el éster está en la aspirina, en el aroma de plátano y en el PET.
         </div>
       </>
     );
   }
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes oiPulse { 0%,100%{ box-shadow:0 0 0 0 var(--oid); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .oi-live-dot { animation: oiPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .oi-live-dot { animation:none; } }
-        .oi-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .oi-grid { grid-template-columns: 1fr; } }
-        .oi-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .oi-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .oi-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .oi-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .oi-tab { cursor:pointer; border:1px solid var(--oic); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .oi-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .oi-tab:hover { background:rgba(255,255,255,0.06); }
-        .oi-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .oi-prods { display:grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap:7px; }
-        .oi-2col { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
-        @media (max-width: 640px){ .oi-2col { grid-template-columns: 1fr; } }
-        .oi-datos { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:7px; }
-        .oi-opt { cursor:pointer; border:1px solid var(--oic); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .oi-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .oi-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .oi-opt:disabled { cursor:default; }
-        .oi-opt:disabled[data-on="false"] { opacity:0.55; }
-        .oi-toggle { width:100%; cursor:pointer; border:1px solid var(--oic); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .oi-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .oi-toggle:disabled { cursor:default; opacity:0.75; }
-        .oi-range { width:100%; margin-top:6px; accent-color: var(--oic); }
-        .oi-opt:focus-visible, .oi-tab:focus-visible, .oi-toggle:focus-visible, .oi-icobtn:focus-visible, .oi-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .oi-bottom { grid-template-columns: 1fr !important; } }
-        .oi-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .oi-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .oi-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .oi-drawer[data-open="true"] { transform:translateX(0); }
-        .oi-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .oi-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .oi-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .oi-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .oi-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .oi-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
+  const css = `
+    .oi-opts { display:flex; flex-wrap:wrap; gap:8px; }
+    .oi-prods { display:grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,150px),1fr)); gap:8px; }
+    .oi-2col { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    .oi-datos { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    .oi-opt { cursor:pointer; border:1px solid var(--oic); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+    .oi-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+    .oi-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+    .oi-opt:disabled { cursor:default; }
+    .oi-opt:disabled[data-on="false"] { opacity:0.55; }
+    .oi-toggle { width:100%; cursor:pointer; border:1px solid var(--oic); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+    .oi-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+    .oi-toggle:disabled { cursor:default; opacity:0.75; }
+    .oi-opt:focus-visible, .oi-toggle:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  `;
 
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="oi-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="oi-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--oic" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
+  const teoria = (
+    <>
+      <Bloque titulo="¿Qué tienen en común una tableta, un dulce y una botella?" icono="fa-industry">
+        <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
+      </Bloque>
+      <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+        <div style={{ display: "grid", gap: 9 }}>
+          {INSTRUCCIONES.map((p, i) => (
+            <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+              <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
+              <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
+            </div>
+          ))}
         </div>
-      </div>
-
-      <div className="oi-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <OrganicaIndustriaScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                reaccion={reaccionId}
-                corrida={corrida}
-                fase={fase}
-                polimero={polimeroId}
-                unidades={unidadesVis}
-                nivel={estado.nivel}
-                extraEtq={nEntero > pol.maxVisibles ? `+ ${num(nEntero - pol.maxVisibles)} unidades más` : null}
-                productoId={productoId}
-                resaltar={gElegido}
-                resaltarOk={grupoOk}
-                clasificados={clasificados}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="oi-live-dot" style={{ ["--oid" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span className="oi-chip" style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>
-                  {chipVivo}
-                </span>
+      </Bloque>
+      <Bloque titulo={`Lectura A1 · ${TITULO_A1}`} icono="fa-book-open">
+        <div style={{ display: "grid", gap: 9 }}>
+          {LECTURA_A1.map((p, i) => (
+            <div key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.55 }}>
+              {p}
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
+        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+          {PREGUNTAS.map((q, i) => (
+            <li key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>
+              {q}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Importante (lectura A1)" icono="fa-landmark">
+        <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.55 }}>{RECUADRO_A1}</div>
+      </Bloque>
+      <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+          {HECHOS.map((h, i) => (
+            <li key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>
+              {h}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Glosario (A5)" icono="fa-book">
+        <div style={{ display: "grid", gap: 8 }}>
+          {GLOSARIO.map((gi, i) => (
+            <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+              <span style={{ fontSize: 15, fontWeight: 900, color: accent }}>{gi.termino}. </span>
+              <span style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
+                <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
+                {gi.ejemplo}
               </div>
             </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="oi-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="oi-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="oi-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="oi-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
+          ))}
+        </div>
+        <div style={{ fontSize: 15, color: T.text2 }}>
+          <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+        </div>
+      </Bloque>
+      <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 9 }}>
+          {IDEAS.map((x, i) => (
+            <li key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>
+              {x}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Debate (A3)" icono="fa-comments">
+        <div style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45 }}>{DEBATE_A3.tema}</div>
+        <div className="oi-opts">
+          {DEBATE_A3.posturas.map((p, i) => (
+            <button key={i} className="oi-opt oi-postura" data-on={i === postura} onClick={() => { setPostura(i); blip(); }} style={{ ["--oic" as string]: accent, background: i === postura ? `rgba(${color.rgba},0.16)` : "transparent" }}>
+              {p.etq}
             </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
+          ))}
         </div>
+        <div style={{ fontSize: 15, color: T.text2, fontStyle: "italic", lineHeight: 1.45 }}>«{DEBATE_A3.posturas[postura]!.postura}»</div>
+        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 7 }}>
+          {DEBATE_A3.posturas[postura]!.argumentos.map((a, i) => (
+            <li key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>
+              {a}
+            </li>
+          ))}
+        </ul>
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.45 }}>Reglas: {DEBATE_A3.reglas.join(" ")}</div>
+      </Bloque>
+      <Bloque titulo="Ficha teórica" icono="fa-book">
+        <FichaTeorica data={ORGANICA_INDUSTRIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+      </Bloque>
+      <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+        La lectura A1 con su recuadro y sus preguntas, los hechos del quiz A4, el glosario A5, el debate A3, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la
+        plataforma. Las moléculas de las reacciones y de los productos son <strong>confórmeros 3D reales de PubChem</strong>; la trayectoria de los átomos es una animación didáctica
+        (los mecanismos reales pasan por intermedios y, en la fermentación, por 12 pasos enzimáticos). Las cadenas de PE, PET y nylon se dibujan en zigzag extendido con
+        longitudes y ángulos típicos. Masas molares con masas atómicas IUPAC; la constante K ≈ 4 de la esterificación es un valor típico ilustrativo y los umbrales de grado de
+        polimerización para cera, fibra o botella son <strong>aproximados</strong>. Fuente: {FUENTE}
+      </p>
+    </>
+  );
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-industry" />
+  return (
+    <LabShell
+      accent={modoCol}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <OrganicaIndustriaScene
+            vista={modo}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            reaccion={reaccionId}
+            corrida={corrida}
+            fase={fase}
+            polimero={polimeroId}
+            unidades={unidadesVis}
+            nivel={estado.nivel}
+            extraEtq={nEntero > pol.maxVisibles ? `+ ${num(nEntero - pol.maxVisibles)} unidades más` : null}
+            productoId={productoId}
+            resaltar={gElegido}
+            resaltarOk={grupoOk}
+            clasificados={clasificados}
+            probetas={probetas}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{css}</style>
+              <Bloque titulo={`${def.etq} — ${def.subtitulo}`} icono={def.icono}>
+                <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.5 }}>{pie}</div>
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <style>{css}</style>
+              <SubproductoCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes cómo la química orgánica llega a la industria." />
+              <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                </div>
               </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Qué tienen en común una tableta, un dulce y una botella?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="oi-objetivos" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="oi-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-landmark" style={{ marginRight: 8, color: accent }} />
-              Importante (lectura A1)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{RECUADRO_A1}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-              Ideas clave
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-comments" style={{ marginRight: 8, color: accent }} />
-              Debate (A3)
-            </Eyebrow>
-            <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 10 }}>{DEBATE_A3.tema}</div>
-            <div className="oi-opts">
-              {DEBATE_A3.posturas.map((p, i) => (
-                <button key={i} className="oi-opt oi-postura" data-on={i === postura} onClick={() => { setPostura(i); blip(); }} style={{ ["--oic" as string]: accent, background: i === postura ? `rgba(${color.rgba},0.16)` : "transparent" }}>
-                  {p.etq}
-                </button>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, fontStyle: "italic", lineHeight: 1.45, marginTop: 10 }}>«{DEBATE_A3.posturas[postura]!.postura}»</div>
-            <ul style={{ margin: "8px 0 0", paddingLeft: 16, display: "grid", gap: 7 }}>
-              {DEBATE_A3.posturas[postura]!.argumentos.map((a, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {a}
-                </li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 10.5, color: T.text3, lineHeight: 1.45, marginTop: 10 }}>Reglas: {DEBATE_A3.reglas.join(" ")}</div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con su recuadro y sus preguntas, los hechos del quiz A4, el glosario A5, el debate A3, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la
-          plataforma. Las moléculas de las reacciones y de los productos son <strong>confórmeros 3D reales de PubChem</strong>; la trayectoria de los átomos es una animación didáctica
-          (los mecanismos reales pasan por intermedios y, en la fermentación, por 12 pasos enzimáticos). Las cadenas de PE, PET y nylon se dibujan en zigzag extendido con
-          longitudes y ángulos típicos. Masas molares con masas atómicas IUPAC; la constante K ≈ 4 de la esterificación es un valor típico ilustrativo y los umbrales de grado de
-          polimerización para cera, fibra o botella son <strong>aproximados</strong>. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <SubproductoCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes cómo la química orgánica llega a la industria." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="oi-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="oi-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="oi-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="oi-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="oi-drawer-body">
-          <FichaTeorica data={ORGANICA_INDUSTRIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+            </>
+          ),
+        },
+        { id: "teoria", etiqueta: "Teoría", icono: "fa-book-open", contenido: <><style>{css}</style>{teoria}</> },
+      ]}
+    />
   );
 }

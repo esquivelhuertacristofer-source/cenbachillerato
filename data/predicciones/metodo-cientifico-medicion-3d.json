@@ -1,0 +1,12 @@
+{
+  "escena": "Tres grupos de plantas bajo lámparas con distintas horas de luz. El grupo C además recibe más agua que los otros dos.",
+  "pregunta": "El grupo C crece más que A y B. ¿Qué puedes concluir sobre el efecto de la luz?",
+  "opciones": [
+    { "id": "a", "texto": "Que la luz hace crecer más a las plantas", "icono": "fa-sun" },
+    { "id": "b", "texto": "Que el agua es lo único que importa", "icono": "fa-droplet" },
+    { "id": "c", "texto": "Nada seguro: cambiaron dos variables", "icono": "fa-circle-question" }
+  ],
+  "correcta": "c",
+  "porque": "En un experimento controlado solo debe cambiar la variable independiente. Si cambian luz y agua a la vez, no hay forma de saber cuál causó la diferencia.",
+  "comoComprobarlo": "En «Experimento controlado» elige una hipótesis, activa «Grupo C con 400 ml», siembra y revisa qué conclusión acepta el laboratorio."
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "crisis-sociales",
+  "items": [
+    { "clave": "puestos-banqueta", "formato": "16:9", "estilo": "foto", "escena": "Banqueta frente a una fábrica con muchos puestos ambulantes improvisados de comida y ropa bajo lonas de colores, vendedores atendiendo y clientes en fila" },
+    { "clave": "fila-clinica", "formato": "16:9", "estilo": "foto", "escena": "Fila larga de personas de todas las edades esperando de pie al amanecer frente a la puerta de una clínica pública, algunas con cobijas y niños en brazos" },
+    { "clave": "colonia-hacinada", "formato": "16:9", "estilo": "foto", "escena": "Colonia popular densa en una ladera con casas pegadas de block y techos de lámina, ropa tendida, una sola llave de agua en la calle con cubetas alrededor" },
+    { "clave": "celular-opinion", "formato": "16:9", "estilo": "foto", "escena": "Joven de espaldas grabándose con un celular sobre un tripié en una sala moderna con luz de aro, sin pantalla visible" },
+    { "clave": "lluvia-charcos", "formato": "16:9", "estilo": "foto", "escena": "Calle de tierra de una colonia después de una tormenta con grandes charcos, llantas viejas llenas de agua y cielo gris" },
+    { "clave": "despensas-vecinas", "formato": "16:9", "estilo": "foto", "escena": "Vecinas con cubrebocas repartiendo bolsas de despensa en una mesa plegable en la calle y tocando puertas para visitar a una familia" },
+    { "clave": "fabrica-cerrada", "formato": "16:9", "estilo": "foto", "escena": "Portón de una fábrica de calzado cerrado con cadena y candado, estacionamiento vacío y un grupo de trabajadores de pie afuera mirando hacia adentro" },
+    { "clave": "marcha-clinica", "formato": "16:9", "estilo": "foto", "escena": "Familias reunidas en una plaza frente a un edificio de gobierno municipal, algunas personas con cartulinas en blanco levantadas, bajo el sol del mediodía" }
+  ]
+}

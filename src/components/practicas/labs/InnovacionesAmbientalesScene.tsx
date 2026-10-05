@@ -20,7 +20,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -86,20 +86,23 @@ const hash = (i: number) => {
   return s - Math.floor(s);
 };
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Rótulo en la punta de lo que nombra. 14 px fijos; los anchos se ocultan en pantallas angostas (la info vive en el panel). */
+function Etiqueta({ pos, children, col, ancha = false }: { pos: Pt; children: ReactNode; col?: string; ancha?: boolean }) {
+  const angosto = useThree((st) => st.size.width < 640);
+  if (angosto && ancha) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: 6,
-          padding: "5px 11px",
+          padding: "4px 10px",
           borderRadius: 999,
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -109,6 +112,18 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
       </div>
     </Html>
   );
+}
+
+/** Encuadre responsivo: en pantallas angostas aleja la cámara (zoom) para que quepa todo el contenido. */
+function AjusteAncho({ zoomAngosto }: { zoomAngosto: number }) {
+  useFrame(({ camera, size }) => {
+    const z = size.width < 640 ? zoomAngosto : 1;
+    if (camera.zoom !== z) {
+      camera.zoom = z;
+      camera.updateProjectionMatrix();
+    }
+  });
+  return null;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -241,7 +256,7 @@ function Cisterna({ x, capacidad, nivel, desborda }: { x: number; capacidad: num
         <circleGeometry args={[r * 1.35, 32]} />
         <meshStandardMaterial color="#0ea5e9" transparent opacity={0.45} roughness={0.05} />
       </mesh>
-      <Etiqueta pos={[0, h + 0.55, 0]} df={10} col={desborda ? "#f87171aa" : "#38bdf8aa"} fs={12}>
+      <Etiqueta pos={[0, h + 0.55, 0]} col={desborda ? "#f87171aa" : "#38bdf8aa"}>
         <i className="fa-solid fa-droplet" style={{ color: desborda ? "#f87171" : "#38bdf8" }} />
         <span ref={lectura}>0 L</span>
         {desborda ? " · se desborda" : ""}
@@ -305,10 +320,6 @@ function EscenaLluvia({ ciudadId, techoId, area, capacidad, mesVista, nivel, des
         <boxGeometry args={[11, 0.45, 0.02]} />
         <meshStandardMaterial color="#0284c7" emissive="#0369a1" emissiveIntensity={0.35} roughness={0.3} />
       </mesh>
-      <Etiqueta pos={[3.6, -1.35, 3.9]} df={11} fs={10.5} col="#38bdf8aa">
-        <i className="fa-solid fa-water" style={{ color: "#38bdf8" }} />
-        Acuífero: cada litro cosechado es uno menos que se bombea
-      </Etiqueta>
 
       {/* Vivienda */}
       <mesh position={[0, ALTO_CASA / 2, 0]} castShadow receiveShadow>
@@ -358,7 +369,7 @@ function EscenaLluvia({ ciudadId, techoId, area, capacidad, mesVista, nivel, des
         <sphereGeometry args={[1, 8, 6]} />
         <meshBasicMaterial color="#7dd3fc" />
       </instancedMesh>
-      <Etiqueta pos={[0, ALTO_CASA + 0.55, -sz / 2 + 0.2]} df={10} fs={11} col={`${modoColor}aa`}>
+      <Etiqueta pos={[0, ALTO_CASA + 0.55, -sz / 2 + 0.2]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-house-chimney" style={{ color: modoColor }} />
         Azotea de {area} m²
       </Etiqueta>
@@ -380,14 +391,14 @@ function EscenaLluvia({ ciudadId, techoId, area, capacidad, mesVista, nivel, des
               <meshStandardMaterial color={on ? modoColor : "#1d4ed8"} emissive={on ? modoColor : "#000"} emissiveIntensity={on ? 0.6 : 0} roughness={0.4} />
             </mesh>
             {on && (
-              <Etiqueta pos={[0, 0.2 + hBar + 0.3, 0.1]} df={10} fs={10.5} col={`${modoColor}aa`}>
+              <Etiqueta pos={[0, 0.2 + hBar + 0.3, 0.1]} col={`${modoColor}aa`}>
                 {MESES[i]} · {v} mm
               </Etiqueta>
             )}
           </group>
         );
       })}
-      <Etiqueta pos={[chartX0 + 2.2, 3.15, -0.45]} df={10} fs={11} col={`${modoColor}aa`}>
+      <Etiqueta ancha pos={[chartX0 + 2.2, 3.15, -0.45]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-cloud-rain" style={{ color: modoColor }} />
         {ciudad.etq}: {num(ciudad.mm.reduce((a, b) => a + b, 0))} mm al año
       </Etiqueta>
@@ -492,7 +503,6 @@ function EscenaHumedal({ personas, areaHumedal, tempC, muestraNonce, modoColor }
   const yGraf = (d: number) => (Math.min(d, DBO_ENTRADA) / DBO_ENTRADA) * H_GRAF;
   const zGraf = -ancho / 2 - 1.5;
   const frio = tempC <= 12;
-  const calido = tempC >= 24;
 
   return (
     <group position={[0.3, -1.3, 0.4]}>
@@ -553,7 +563,7 @@ function EscenaHumedal({ personas, areaHumedal, tempC, muestraNonce, modoColor }
         <cylinderGeometry args={[0.08, 0.08, 0.8, 12]} />
         <meshStandardMaterial color="#e5e7eb" roughness={0.5} />
       </mesh>
-      <Etiqueta pos={[-L_HUM / 2 - 1.3, 1.35, 0]} df={10} fs={11} col="#a16207aa">
+      <Etiqueta ancha pos={[-L_HUM / 2 - 1.3, 1.35, 0]} col="#a16207aa">
         <i className="fa-solid fa-toilet" style={{ color: "#fbbf24" }} />
         Entra: {DBO_ENTRADA} mg/L · {num(personas)} personas
       </Etiqueta>
@@ -595,23 +605,16 @@ function EscenaHumedal({ personas, areaHumedal, tempC, muestraNonce, modoColor }
             <meshBasicMaterial color={lim === NOM_DIRECTO ? "#34d399" : "#fbbf24"} />
           </mesh>
         ))}
-        <Etiqueta pos={[L_HUM / 2 + 1.25, yGraf(NOM_INDIRECTO) + 0.14, 0]} df={11} fs={10} col="#fbbf24aa">
+        <Etiqueta ancha pos={[L_HUM / 2 + 1.25, yGraf(NOM_INDIRECTO) + 0.14, 0]} col="#fbbf24aa">
           NOM-003: 30 / 20 mg/L
         </Etiqueta>
-        <Etiqueta pos={[0, H_GRAF + 0.2, 0]} df={10} fs={11} col={`${modoColor}aa`}>
+        <Etiqueta ancha pos={[0, H_GRAF + 0.2, 0]} col={`${modoColor}aa`}>
           <i className="fa-solid fa-chart-line" style={{ color: modoColor }} />
           DBO₅ a lo largo del humedal · {num(t, 1)} días dentro
         </Etiqueta>
       </group>
 
-      {/* Termómetro del clima */}
-      <group position={[-L_HUM / 2 - 1.3, 0.25, 1.35]}>
-        <Etiqueta pos={[0, 0, 0]} df={10} fs={11} col={frio ? "#93c5fdaa" : calido ? "#fb923caa" : "#e2e8f0aa"}>
-          <i className={`fa-solid ${frio ? "fa-snowflake" : calido ? "fa-sun" : "fa-temperature-half"}`} style={{ color: frio ? "#93c5fd" : calido ? "#fb923c" : "#e2e8f0" }} />
-          Agua a {tempC} °C
-        </Etiqueta>
-      </group>
-      <Etiqueta pos={[L_HUM / 2 + 1.5, 1.05, 0.9]} df={10} fs={11} col={`${CALIDAD_DEF[cal].color}aa`}>
+      <Etiqueta pos={[L_HUM / 2 + 1.5, 1.05, 0.9]} col={`${CALIDAD_DEF[cal].color}aa`}>
         <i className="fa-solid fa-faucet-drip" style={{ color: CALIDAD_DEF[cal].color }} />
         Sale: {num(salida, 1)} mg/L
       </Etiqueta>
@@ -805,6 +808,7 @@ function OlaTormenta({ plantacion, ancho, anios, xPueblo }: { plantacion: Planta
   const espuma = useRef<THREE.Mesh>(null);
   const t = useRef(0);
   const lectura = useRef<HTMLSpanElement>(null);
+  const angosto = useThree((st) => st.size.width < 640);
   const alturas = olaTrasZonas(plantacion, ancho, anios);
   const largo = (ancho / ANCHO_MAX) * LARGO_VISUAL;
   const X_INICIO = -11;
@@ -840,12 +844,12 @@ function OlaTormenta({ plantacion, ancho, anios, xPueblo }: { plantacion: Planta
         <cylinderGeometry args={[0.09, 0.09, 6.5, 10]} />
         <meshStandardMaterial color="#f0f9ff" roughness={0.6} />
       </mesh>
-      <Html position={[0, 2.4, 0]} center distanceFactor={10} zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ padding: "5px 11px", borderRadius: 999, background: "rgba(3,105,161,0.9)", border: "1px solid #7dd3fc", color: "#fff", fontSize: 12, fontWeight: 900, whiteSpace: "nowrap" }}>
+      {!angosto && <Html position={[0, 2.4, 0]} center zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ padding: "5px 11px", borderRadius: 999, background: "rgba(3,105,161,0.9)", border: "1px solid #7dd3fc", color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
           <i className="fa-solid fa-house-flood-water" style={{ marginRight: 6 }} />
           <span ref={lectura}>Ola: 1.50 m</span>
         </div>
-      </Html>
+      </Html>}
     </group>
   );
 }
@@ -931,7 +935,7 @@ function EscenaManglar({ plantacion, ancho, anios, olaNonce, modoColor }: { plan
               </mesh>
             )}
             {largo > 0 && (
-              <Etiqueta pos={[x + w / 2, y + 0.05, zi === 1 ? 2.5 : 3.55]} df={11} fs={10} col={e ? `${e.nativa ? modoColor : "#f87171"}aa` : undefined}>
+              <Etiqueta pos={[x + w / 2, y + 0.05, zi === 1 ? 2.5 : 3.55]} col={e ? `${e.nativa ? modoColor : "#f87171"}aa` : undefined}>
                 {z.id === "borde" ? "Borde" : z.id === "media" ? "Media" : "Interna"}: {e ? e.etq.replace("Mangle ", "").toLowerCase() : "—"}
               </Etiqueta>
             )}
@@ -953,14 +957,6 @@ function EscenaManglar({ plantacion, ancho, anios, olaNonce, modoColor }: { plan
       ))}
       <Bosque plantacion={plantacion} ancho={ancho} anios={anios} />
       {olaNonce > 0 && <OlaTormenta key={olaNonce} plantacion={plantacion} ancho={ancho} anios={anios} xPueblo={xPueblo} />}
-      <Etiqueta pos={[-8.5, 1.6, 0]} df={11} fs={11} col="#38bdf8aa">
-        <i className="fa-solid fa-water" style={{ color: "#38bdf8" }} />
-        Mar · ola de tormenta de {num(OLA_INICIAL, 1)} m
-      </Etiqueta>
-      <Etiqueta pos={[X0_COSTA + Math.max(largo, 1) / 2, 3.6, 0]} df={10} fs={11.5} col={`${modoColor}aa`}>
-        <i className="fa-solid fa-tree" style={{ color: modoColor }} />
-        {ancho} m de manglar · {anios} {anios === 1 ? "año" : "años"} · {num(total)} t CO₂e capturadas
-      </Etiqueta>
     </group>
   );
 }
@@ -970,9 +966,9 @@ function EscenaManglar({ plantacion, ancho, anios, olaNonce, modoColor }: { plan
 export default function InnovacionesAmbientalesScene(p: InnovacionesSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "lluvia") return { pos: [2.6, 4.2, 13.6], target: [-1.4, 1.1, 0] };
-    if (vista === "humedal") return { pos: [2.4, 5.6, 10.4], target: [0.4, 0.2, 0] };
-    return { pos: [0.6, 6.4, 12.8], target: [-1.2, 0.2, 0] };
+    if (vista === "lluvia") return { pos: [2.8, 4.6, 15.6], target: [-1.4, 0.6, 0] };
+    if (vista === "humedal") return { pos: [2.6, 6.2, 12.8], target: [0.4, -0.2, 0] };
+    return { pos: [0.6, 6.6, 14.4], target: [-1.2, -0.2, 0] };
   }, [vista]);
 
   return (
@@ -991,7 +987,8 @@ export default function InnovacionesAmbientalesScene(p: InnovacionesSceneProps) 
       {vista === "humedal" && <EscenaHumedal personas={p.personas} areaHumedal={p.areaHumedal} tempC={p.tempC} muestraNonce={p.muestraNonce} modoColor={modoColor} />}
       {vista === "manglar" && <EscenaManglar plantacion={p.plantacion} ancho={p.ancho} anios={p.anios} olaNonce={p.olaNonce} modoColor={modoColor} />}
 
-      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={24} maxPolarAngle={Math.PI * 0.47} minPolarAngle={Math.PI * 0.06} target={cam.target} />
+      <AjusteAncho zoomAngosto={vista === "manglar" ? 0.55 : 0.65} />
+      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={26} maxPolarAngle={Math.PI * 0.47} minPolarAngle={Math.PI * 0.06} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.28} luminanceThreshold={0.65} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.6} />

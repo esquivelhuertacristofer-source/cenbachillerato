@@ -22,7 +22,9 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, NUM, OK, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -186,10 +188,10 @@ function GraficaPotencia({ datos, col }: { datos: number[]; col: string }) {
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: 86, display: "block", borderRadius: 10, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }} role="img" aria-label="Potencia de fisión en los últimos 6 segundos">
       <line x1={0} x2={W} y1={y(1)} y2={y(1)} stroke="rgba(255,255,255,0.28)" strokeDasharray="4 4" />
       <line x1={0} x2={W} y1={y(SCRAM_UMBRAL)} y2={y(SCRAM_UMBRAL)} stroke={NO} strokeOpacity={0.6} strokeDasharray="2 3" />
-      <text x={4} y={y(1) - 3} fill="rgba(255,255,255,0.55)" fontSize={9} fontWeight={700}>
+      <text x={4} y={y(1) - 3} fill="rgba(255,255,255,0.55)" fontSize={11} fontWeight={700}>
         100 %
       </text>
-      <text x={4} y={y(SCRAM_UMBRAL) - 3} fill={NO} fontSize={9} fontWeight={700}>
+      <text x={4} y={y(SCRAM_UMBRAL) - 3} fill={NO} fontSize={11} fontWeight={700}>
         120 % · SCRAM
       </text>
       <polyline points={pts} fill="none" stroke={col} strokeWidth={2.2} strokeLinejoin="round" />
@@ -231,22 +233,22 @@ function CienciaEticaCard({ accent, rgba, mejor, onResultado, playSfx }: { accen
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-star" style={{ marginRight: 8, color: accent }} />
           ¿Ciencia o ética?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Pregunta {pos + 1} de {ronda.length} · ¿se responde midiendo o deliberando?
           </div>
           <div style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>«{actual.texto}»</div>
@@ -260,7 +262,7 @@ function CienciaEticaCard({ accent, rgba, mejor, onResultado, playSfx }: { accen
               Ética: se delibera con valores
             </button>
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -268,9 +270,9 @@ function CienciaEticaCard({ accent, rgba, mejor, onResultado, playSfx }: { accen
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -284,6 +286,28 @@ function CienciaEticaCard({ accent, rgba, mejor, onResultado, playSfx }: { accen
 function leerNumero(s: string): number {
   return Number(s.replace(/[\s,]/g, "").replace(/−/g, "-"));
 }
+
+const CSS_FN = `
+  @keyframes fnAparece { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  .fn-subtabs { display:flex; flex-wrap:wrap; gap:6px; padding:4px; border-radius:12px; background:rgba(4,10,22,0.45); border:1px solid ${T.line}; }
+  .fn-subtab { flex:1 1 120px; cursor:pointer; border:1px solid transparent; border-radius:9px; padding:9px 10px; font-size:14px; font-weight:800; color:rgba(255,255,255,0.66); background:transparent; transition:all .15s; }
+  .fn-subtab[data-on="true"] { border-color:var(--fnc); color:#fff; background:rgba(255,255,255,0.07); }
+  .fn-opts { display:flex; flex-wrap:wrap; gap:7px; }
+  .fn-opt { cursor:pointer; border:1px solid var(--fnc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; text-align:left; }
+  .fn-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+  .fn-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+  .fn-opt:disabled { cursor:default; }
+  .fn-opt:disabled[data-on="false"] { opacity:0.55; }
+  .fn-toggle { width:100%; cursor:pointer; border:1px solid var(--fnc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+  .fn-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+  .fn-input { width:min(100%,160px); padding:9px 11px; border-radius:10px; border:1px solid ${T.lineStrong}; background:rgba(4,10,22,0.6); color:#fff; font-size:14px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .fn-input:disabled { opacity:0.7; }
+  .fn-tabla { width:100%; border-collapse:collapse; font-size:14px; font-variant-numeric:tabular-nums; }
+  .fn-tabla td { padding:6px 9px; border-bottom:1px solid ${T.line}; color:${T.text2}; white-space:nowrap; }
+  .fn-tabla td:first-child { color:#fff; font-weight:800; }
+  .fn-tabla .fn-suma { color:#fff; font-weight:900; border-left:1px solid ${T.line}; text-align:center; }
+  .fn-opt:focus-visible, .fn-subtab:focus-visible, .fn-toggle:focus-visible, .fn-input:focus-visible { outline:2px solid #38bdf8; outline-offset:2px; }
+`;
 
 /* ════════════════════════════════════════════════════════════════════════
  * Shell
@@ -338,7 +362,6 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -529,18 +552,19 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
   const regimenes = [reactor.vioSub, reactor.vioCrit, reactor.vioSuper].filter(Boolean).length;
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: `Recorrer los tres regímenes: apagarse en k < 1, sostener k = 1 y llegar al SCRAM con k > 1 (${regimenes}/3)`, done: regimenes === 3 },
-    { t: "Comprobar un freno físico: con uranio natural o sin agua, un BWR no llega a crítico", done: reactor.freno },
-    { t: "Apagar el reactor, cortar las bombas y ver el calor residual dejar el combustible al descubierto", done: reactor.descubierto },
-    { t: "Calcular con E = mc² la energía de una fisión", done: eOk },
-    { t: "Predecir cuántas veces más carbón que uranio hace falta", done: prediccionOk },
-    { t: "Calcular cuándo queda 1/8 del plutonio-239 y llevar el tiempo hasta ahí", done: puOk && puLlego },
-    { t: "Conectar los tres pueblos eligiendo banda y torres", done: conecto },
-    { t: "Cruzar la zona de exclusión de una antena y ubicar un celular con tres antenas", done: vioExcede && vioCumple && ubico },
-    { t: "Clasificar preguntas en «¿Ciencia o ética?» y ganar estrellas", done: clasifico },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Mueve las barras de control y mira cómo cambian k, la potencia y la gráfica", done: barras !== 25 },
+    { txt: `Recorrer los tres regímenes: apagarse en k < 1, sostener k = 1 y llegar al SCRAM con k > 1 (${regimenes}/3)`, done: regimenes === 3 },
+    { txt: "Comprobar un freno físico: con uranio natural o sin agua, un BWR no llega a crítico", done: reactor.freno },
+    { txt: "Apagar el reactor, cortar las bombas y ver el calor residual dejar el combustible al descubierto", done: reactor.descubierto },
+    { txt: "Calcular con E = mc² la energía de una fisión", done: eOk },
+    { txt: "Predecir cuántas veces más carbón que uranio hace falta", done: prediccionOk },
+    { txt: "Calcular cuándo queda 1/8 del plutonio-239 y llevar el tiempo hasta ahí", done: puOk && puLlego },
+    { txt: "Conectar los tres pueblos eligiendo banda y torres", done: conecto },
+    { txt: "Cruzar la zona de exclusión de una antena y ubicar un celular con tres antenas", done: vioExcede && vioCumple && ubico },
+    { txt: "Clasificar preguntas en «¿Ciencia o ética?» y ganar estrellas", done: clasifico },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -593,25 +617,20 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
   );
   const lectura = (etq: string, valor: string, col = "#fff") => (
-    <div style={{ flex: "1 1 90px", padding: "9px 10px", borderRadius: 10, background: "rgba(4,10,22,0.45)", border: `1px solid ${T.line}` }}>
-      <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: "0.07em", color: T.text3, textTransform: "uppercase" }}>{etq}</div>
-      <div style={{ fontSize: 14.5, fontWeight: 900, color: col, marginTop: 3, ...NUM }}>{valor}</div>
+    <div style={{ flex: "1 1 130px", minWidth: 0 }}>
+      <Dato label={etq} value={valor} col={col === "#fff" ? undefined : col} />
     </div>
   );
   const deslizador = (aria: string, icono: string, min: number, max: number, step: number, value: number, onChange: (v: number) => void, texto: string, col: string) => (
-    <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10 }}>
-      <i className={`fa-solid ${icono}`} style={{ color: col, width: 16 }} />
-      <input type="range" aria-label={aria} className="fn-range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} style={{ ["--fnc" as string]: col }} />
-      <span style={{ minWidth: 92, textAlign: "right", fontSize: 12.5, color: "#fff", fontWeight: 800, ...NUM }}>{texto}</span>
-    </label>
+    <Deslizador label={aria} icon={icono} colr={col} valor={texto} min={min} max={max} step={step} value={value} onChange={onChange} />
   );
   const pestanas = <X extends string>(items: { id: X; etq: string; icono: string }[], actual: X, set: (x: X) => void) => (
     <div className="fn-subtabs">
@@ -637,7 +656,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.5, marginTop: 8 }}>{tipoDef.detalle}</div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 8 }}>{tipoDef.detalle}</div>
         {sub("Combustible")}
         <div className="fn-opts">
           {ENRIQUECIMIENTOS.map((e) => (
@@ -721,7 +740,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
                 </tbody>
               </table>
             </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginTop: 8 }}>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, marginTop: 8 }}>
               Calcula la masa que falta (Δm = antes − después) y conviértela: <strong style={{ color: "#fff" }}>E = Δm · c²</strong>, con 1 u · c² = {U_MEV} MeV.
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
@@ -752,7 +771,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
                 </button>
               ))}
             </div>
-            <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>{DEMANDAS.find((d) => d.id === demanda)!.nota}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{DEMANDAS.find((d) => d.id === demanda)!.nota}</div>
             {sub("2 · Predice: ¿cuántas veces más masa de carbón que de uranio?")}
             <div className="fn-opts">
               {OPCIONES_RAZON.map((o) => {
@@ -800,7 +819,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
       <>
         {sub("Línea del tiempo (escala logarítmica)")}
         {deslizador("Tiempo desde que sale del reactor (log)", "fa-clock", LOG_T_MIN, LOG_T_MAX, 0.01, logT, moverTiempo, formatoAnios(tAnios), modoCol)}
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: T.text3, marginTop: 4, paddingLeft: 26 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: T.text3, marginTop: 4, paddingLeft: 26 }}>
           <span>1 día</span>
           <span>1 año</span>
           <span>100 años</span>
@@ -812,7 +831,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
           {lectura("Generaciones", num(tAnios / ANIOS_GENERACION, tAnios < 250 ? 1 : 0))}
           {lectura(isoDef.etq, fracSel >= 0.001 ? `${num(fracSel * 100, fracSel < 0.1 ? 1 : 0)} %` : "< 0.1 %", isoDef.color)}
         </div>
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 8 }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 8 }}>
           <i className="fa-solid fa-landmark" style={{ marginRight: 7, color: modoCol }} />
           {hitoHumano(tAnios)}
         </div>
@@ -826,7 +845,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
         </div>
         {nota(`${isoDef.nota} N = N₀ · (1/2)^(t / ${formatoAnios(isoDef.t12)}).`, T.text2)}
         {sub("Reto: ¿en cuántos años queda 1/8 del plutonio-239?")}
-        <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>Su vida media es de 24 110 años. Calcúlalo y después lleva la línea del tiempo hasta ese momento.</div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>Su vida media es de 24 110 años. Calcúlalo y después lleva la línea del tiempo hasta ese momento.</div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
           <input className="fn-input" aria-label="Años para que quede 1/8 del plutonio-239 (años)" inputMode="numeric" placeholder="años" value={puTexto} onChange={(e) => setPuTexto(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") comprobarPu(); }} disabled={puOk} />
           <button className="fn-opt fn-comprobar-pu" data-on="true" onClick={comprobarPu} disabled={puOk} style={{ ["--fnc" as string]: modoCol }}>
@@ -875,7 +894,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
               {pueblos.map((l) => {
                 const on = cub.has(l.id);
                 return (
-                  <div key={l.id} style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12, padding: "7px 10px", borderRadius: 9, background: "rgba(4,10,22,0.45)", border: `1px solid ${on ? `${OK}55` : T.line}` }}>
+                  <div key={l.id} style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 14, padding: "7px 10px", borderRadius: 9, background: "rgba(4,10,22,0.45)", border: `1px solid ${on ? `${OK}55` : T.line}` }}>
                     <span style={{ color: "#fff", fontWeight: 800 }}>
                       <i className={`fa-solid ${on ? "fa-signal" : "fa-ban"}`} style={{ marginRight: 8, color: on ? OK : NO }} />
                       {l.etq}
@@ -899,7 +918,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
               {lectura("Límite ICNIRP 2020", `${num(bandaDef.limite, 1)} W/m²`)}
               {lectura("Zona de exclusión", `${num(dLim, 1)} m`, "#fbbf24")}
             </div>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 10, ...NUM }}>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 10, ...NUM }}>
               S = PIRE / (4π d²) = 794 W / (4π · {num(distanciaM, 1)}²) = <strong style={{ color: "#fff" }}>{S >= 0.01 ? num(S, 3) : cient(S, 2)} W/m²</strong>
             </div>
             {sub("¿Puede ionizar?")}
@@ -930,7 +949,7 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
             </div>
             <div style={{ display: "grid", gap: 6, marginTop: 12 }}>
               {ANTENAS_RASTREO.filter((a) => antenas.includes(a.id)).map((a) => (
-                <div key={a.id} style={{ fontSize: 12, color: T.text2, ...NUM }}>
+                <div key={a.id} style={{ fontSize: 14, color: T.text2, ...NUM }}>
                   Antena {a.id + 1}: el celular está a <strong style={{ color: "#fff" }}>{num(Math.hypot(telefono.x - a.x, telefono.z - a.z) * 1000, 0)} m</strong> (± {num(INCERTIDUMBRE_KM * 1000)} m)
                 </div>
               ))}
@@ -943,372 +962,172 @@ export function LabFisionNuclear({ color }: PracticaLabProps) {
     );
   }
 
+  const bloqueVivo = (
+    <Bloque titulo="Qué está pasando" icono={def.icono}>
+      <style>{CSS_FN}</style>
+      <p style={{ margin: 0, ...NUM }}>{pie}</p>
+    </Bloque>
+  );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes fnAparece { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
-        @keyframes fnPulse { 0%,100%{ box-shadow:0 0 0 0 var(--fnd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .fn-live-dot { animation: fnPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .fn-live-dot { animation:none; } }
-        .fn-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .fn-grid { grid-template-columns: 1fr; } }
-        .fn-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .fn-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .fn-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .fn-tabs { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; }
-        @media (max-width: 760px){ .fn-tabs { grid-template-columns: repeat(2,1fr); } }
-        .fn-tab { cursor:pointer; border:1px solid var(--fnc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .fn-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .fn-tab:hover { background:rgba(255,255,255,0.06); }
-        .fn-subtabs { display:flex; flex-wrap:wrap; gap:6px; padding:4px; border-radius:12px; background:rgba(4,10,22,0.45); border:1px solid ${T.line}; }
-        .fn-subtab { flex:1 1 140px; cursor:pointer; border:1px solid transparent; border-radius:9px; padding:8px 10px; font-size:12px; font-weight:800; color:rgba(255,255,255,0.66); background:transparent; transition:all .15s; }
-        .fn-subtab[data-on="true"] { border-color:var(--fnc); color:#fff; background:rgba(255,255,255,0.07); }
-        .fn-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .fn-opt { cursor:pointer; border:1px solid var(--fnc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .fn-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .fn-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .fn-opt:disabled { cursor:default; }
-        .fn-opt:disabled[data-on="false"] { opacity:0.55; }
-        .fn-toggle { width:100%; cursor:pointer; border:1px solid var(--fnc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .fn-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .fn-range { flex:1; accent-color: var(--fnc); min-width:0; }
-        .fn-input { width:130px; padding:9px 11px; border-radius:10px; border:1px solid ${T.lineStrong}; background:rgba(4,10,22,0.6); color:#fff; font-size:13px; font-weight:800; font-variant-numeric:tabular-nums; }
-        .fn-input:disabled { opacity:0.7; }
-        .fn-tabla { width:100%; border-collapse:collapse; font-size:12px; font-variant-numeric:tabular-nums; }
-        .fn-tabla td { padding:6px 9px; border-bottom:1px solid ${T.line}; color:${T.text2}; white-space:nowrap; }
-        .fn-tabla td:first-child { color:#fff; font-weight:800; }
-        .fn-tabla .fn-suma { color:#fff; font-weight:900; border-left:1px solid ${T.line}; text-align:center; }
-        .fn-opt:focus-visible, .fn-tab:focus-visible, .fn-subtab:focus-visible, .fn-toggle:focus-visible, .fn-icobtn:focus-visible, .fn-range:focus-visible, .fn-input:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .fn-bottom { grid-template-columns: 1fr !important; } }
-        .fn-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .fn-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .fn-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .fn-drawer[data-open="true"] { transform:translateX(0); }
-        .fn-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .fn-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .fn-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .fn-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .fn-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .fn-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="fn-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="fn-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--fnc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <FisionScene
+            vista={modo}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            p={sim.p}
+            k={k}
+            barras={barrasEf}
+            vacios={vacios / 100}
+            tipo={tipo}
+            scram={sim.scram}
+            agua={sim.agua}
+            bombas={bombas}
+            ebullicion={ebullicion}
+            subEnergia={subEnergia}
+            disparo={disparo}
+            demanda={demanda}
+            revelado={prediccion !== null}
+            tAnios={tAnios}
+            isotopo={isotopo}
+            subTelecom={subTelecom}
+            banda={banda}
+            torres={torres}
+            distanciaM={distanciaM}
+            antenas={antenas}
+            telefono={telefono}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={`${def.etq}: ${def.subtitulo}`} icono={def.icono}>
+                {control}
+              </Bloque>
+              {bloqueVivo}
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <Bloque titulo="¿Ciencia o ética?" icono="fa-star">
+                <CienciaEticaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              </Bloque>
+              <Bloque titulo="Quiz evaluable (A2)" icono="fa-circle-question">
+                <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Puedes argumentar con física y con ética." />
+              </Bloque>
+              <Bloque titulo="Completa el texto (A6)" icono="fa-keyboard">
+                <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="La misma física, usos opuestos" icono="fa-scale-balanced">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((t, n) => <li key={n}>{t}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo={`Lectura A1: ${TITULO_A1}`} icono="fa-book-open">
+                <div style={{ display: "grid", gap: 9 }}>
+                  {LECTURA_A1.map((t, n) => <p key={n} style={{ margin: 0, color: T.text2 }}>{t}</p>)}
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="fn-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <FisionScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                p={sim.p}
-                k={k}
-                barras={barrasEf}
-                vacios={vacios / 100}
-                tipo={tipo}
-                scram={sim.scram}
-                agua={sim.agua}
-                bombas={bombas}
-                ebullicion={ebullicion}
-                subEnergia={subEnergia}
-                disparo={disparo}
-                demanda={demanda}
-                revelado={prediccion !== null}
-                tAnios={tAnios}
-                isotopo={isotopo}
-                subTelecom={subTelecom}
-                banda={banda}
-                torres={torres}
-                distanciaM={distanciaM}
-                antenas={antenas}
-                telefono={telefono}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="fn-live-dot" style={{ ["--fnd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="fn-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="fn-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="fn-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="fn-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-scale-balanced" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>La misma física, usos opuestos</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
+                <strong style={{ color: T.text3, letterSpacing: "0.06em" }}>PARA REFLEXIONAR</strong>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, n) => <li key={n}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Importante (lectura A1)" icono="fa-landmark">
+                <p style={{ margin: 0, color: T.text2 }}>{RECUADRO_A1}</p>
+              </Bloque>
+              <Bloque titulo={`Debate ético: ${TITULO_A3}`} icono="fa-comments">
+                <p style={{ margin: 0, color: T.text2 }}>{DEBATE_A3}</p>
+                <strong style={{ color: T.text3, letterSpacing: "0.06em" }}>PISTAS</strong>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, color: T.text2 }}>
+                  {PISTAS_A3.map((t, n) => <li key={n}>{t}</li>)}
+                </ul>
+                <p style={{ margin: 0, color: T.text2 }}><strong style={{ color: "#fff" }}>Si tuvieras que votar (A7):</strong> {REFLEXION_A7}</p>
+                <p style={{ margin: 0, color: T.text2 }}><strong style={{ color: "#fff" }}>Después del video (A9):</strong> {PREGUNTA_A9}</p>
+                <p style={{ margin: 0, color: T.text2 }}><strong style={{ color: "#fff" }}>Analiza una tecnología (A5):</strong> {ACTIVIDAD_A5}</p>
+              </Bloque>
+              <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, n) => <li key={n}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {GLOSARIO.map((gi, n) => (
+                    <div key={n} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                      <strong style={{ color: accent }}>{gi.termino}. </strong>
+                      <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                      <div style={{ color: T.text3, marginTop: 4 }}>
+                        <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />
+                        {gi.ejemplo}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="fn-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: "1px solid #c084fc55", background: "rgba(192,132,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-comments" style={{ marginRight: 8, color: "#c084fc" }} />
-              Debate ético (A3, A7, A9 y A5)
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, marginBottom: 6 }}>{TITULO_A3}</div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{DEBATE_A3}</div>
-            <div style={{ fontSize: 10.5, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "10px 0 6px" }}>PISTAS</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 5 }}>
-              {PISTAS_A3.map((p, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {p}
-                </li>
-              ))}
-            </ul>
-            <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
-              <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
-                <strong style={{ color: "#fff" }}>Si tuvieras que votar (A7):</strong> {REFLEXION_A7}
-              </div>
-              <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
-                <strong style={{ color: "#fff" }}>Después del video (A9):</strong> {PREGUNTA_A9}
-              </div>
-              <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
-                <strong style={{ color: "#fff" }}>Analiza una tecnología (A5):</strong> {ACTIVIDAD_A5}
-              </div>
-            </div>
-          </div>
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-landmark" style={{ marginRight: 8, color: accent }} />
-              Importante (lectura A1)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{RECUADRO_A1}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-              Ideas clave
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-clock-rotate-left" style={{ marginRight: 8, color: "#fbbf24" }} />
-              Actualizaciones
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {NOTAS_ACTUALIZACION.map((x, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas y su recuadro, el debate de A3, A5, A7 y A9, los hechos del quiz A4, el glosario A5, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma
-          (en el texto A6 se acepta además «mc2», porque el «²» no se teclea fácilmente). La dimensión ética se conserva como <strong>debate</strong>; lo manipulable es la física. Son <strong>datos reales</strong>:
-          masas atómicas (AME2020), vidas medias, calor residual (Way–Wigner), neutrones retardados, potencia de Laguna Verde (CFE), emisiones de ciclo de vida (IPCC 2014), límites de exposición
-          (ICNIRP 2020) y brecha digital (INEGI, ENDUTIH 2024). Son <strong>modelos ilustrativos</strong>: la reactividad k y su respuesta a barras y vapor, la velocidad de la simulación, el agua sobre el
-          combustible, el alcance de las torres, los pueblos y sus habitantes, la potencia de la antena y la precisión del rastreo. Las actualizaciones no son parte de la lectura. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <CienciaEticaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Puedes argumentar con física y con ética." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="fn-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="fn-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="fn-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="fn-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="fn-drawer-body">
-          <FichaTeorica data={FISION_NUCLEAR_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, n) => <li key={n}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Actualizaciones" icono="fa-clock-rotate-left">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {NOTAS_ACTUALIZACION.map((x, n) => <li key={n}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={FISION_NUCLEAR_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                La lectura A1 con sus preguntas y su recuadro, el debate de A3, A5, A7 y A9, los hechos del quiz A4, el glosario A5, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma
+                (en el texto A6 se acepta además «mc2», porque el «²» no se teclea fácilmente). La dimensión ética se conserva como <strong>debate</strong>; lo manipulable es la física. Son <strong>datos reales</strong>:
+                masas atómicas (AME2020), vidas medias, calor residual (Way–Wigner), neutrones retardados, potencia de Laguna Verde (CFE), emisiones de ciclo de vida (IPCC 2014), límites de exposición
+                (ICNIRP 2020) y brecha digital (INEGI, ENDUTIH 2024). Son <strong>modelos ilustrativos</strong>: la reactividad k y su respuesta a barras y vapor, la velocidad de la simulación, el agua sobre el
+                combustible, el alcance de las torres, los pueblos y sus habitantes, la potencia de la antena y la precisión del rastreo. Las actualizaciones no son parte de la lectura. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

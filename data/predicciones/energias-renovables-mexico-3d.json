@@ -1,0 +1,12 @@
+{
+  "escena": "La mezcla eléctrica de México en torres de colores y una nube de CO₂. Agregas 10 puntos de sol y viento y debes retirar combustibles fósiles.",
+  "pregunta": "Con la misma energía solar y eólica agregada, ¿qué fósil conviene retirar primero para emitir menos?",
+  "opciones": [
+    { "id": "a", "texto": "El gas natural, por ser el más usado", "icono": "fa-fire-flame-simple" },
+    { "id": "b", "texto": "El carbón y el combustóleo", "icono": "fa-smog" },
+    { "id": "c", "texto": "Da igual cuál se retire", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Cada kWh de carbón emite unos 820 g de CO₂e y uno de gas, 490 g. Quitar primero lo más sucio evita más emisiones con la misma energía limpia: la nube se reduce más.",
+  "comoComprobarlo": "En «Emisiones y agotamiento» sube solar 10 puntos, elige «carbón y combustóleo primero», anota las Mt y repite con el orden del gas."
+}

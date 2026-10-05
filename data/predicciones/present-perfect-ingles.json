@@ -1,0 +1,12 @@
+{
+  "escena": "Sam, un estudiante de intercambio, pregunta si alguna vez has viajado a otro estado.",
+  "pregunta": "En el chat con Sam, ¿qué respuesta lo deja confundido?",
+  "opciones": [
+    { "id": "a", "texto": "I have gone there yesterday.", "icono": "fa-circle-question" },
+    { "id": "b", "texto": "I have never travelled.", "icono": "fa-ban" },
+    { "id": "c", "texto": "Yes, I have travelled.", "icono": "fa-plane" }
+  ],
+  "correcta": "a",
+  "porque": "«Yesterday» es un momento específico y exige past simple (went). El present perfect cuenta experiencias sin fecha, por eso never y una respuesta sin tiempo concreto sí funcionan.",
+  "comoComprobarlo": "Abre «Chat with Sam», elige cada respuesta de la primera pregunta y observa la reacción de Sam y el mapa de experiencias."
+}

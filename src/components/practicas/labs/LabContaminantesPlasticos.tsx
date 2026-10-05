@@ -20,6 +20,8 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -93,7 +95,7 @@ const ContaminantesScene = dynamic(() => import("./ContaminantesPlasticosScene")
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-water fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la costa y la cadena alimenticia en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la costa y la cadena alimenticia en 3D…</span>
     </div>
   ),
 });
@@ -148,15 +150,15 @@ function ClasificaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
           ¿Qué tipo de contaminante es?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Contaminante {pos + 1} de {ronda.length} · clasifícalo en uno de los tres grupos de la lectura A1
           </div>
           <div style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>{actual.texto}</div>
@@ -168,7 +170,7 @@ function ClasificaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -176,9 +178,9 @@ function ClasificaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -240,7 +242,6 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const timers = useRef<number[]>([]);
@@ -331,6 +332,7 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
     });
   };
   const moverTiempo = (s: number) => {
+    if (!tirado) return;
     setSliderT(s);
     setRedCaptura(null);
     const e = estadoPlastico(resina, lugar, aniosDeSlider(s), bio);
@@ -384,6 +386,7 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
     if (contamId === "ddt" && n === ultimo) setVioCimaDdt(true);
   };
   const moverEdad = (v: number) => {
+    if (paso < iAtun) return;
     setEdadAtun(v);
     if (v <= 2) setEdadJoven(true);
     if (v >= 10) setEdadVieja(true);
@@ -447,18 +450,18 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Tirar al mar un plástico más denso que el agua de mar y verlo hundirse", done: vioHundirse },
-    { t: "Dejar pasar el tiempo hasta que un plástico se vuelva microplástico", done: vioMicro },
-    { t: "Pasar la red de superficie y ver que se escapa más de la mitad del plástico", done: vioRedEscapa },
-    { t: "Seguir el DDT eslabón por eslabón hasta el águila pescadora", done: vioCimaDdt },
-    { t: "Comparar el mercurio de un atún joven (≤ 2 años) y uno viejo (≥ 10 años)", done: edadJoven && edadVieja },
-    { t: "Encontrar una dieta que rebase la ingesta tolerable de metilmercurio", done: vioExcede },
-    { t: "Reciclar una botella de PET y cerrar el ciclo", done: cicloPet },
-    { t: "Comprobar dónde sí y dónde no se degrada el vaso de PLA", done: plaSi && plaNo },
-    { t: "Clasificar contaminantes y ganar estrellas", done: clasifico },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Tirar al mar un plástico más denso que el agua de mar y verlo hundirse", done: vioHundirse },
+    { txt: "Dejar pasar el tiempo hasta que un plástico se vuelva microplástico", done: vioMicro },
+    { txt: "Pasar la red de superficie y ver que se escapa más de la mitad del plástico", done: vioRedEscapa },
+    { txt: "Seguir el DDT eslabón por eslabón hasta el águila pescadora", done: vioCimaDdt },
+    { txt: "Comparar el mercurio de un atún joven (≤ 2 años) y uno viejo (≥ 10 años)", done: edadJoven && edadVieja },
+    { txt: "Encontrar una dieta que rebase la ingesta tolerable de metilmercurio", done: vioExcede },
+    { txt: "Reciclar una botella de PET y cerrar el ciclo", done: cicloPet },
+    { txt: "Comprobar dónde sí y dónde no se degrada el vaso de PLA", done: plaSi && plaNo },
+    { txt: "Clasificar contaminantes y ganar estrellas", done: clasifico },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -497,23 +500,18 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
   );
-  const dato = (etq: string, valor: string, col = "#fff") => (
-    <div style={{ flex: "1 1 120px", padding: "9px 11px", borderRadius: 10, background: "rgba(4,10,22,0.45)", border: `1px solid ${T.line}` }}>
-      <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>{etq}</div>
-      <div style={{ fontSize: 13.5, fontWeight: 900, color: col, marginTop: 3, ...NUM }}>{valor}</div>
-    </div>
-  );
+  const dato = (etq: string, valor: string, col?: string) => <Dato key={etq} label={etq} value={valor} col={col} />;
 
   /* ── Panel ─────────────────────────────────────────────────────────── */
   let control: ReactNode = null;
@@ -532,10 +530,10 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
           ))}
         </div>
         <div style={{ marginTop: 10, padding: "11px 13px", borderRadius: 12, background: "rgba(248,250,252,0.05)", border: `1px solid ${T.line}` }}>
-          <div style={{ fontSize: 13.5, color: "#fff", fontWeight: 900 }}>
+          <div style={{ fontSize: 14, color: "#fff", fontWeight: 900 }}>
             {resina.objeto} · {resina.nombre}
           </div>
-          <div style={{ fontSize: 12, color: T.text2, marginTop: 4, lineHeight: 1.45, ...NUM }}>
+          <div style={{ fontSize: 14, color: T.text2, marginTop: 4, lineHeight: 1.45, ...NUM }}>
             Densidad {resina.densTxt} g/cm³ · agua de mar {num(DENS_MAR, 3)} g/cm³. {resina.reciclaje}
           </div>
         </div>
@@ -568,20 +566,15 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
 
         {sub("3 · Deja pasar el tiempo")}
         <div style={{ opacity: tirado ? 1 : 0.45, pointerEvents: tirado ? "auto" : "none" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <i className="fa-solid fa-hourglass-half" style={{ color: modoCol }} />
-            <input type="range" aria-label="Tiempo transcurrido (años)" className="cp-range" min={0} max={100} step={1} value={sliderT} disabled={!tirado} onChange={(e) => moverTiempo(Number(e.target.value))} style={{ ["--cpc" as string]: modoCol }} />
-            <span style={{ width: 96, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{tiempoTxt(tAnios)}</span>
-          </label>
-          <div style={{ fontSize: 10.5, color: T.text3, marginTop: 2 }}>Escala logarítmica: de un mes a mil años.</div>
-          <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginTop: 10 }}>
+          <Deslizador label="Tiempo transcurrido" icon="fa-hourglass-half" colr={modoCol} valor={tiempoTxt(tAnios)} min={0} max={100} step={1} value={sliderT} onChange={moverTiempo} hintL="1 mes" hintR="1 000 años" />
+          <div className="cp-datos" style={{ marginTop: 10 }}>
             {dato("Dónde está", ZONA_DEF[est.zona].etq)}
             {dato("Pedazos típicos", tamTxt(est.L), clase.color)}
             {dato("Clase", clase.etq, clase.color)}
             {dato("Cuántos", pedazosTxt(est.pedazos))}
           </div>
           {lugar === "mar" && !seHunde && (
-            <label style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 10, fontSize: 12, color: T.text2, cursor: "pointer" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 10, fontSize: 14, color: T.text2, cursor: "pointer" }}>
               <input type="checkbox" checked={bio} onChange={cambiarBio} aria-label="Considerar bioincrustación" style={{ accentColor: modoCol }} />
               Considerar la bioincrustación: algas y bacterias lo cubren y lo hunden (en el modelo, a los {Math.round(T_BIO * 12)} meses)
             </label>
@@ -607,7 +600,7 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
             redCaptura >= 0.5 ? "#fbbf24" : WARN,
             "fa-border-all",
           )}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Las densidades son reales. La velocidad de fragmentación es un modelo ilustrativo: sólo el orden de magnitud y que la playa fragmenta más rápido que la superficie y ésta más que el fondo están
           respaldados. Los «450 años» del PET que cita la lectura A1 son una estimación: nadie lo ha medido, y fragmentarse no es desaparecer.
         </div>
@@ -625,7 +618,7 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 8, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 8, lineHeight: 1.5 }}>
           <strong style={{ color: "#fff" }}>{cadena.nombre}.</strong> {cadena.porque}
         </div>
         {sub(`Eslabón ${paso + 1} de ${niveles.length}`)}
@@ -638,31 +631,27 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
             const ppm = ppmNivel(cadena, i, edadAtun);
             const visto = i <= paso;
             return (
-              <div key={`${contamId}-${i}`} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 9, background: i === paso ? `${modoCol}1a` : "rgba(4,10,22,0.35)", border: `1px solid ${i === paso ? `${modoCol}66` : T.line}`, fontSize: 12, ...NUM }}>
+              <div key={`${contamId}-${i}`} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 9, background: i === paso ? `${modoCol}1a` : "rgba(4,10,22,0.35)", border: `1px solid ${i === paso ? `${modoCol}66` : T.line}`, fontSize: 14, ...NUM }}>
                 <span style={{ flex: 1, color: visto ? "#fff" : T.text3, fontWeight: 800 }}>{n.etq}</span>
                 <span style={{ color: visto ? "#fff" : T.text3, fontWeight: 900 }}>{visto ? (ppm !== null ? `${ppmTxt(ppm)} ppm` : `${num(ingesta, 2)} µg/kg/sem`) : "?"}</span>
-                <span style={{ width: 92, textAlign: "right", fontSize: 10.5, color: T.text3 }}>{visto && ppm !== null && i > 0 ? `×${factorTxt(factorDesdeAgua(cadena, i, edadAtun)!)} vs agua` : ORIGEN_TXT[n.origen]}</span>
+                <span style={{ minWidth: 0, textAlign: "right", fontSize: 14, color: T.text3 }}>{visto && ppm !== null && i > 0 ? `×${factorTxt(factorDesdeAgua(cadena, i, edadAtun)!)} vs agua` : ORIGEN_TXT[n.origen]}</span>
               </div>
             );
           })}
         </div>
         {paso === ultimo && nota(cadena.efecto, "#fbbf24", "fa-landmark")}
-        {contamId === "ddt" && <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Agua, peces pequeños y águila: cifras del quiz A2. Zooplancton y peces grandes: valores del mismo ejemplo clásico de libro de texto (estuario de Long Island, años 60).</div>}
+        {contamId === "ddt" && <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Agua, peces pequeños y águila: cifras del quiz A2. Zooplancton y peces grandes: valores del mismo ejemplo clásico de libro de texto (estuario de Long Island, años 60).</div>}
         {contamId === "hg" && (
           <>
             {sub("Bioacumulación: la edad del atún")}
             <div style={{ opacity: paso >= iAtun ? 1 : 0.45, pointerEvents: paso >= iAtun ? "auto" : "none" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <i className="fa-solid fa-fish" style={{ color: modoCol }} />
-                <input type="range" aria-label="Edad del atún (años)" className="cp-range" min={1} max={12} step={1} value={edadAtun} disabled={paso < iAtun} onChange={(e) => moverEdad(Number(e.target.value))} style={{ ["--cpc" as string]: modoCol }} />
-                <span style={{ width: 70, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{edadAtun} años</span>
-              </label>
+              <Deslizador label="Edad del atún" icon="fa-fish" colr={modoCol} valor={`${edadAtun} años`} min={1} max={12} step={1} value={edadAtun} onChange={moverEdad} />
               {nota(
                 `Un atún de ${edadAtun} años tiene ≈ ${ppmTxt(ppmNivel(cadena, iAtun, edadAtun)!)} ppm. Come lo mismo que uno joven, pero ha acumulado metilmercurio durante más tiempo: eso es bioacumulación, dentro de un solo organismo. La biomagnificación es el salto entre eslabones.`,
                 T.text2,
                 "fa-clock",
               )}
-              {paso < iAtun && <div style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>Avanza la cadena hasta el atún para mover la edad.</div>}
+              {paso < iAtun && <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>Avanza la cadena hasta el atún para mover la edad.</div>}
             </div>
             {sub("¿Cuánto recibe una persona?")}
             <div className="cp-opts">
@@ -672,24 +661,16 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
                 </button>
               ))}
             </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10 }}>
-              <span style={{ width: 128, fontSize: 11.5, color: T.text2 }}>Porciones de {PORCION_G} g por semana</span>
-              <input type="range" aria-label="Porciones por semana" className="cp-range" min={0} max={7} step={1} value={porciones} onChange={(e) => { const v = Number(e.target.value); setPorciones(v); actualizaIngesta(pescadoId, v, peso); }} style={{ ["--cpc" as string]: accent }} />
-              <span style={{ width: 40, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{porciones}</span>
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6 }}>
-              <span style={{ width: 128, fontSize: 11.5, color: T.text2 }}>Peso corporal</span>
-              <input type="range" aria-label="Peso corporal (kg)" className="cp-range" min={40} max={90} step={5} value={peso} onChange={(e) => { const v = Number(e.target.value); setPeso(v); actualizaIngesta(pescadoId, porciones, v); }} style={{ ["--cpc" as string]: accent }} />
-              <span style={{ width: 40, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{peso} kg</span>
-            </label>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 8, ...NUM }}>
+            <div style={{ marginTop: 12 }}><Deslizador label={`Porciones de ${PORCION_G} g por semana`} icon="fa-utensils" colr={accent} valor={`${porciones}`} min={0} max={7} step={1} value={porciones} onChange={(v) => { setPorciones(v); actualizaIngesta(pescadoId, v, peso); }} /></div>
+            <Deslizador label="Peso corporal" icon="fa-weight-scale" colr={accent} valor={`${peso} kg`} min={40} max={90} step={5} value={peso} onChange={(v) => { setPeso(v); actualizaIngesta(pescadoId, porciones, v); }} />
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 8, ...NUM }}>
               {ppmTxt(pescado.ppm)} mg/kg × 1000 µg/mg × {PORCION_G / 1000} kg × {porciones} ÷ {peso} kg = <strong style={{ color: excede ? WARN : OK }}>{num(ingesta, 2)} µg/kg por semana</strong>
             </div>
             <div className="cp-barra" aria-hidden>
               <div style={{ width: `${Math.min(100, (ingesta / (LIMITE_HG * 2)) * 100)}%`, background: excede ? WARN : OK }} />
               <span style={{ left: "50%" }} />
             </div>
-            <div style={{ fontSize: 10.5, color: T.text3, display: "flex", justifyContent: "space-between", marginTop: 3, ...NUM }}>
+            <div style={{ fontSize: 14, color: T.text3, display: "flex", justifyContent: "space-between", marginTop: 3, ...NUM }}>
               <span>0</span>
               <span>límite {num(LIMITE_HG, 1)}</span>
               <span>{num(LIMITE_HG * 2, 1)}</span>
@@ -701,7 +682,7 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
               excede ? WARN : OK,
               excede ? "fa-triangle-exclamation" : "fa-circle-check",
             )}
-            <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
               Mercurio en pescado: promedios de la FDA (1990–2012), casi todo como metilmercurio. Agua, plancton y la curva de la edad del atún: valores ilustrativos del orden de magnitud real. Es un ejercicio, no una recomendación médica; en el embarazo el cuidado es mayor.
             </div>
           </>
@@ -720,7 +701,7 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 8 }}>{objeto.material}</div>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 8 }}>{objeto.material}</div>
         {sub("2 · ¿A dónde lo mandas?")}
         <div className="cp-opts">
           {DESTINOS.map((d) => (
@@ -731,345 +712,207 @@ export function LabContaminantesPlasticos({ color }: PracticaLabProps) {
           ))}
         </div>
         {sub("Temperatura de la composta")}
-        <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <i className="fa-solid fa-temperature-half" style={{ color: "#fb923c" }} />
-          <input type="range" aria-label="Temperatura de la composta (°C)" className="cp-range" min={T_COMPOSTA_MIN} max={T_COMPOSTA_MAX} step={1} value={tempComposta} onChange={(e) => moverTemp(Number(e.target.value))} style={{ ["--cpc" as string]: "#fb923c" }} />
-          <span style={{ width: 56, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{tempComposta} °C</span>
-        </label>
-        <div style={{ fontSize: 10.5, color: T.text3, marginTop: 2 }}>Composta casera: 20–40 °C · planta de compostaje industrial: ≈ {T_COMPOSTA_INDUSTRIAL} °C.</div>
+        <Deslizador label="Temperatura de la composta" icon="fa-temperature-half" colr="#fb923c" valor={`${tempComposta} °C`} min={T_COMPOSTA_MIN} max={T_COMPOSTA_MAX} step={1} value={tempComposta} onChange={moverTemp} />
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>Composta casera: 20–40 °C · planta de compostaje industrial: ≈ {T_COMPOSTA_INDUSTRIAL} °C.</div>
         {destinoId && !llego && nota("En camino…", T.text2, "fa-truck-arrow-right")}
         {llego && des && res && (
           <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 12, border: `1px solid ${res.color}66`, background: "rgba(4,10,22,0.45)" }}>
-            <div style={{ fontSize: 12.5, fontWeight: 900, color: res.color, marginBottom: 4 }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: res.color, marginBottom: 4 }}>
               <i className={`fa-solid ${res.icono}`} style={{ marginRight: 7 }} />
               {res.etq} · {des.titulo}
             </div>
-            <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>{des.texto}</div>
+            <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5 }}>{des.texto}</div>
           </div>
         )}
         {objetoId === "pla" && nota(plaSi && plaNo ? "Ya lo viste: el PLA sólo se desintegra con el calor de la composta industrial." : "Prueba el vaso de PLA en la composta a menos de 50 °C y a 58 °C, y en otro destino.", plaSi && plaNo ? OK : T.text3, "fa-leaf")}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Los desenlaces describen lo que ocurre normalmente en México; cada municipio y cada planta es distinto. La desintegración del PLA entre 50 y 58 °C es una transición ilustrativa; a 58 °C la norma EN 13432 exige al menos 90 % en 12 semanas.
         </div>
       </>
     );
   }
 
+  const css = `
+    .cp-opts { display:flex; flex-wrap:wrap; gap:8px; }
+    .cp-datos { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    .cp-opt { cursor:pointer; border:1px solid var(--cpc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; display:inline-flex; align-items:center; }
+    .cp-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+    .cp-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+    .cp-opt:disabled { cursor:default; }
+    .cp-opt:disabled[data-on="false"] { opacity:0.55; }
+    .cp-codigo { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; margin-right:7px; border:1.5px solid; border-radius:5px; font-size:14px; font-weight:900; }
+    .cp-toggle { width:100%; cursor:pointer; border:1px solid var(--cpc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+    .cp-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+    .cp-toggle:disabled { cursor:default; opacity:0.75; }
+    .cp-barra { position:relative; height:10px; border-radius:6px; background:rgba(255,255,255,0.08); margin-top:10px; overflow:hidden; }
+    .cp-barra > div { height:100%; border-radius:6px; transition:width .3s ease, background .3s ease; }
+    .cp-barra > span { position:absolute; top:0; bottom:0; width:2px; background:#fff; }
+    .cp-opt:focus-visible, .cp-toggle:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  `;
+
+  const teoria = (
+    <>
+      <Bloque titulo="¿A dónde va lo que tiramos?" icono="fa-bottle-water">
+        <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
+      </Bloque>
+      <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+        <div style={{ display: "grid", gap: 9 }}>
+          {INSTRUCCIONES.map((p, i) => (
+            <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+              <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
+              <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
+            </div>
+          ))}
+        </div>
+      </Bloque>
+      <Bloque titulo={`Lectura A1 · ${TITULO_A1}`} icono="fa-book-open">
+        <div style={{ display: "grid", gap: 9 }}>
+          {LECTURA_A1.map((p, i) => (
+            <div key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.55 }}>
+              {p}
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
+        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+          {PREGUNTAS.map((q, i) => (
+            <li key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>
+              {q}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Importante (lectura A1)" icono="fa-droplet">
+        <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.55 }}>{RECUADRO_A1}</div>
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.45, fontStyle: "italic" }}>{NOTA_RECUADRO}</div>
+      </Bloque>
+      <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+          {HECHOS.map((h, i) => (
+            <li key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>
+              {h}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Glosario (A5)" icono="fa-book">
+        <div style={{ display: "grid", gap: 8 }}>
+          {GLOSARIO.map((gi, i) => (
+            <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+              <span style={{ fontSize: 15, fontWeight: 900, color: accent }}>{gi.termino}. </span>
+              <span style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
+                <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
+                {gi.ejemplo}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 15, color: T.text2 }}>
+          <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+        </div>
+      </Bloque>
+      <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 9 }}>
+          {IDEAS.map((x, i) => (
+            <li key={i} style={{ fontSize: 15, color: T.text2, lineHeight: 1.45 }}>
+              {x}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Ficha teórica" icono="fa-book">
+        <FichaTeorica data={CONTAMINANTES_PLASTICOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+      </Bloque>
+      <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+        La lectura A1 con sus preguntas y su recuadro, los hechos del quiz A4, el glosario A5, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma (la
+        precisión bajo el recuadro no lo es). Son <strong>datos reales</strong>: las densidades de las resinas, la malla de 0.333 mm de la red de manta, las clases de tamaño de los
+        plásticos, el mercurio promedio en pescado comercial (FDA, 1990–2012) y la ingesta semanal tolerable de metilmercurio de 1.6 µg/kg (JECFA, FAO/OMS). Son{" "}
+        <strong>modelos ilustrativos</strong>: la velocidad de fragmentación, el efecto de la bioincrustación, el mercurio del agua y del plancton, la curva con la edad del atún y la
+        desintegración del PLA entre 50 y 58 °C. La cadena del DDT combina las cifras del quiz A2 con el ejemplo clásico de libro de texto. Fuente: {FUENTE}
+      </p>
+    </>
+  );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes cpPulse { 0%,100%{ box-shadow:0 0 0 0 var(--cpd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .cp-live-dot { animation: cpPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .cp-live-dot { animation:none; } }
-        .cp-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .cp-grid { grid-template-columns: 1fr; } }
-        .cp-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .cp-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .cp-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .cp-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .cp-tab { cursor:pointer; border:1px solid var(--cpc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .cp-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .cp-tab:hover { background:rgba(255,255,255,0.06); }
-        .cp-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .cp-opt { cursor:pointer; border:1px solid var(--cpc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; display:inline-flex; align-items:center; }
-        .cp-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .cp-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .cp-opt:disabled { cursor:default; }
-        .cp-opt:disabled[data-on="false"] { opacity:0.55; }
-        .cp-codigo { display:inline-flex; align-items:center; justify-content:center; width:19px; height:19px; margin-right:7px; border:1.5px solid; border-radius:5px; font-size:10.5px; font-weight:900; }
-        .cp-toggle { width:100%; cursor:pointer; border:1px solid var(--cpc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .cp-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .cp-toggle:disabled { cursor:default; opacity:0.75; }
-        .cp-range { flex:1; accent-color: var(--cpc); }
-        .cp-barra { position:relative; height:10px; border-radius:6px; background:rgba(255,255,255,0.08); margin-top:10px; overflow:hidden; }
-        .cp-barra > div { height:100%; border-radius:6px; transition:width .3s ease, background .3s ease; }
-        .cp-barra > span { position:absolute; top:0; bottom:0; width:2px; background:#fff; }
-        .cp-opt:focus-visible, .cp-tab:focus-visible, .cp-toggle:focus-visible, .cp-icobtn:focus-visible, .cp-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .cp-bottom { grid-template-columns: 1fr !important; } }
-        .cp-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .cp-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .cp-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .cp-drawer[data-open="true"] { transform:translateX(0); }
-        .cp-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .cp-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .cp-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .cp-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .cp-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .cp-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="cp-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="cp-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--cpc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+    <LabShell
+      accent={modoCol}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <ContaminantesScene
+            vista={vista}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            resinaId={resinaId}
+            lugar={lugar}
+            tirado={tirado}
+            tAnios={tAnios}
+            bio={bio}
+            redNonce={redNonce}
+            contamId={contamId}
+            paso={paso}
+            edadAtun={edadAtun}
+            ingesta={ingesta}
+            objetoId={objetoId}
+            destinoId={destinoId}
+            envioNonce={envioNonce}
+            tempComposta={tempComposta}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{css}</style>
+              <Bloque titulo={`${def.etq} — ${def.subtitulo}`} icono={def.icono}>
+                <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.5 }}>{pie}</div>
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <style>{css}</style>
+              <ClasificaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes qué pasa con los plásticos y los contaminantes." />
+              <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="cp-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <ContaminantesScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                resinaId={resinaId}
-                lugar={lugar}
-                tirado={tirado}
-                tAnios={tAnios}
-                bio={bio}
-                redNonce={redNonce}
-                contamId={contamId}
-                paso={paso}
-                edadAtun={edadAtun}
-                ingesta={ingesta}
-                objetoId={objetoId}
-                destinoId={destinoId}
-                envioNonce={envioNonce}
-                tempComposta={tempComposta}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="cp-live-dot" style={{ ["--cpd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
               </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="cp-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="cp-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="cp-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="cp-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-bottle-water" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿A dónde va lo que tiramos?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="cp-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-droplet" style={{ marginRight: 8, color: accent }} />
-              Importante (lectura A1)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{RECUADRO_A1}</div>
-            <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.45, marginTop: 6, fontStyle: "italic" }}>{NOTA_RECUADRO}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas y su recuadro, los hechos del quiz A4, el glosario A5, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma (la
-          precisión bajo el recuadro no lo es). Son <strong>datos reales</strong>: las densidades de las resinas, la malla de 0.333 mm de la red de manta, las clases de tamaño de los
-          plásticos, el mercurio promedio en pescado comercial (FDA, 1990–2012) y la ingesta semanal tolerable de metilmercurio de 1.6 µg/kg (JECFA, FAO/OMS). Son{" "}
-          <strong>modelos ilustrativos</strong>: la velocidad de fragmentación, el efecto de la bioincrustación, el mercurio del agua y del plancton, la curva con la edad del atún y la
-          desintegración del PLA entre 50 y 58 °C. La cadena del DDT combina las cifras del quiz A2 con el ejemplo clásico de libro de texto. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <ClasificaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes qué pasa con los plásticos y los contaminantes." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="cp-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="cp-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="cp-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="cp-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="cp-drawer-body">
-          <FichaTeorica data={CONTAMINANTES_PLASTICOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+            </>
+          ),
+        },
+        { id: "teoria", etiqueta: "Teoría", icono: "fa-book-open", contenido: <><style>{css}</style>{teoria}</> },
+      ]}
+    />
   );
 }

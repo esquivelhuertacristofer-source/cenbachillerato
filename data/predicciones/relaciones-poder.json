@@ -1,0 +1,12 @@
+{
+  "escena": "Tienes fichas para sumar aliados y Radio Valle repite la versión de la empresa",
+  "pregunta": "Gastas 2 fichas en llevar Radio Valle a tu lado, sin haber pedido el peritaje. ¿Qué pasa con el balance?",
+  "opciones": [
+    { "id": "a", "texto": "Sube mucho porque la radio llega a todos los vecinos del valle", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "No se mueve: sin datos, la radio no cambia de lado", "icono": "fa-equals" },
+    { "id": "c", "texto": "Baja: la empresa responde con más publicidad en la radio", "icono": "fa-arrow-trend-down" }
+  ],
+  "correcta": "b",
+  "porque": "Un relato necesita respaldo: sin un peritaje propio, la radio no tiene argumentos distintos a los de la empresa. Las fichas se gastan y el balance queda igual.",
+  "comoComprobarlo": "En «Actúa en el conflicto» elige solo la acción de Radio Valle y mira el medidor y el color del nodo; luego agrega el peritaje y repite."
+}

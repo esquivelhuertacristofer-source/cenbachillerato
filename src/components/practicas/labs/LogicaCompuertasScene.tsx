@@ -21,8 +21,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -107,9 +107,16 @@ function useReloj(pulso: number) {
   return t;
 }
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/**
+ * Etiqueta fija en pantalla (14 px, sin distanceFactor): `sec` la omite (su dato
+ * vive en el panel) y en pantallas angostas solo se ven las `corta`.
+ */
+function Etiqueta({ pos, children, col, sec = false, corta = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; sec?: boolean; corta?: boolean }) {
+  const ancho = useThree((st) => st.size.width);
+  if (sec || (ancho < 640 && !corta)) return null;
+  const fs = 14;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -133,7 +140,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
 }
 
 /** Chip V / F / ? que aparece cuando la señal llega. */
-function ChipValor({ valor, retardo, pulso, fs = 13, error }: { valor: boolean | null; retardo: number; pulso: number; fs?: number; error?: boolean | null }) {
+function ChipValor({ valor, retardo, pulso, fs = 14, error }: { valor: boolean | null; retardo: number; pulso: number; fs?: number; error?: boolean | null }) {
   const col = valor === null ? "#64748b" : valor ? AMBAR : "#94a3b8";
   return (
     <div key={`${pulso}-${String(valor)}`} style={{ display: "flex", alignItems: "center", gap: 5, animation: valor === null ? undefined : `lcAparece .35s ease-out ${retardo}s both` }}>
@@ -155,7 +162,7 @@ function ChipValor({ valor, retardo, pulso, fs = 13, error }: { valor: boolean |
         {valor === null ? "?" : vf(valor)}
       </span>
       {error !== undefined && error !== null && (
-        <span style={{ padding: "2px 7px", borderRadius: 7, background: "rgba(127,29,29,0.9)", border: `1px solid ${NO}`, color: "#fff", fontSize: fs * 0.72, fontWeight: 900, whiteSpace: "nowrap" }}>
+        <span style={{ padding: "2px 7px", borderRadius: 7, background: "rgba(127,29,29,0.9)", border: `1px solid ${NO}`, color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
           tú: {vf(error)}
         </span>
       )}
@@ -336,16 +343,16 @@ function Compuerta({ tipo, pos, esc, valor, retardo, pulso, error, nombre }: { t
           </mesh>
         )}
       </group>
-      <Html position={[tipo === "and" ? -0.1 * esc : -0.05 * esc, 0.34 * esc, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ fontSize: 20 * esc, fontWeight: 900, color: "#fff", textShadow: `0 0 10px ${col}, 0 2px 4px #000`, lineHeight: 1 }}>{SIMBOLO[tipo]}</div>
+      <Html position={[tipo === "and" ? -0.1 * esc : -0.05 * esc, 0.34 * esc, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ fontSize: Math.max(18, 20 * esc), fontWeight: 900, color: "#fff", textShadow: `0 0 10px ${col}, 0 2px 4px #000`, lineHeight: 1 }}>{SIMBOLO[tipo]}</div>
       </Html>
       {nombre && (
-        <Etiqueta pos={[0, 0.05, 0.95 * esc]} df={10} fs={11} col={`${col}cc`}>
+        <Etiqueta sec pos={[0, 0.05, 0.95 * esc]} col={`${col}cc`}>
           {nombre}
         </Etiqueta>
       )}
-      <Html position={[X_SALIDA[tipo] * esc + 0.28, 0.55, -0.32 * esc]} center distanceFactor={10} zIndexRange={[21, 0]} style={{ pointerEvents: "none" }}>
-        <ChipValor valor={valor} retardo={retardo} pulso={pulso} fs={esc > 1.2 ? 14 : 12} error={error} />
+      <Html position={[X_SALIDA[tipo] * esc + 0.28, 0.55, -0.32 * esc]} center zIndexRange={[21, 0]} style={{ pointerEvents: "none" }}>
+        <ChipValor valor={valor} retardo={retardo} pulso={pulso} fs={esc > 1.2 ? 16 : 14} error={error} />
       </Html>
     </group>
   );
@@ -396,7 +403,7 @@ function Foco({ pos, esc, valor, retardo, pulso, children }: { pos: Pt; esc: num
       </mesh>
       <mesh ref={filamento} position={[0, 1.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.13, 0.025, 8, 24]} />
-        <meshStandardMaterial color="#fde68a" emissive={AMBAR} emissiveIntensity={0.1} toneMapped={false} />
+        <meshStandardMaterial color="#fde68a" emissive={AMBAR} emissiveIntensity={0.1} />
       </mesh>
       <mesh ref={halo} position={[0, 1.05, 0]} visible={false}>
         <sphereGeometry args={[0.75, 24, 18]} />
@@ -404,7 +411,7 @@ function Foco({ pos, esc, valor, retardo, pulso, children }: { pos: Pt; esc: num
       </mesh>
       <pointLight ref={luz} position={[0, 1.1, 0]} color={AMBAR} intensity={0} distance={7} decay={1.6} />
       {children && (
-        <Html position={[0, 2.0, 0]} center distanceFactor={10 / esc} zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
+        <Html position={[0, 2.0, 0]} center zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
           {children}
         </Html>
       )}
@@ -413,6 +420,7 @@ function Foco({ pos, esc, valor, retardo, pulso, children }: { pos: Pt; esc: num
 }
 
 function Palanca({ pos, variable, valor, frase, onToggle }: { pos: Pt; variable: Var; valor: boolean; frase: string; onToggle: (v: Var) => void }) {
+  const ancho = useThree((st) => st.size.width);
   const brazo = useRef<THREE.Group>(null);
   const led = useRef<THREE.Mesh>(null);
   const ang = useRef(valor ? -0.55 : 0.55);
@@ -449,16 +457,16 @@ function Palanca({ pos, variable, valor, frase, onToggle }: { pos: Pt; variable:
         </group>
         <mesh ref={led} position={[-0.42, 0.36, 0.3]}>
           <sphereGeometry args={[0.08, 16, 12]} />
-          <meshStandardMaterial color={valor ? AMBAR : "#334155"} emissive={AMBAR} emissiveIntensity={0.05} toneMapped={false} />
+          <meshStandardMaterial color={valor ? AMBAR : "#334155"} emissive={AMBAR} emissiveIntensity={0.05} />
         </mesh>
       </group>
-      <Html position={[0, 0.05, 0.85]} center distanceFactor={10} zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
+      {ancho >= 640 && <Html position={[0, 0.05, 0.85]} center zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px 6px 8px", borderRadius: 12, background: "rgba(4,10,22,0.88)", border: `1px solid ${valor ? AMBAR : "rgba(255,255,255,0.22)"}`, whiteSpace: "nowrap", boxShadow: "0 6px 18px -8px #000" }}>
           <span style={{ width: 24, height: 24, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", background: valor ? AMBAR : "#334155", color: valor ? "#1c1300" : "#e2e8f0", fontSize: 15, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{variable}</span>
-          <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{frase}</span>
-          <span style={{ fontSize: 13, fontWeight: 900, color: valor ? "#fde68a" : "#94a3b8", fontFamily: "ui-monospace, monospace" }}>{vf(valor)}</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{frase}</span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: valor ? "#fde68a" : "#94a3b8", fontFamily: "ui-monospace, monospace" }}>{vf(valor)}</span>
         </div>
-      </Html>
+      </Html>}
     </group>
   );
 }
@@ -477,10 +485,10 @@ function Entrada({ pos, variable, valor }: { pos: Pt; variable: Var; valor: bool
       </mesh>
       <mesh ref={led} position={[0, 0.3, 0]}>
         <sphereGeometry args={[0.15, 18, 14]} />
-        <meshStandardMaterial color={valor ? AMBAR : "#334155"} emissive={AMBAR} emissiveIntensity={0.04} toneMapped={false} />
+        <meshStandardMaterial color={valor ? AMBAR : "#334155"} emissive={AMBAR} emissiveIntensity={0.04} />
       </mesh>
-      <Html position={[-0.7, 0.2, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1px solid ${valor ? AMBAR : "rgba(255,255,255,0.22)"}`, fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 12, whiteSpace: "nowrap" }}>
+      <Html position={[-0.7, 0.2, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1px solid ${valor ? AMBAR : "rgba(255,255,255,0.22)"}`, fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 14, whiteSpace: "nowrap" }}>
           <span style={{ color: "#fff" }}>{variable}</span>
           <span style={{ color: valor ? "#fde68a" : "#94a3b8" }}>{vf(valor)}</span>
         </div>
@@ -697,7 +705,7 @@ function EscenaTabla({ expresionId, fila, probada, marcas, pulso, modoColor }: {
         <Cable key={`${ex.id}-sal`} puntos={[raiz.salida, [L.focoX - 0.25, Y_CABLE, raiz.z]]} valor={probada ? salida : null} retardo={tRaiz} pulso={pulso} />
         <Foco pos={[L.focoX, 0, raiz.z]} esc={0.95} valor={probada ? salida : null} retardo={tRaiz + VIAJE} pulso={pulso} />
       </group>
-      <Etiqueta pos={[0, 0.1, 3.55]} df={10} fs={13} col={`${modoColor}aa`}>
+      <Etiqueta corta pos={[0, 0.1, 3.55]} col={`${modoColor}aa`}>
         <span style={{ fontFamily: "ui-monospace, monospace" }}>{texto(ex.expr)}</span>
         <span style={{ color: "rgba(255,255,255,0.45)" }}>·</span>
         fila {claveFila(p, q)}
@@ -733,8 +741,8 @@ function Cristal({ pos, valor, letra }: { pos: Pt; valor: boolean; letra: string
         <octahedronGeometry args={[0.26, 0]} />
         <meshStandardMaterial color={valor ? AMBAR : "#334155"} emissive={valor ? AMBAR : "#000000"} emissiveIntensity={valor ? 1.1 : 0} metalness={0.2} roughness={0.25} flatShading />
       </mesh>
-      <Html position={[0, 1.42, 0]} center distanceFactor={10} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 12, fontWeight: 900, color: valor ? "#fde68a" : "#94a3b8", textShadow: "0 1px 3px #000" }}>
+      <Html position={[0, 1.42, 0]} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14, fontWeight: 900, color: valor ? "#fde68a" : "#94a3b8", textShadow: "0 1px 3px #000" }}>
           {letra}={vf(valor)}
         </div>
       </Html>
@@ -765,10 +773,10 @@ function FocoMundo({ pos, valor, retardo, pulso, col, etq }: { pos: Pt; valor: b
       </mesh>
       <mesh ref={bulbo}>
         <sphereGeometry args={[0.24, 24, 18]} />
-        <meshStandardMaterial color="#233447" roughness={0.2} toneMapped={false} />
+        <meshStandardMaterial color="#233447" roughness={0.2} />
       </mesh>
-      <Html position={[0, -0.62, 0]} center distanceFactor={10} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10.5, fontWeight: 900, color: "#e2e8f0", whiteSpace: "nowrap", textShadow: "0 1px 3px #000" }}>{etq}</div>
+      <Html position={[0, -0.62, 0]} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14, fontWeight: 900, color: "#e2e8f0", whiteSpace: "nowrap", textShadow: "0 1px 3px #000" }}>{etq}</div>
       </Html>
     </group>
   );
@@ -795,6 +803,7 @@ function Mundo({
   estado: EstadoMundo | null;
   pulso: number;
 }) {
+  const ancho = useThree((st) => st.size.width);
   const sit = SITUACIONES.find((s) => s.id === situacionId) ?? SITUACIONES[0]!;
   const [p, q] = FILAS[i]!;
   const clave = claveFila(p, q);
@@ -835,7 +844,7 @@ function Mundo({
         padding: "2px 6px",
         borderRadius: 6,
         fontFamily: "ui-monospace, monospace",
-        fontSize: 10.5,
+        fontSize: 14,
         fontWeight: 900,
         border: `1px solid ${!probado || !activa ? "rgba(255,255,255,0.18)" : val ? OK : NO}`,
         background: !probado || !activa ? "rgba(4,10,22,0.7)" : val ? "rgba(52,211,153,0.2)" : "rgba(248,113,113,0.22)",
@@ -858,7 +867,7 @@ function Mundo({
             ? { txt: "Premisas V · conclusión V", col: OK, t: T_C }
             : { txt: "¡Contraejemplo!", col: NO, t: T_C };
     insignia = (
-      <div key={`${pulso}-${estado}`} style={{ padding: "4px 10px", borderRadius: 999, background: "rgba(4,10,22,0.9)", border: `1.5px solid ${def.col}`, color: "#fff", fontSize: 11.5, fontWeight: 900, whiteSpace: "nowrap", animation: `lcAparece .35s ease-out ${def.t}s both` }}>
+      <div key={`${pulso}-${estado}`} style={{ padding: "4px 10px", borderRadius: 999, background: "rgba(4,10,22,0.9)", border: `1.5px solid ${def.col}`, color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap", animation: `lcAparece .35s ease-out ${def.t}s both` }}>
         {def.txt}
       </div>
     );
@@ -882,7 +891,7 @@ function Mundo({
             <FocoMundo pos={[-0.42, 2.75, -0.2]} valor={orig} retardo={0} pulso={0} col="#38bdf8" etq="p → q" />
             <FocoMundo pos={[0.42, 2.75, -0.2]} valor={formaRevelada ? otra : null} retardo={i * 0.35} pulso={pulso} col={modoColor} etq={FORMA_DEF[forma].simbolo} />
             {formaRevelada && (
-              <Html position={[0, 3.45, -0.2]} center distanceFactor={10} zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
+              <Html position={[0, 3.45, -0.2]} center zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
                 <div key={`${pulso}-${forma}`} style={{ width: 30, height: 30, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(4,10,22,0.9)", border: `2px solid ${orig === otra ? OK : NO}`, color: orig === otra ? OK : NO, fontSize: 18, fontWeight: 900, animation: `lcAparece .35s ease-out ${i * 0.35 + 0.2}s both` }}>
                   {orig === otra ? "=" : "≠"}
                 </div>
@@ -892,7 +901,7 @@ function Mundo({
         )}
       </group>
         {sub === "argumentos" && (
-          <Html position={[0, 2.55, -0.2]} center distanceFactor={10} zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
+          <Html position={[0, 2.55, -0.2]} center zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
             <div style={{ display: "grid", justifyItems: "center", gap: 6 }}>
               {insignia}
               <div style={{ display: "flex", gap: 4 }}>
@@ -903,25 +912,25 @@ function Mundo({
             </div>
           </Html>
         )}
-        <Html position={[0, 0.3, 1.45]} center distanceFactor={10} zIndexRange={[17, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ width: 168, padding: "7px 9px", borderRadius: 11, opacity: estado === "descartadoP1" || estado === "descartadoP2" ? 0.5 : 1, transition: `opacity .5s ease ${estado === "descartadoP1" ? T_P1 : T_P2}s`, background: "rgba(4,10,22,0.9)", border: `1px solid ${estado === "contraejemplo" ? NO : "rgba(255,255,255,0.18)"}`, color: "#fff", boxShadow: "0 8px 20px -10px #000" }}>
-            <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.12em", color: modoColor, marginBottom: 4 }}>MUNDO {clave}</div>
+        {ancho >= 640 && <Html position={[0, 0.3, 1.45]} center zIndexRange={[17, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ width: 210, padding: "7px 9px", borderRadius: 11, opacity: estado === "descartadoP1" || estado === "descartadoP2" ? 0.5 : 1, transition: `opacity .5s ease ${estado === "descartadoP1" ? T_P1 : T_P2}s`, background: "rgba(4,10,22,0.9)", border: `1px solid ${estado === "contraejemplo" ? NO : "rgba(255,255,255,0.18)"}`, color: "#fff", boxShadow: "0 8px 20px -10px #000" }}>
+            <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.12em", color: modoColor, marginBottom: 4 }}>MUNDO {clave}</div>
             {(
               [
                 ["p", p, p ? sit.p.si : sit.p.no],
                 ["q", q, q ? sit.q.si : sit.q.no],
               ] as const
             ).map(([l, v, frase]) => (
-              <div key={l} style={{ display: "flex", gap: 6, alignItems: "baseline", fontSize: 11, lineHeight: 1.35 }}>
+              <div key={l} style={{ display: "flex", gap: 6, alignItems: "baseline", fontSize: 14, lineHeight: 1.35 }}>
                 <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 900, color: v ? "#fde68a" : "#94a3b8", flexShrink: 0 }}>
                   {l}={vf(v)}
                 </span>
                 <span style={{ color: "#e2e8f0", fontWeight: 700 }}>{frase}</span>
               </div>
             ))}
-            <div style={{ fontSize: 10.5, color: ejemplo ? "#cbd5e1" : "#fca5a5", marginTop: 4, fontWeight: 700 }}>{ejemplo ? `Ej.: ${ejemplo}` : "No existe ningún caso"}</div>
+            <div style={{ fontSize: 14, color: ejemplo ? "#cbd5e1" : "#fca5a5", marginTop: 4, fontWeight: 700 }}>{ejemplo ? `Ej.: ${ejemplo}` : "No existe ningún caso"}</div>
           </div>
-        </Html>
+        </Html>}
       <mesh ref={haz} visible={false}>
         <cylinderGeometry args={[0.95, 0.95, 3.2, 32, 1, true]} />
         <meshBasicMaterial color={cHaz} transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} blending={THREE.AdditiveBlending} />
@@ -953,7 +962,7 @@ function EscenaMundos(p: { modoColor: string; situacionId: string; sub: "formas"
           pulso={p.pulso}
         />
       ))}
-      <Etiqueta pos={[0, 4.35, -0.6]} df={10} fs={15} col={`${p.modoColor}aa`}>
+      <Etiqueta pos={[0, 4.35, -0.6]} col={`${p.modoColor}aa`}>
         <span style={{ fontFamily: "ui-monospace, monospace" }}>{p.sub === "formas" ? `p → q   vs   ${FORMA_DEF[p.forma].simbolo}` : `P1: p → q   ·   P2: ${texto(arg.premisa2)}   ∴ C: ${texto(arg.conclusion)}`}</span>
       </Etiqueta>
     </group>
@@ -961,6 +970,18 @@ function EscenaMundos(p: { modoColor: string; situacionId: string; sub: "formas"
 }
 
 /* ── Escena ───────────────────────────────────────────────────────────── */
+
+/** Aleja la cámara cuando la escena es angosta, para que quepa todo el circuito. */
+function Encuadre({ pos, target, aspectoNecesario }: { pos: Pt; target: Pt; aspectoNecesario: number }) {
+  const camera = useThree((st) => st.camera);
+  const w = useThree((st) => st.size.width);
+  const h = useThree((st) => st.size.height);
+  useEffect(() => {
+    const k = Math.min(2.4, Math.max(1, aspectoNecesario / Math.max(0.3, w / Math.max(1, h))));
+    camera.position.set(target[0] + (pos[0] - target[0]) * k, target[1] + (pos[1] - target[1]) * k, target[2] + (pos[2] - target[2]) * k);
+  }, [camera, w, h, pos, target, aspectoNecesario]);
+  return null;
+}
 
 export default function LogicaCompuertasScene(p: LogicaSceneProps) {
   const { vista, modoColor, resetNonce } = p;
@@ -988,7 +1009,8 @@ export default function LogicaCompuertasScene(p: LogicaSceneProps) {
         <EscenaMundos modoColor={modoColor} situacionId={p.situacionId} sub={p.sub} forma={p.forma} formaRevelada={p.formaRevelada} argumento={p.argumento} argProbado={p.argProbado} pulso={p.pulsoRazonar} />
       )}
 
-      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={20} maxPolarAngle={Math.PI * 0.46} minPolarAngle={Math.PI * 0.05} target={cam.target} />
+      <Encuadre pos={cam.pos} target={cam.target} aspectoNecesario={vista === "razonar" ? 1.9 : vista === "tabla" ? 1.8 : 1.5} />
+      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={32} maxPolarAngle={Math.PI * 0.46} minPolarAngle={Math.PI * 0.05} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.45} luminanceThreshold={0.6} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.6} />

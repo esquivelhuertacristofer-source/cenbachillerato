@@ -1,0 +1,12 @@
+{
+  "escena": "Una casa de 2 pisos con 12 aparatos y su recibo bimestral. Los 8 focos son incandescentes de 60 W y se usan las mismas horas.",
+  "pregunta": "Si cambias los 8 focos incandescentes por LED de 9 W, ¿cuánto baja lo que gastan los focos?",
+  "opciones": [
+    { "id": "a", "texto": "Cerca de la mitad", "icono": "fa-scale-balanced" },
+    { "id": "b", "texto": "Casi nada, la luz es la misma", "icono": "fa-equals" },
+    { "id": "c", "texto": "Alrededor del 85 %", "icono": "fa-lightbulb" }
+  ],
+  "correcta": "c",
+  "porque": "Un LED de 9 W da los mismos 800 lúmenes que un foco de 60 W. Con las mismas horas gasta 9/60 = 15 % de la energía: ahorras 85 %. La energía es potencia por tiempo.",
+  "comoComprobarlo": "En «Mi casa y el recibo» toca los focos, anota sus kWh por bimestre, cambia el tipo de foco a LED y compara."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Una costa con mar, tres zonas de inundación, un pueblo y una ola de tormenta de 1.5 m. Plantas cada especie de mangle en su zona, con un cinturón ancho.",
+  "pregunta": "Lanzas la ola recién plantado el manglar (0 años). ¿Qué altura llega al pueblo?",
+  "opciones": [
+    { "id": "a", "texto": "Muy baja: el manglar la frena por completo", "icono": "fa-shield-halved" },
+    { "id": "b", "texto": "Casi 1.5 m: el manglar aún es joven", "icono": "fa-seedling" },
+    { "id": "c", "texto": "Más de 1.5 m: los troncos la empujan", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "b",
+  "porque": "Los mangles frenan la ola con sus troncos y raíces, que tardan unos 15 años en madurar. Recién plantados son muy delgados y casi no disipan energía, aunque estén en la zona correcta.",
+  "comoComprobarlo": "En «Restaurar el manglar», planta cada especie en su zona, sube el ancho a 400 m, deja los años en 0 y lanza la ola. Luego sube los años a 20 y repite."
+}

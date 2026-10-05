@@ -1,0 +1,13 @@
+{
+  "slug": "relaciones-poder",
+  "items": [
+    { "clave": "ayuntamiento", "formato": "16:9", "estilo": "foto", "escena": "Fachada de un palacio municipal mexicano de provincia con portales de arcos, plaza con bancas y un asta bandera vacía al atardecer" },
+    { "clave": "empresa", "formato": "16:9", "estilo": "foto", "escena": "Planta moderna de tratamiento y embotellado de agua con tanques metálicos brillantes, tuberías azules y camiones de reparto estacionados" },
+    { "clave": "radio", "formato": "16:9", "estilo": "foto", "escena": "Cabina de radio local con micrófono de estudio, audífonos y consola de sonido con luces, vista por el cristal a un locutor de espaldas" },
+    { "clave": "instituto", "formato": "16:9", "estilo": "foto", "escena": "Laboratorio de hidrología con matraces de agua, un microscopio y un técnico con bata midiendo una muestra frente a un mapa de acuífero" },
+    { "clave": "colonia", "formato": "16:9", "estilo": "foto", "escena": "Calle de colonia popular en ladera con casas de block sin terminar, tinacos negros en las azoteas y una pipa de agua repartiendo a vecinos con cubetas" },
+    { "clave": "manantial", "formato": "16:9", "estilo": "foto", "escena": "Manantial entre rocas y helechos en una montaña, con agua clara que baja a un pequeño canal de piedra y un camino de tierra con una familia de pueblo originario a lo lejos" },
+    { "clave": "mujeres", "formato": "16:9", "estilo": "foto", "escena": "Mujeres de distintas edades llenando garrafones y cubetas en una llave comunitaria de patio, conversando entre sí bajo la luz de la mañana" },
+    { "clave": "asamblea", "formato": "16:9", "estilo": "foto", "escena": "Asamblea vecinal al aire libre en una plaza de pueblo con sillas de plástico en círculo, personas de todas las edades sentadas y una mesa con papeles" }
+  ]
+}

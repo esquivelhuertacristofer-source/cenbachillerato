@@ -1,0 +1,12 @@
+{
+  "escena": "Una escuela de 1 500 estudiantes. Cada encuesta al azar da una media de hermanos, y cada media cae en un punto distinto.",
+  "pregunta": "Repites muchas encuestas. Al pasar de n = 20 a n = 500, ¿cómo quedan sus medias?",
+  "opciones": [
+    { "id": "a", "texto": "Más juntas alrededor del valor real", "icono": "fa-bullseye" },
+    { "id": "b", "texto": "Igual de dispersas, solo cambia el centro", "icono": "fa-arrows-left-right" },
+    { "id": "c", "texto": "Más separadas, porque hay más datos que varían", "icono": "fa-expand" }
+  ],
+  "correcta": "a",
+  "porque": "Una muestra grande promedia muchos casos y los extremos se compensan. El error típico baja con la raíz de n: con 500 las medias se agrupan mucho más que con 20.",
+  "comoComprobarlo": "En «Población y muestra» elige n = 20 y pulsa «Repetir 20 veces»; luego n = 500 y repite. Compara el ancho de las dos filas de puntos."
+}

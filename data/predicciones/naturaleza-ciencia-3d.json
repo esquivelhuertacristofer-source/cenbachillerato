@@ -1,0 +1,12 @@
+{
+  "escena": "Una afirmación dice: «el agua hierve siempre a 100 °C». Una olla con termómetro se calienta en distintos lugares de México.",
+  "pregunta": "Pones la olla en la Ciudad de México, a 2 240 m. ¿A qué temperatura hierve el agua?",
+  "opciones": [
+    { "id": "a", "texto": "Exactamente 100 °C, igual que a nivel del mar", "icono": "fa-equals" },
+    { "id": "b", "texto": "Menos de 100 °C, por la menor presión", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "Más de 100 °C, por el aire frío", "icono": "fa-arrow-trend-up" }
+  ],
+  "correcta": "b",
+  "porque": "A mayor altitud hay menos presión atmosférica y el agua hierve antes. Un solo dato como este basta para refutar «siempre a 100 °C» y obliga a corregir la hipótesis.",
+  "comoComprobarlo": "En «Falsabilidad» elige «Agua hirviendo», predice, selecciona Veracruz y enciende la estufa; luego repite en la Ciudad de México y compara el termómetro."
+}

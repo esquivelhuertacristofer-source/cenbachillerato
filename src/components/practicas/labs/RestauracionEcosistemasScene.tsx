@@ -21,7 +21,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -70,9 +70,16 @@ const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Mat
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const OCULTO = 0.0001;
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/**
+ * Etiqueta fija en pantalla (14 px, sin distanceFactor): `sec` la omite (su dato
+ * vive en el panel) y en pantallas angostas solo se ven las `corta`.
+ */
+function Etiqueta({ pos, children, col, sec = false, corta = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; sec?: boolean; corta?: boolean }) {
+  const ancho = useThree((st) => st.size.width);
+  if (sec || (ancho < 640 && !corta)) return null;
+  const fs = 14;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -134,6 +141,7 @@ const COL_BOSQUE: Record<Zona["tipo"], string> = { selva: "#24502c", sierra: "#1
 const COL_COPA: Record<Zona["tipo"], string> = { selva: "#2f8f3f", sierra: "#1d6b4a", franja: "#3a9a45", potrero: "#46a04a", rancho: "#8a9a3c", bahia: "#000" };
 
 function ZonaTile({ z, k, instrumento, cob, bio, sel, modoColor, onZona }: { z: Zona; k: number; instrumento: InstrumentoId; cob: number; bio: number; sel: boolean; modoColor: string; onZona: (k: number) => void }) {
+  const ancho = useThree((st) => st.size.width);
   const arboles = ARBOLES[k]!;
   const n = arboles.length;
   const top = altoZona(z);
@@ -270,7 +278,7 @@ function ZonaTile({ z, k, instrumento, cob, bio, sel, modoColor, onZona }: { z: 
           </mesh>
         </group>
       )}
-      <Html position={[z.x, top + 1.05, z.z + (z.id === "franja" ? -0.45 : z.id === "frontera" ? 0.45 : 0)]} center distanceFactor={13} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      {sel && ancho >= 640 && <Html position={[z.x, top + 1.05, z.z + (z.id === "franja" ? -0.45 : z.id === "frontera" ? 0.45 : 0)]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
             display: "flex",
@@ -286,13 +294,13 @@ function ZonaTile({ z, k, instrumento, cob, bio, sel, modoColor, onZona }: { z: 
             boxShadow: "0 6px 18px -8px #000",
           }}
         >
-          <span style={{ fontSize: 11, fontWeight: 900 }}>{z.etq}</span>
-          <span style={{ fontSize: 10, fontWeight: 800, color: instrumento === "ninguno" ? "#94a3b8" : inst.color }}>
+          <span style={{ fontSize: 14, fontWeight: 900 }}>{z.etq}</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: instrumento === "ninguno" ? "#94a3b8" : inst.color }}>
             <i className={`fa-solid ${inst.icono}`} style={{ marginRight: 4 }} />
             {inst.corto}
           </span>
         </div>
-      </Html>
+      </Html>}
     </group>
   );
 }
@@ -405,6 +413,7 @@ function Jaguar() {
 }
 
 function EscenaPoliticas({ plan, anio, zonaSel, onZona, modoColor }: { plan: InstrumentoId[]; anio: number; zonaSel: number; onZona: (k: number) => void; modoColor: string }) {
+  const ancho = useThree((st) => st.size.width);
   const ind = indicadores(plan, anio);
   return (
     <group position={[0, -0.6, 0]}>
@@ -438,15 +447,15 @@ function EscenaPoliticas({ plan, anio, zonaSel, onZona, modoColor }: { plan: Ins
               <boxGeometry args={[z.w, 0.1, z.d]} />
               <meshBasicMaterial transparent opacity={0} depthWrite={false} />
             </mesh>
-            <Html position={[z.x + 4.6, 0.7, z.z]} center distanceFactor={13} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+            {zonaSel === k && ancho >= 640 && <Html position={[z.x + 4.6, 0.7, z.z]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 9px", borderRadius: 10, background: zonaSel === k ? "rgba(4,10,22,0.94)" : "rgba(4,10,22,0.78)", border: `1px solid ${zonaSel === k ? modoColor : "rgba(255,255,255,0.2)"}`, color: "#fff", whiteSpace: "nowrap" }}>
-                <span style={{ fontSize: 11, fontWeight: 900 }}>{z.etq}</span>
-                <span style={{ fontSize: 10, fontWeight: 800, color: (plan[k] ?? "ninguno") === "ninguno" ? "#94a3b8" : INSTRUMENTOS[plan[k]!].color }}>
+                <span style={{ fontSize: 14, fontWeight: 900 }}>{z.etq}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: (plan[k] ?? "ninguno") === "ninguno" ? "#94a3b8" : INSTRUMENTOS[plan[k]!].color }}>
                   <i className={`fa-solid ${INSTRUMENTOS[plan[k] ?? "ninguno"].icono}`} style={{ marginRight: 4 }} />
                   {INSTRUMENTOS[plan[k] ?? "ninguno"].corto}
                 </span>
               </div>
-            </Html>
+            </Html>}
           </group>
         ) : (
           <ZonaTile key={z.id} z={z} k={k} instrumento={plan[k] ?? "ninguno"} cob={ind.zonas[k]!.cob} bio={ind.zonas[k]!.bio} sel={zonaSel === k} modoColor={modoColor} onZona={onZona} />
@@ -464,7 +473,7 @@ function EscenaPoliticas({ plan, anio, zonaSel, onZona, modoColor }: { plan: Ins
           </mesh>
         </group>
       ))}
-      <Etiqueta pos={[-0.1, 0.72, 2.45]} df={13} fs={10.5} col={ind.comunidades >= 80 ? "#34d399aa" : ind.comunidades < 50 ? "#f87171aa" : "#fbbf24aa"}>
+      <Etiqueta corta pos={[-0.1, 0.72, 2.45]} col={ind.comunidades >= 80 ? "#34d399aa" : ind.comunidades < 50 ? "#f87171aa" : "#fbbf24aa"}>
         <i className="fa-solid fa-people-roof" style={{ color: "#fbbf24" }} />
         Pueblo · bienestar {num(ind.comunidades)}
       </Etiqueta>
@@ -477,7 +486,7 @@ function EscenaPoliticas({ plan, anio, zonaSel, onZona, modoColor }: { plan: Ins
         </>
       )}
       {!ind.conectado && (plan[1] ?? "ninguno") === "ninguno" && anio > 0 && (
-        <Etiqueta pos={[-0.5, 1.2, -3.9]} df={13} fs={10} col="#f87171aa">
+        <Etiqueta corta pos={[-0.5, 1.2, -3.9]} col="#f87171aa">
           <i className="fa-solid fa-link-slash" style={{ color: "#f87171" }} />
           Sierra y selva aisladas
         </Etiqueta>
@@ -831,7 +840,7 @@ function EscenaSucesion({ condiciones, anio, modoColor }: { condiciones: Condici
         <instancedMesh ref={bosqueC} args={[GEO_COPA, undefined, N_BOSQUE]} castShadow frustumCulled={false}>
           <meshStandardMaterial color="#1f5e2c" roughness={0.8} flatShading />
         </instancedMesh>
-        <Etiqueta pos={[0, 3.6, 0]} df={20} col="#22c55eaa" fs={11}>
+        <Etiqueta sec pos={[0, 3.6, 0]} col="#22c55eaa">
           <i className="fa-solid fa-tree" style={{ color: "#4ade80" }} />
           Bosque maduro · a {num(c.distancia)} m
         </Etiqueta>
@@ -849,8 +858,8 @@ function EscenaSucesion({ condiciones, anio, modoColor }: { condiciones: Condici
             <mesh position={[0, 0.12 + 1.2, 0]} scale={[0.5, 2.4, 0.5]} geometry={GEO_CAJA}>
               <meshStandardMaterial color="#e2e8f0" transparent opacity={0.12} roughness={0.1} depthWrite={false} />
             </mesh>
-            <Html position={[0.62, 0.35, 0.05]} distanceFactor={12} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ padding: "2px 7px", borderRadius: 7, background: "rgba(4,10,22,0.86)", border: `1px solid ${ATRIBUTO_DEF[a].color}`, color: "#fff", fontSize: 10, fontWeight: 900, whiteSpace: "nowrap" }}>
+            <Html position={[0.62, 0.35, 0.05]} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+              <div style={{ padding: "2px 7px", borderRadius: 7, background: "rgba(4,10,22,0.86)", border: `1px solid ${ATRIBUTO_DEF[a].color}`, color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
                 <i className={`fa-solid ${ATRIBUTO_DEF[a].icono}`} style={{ marginRight: 5, color: ATRIBUTO_DEF[a].color }} />
                 {ETIQUETA_CORTA[a]}{" "}
                 <span
@@ -865,10 +874,10 @@ function EscenaSucesion({ condiciones, anio, modoColor }: { condiciones: Condici
           </group>
         ))}
       </group>
-      <Etiqueta pos={[LADO / 2 + 1.3, 3.25, 0]} df={12} fs={10}>
+      <Etiqueta sec pos={[LADO / 2 + 1.3, 3.25, 0]}>
         100 % = bosque maduro
       </Etiqueta>
-      <Etiqueta pos={[0, 3.2, 0]} df={11} col={`${modoColor}aa`} fs={14}>
+      <Etiqueta sec pos={[0, 3.2, 0]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-calendar" style={{ color: modoColor }} />
         <span ref={chipAnio}>Año 0</span>
       </Etiqueta>
@@ -951,13 +960,13 @@ function EscenaVaquita({ hito, modoColor }: { hito: number; modoColor: string })
         <boxGeometry args={[14, 0.25, 5]} />
         <meshStandardMaterial color="#8f8457" roughness={1} flatShading />
       </mesh>
-      <Etiqueta pos={[-7.4, 0.7, -1.5]} df={13} fs={10}>
+      <Etiqueta sec pos={[-7.4, 0.7, -1.5]}>
         Baja California
       </Etiqueta>
-      <Etiqueta pos={[7.2, 0.7, -1.5]} df={13} fs={10}>
+      <Etiqueta sec pos={[7.2, 0.7, -1.5]}>
         Sonora
       </Etiqueta>
-      <Etiqueta pos={[0, 0.9, -7.2]} df={13} fs={10}>
+      <Etiqueta sec pos={[0, 0.9, -7.2]}>
         Delta del río Colorado
       </Etiqueta>
       {refugio && (
@@ -992,20 +1001,20 @@ function EscenaVaquita({ hito, modoColor }: { hito: number; modoColor: string })
         )}
       </group>
       {refugio && (
-        <Etiqueta pos={[3.6, 0.5, -0.4]} df={13} fs={10} col="#22d3eeaa">
+        <Etiqueta corta pos={[3.6, 0.5, -0.4]} col="#22d3eeaa">
           Área de refugio
         </Etiqueta>
       )}
       {ztc && (
-        <Etiqueta pos={[-1.6, 0.5, -5.4]} df={13} fs={10} col="#facc15aa">
+        <Etiqueta corta pos={[-1.6, 0.5, -5.4]} col="#facc15aa">
           Zona de Tolerancia Cero
         </Etiqueta>
       )}
-      <Etiqueta pos={[0, 2.4, -2]} df={11} col={`${modoColor}aa`} fs={14}>
+      <Etiqueta corta pos={[0, 2.4, -2]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-fish-fins" style={{ color: modoColor }} />
         {h.anio} · {v.medido ? textoValor(caso, hito) : "sin censo: el primero es de 1997"}
       </Etiqueta>
-      <Etiqueta pos={[0, 0.2, 2.6]} df={12} fs={10}>
+      <Etiqueta sec pos={[0, 0.2, 2.6]}>
         Cada figura gris es una vaquita estimada · las lanchas con red son ilustrativas
       </Etiqueta>
     </group>
@@ -1076,10 +1085,10 @@ function Arrecife({ x, peces, depred, etq, valor, col }: { x: number; peces: num
       <instancedMesh ref={dm} args={[GEO_PEZ, undefined, 24]} frustumCulled={false}>
         <meshStandardMaterial color="#475569" roughness={0.5} />
       </instancedMesh>
-      <Etiqueta pos={[x, 0.5, -1.9]} df={12} col={`${col}aa`} fs={11.5}>
+      <Etiqueta corta pos={[x, 0.5, -1.9]} col={`${col}aa`}>
         {etq}
       </Etiqueta>
-      <Etiqueta pos={[x, 0.45, 2.1]} df={12} col={`${col}aa`} fs={12.5}>
+      <Etiqueta corta pos={[x, 0.45, 2.1]} col={`${col}aa`}>
         <i className="fa-solid fa-fish" style={{ color: col }} />
         {valor}
       </Etiqueta>
@@ -1133,11 +1142,11 @@ function EscenaPulmo({ hito, modoColor }: { hito: number; modoColor: string }) {
           </mesh>
         </group>
       )}
-      <Etiqueta pos={[0, 1.9, 0]} df={11} col={`${modoColor}aa`} fs={14}>
+      <Etiqueta sec pos={[0, 1.9, 0]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-water" style={{ color: modoColor }} />
         {h.anio}
       </Etiqueta>
-      <Etiqueta pos={[0, -1.2, 3.1]} df={12} fs={10}>
+      <Etiqueta sec pos={[0, -1.2, 3.1]}>
         Cada pez amarillo ≈ 25 kg/ha de biomasa · los grises son grandes depredadores
       </Etiqueta>
     </group>
@@ -1255,16 +1264,16 @@ function EscenaMonarca({ hito, modoColor }: { hito: number; modoColor: string })
         <meshStandardMaterial color="#f97316" emissive="#ea580c" emissiveIntensity={0.55} side={THREE.DoubleSide} />
       </instancedMesh>
       {reserva && (
-        <Etiqueta pos={[-3.2, 2.4, 3.4]} df={12} fs={10.5} col="#34d399aa">
+        <Etiqueta pos={[-3.2, 2.4, 3.4]} col="#34d399aa">
           <i className="fa-solid fa-shield-halved" style={{ color: "#34d399" }} />
           Reserva de la Biosfera Mariposa Monarca
         </Etiqueta>
       )}
-      <Etiqueta pos={[-1.6, 6.1, 1]} df={11} col={`${modoColor}aa`} fs={14}>
+      <Etiqueta corta pos={[-1.6, 6.1, 1]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-feather" style={{ color: "#fb923c" }} />
         {h.anio} · {v.medido ? `${textoValor(caso, hito)} ocupadas` : "sin medición todavía"}
       </Etiqueta>
-      <Etiqueta pos={[3.4, 5.1, 1]} df={12} fs={10}>
+      <Etiqueta sec pos={[3.4, 5.1, 1]}>
         Árboles con mariposas ∝ hectáreas ocupadas · los tocones son ilustrativos
       </Etiqueta>
     </group>

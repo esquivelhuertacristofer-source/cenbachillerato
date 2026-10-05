@@ -24,6 +24,7 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -97,7 +98,7 @@ const HidrosferaScene = dynamic(() => import("./HidrosferaAtmosferaScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-earth-americas fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el aire y el agua del planeta en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el aire y el agua del planeta en 3D…</span>
     </div>
   ),
 });
@@ -144,22 +145,22 @@ function TiempoClimaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+    <div style={{ ...card, padding: "16px", marginTop: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-star" style={{ marginRight: 8, color: accent }} />
           ¿Tiempo atmosférico o clima?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Enunciado {pos + 1} de {ronda.length} · ¿describe un momento concreto o el patrón de muchos años?
           </div>
           <div style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>«{actual.texto}»</div>
@@ -173,7 +174,7 @@ function TiempoClimaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
               Clima
             </button>
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -181,9 +182,9 @@ function TiempoClimaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -215,19 +216,19 @@ function GraficaDensidad({ zonaId, prof, col }: { zonaId: ZonaId; prof: number; 
       {[1022, 1024, 1026, 1028].map((r) => (
         <g key={r}>
           <line x1={x(r)} x2={x(r)} y1={12} y2={H - 22} stroke="rgba(255,255,255,0.08)" />
-          <text x={x(r)} y={H - 8} fill="rgba(255,255,255,0.55)" fontSize={9} textAnchor="middle">
+          <text x={x(r)} y={H - 8} fill="rgba(255,255,255,0.55)" fontSize={12} textAnchor="middle">
             {r}
           </text>
         </g>
       ))}
       {[0, 250, 1000, 4000].map((d) => (
-        <text key={d} x={32} y={y(d) + 3} fill="rgba(255,255,255,0.55)" fontSize={9} textAnchor="end">
+        <text key={d} x={32} y={y(d) + 3} fill="rgba(255,255,255,0.55)" fontSize={12} textAnchor="end">
           {d} m
         </text>
       ))}
       <polyline points={pts} fill="none" stroke={col} strokeWidth={2.4} />
       <circle cx={x(actual.rho)} cy={y(prof)} r={4.5} fill="#fbbf24" stroke="#04121f" strokeWidth={1.5} />
-      <text x={W - 12} y={24} fill="rgba(255,255,255,0.7)" fontSize={9.5} textAnchor="end" fontWeight={700}>
+      <text x={W - 12} y={24} fill="rgba(255,255,255,0.7)" fontSize={12} textAnchor="end" fontWeight={700}>
         densidad (kg/m³)
       </text>
     </svg>
@@ -253,13 +254,13 @@ function GraficaParcela({ viaje, progreso, lanzada, col }: { viaje: ViajeParcela
       {Array.from({ length: Math.floor((tMax - tMin) / 10) + 1 }, (_, k) => tMin + k * 10).map((t) => (
         <g key={t}>
           <line x1={x(t)} x2={x(t)} y1={10} y2={H - 24} stroke="rgba(255,255,255,0.08)" />
-          <text x={x(t)} y={H - 10} fill="rgba(255,255,255,0.55)" fontSize={9} textAnchor="middle">
+          <text x={x(t)} y={H - 10} fill="rgba(255,255,255,0.55)" fontSize={12} textAnchor="middle">
             {t} °C
           </text>
         </g>
       ))}
       {[0, 1000, 2000, 3000].map((z) => (
-        <text key={z} x={26} y={y(z) + 3} fill="rgba(255,255,255,0.55)" fontSize={9} textAnchor="end">
+        <text key={z} x={26} y={y(z) + 3} fill="rgba(255,255,255,0.55)" fontSize={12} textAnchor="end">
           {z / 1000} km
         </text>
       ))}
@@ -268,7 +269,7 @@ function GraficaParcela({ viaje, progreso, lanzada, col }: { viaje: ViajeParcela
       {viaje.zNube !== null && <line x1={30} x2={W - 12} y1={y(viaje.zNube)} y2={y(viaje.zNube)} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="2 3" opacity={0.6} />}
       <polyline points={recorrido} fill="none" stroke={col} strokeWidth={2.6} />
       <circle cx={x(actual.tC)} cy={y(actual.z)} r={4.5} fill="#fff" stroke="#04121f" strokeWidth={1.5} />
-      <text x={W - 12} y={20} fill="rgba(255,255,255,0.6)" fontSize={9} textAnchor="end">
+      <text x={W - 12} y={20} fill="rgba(255,255,255,0.6)" fontSize={12} textAnchor="end">
         - - - sin condensar (−9.8 °C/km)
       </text>
     </svg>
@@ -326,7 +327,6 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const timers = useRef<number[]>([]);
@@ -561,18 +561,18 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Predecir qué pasa con la temperatura en la estratósfera y subir a comprobarlo", done: subioEstratosfera },
-    { t: "Soltar el globo sonda y ver a qué altura revienta", done: globoReventado },
-    { t: "Comparar el punto de ebullición del agua en tres lugares en tierra firme", done: lugares.size >= 3 },
-    { t: "Bajar el CTD por debajo de una termoclina y de una haloclina", done: clinas.size === 2 },
-    { t: "Soltar un bloque de hielo y ver qué parte queda bajo el agua", done: hieloVisto },
-    { t: "Hacer flotar agua dulce y llevar una masa de agua a más de 1 000 m", done: flotoDulce && hundioHondo },
-    { t: "Formar una nube y lluvia en la ladera de barlovento", done: conNube !== null },
-    { t: "Cruzar la sierra con y sin nube y comparar el aire que llega a Perote", done: conNube !== null && sinNube !== null },
-    { t: "Clasificar tiempo o clima y ganar estrellas", done: clasifico },
-    { t: "Resolver el reto de densidad y presión (A2)", done: retoOk },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: { txt: string; done: boolean }[] = [
+    { txt: "Predecir qué pasa con la temperatura en la estratósfera y subir a comprobarlo", done: subioEstratosfera },
+    { txt: "Soltar el globo sonda y ver a qué altura revienta", done: globoReventado },
+    { txt: "Comparar el punto de ebullición del agua en tres lugares en tierra firme", done: lugares.size >= 3 },
+    { txt: "Bajar el CTD por debajo de una termoclina y de una haloclina", done: clinas.size === 2 },
+    { txt: "Soltar un bloque de hielo y ver qué parte queda bajo el agua", done: hieloVisto },
+    { txt: "Hacer flotar agua dulce y llevar una masa de agua a más de 1 000 m", done: flotoDulce && hundioHondo },
+    { txt: "Formar una nube y lluvia en la ladera de barlovento", done: conNube !== null },
+    { txt: "Cruzar la sierra con y sin nube y comparar el aire que llega a Perote", done: conNube !== null && sinNube !== null },
+    { txt: "Clasificar tiempo o clima y ganar estrellas", done: clasifico },
+    { txt: "Resolver el reto de densidad y presión (A2)", done: retoOk },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -613,30 +613,22 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, margin: "18px 0 8px" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
   );
-  const dato = (etq: string, valor: string, col = "#fff") => (
-    <div className="ha-dato">
-      <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.07em", color: T.text3, textTransform: "uppercase" }}>{etq}</div>
-      <div style={{ fontSize: 14, fontWeight: 900, color: col, marginTop: 3, ...NUM }}>{valor}</div>
-    </div>
-  );
+  const dato = (etq: string, valor: string, col = "#fff") => <Dato label={etq} value={valor} col={col} />;
   const deslizador = (etq: string, icono: string, colR: string, min: number, max: number, step: number, valor: number, onChange: (v: number) => void, txt: string, disabled = false) => (
-    <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, opacity: disabled ? 0.5 : 1 }}>
-      <i className={`fa-solid ${icono}`} style={{ color: colR, width: 16, textAlign: "center" }} />
-      <span style={{ fontSize: 11.5, color: T.text2, width: 92, flexShrink: 0 }}>{etq}</span>
-      <input type="range" aria-label={etq} className="ha-range" min={min} max={max} step={step} value={valor} disabled={disabled} onChange={(e) => onChange(Number(e.target.value))} style={{ ["--hac" as string]: colR }} />
-      <span style={{ width: 74, textAlign: "right", fontSize: 12.5, color: "#fff", fontWeight: 800, ...NUM }}>{txt}</span>
-    </label>
+    <div style={{ opacity: disabled ? 0.5 : 1, pointerEvents: disabled ? "none" : "auto", marginTop: 12 }}>
+      <Deslizador label={etq} icon={icono} colr={colR} valor={txt} min={min} max={max} step={step} value={valor} onChange={onChange} />
+    </div>
   );
 
   /* ── Panel ─────────────────────────────────────────────────────────── */
@@ -682,7 +674,7 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
           {dato("El agua hierve a", eb === null ? "no hay líquido" : `${num(eb, 1)} °C`, "#7dd3fc")}
           {dato("O₂ por litro", `${cientifico(o2PorLitro(aire), 1)}`, "#f87171")}
         </div>
-        <div style={{ marginTop: 10, fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
           <strong style={{ color: capa.color }}>{capa.etq}.</strong> {capa.clave} {capa.temp}
           {eb === null && " Con menos de 0.61 kPa (punto triple del agua) el agua no puede estar líquida: el hielo pasa directo a vapor."}
         </div>
@@ -707,13 +699,13 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
         </div>
         <div className="ha-opts" style={{ marginTop: 8 }}>
           {COMPOSICION.map((c) => (
-            <span key={c.formula} style={{ fontSize: 11.5, color: T.text2, ...NUM }}>
+            <span key={c.formula} style={{ fontSize: 14, color: T.text2, ...NUM }}>
               <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 3, background: c.color, marginRight: 6 }} />
               {c.formula} {c.pct} %
             </span>
           ))}
         </div>
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 8, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           El vapor de agua varía de casi 0 a ~4 % y vive sobre todo en la tropósfera. La proporción de los gases no cambia al subir; cambia cuántas moléculas caben en cada litro: aquí hay {num((100 * aire.rho) / AIRE_0.rho, aire.rho / AIRE_0.rho < 0.1 ? 2 : 0)} % de las del nivel del mar.
         </div>
       </>
@@ -729,7 +721,7 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ marginTop: 8, fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 8, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
           <strong style={{ color: "#fff" }}>{zona.lugar}.</strong> {zona.explica}
         </div>
 
@@ -746,17 +738,17 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 10 }}>
           <div>
-            <div style={{ fontSize: 10, color: T.text3, fontWeight: 800 }}>CARA FRONTAL · TEMPERATURA</div>
+            <div style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>CARA FRONTAL · TEMPERATURA</div>
             <div style={{ height: 8, borderRadius: 4, background: GRAD_T, marginTop: 4 }} />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: T.text3 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: T.text3 }}>
               <span>−2 °C</span>
               <span>30 °C</span>
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 10, color: T.text3, fontWeight: 800 }}>LATERAL · SALINIDAD</div>
+            <div style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>LATERAL · SALINIDAD</div>
             <div style={{ height: 8, borderRadius: 4, background: GRAD_S, marginTop: 4 }} />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: T.text3 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: T.text3 }}>
               <span>31 g/kg</span>
               <span>36.5 g/kg</span>
             </div>
@@ -774,10 +766,10 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
             );
           })}
         </div>
-        {MASAS.find((m) => m.t === masaT && m.s === masaS) && <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>{MASAS.find((m) => m.t === masaT && m.s === masaS)!.nota}</div>}
+        {MASAS.find((m) => m.t === masaT && m.s === masaS) && <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{MASAS.find((m) => m.t === masaT && m.s === masaS)!.nota}</div>}
         {deslizador("Temperatura", "fa-temperature-half", "#fb923c", T_MASA.min, T_MASA.max, 0.1, masaT, setMasaT, `${num(masaT, 1)} °C`, cayendo)}
         {deslizador("Salinidad", "fa-droplet", "#4ade80", S_MASA.min, S_MASA.max, 0.1, masaS, setMasaS, `${num(masaS, 1)} g/kg`, cayendo)}
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 8, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 8, ...NUM }}>
           Densidad de tu masa de agua: <strong style={{ color: "#fff" }}>{num(rhoMasa, 2)} kg/m³</strong> · superficie de esta zona: {num(sup.rho, 2)} kg/m³
         </div>
         <div className="ha-opts" style={{ marginTop: 10 }}>
@@ -810,16 +802,16 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
         {sub("Toda el agua de la Tierra en 1 000 litros")}
         <div style={{ display: "grid", gap: 6 }}>
           {AGUA_1000L.map((a) => (
-            <div key={a.etq} style={{ display: "grid", gridTemplateColumns: "150px 1fr 64px", gap: 8, alignItems: "center" }}>
-              <span style={{ fontSize: 11.5, color: T.text2 }}>{a.etq}</span>
+            <div key={a.etq} style={{ display: "grid", gridTemplateColumns: "minmax(0,110px) minmax(0,1fr) 76px", gap: 8, alignItems: "center" }}>
+              <span style={{ fontSize: 14, color: T.text2 }}>{a.etq}</span>
               <div style={{ height: 9, borderRadius: 4, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
                 <div style={{ width: `${Math.max(0.8, (Math.log10(a.litros * 1000 + 1) / Math.log10(965001)) * 100)}%`, height: "100%", background: a.color }} />
               </div>
-              <span style={{ fontSize: 11.5, color: "#fff", fontWeight: 800, textAlign: "right", ...NUM }}>{a.litros >= 1 ? `${num(a.litros, a.litros < 100 ? 1 : 0)} L` : `${num(a.litros * 1000, a.litros < 0.1 ? 0 : 0)} mL`}</span>
+              <span style={{ fontSize: 14, color: "#fff", fontWeight: 800, textAlign: "right", ...NUM }}>{a.litros >= 1 ? `${num(a.litros, a.litros < 100 ? 1 : 0)} L` : `${num(a.litros * 1000, a.litros < 0.1 ? 0 : 0)} mL`}</span>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 6, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Barras en escala logarítmica. Del agua dulce (≈ 2.5 %), cerca de 69 % es hielo y 30 % subterránea; ríos y lagos son una fracción mínima.</div>
+        <div style={{ marginTop: 6, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Barras en escala logarítmica. Del agua dulce (≈ 2.5 %), cerca de 69 % es hielo y 30 % subterránea; ríos y lagos son una fracción mínima.</div>
       </>
     );
   } else {
@@ -833,7 +825,7 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
           {dato("Vapor de agua", `${num(viaje.r0, 1)} g/kg`)}
           {dato("Evaporación", `${num(evaporacion)} %`, "#67e8f9")}
         </div>
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 8, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Evaporar 1 kg de agua a {t0} °C cuesta {num(calorLatente(t0) / 1e6, 2)} MJ de energía del Sol. La evaporación crece con la temperatura y se detiene cuando el aire está saturado (100 %).
         </div>
         {sub("2 · Suelta la parcela de aire")}
@@ -911,325 +903,184 @@ export function LabHidrosferaAtmosfera({ color }: PracticaLabProps) {
     );
   }
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes haPulse { 0%,100%{ box-shadow:0 0 0 0 var(--had); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ha-live-dot { animation: haPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .ha-live-dot { animation:none; } }
-        .ha-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ha-grid { grid-template-columns: 1fr; } }
-        .ha-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ha-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ha-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ha-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .ha-tab { cursor:pointer; border:1px solid var(--hac); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .ha-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .ha-tab:hover { background:rgba(255,255,255,0.06); }
-        .ha-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .ha-opt { cursor:pointer; border:1px solid var(--hac); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .ha-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+  const estiloCSS = `
+        .ha-opts { display:flex; flex-wrap:wrap; gap:8px; }
+        .ha-opt { cursor:pointer; border:1px solid var(--hac); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+        .ha-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
         .ha-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
         .ha-opt:disabled { cursor:default; }
         .ha-opt:disabled[data-on="false"] { opacity:0.55; }
-        .ha-toggle { width:100%; cursor:pointer; border:1px solid var(--hac); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
+        .ha-toggle { width:100%; cursor:pointer; border:1px solid var(--hac); border-radius:11px; padding:12px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
         .ha-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
         .ha-toggle:disabled { cursor:default; opacity:0.75; }
-        .ha-range { flex:1; min-width:0; accent-color: var(--hac); }
-        .ha-datos { display:grid; grid-template-columns: repeat(auto-fit, minmax(118px,1fr)); gap:7px; }
-        .ha-dato { padding:9px 11px; border-radius:10px; background:rgba(4,10,22,0.45); border:1px solid ${T.line}; min-width:0; }
-        .ha-tabla { width:100%; border-collapse:collapse; font-size:12px; }
-        .ha-tabla th { text-align:left; font-size:10px; letter-spacing:.06em; color:${T.text3}; text-transform:uppercase; padding:6px 8px; border-bottom:1px solid ${T.line}; }
+        .ha-datos { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+        .ha-tabla { width:100%; border-collapse:collapse; font-size:14px; }
+        .ha-tabla th { text-align:left; font-size:14px; color:${T.text3}; padding:6px 8px; border-bottom:1px solid ${T.line}; }
         .ha-tabla td { padding:7px 8px; border-bottom:1px solid ${T.line}; color:#fff; font-weight:700; font-variant-numeric: tabular-nums; }
         .ha-tabla td:first-child { color:${T.text2}; font-weight:600; }
-        .ha-opt:focus-visible, .ha-tab:focus-visible, .ha-toggle:focus-visible, .ha-icobtn:focus-visible, .ha-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .ha-bottom { grid-template-columns: 1fr !important; } }
-        .ha-glosario { display:grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap:8px; }
-        .ha-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ha-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ha-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .ha-drawer[data-open="true"] { transform:translateX(0); }
-        .ha-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ha-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ha-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ha-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ha-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .ha-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
+        .ha-glosario { display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px),1fr)); gap:8px; }
+        .ha-opt:focus-visible, .ha-toggle:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  `;
 
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="ha-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="ha-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--hac" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+  const sceneEl = (
+    <SceneBoundary fallback={sceneFallback}>
+      <HidrosferaScene
+        vista={modo}
+        modoColor={modoCol}
+        resetNonce={resetNonce}
+        zKm={zKm}
+        vuelo={vuelo}
+        zonaId={zonaId}
+        profCTD={profCTD}
+        masaT={masaT}
+        masaS={masaS}
+        masaNonce={masaNonce}
+        hieloNonce={hieloNonce}
+        t0={t0}
+        hr0={hr0}
+        viaje={viaje}
+        progreso={progreso}
+        lanzada={lanzada}
+      />
+    </SceneBoundary>
+  );
+
+  const parrafo = (txt: ReactNode) => <p style={{ margin: 0, color: T.text2, lineHeight: 1.55 }}>{txt}</p>;
+
+  return (
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={sceneEl}
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{estiloCSS}</style>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                {control}
+              </Bloque>
+              <Bloque titulo="Qué está pasando" icono="fa-eye">
+                {parrafo(pie)}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <TiempoClimaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoNumericoCard reto={RETO_A2} accent={accent} aprobado={retoOk} onAprobado={() => setRetoOk(true)} playSfx={sfx} />
+              <div style={{ ...card, padding: "16px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="ha-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 62vh, 700px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <HidrosferaScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                zKm={zKm}
-                vuelo={vuelo}
-                zonaId={zonaId}
-                profCTD={profCTD}
-                masaT={masaT}
-                masaS={masaS}
-                masaNonce={masaNonce}
-                hieloNonce={hieloNonce}
-                t0={t0}
-                hr0={hr0}
-                viaje={viaje}
-                progreso={progreso}
-                lanzada={lanzada}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="ha-live-dot" style={{ ["--had" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
               </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ha-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ha-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ha-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="ha-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-earth-americas" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Por qué el aire y el agua se acomodan en capas?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Por qué el aire y el agua se acomodan en capas?" icono="fa-earth-americas">
+                {parrafo(PROBLEMA)}
+              </Bloque>
+              <Bloque titulo={`Lectura A1 · ${TITULO_A1}`} icono="fa-book-open">
+                {LECTURA_A1.map((p, i) => (
+                  <div key={i}>{parrafo(p)}</div>
+                ))}
+                <strong style={{ color: T.text3, fontSize: 14 }}>Para reflexionar</strong>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => (
+                    <li key={i}>{q}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ol>
+              </Bloque>
+              <Bloque titulo="En tu localidad (reflexión A3)" icono="fa-location-dot">
+                {parrafo(REFLEXION_A3)}
+              </Bloque>
+              <Bloque titulo="Hechos (verdadero o falso, A4)" icono="fa-circle-question">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {HECHOS.map((h, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                      <span style={{ flexShrink: 0, marginTop: 2, fontSize: 14, fontWeight: 900, padding: "1px 8px", borderRadius: 6, color: "#04121f", background: h.verdadero ? OK : WARN }}>{h.verdadero ? "V" : "F"}</span>
+                      <span style={{ color: T.text2, lineHeight: 1.45 }}>
+                        <span style={{ color: "#fff" }}>«{h.enunciado}»</span> {h.retro}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                <div className="ha-glosario">
+                  {GLOSARIO.map((gi, i) => (
+                    <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                      <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                      <span style={{ color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+                      <div style={{ color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
+                        <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
+                        {gi.ejemplo}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ha-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />
-              En tu localidad (reflexión A3)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{REFLEXION_A3}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (verdadero o falso, A4)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <span style={{ flexShrink: 0, marginTop: 1, fontSize: 10, fontWeight: 900, padding: "2px 7px", borderRadius: 6, color: "#04121f", background: h.verdadero ? OK : WARN }}>{h.verdadero ? "V" : "F"}</span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                    <span style={{ color: "#fff" }}>«{h.enunciado}»</span> {h.retro}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div className="ha-glosario">
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas, la reflexión A3, los hechos A4, el glosario A5, el ejercicio A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma. La columna de aire
-          usa la <strong>Atmósfera Estándar de EUA (1976)</strong>, un promedio global: da 0 °C a 2 240 m, aunque la Ciudad de México promedia unos 16 °C; las fronteras de las capas varían con la
-          latitud y la estación. La ebullición se calcula con la ecuación de Antoine y el globo como gas ideal con valores típicos de radiosondeo. La densidad del agua de mar usa la ecuación de estado
-          UNESCO 1981 sin el efecto de la presión; los perfiles de las tres zonas son <strong>típicos e ilustrativos</strong>. La parcela de aire es un <strong>modelo simplificado</strong> (toda el
-          agua condensada cae como lluvia; terreno y distancias esquemáticos). La distribución del agua es del USGS. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <TiempoClimaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoNumericoCard reto={RETO_A2} accent={accent} aprobado={retoOk} onAprobado={() => setRetoOk(true)} playSfx={sfx} />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="ha-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ha-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ha-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ha-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ha-drawer-body">
-          <FichaTeorica data={HIDROSFERA_ATMOSFERA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                {parrafo(<><strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}</>)}
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 9, color: T.text2 }}>
+                  {IDEAS.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={HIDROSFERA_ATMOSFERA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1 con sus preguntas, la reflexión A3, los hechos A4, el glosario A5, el ejercicio A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma. La columna de aire
+                usa la <strong>Atmósfera Estándar de EUA (1976)</strong>, un promedio global: da 0 °C a 2 240 m, aunque la Ciudad de México promedia unos 16 °C; las fronteras de las capas varían con la
+                latitud y la estación. La ebullición se calcula con la ecuación de Antoine y el globo como gas ideal con valores típicos de radiosondeo. La densidad del agua de mar usa la ecuación de estado
+                UNESCO 1981 sin el efecto de la presión; los perfiles de las tres zonas son <strong>típicos e ilustrativos</strong>. La parcela de aire es un <strong>modelo simplificado</strong> (toda el
+                agua condensada cae como lluvia; terreno y distancias esquemáticos). La distribución del agua es del USGS. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

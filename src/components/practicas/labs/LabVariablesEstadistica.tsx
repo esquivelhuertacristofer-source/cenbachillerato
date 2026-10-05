@@ -11,7 +11,9 @@
  *  (1) Tipos de variables — una máquina clasificadora en 3D: nominal, ordinal,
  *      discreta o continua. Da las estrellas.
  *  (2) Población y muestra — censo de 1 500 estudiantes contra encuestas de
- *      20 a 500: parámetro y estadístico.
+ *      20 a 500: parámetro y estadístico. EXPERIMENTO CENTRAL: el deslizador
+ *      de n levanta una muestra distinta y «Repetir 20 encuestas» dibuja cuánto
+ *      se dispersan las medias: con n grande se juntan alrededor de μ.
  *  (3) Descriptiva o inferencial — la tabla de frecuencias de la muestra, los
  *      intervalos que estiman a la escuela y afirmaciones para clasificar.
  */
@@ -19,7 +21,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, NUM, OK, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
@@ -67,7 +70,7 @@ const VariablesScene = dynamic(() => import("./VariablesEstadisticaScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-shapes fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el laboratorio en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el laboratorio en 3D…</span>
     </div>
   ),
 });
@@ -76,12 +79,19 @@ const RETO_KEY = "cen-variables-estadistica-reto";
 const T_ACIERTO = 1700;
 const T_ERROR = 2700;
 const T_CENSO = 3900;
+const REPETICIONES = 20;
+const MAX_POR_N = 40;
+const COL_N = ["#f472b6", "#fbbf24", "#34d399", "#38bdf8"];
 const pct = (x: number, dec = 1) => `${num(x * 100, dec)} %`;
 
 interface Historial {
   n: number;
   media: number;
   p0: number;
+}
+interface Punto {
+  n: number;
+  media: number;
 }
 
 export function LabVariablesEstadistica({ color }: PracticaLabProps) {
@@ -109,6 +119,7 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
   const [n, setN] = useState(200);
   const [muestra, setMuestra] = useState<number[] | null>(null);
   const [historial, setHistorial] = useState<Historial[]>([]);
+  const [puntos, setPuntos] = useState<Punto[]>([]);
   const [tamanosProbados, setTamanosProbados] = useState<Set<number>>(() => new Set());
   const censoTimer = useRef<number | null>(null);
 
@@ -120,7 +131,6 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
   const [quizAprobado, setQuizAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -233,11 +243,34 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
     }, T_CENSO);
   };
 
+  const guardaPuntos = (nuevos: Punto[]) =>
+    setPuntos((p) => {
+      const todos = [...p, ...nuevos];
+      return TAMANOS.flatMap((t) => todos.filter((x) => x.n === t).slice(-MAX_POR_N));
+    });
+
   const tomarMuestra = (tam: number) => {
     const m = muestraAleatoria(tam);
     const r = resumir(m);
+    setN(tam);
     setMuestra(m);
     setHistorial((h) => [{ n: tam, media: r.media, p0: r.relativas[0]! }, ...h].slice(0, 8));
+    guardaPuntos([{ n: tam, media: r.media }]);
+    setTamanosProbados((s) => new Set(s).add(tam));
+    blip();
+  };
+
+  /** Repite la encuesta muchas veces con el mismo n: dibuja cuánto varía la media. */
+  const repetirEncuestas = (tam: number) => {
+    const nuevos: Punto[] = [];
+    let ultima: number[] = [];
+    for (let k = 0; k < REPETICIONES; k++) {
+      ultima = muestraAleatoria(tam);
+      nuevos.push({ n: tam, media: resumir(ultima).media });
+    }
+    setN(tam);
+    setMuestra(ultima);
+    guardaPuntos(nuevos);
     setTamanosProbados((s) => new Set(s).add(tam));
     blip();
   };
@@ -263,41 +296,46 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
   };
   const aciertosAfirm = AFIRMACIONES.filter((a, i) => respuestas[i] === a.rama).length;
 
+  const cuantos = (t: number) => puntos.filter((p) => p.n === t).length;
+
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Acertar una variable de cada uno de los cuatro tipos", done: tiposAcertados.size === 4 },
-    { t: `Terminar una ronda de ${POR_RONDA} variables y ganar estrellas`, done: rondaEstrellas !== null },
-    { t: `Hacer el censo de los ${num(N_POBLACION)} estudiantes`, done: censado },
-    { t: "Tomar tres encuestas y comparar su estadístico con el parámetro", done: historial.length >= 3 },
-    { t: "Probar una muestra de 20 y una de 500", done: tamanosProbados.has(20) && tamanosProbados.has(500) },
-    { t: "Revelar la población y compararla con los intervalos", done: revelo },
-    { t: `Clasificar bien las ${AFIRMACIONES.length} afirmaciones`, done: aciertosAfirm === AFIRMACIONES.length },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+  const objetivos: { txt: string; done: boolean }[] = [
+    { txt: "Acertar una variable de cada uno de los cuatro tipos", done: tiposAcertados.size === 4 },
+    { txt: `Terminar una ronda de ${POR_RONDA} variables y ganar estrellas`, done: rondaEstrellas !== null },
+    { txt: `Hacer el censo de los ${num(N_POBLACION)} estudiantes`, done: censado },
+    { txt: "Tomar tres encuestas y comparar su estadístico con el parámetro", done: historial.length >= 3 },
+    { txt: "Probar una muestra de 20 y una de 500", done: tamanosProbados.has(20) && tamanosProbados.has(500) },
+    { txt: `Repetir ${REPETICIONES} encuestas con n = 20 y con n = 500: ¿cuáles medias quedan más juntas?`, done: cuantos(20) >= REPETICIONES && cuantos(500) >= REPETICIONES },
+    { txt: "Revelar la población y compararla con los intervalos", done: revelo },
+    { txt: `Clasificar bien las ${AFIRMACIONES.length} afirmaciones`, done: aciertosAfirm === AFIRMACIONES.length },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
   ];
 
-  /* ── Textos del visor ──────────────────────────────────────────────── */
-  let chipVivo = "";
-  let pie = "";
+  /* ── Lectura en vivo (≤ 10 palabras) ───────────────────────────────── */
+  let lectura: ReactNode = null;
+  const dentro = resumen ? PARAMETRO.relativas.filter((p, k) => Math.abs(p - resumen.relativas[k]!) <= margen95(resumen.relativas[k]!, resumen.n)).length : 0;
   if (modo === "variables") {
-    chipVivo = tarjeta ? `tarjeta ${idx + 1}/${ronda.length} · errores ${errores}` : `ronda completa · errores ${errores}`;
-    pie = tarjeta ? `«${tarjeta.nombre}» (${tarjeta.ejemplos}). ¿Categorías o cantidades?` : `Ronda terminada con ${errores} ${errores === 1 ? "error" : "errores"}.`;
+    lectura = mensaje && envio
+      ? mensaje.ok
+        ? <>Correcto: {TIPOS_DEF[envio.destino].rama.toLowerCase()} {TIPOS_DEF[envio.destino].etq.toLowerCase()}</>
+        : <>No es {TIPOS_DEF[envio.destino].etq.toLowerCase()}: revisa la pista</>
+      : tarjeta
+        ? <>«{tarjeta.nombre}»: ¿categorías o cantidades?</>
+        : <>Ronda terminada con {errores} {errores === 1 ? "error" : "errores"}</>;
   } else if (modo === "poblacion") {
-    chipVivo = muestra ? `muestra n = ${num(muestra.length)} · x̄ = ${num(resumen!.media, 2)}` : censado ? `censo · μ = ${num(PARAMETRO.media, 2)}` : `población N = ${num(N_POBLACION)}`;
-    pie = censando
-      ? "El censo recorre a todos los estudiantes, fila por fila."
+    lectura = censando
+      ? <>El censo recorre a todos, fila por fila</>
       : muestra
-        ? `La encuesta preguntó a ${num(muestra.length)} de ${num(N_POBLACION)}: en promedio tienen ${num(resumen!.media, 2)} hermanos y ${pct(resumen!.relativas[0]!)} no tiene hermanos.${censado ? ` En toda la escuela: ${num(PARAMETRO.media, 2)} y ${pct(PARAMETRO.relativas[0]!)}.` : ""}`
+        ? <>n = {num(muestra.length)}: x̄ = {num(resumen!.media, 2)}{censado ? <> frente a μ = {num(PARAMETRO.media, 2)}</> : <>, μ aún desconocida</>}</>
         : censado
-          ? `Censo completo: en promedio ${num(PARAMETRO.media, 2)} hermanos por estudiante. Ese es el parámetro de la población.`
-          : "Cada estudiante tiene un número de hermanos. Nadie lo sabe hasta preguntarles.";
+          ? <>Censo: μ = {num(PARAMETRO.media, 2)} hermanos</>
+          : <>Nadie sabe cuántos hermanos hay: pregunta</>;
   } else {
-    chipVivo = resumen ? `n = ${num(resumen.n)} · 5 intervalos al 95 %` : "sin muestra";
-    const dentro = resumen ? PARAMETRO.relativas.filter((p, k) => Math.abs(p - resumen.relativas[k]!) <= margen95(resumen.relativas[k]!, resumen.n)).length : 0;
-    pie = !resumen
-      ? "Toma una muestra para construir la tabla de frecuencias."
+    lectura = !resumen
+      ? <>Toma una muestra para ver la tabla</>
       : revelar
-        ? `El dorado es el valor de toda la escuela: ${dentro} de 5 intervalos lo contienen.`
-        : `Las barras describen a los ${num(resumen.n)} encuestados (descriptiva). Las líneas blancas estiman a los ${num(N_POBLACION)} (inferencial).`;
+        ? <>{dentro} de 5 intervalos contienen el valor real</>
+        : <>Barras: lo observado. Rayitas: lo que se infiere</>;
   }
 
   const sceneFallback = (
@@ -306,53 +344,53 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los cálculos siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los cálculos siguen aquí.</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  /* ── Panel «Controles» por modo ────────────────────────────────────── */
+  const dentroK = (k: number) => resumen !== null && Math.abs(PARAMETRO.relativas[k]! - resumen.relativas[k]!) <= margen95(resumen.relativas[k]!, resumen.n);
+  const idxN = Math.max(0, TAMANOS.indexOf(n));
 
-  /* ── Panel por modo ────────────────────────────────────────────────── */
-  let control: ReactNode = null;
+  let controles: ReactNode = null;
   if (modo === "variables") {
-    control = (
+    controles = (
       <>
         <div style={{ padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10.5, fontWeight: 900, color: T.text3, letterSpacing: "0.06em" }}>{tarjeta ? `TARJETA ${idx + 1} DE ${ronda.length}` : "RONDA COMPLETA"}</div>
-            <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", marginTop: 2 }}>{tarjeta ? tarjeta.nombre : `${errores} ${errores === 1 ? "error" : "errores"}`}</div>
-            {tarjeta && <div style={{ fontSize: 12, color: T.text2, marginTop: 2 }}>{tarjeta.ejemplos}</div>}
+            <div style={{ fontSize: 13, fontWeight: 900, color: T.text3, letterSpacing: "0.06em" }}>{tarjeta ? `TARJETA ${idx + 1} DE ${ronda.length}` : "RONDA COMPLETA"}</div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#fff", marginTop: 2 }}>{tarjeta ? tarjeta.nombre : `${errores} ${errores === 1 ? "error" : "errores"}`}</div>
+            {tarjeta && <div style={{ fontSize: 14, color: T.text2, marginTop: 2 }}>{tarjeta.ejemplos}</div>}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
             {[1, 2, 3].map((k) => (
-              <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejorEstrellas ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+              <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= mejorEstrellas ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
           </div>
         </div>
 
         {(["Cualitativa", "Cuantitativa"] as const).map((rama) => (
-          <div key={rama}>
-            {sub(rama)}
+          <Bloque key={rama} titulo={rama}>
             <div className="ve-clasif">
               {TIPOS.filter((t) => TIPOS_DEF[t].rama === rama).map((t) => {
                 const d = TIPOS_DEF[t];
                 return (
                   <button key={t} className="ve-bin" disabled={!tarjeta || envio !== null} onClick={() => clasificar(t)} style={{ ["--vec" as string]: d.color }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13.5, fontWeight: 900, color: "#fff" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 900, color: "#fff" }}>
                       <span style={{ width: 10, height: 10, borderRadius: 3, background: d.color }} />
                       {d.etq}
                     </span>
-                    <span style={{ fontSize: 11, color: T.text3, marginTop: 3, textAlign: "left" }}>{d.pregunta}</span>
+                    <span style={{ fontSize: 14, color: T.text2, marginTop: 3, textAlign: "left" }}>{d.pregunta}</span>
                   </button>
                 );
               })}
             </div>
-          </div>
+          </Bloque>
         ))}
 
         {mensaje && (
-          <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 11, border: `1px solid ${mensaje.ok ? `${OK}55` : "#FF8A3C55"}`, background: mensaje.ok ? "rgba(52,211,153,0.08)" : "rgba(255,138,60,0.08)", fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
+          <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 11, border: `1px solid ${mensaje.ok ? `${OK}55` : "#FF8A3C55"}`, background: mensaje.ok ? "rgba(52,211,153,0.08)" : "rgba(255,138,60,0.08)", fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
             <i className={`fa-solid ${mensaje.ok ? "fa-circle-check" : "fa-rotate-left"}`} style={{ marginRight: 7, color: mensaje.ok ? OK : "#FF8A3C" }} />
             {mensaje.texto}
           </div>
@@ -362,9 +400,9 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
           <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
               {[1, 2, 3].map((k) => (
-                <i key={k} className="fa-solid fa-star" style={{ fontSize: 16, color: k <= rondaEstrellas ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+                <i key={k} className="fa-solid fa-star" style={{ fontSize: 17, color: k <= rondaEstrellas ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
               ))}
-              <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>
+              <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>
                 Ronda con {errores} {errores === 1 ? "error" : "errores"}
               </span>
             </div>
@@ -374,89 +412,98 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
             </button>
           </div>
         )}
-        <div style={{ marginTop: 10, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>Estrellas: 3 sin errores, 2 con uno o dos, 1 con más.</div>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Estrellas: 3 sin errores, 2 con uno o dos, 1 con más.</div>
       </>
     );
   } else if (modo === "poblacion") {
-    control = (
+    controles = (
       <>
-        <button className="ve-toggle" onClick={hacerCenso} disabled={censando || censado} style={{ ["--vec" as string]: modoCol, opacity: censado ? 0.7 : 1 }}>
-          <i className={`fa-solid ${censando ? "fa-spinner fa-spin" : censado ? "fa-circle-check" : "fa-clipboard-list"}`} style={{ marginRight: 9, color: modoCol }} />
-          {censando ? "Censando a toda la escuela…" : censado ? `Censo hecho: ${num(N_POBLACION)} entrevistas` : `Hacer el censo (${num(N_POBLACION)} entrevistas)`}
-        </button>
+        <Bloque titulo="Experimento: ¿cuánto pesa el tamaño de la muestra?" icono="fa-people-group">
+          <button className="ve-toggle" onClick={hacerCenso} disabled={censando || censado} style={{ ["--vec" as string]: modoCol, opacity: censado ? 0.7 : 1 }}>
+            <i className={`fa-solid ${censando ? "fa-spinner fa-spin" : censado ? "fa-circle-check" : "fa-clipboard-list"}`} style={{ marginRight: 9, color: modoCol }} />
+            {censando ? "Censando a toda la escuela…" : censado ? `Censo hecho: ${num(N_POBLACION)} entrevistas` : `Hacer el censo (${num(N_POBLACION)} entrevistas)`}
+          </button>
 
-        {sub("Encuesta: tamaño de la muestra (n)")}
-        <div className="ve-opts">
-          {TAMANOS.map((t) => (
-            <button key={t} className="ve-opt" data-on={t === n} onClick={() => setN(t)} style={{ ["--vec" as string]: accent, background: t === n ? `rgba(${color.rgba},0.16)` : "transparent", minWidth: 56, ...NUM }}>
-              {t}
+          <Deslizador
+            label="Tamaño de la muestra n"
+            icon="fa-hand-pointer"
+            colr={accent}
+            valor={`n = ${n}`}
+            min={0}
+            max={TAMANOS.length - 1}
+            step={1}
+            value={idxN}
+            onChange={(v) => tomarMuestra(TAMANOS[v]!)}
+            hintL={`${TAMANOS[0]}`}
+            hintR={`${TAMANOS[TAMANOS.length - 1]}`}
+          />
+          <div className="ve-dos">
+            <button className="ve-toggle" onClick={() => tomarMuestra(n)} style={{ ["--vec" as string]: accent }}>
+              <i className="fa-solid fa-shuffle" style={{ marginRight: 9, color: accent }} />
+              Otra de {n}
             </button>
-          ))}
-        </div>
-        <button className="ve-toggle" onClick={() => tomarMuestra(n)} style={{ marginTop: 12, ["--vec" as string]: accent }}>
-          <i className="fa-solid fa-hand-pointer" style={{ marginRight: 9, color: accent }} />
-          {muestra ? `Tomar otra muestra de ${n}` : `Encuestar a ${n} estudiantes al azar`}
-        </button>
+            <button className="ve-toggle" onClick={() => repetirEncuestas(n)} style={{ ["--vec" as string]: "#fbbf24" }}>
+              <i className="fa-solid fa-repeat" style={{ marginRight: 9, color: "#fbbf24" }} />
+              Repetir {REPETICIONES} veces
+            </button>
+          </div>
+        </Bloque>
 
-        <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10 }}>
-          <div style={{ padding: "10px 12px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}10` }}>
-            <div style={{ fontSize: 10.5, fontWeight: 900, color: T.text3, letterSpacing: "0.06em" }}>POBLACIÓN · PARÁMETRO</div>
-            <div style={{ display: "flex", flexWrap: "wrap" }}>
-              <Readout label="Media μ" value={censado ? num(PARAMETRO.media, 2) : "?"} col={modoCol} size={17} />
-              <Readout label="Sin hermanos" value={censado ? pct(PARAMETRO.relativas[0]!, 0) : "?"} size={17} />
-            </div>
+        <Bloque titulo="Las medias de tus encuestas" icono="fa-chart-simple">
+          <DispersionMedias puntos={puntos} censado={censado} />
+          <Comparacion puntos={puntos} />
+        </Bloque>
+
+        <Bloque titulo="Parámetro y estadístico" icono="fa-scale-balanced">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+            <Dato label="Población · media μ" value={censado ? num(PARAMETRO.media, 2) : "?"} col={modoCol} />
+            <Dato label="Muestra · media x̄" value={resumen ? num(resumen.media, 2) : "—"} col={accent} />
+            <Dato label="Población · sin hermanos" value={censado ? pct(PARAMETRO.relativas[0]!, 0) : "?"} />
+            <Dato label="Muestra · sin hermanos" value={resumen ? pct(resumen.relativas[0]!) : "—"} />
           </div>
-          <div style={{ padding: "10px 12px", borderRadius: 12, border: `1px solid ${accent}55`, background: `rgba(${color.rgba},0.08)` }}>
-            <div style={{ fontSize: 10.5, fontWeight: 900, color: T.text3, letterSpacing: "0.06em" }}>MUESTRA · ESTADÍSTICO</div>
-            <div style={{ display: "flex", flexWrap: "wrap" }}>
-              <Readout label="Media x̄" value={resumen ? num(resumen.media, 2) : "—"} col={accent} size={17} />
-              <Readout label="Sin hermanos" value={resumen ? pct(resumen.relativas[0]!) : "—"} size={17} />
-            </div>
-          </div>
-        </div>
+        </Bloque>
 
         {historial.length > 0 && (
-          <>
-            {sub("Encuestas tomadas (la más reciente primero)")}
+          <Bloque titulo="Últimas encuestas" icono="fa-clock-rotate-left">
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {historial.map((h, i) => {
                 const lejos = censado ? Math.abs(h.media - PARAMETRO.media) : null;
                 return (
-                  <span key={i} style={{ fontSize: 11, color: T.text2, padding: "4px 9px", borderRadius: 999, border: `1px solid ${lejos !== null && lejos > 0.25 ? "#f8717155" : T.line}`, ...NUM }}>
+                  <span key={i} style={{ fontSize: 14, color: T.text2, padding: "4px 9px", borderRadius: 999, border: `1px solid ${lejos !== null && lejos > 0.25 ? "#f8717155" : T.line}`, ...NUM }}>
                     n = {h.n} · x̄ = {num(h.media, 2)}
                     {lejos !== null ? ` (${h.media >= PARAMETRO.media ? "+" : "−"}${num(Math.abs(h.media - PARAMETRO.media), 2)})` : ""}
                   </span>
                 );
               })}
             </div>
-            {!censado && <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3 }}>Haz el censo para saber qué tan lejos quedó cada encuesta.</div>}
-          </>
+            {!censado && <div style={{ fontSize: 14, color: T.text3 }}>Haz el censo para saber qué tan lejos quedó cada encuesta.</div>}
+          </Bloque>
         )}
       </>
     );
   } else {
-    const dentro = (k: number) => resumen !== null && Math.abs(PARAMETRO.relativas[k]! - resumen.relativas[k]!) <= margen95(resumen.relativas[k]!, resumen.n);
-    control = (
+    controles = (
       <>
-        <div className="ve-opts">
-          {TAMANOS.map((t) => (
-            <button key={t} className="ve-opt" data-on={resumen?.n === t} onClick={() => { setN(t); tomarMuestra(t); }} style={{ ["--vec" as string]: accent, background: resumen?.n === t ? `rgba(${color.rgba},0.16)` : "transparent", minWidth: 56, ...NUM }}>
-              n = {t}
-            </button>
-          ))}
-        </div>
+        <Bloque titulo="Tamaño de la muestra" icono="fa-hand-pointer">
+          <div className="ve-opts">
+            {TAMANOS.map((t) => (
+              <button key={t} className="ve-opt" data-on={resumen?.n === t} onClick={() => tomarMuestra(t)} style={{ ["--vec" as string]: accent, background: resumen?.n === t ? `rgba(${color.rgba},0.16)` : "transparent", minWidth: 64, ...NUM }}>
+                n = {t}
+              </button>
+            ))}
+          </div>
+        </Bloque>
 
         {resumen && (
-          <>
-            {sub("Tabla de frecuencias de la muestra")}
+          <Bloque titulo="Tabla de frecuencias de la muestra" icono="fa-table">
             <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 3, fontSize: 12.5, ...NUM }}>
+              <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 3, fontSize: 14, ...NUM }}>
                 <thead>
-                  <tr style={{ color: T.text3, fontSize: 10.5 }}>
+                  <tr style={{ color: T.text3, fontSize: 13 }}>
                     <th style={{ textAlign: "left", padding: 4 }}>Hermanos</th>
-                    <th style={{ padding: 4 }}>f absoluta</th>
-                    <th style={{ padding: 4 }}>f relativa</th>
-                    <th style={{ padding: 4 }}>Escuela (95 %)</th>
+                    <th style={{ padding: 4 }}>f abs.</th>
+                    <th style={{ padding: 4 }}>f rel.</th>
+                    <th style={{ padding: 4 }}>Escuela 95 %</th>
                     {revelar && <th style={{ padding: 4 }}>Real</th>}
                   </tr>
                 </thead>
@@ -475,7 +522,7 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
                           {pct(Math.max(0, p - me), 0)} – {pct(Math.min(1, p + me), 0)}
                         </td>
                         {revelar && (
-                          <td className="ve-td" style={{ color: dentro(k) ? OK : "#f87171" }}>
+                          <td className="ve-td" style={{ color: dentroK(k) ? OK : "#f87171" }}>
                             {pct(PARAMETRO.relativas[k]!, 0)}
                           </td>
                         )}
@@ -494,7 +541,7 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
                 </tbody>
               </table>
             </div>
-            <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
               f relativa = f absoluta ÷ {resumen.n} (descriptiva). Intervalo: f relativa ± 1.96·√(p(1 − p)/n), con corrección por población finita (inferencial).
             </div>
             <button
@@ -504,377 +551,284 @@ export function LabVariablesEstadistica({ color }: PracticaLabProps) {
                 setRevelo(true);
                 blip();
               }}
-              style={{ marginTop: 12, ["--vec" as string]: "#fbbf24" }}
+              style={{ ["--vec" as string]: "#fbbf24" }}
             >
               <i className={`fa-solid ${revelar ? "fa-eye-slash" : "fa-eye"}`} style={{ marginRight: 9, color: "#fbbf24" }} />
               {revelar ? "Ocultar la población" : "Revelar la población"}
             </button>
-          </>
+          </Bloque>
         )}
 
-        {sub(`¿Descriptiva o inferencial? · ${aciertosAfirm}/${AFIRMACIONES.length}`)}
-        <div style={{ display: "grid", gap: 8 }}>
-          {AFIRMACIONES.map((a, i) => {
-            const r = respuestas[i];
-            const bien = r === a.rama;
-            return (
-              <div key={i} style={{ padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.45)", border: `1px solid ${r ? (bien ? `${OK}55` : "#FF8A3C55") : T.line}` }}>
-                <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.45 }}>{a.texto}</div>
-                <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap", alignItems: "center" }}>
-                  {(["descriptiva", "inferencial"] as Rama[]).map((op) => (
-                    <button key={op} className="ve-opt ve-afirm" data-on={r === op} onClick={() => responder(i, op)} style={{ ["--vec" as string]: r === op ? (bien ? OK : "#FF8A3C") : modoCol, background: r === op ? (bien ? "rgba(52,211,153,0.14)" : "rgba(255,138,60,0.12)") : "transparent", padding: "6px 11px" }}>
-                      {op === "descriptiva" ? "Descriptiva" : "Inferencial"}
-                    </button>
-                  ))}
-                  {r && <span style={{ fontSize: 11.5, color: bien ? OK : "#FF8A3C" }}>{bien ? a.porque : "Revisa: ¿se queda en los datos observados o habla de alguien más?"}</span>}
+        <Bloque titulo={`¿Descriptiva o inferencial? · ${aciertosAfirm}/${AFIRMACIONES.length}`} icono="fa-circle-question">
+          <div style={{ display: "grid", gap: 8 }}>
+            {AFIRMACIONES.map((a, i) => {
+              const r = respuestas[i];
+              const bien = r === a.rama;
+              return (
+                <div key={i} style={{ padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.45)", border: `1px solid ${r ? (bien ? `${OK}55` : "#FF8A3C55") : T.line}` }}>
+                  <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.45 }}>{a.texto}</div>
+                  <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap", alignItems: "center" }}>
+                    {(["descriptiva", "inferencial"] as Rama[]).map((op) => (
+                      <button key={op} className="ve-opt ve-afirm" data-on={r === op} onClick={() => responder(i, op)} style={{ ["--vec" as string]: r === op ? (bien ? OK : "#FF8A3C") : modoCol, background: r === op ? (bien ? "rgba(52,211,153,0.14)" : "rgba(255,138,60,0.12)") : "transparent", padding: "6px 11px" }}>
+                        {op === "descriptiva" ? "Descriptiva" : "Inferencial"}
+                      </button>
+                    ))}
+                    {r && <span style={{ fontSize: 14, color: bien ? OK : "#FF8A3C" }}>{bien ? a.porque : "Revisa: ¿se queda en los datos observados o habla de alguien más?"}</span>}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </Bloque>
       </>
     );
   }
 
+  const estilos = (
+    <style>{`
+      .ve-opts { display:flex; flex-wrap:wrap; gap:7px; }
+      .ve-opt { cursor:pointer; border:1px solid var(--vec); border-radius:10px; padding:9px 12px; font-size:14px;
+        font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+      .ve-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
+      .ve-opt:hover { background:rgba(255,255,255,0.06); }
+      .ve-clasif { display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:8px; }
+      .ve-dos { display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap:8px; }
+      .ve-bin { cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; padding:11px 13px; border-radius:12px;
+        border:1px solid var(--vec); background:rgba(4,10,22,0.45); transition:all .15s; }
+      .ve-bin:hover:not(:disabled) { background:rgba(255,255,255,0.07); transform:translateY(-1px); }
+      .ve-bin:disabled { cursor:default; opacity:0.55; }
+      .ve-opt:focus-visible, .ve-toggle:focus-visible, .ve-bin:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+      .ve-toggle { width:100%; cursor:pointer; border:1px solid var(--vec); border-radius:11px; padding:11px 14px;
+        background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+      .ve-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+      .ve-toggle:disabled { cursor:default; }
+      .ve-td { padding:6px; text-align:center; border-radius:6px; background:rgba(4,10,22,0.45); color:${T.text2}; font-weight:800; }
+    `}</style>
+  );
+
+  const parrafo = (txt: string) => <p style={{ margin: 0, color: T.text2, lineHeight: 1.55 }}>{txt}</p>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes vePulse { 0%,100%{ box-shadow:0 0 0 0 var(--ved); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ve-live-dot { animation: vePulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .ve-live-dot { animation:none; } }
-        .ve-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ve-grid { grid-template-columns: 1fr; } }
-        .ve-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ve-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ve-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ve-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .ve-tab { cursor:pointer; border:1px solid var(--vec); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .ve-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .ve-tab:hover { background:rgba(255,255,255,0.06); }
-        .ve-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .ve-opt { cursor:pointer; border:1px solid var(--vec); border-radius:10px; padding:9px 12px; font-size:12px;
-          font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .ve-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
-        .ve-opt:hover { background:rgba(255,255,255,0.06); }
-        .ve-clasif { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
-        .ve-bin { cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; padding:11px 13px; border-radius:12px;
-          border:1px solid var(--vec); background:rgba(4,10,22,0.45); transition:all .15s; }
-        .ve-bin:hover:not(:disabled) { background:rgba(255,255,255,0.07); transform:translateY(-1px); }
-        .ve-bin:disabled { cursor:default; opacity:0.55; }
-        .ve-opt:focus-visible, .ve-tab:focus-visible, .ve-toggle:focus-visible, .ve-icobtn:focus-visible, .ve-bin:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        .ve-toggle { width:100%; cursor:pointer; border:1px solid var(--vec); border-radius:11px; padding:11px 14px;
-          background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .ve-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .ve-toggle:disabled { cursor:default; }
-        .ve-td { padding:6px; text-align:center; border-radius:6px; background:rgba(4,10,22,0.45); color:${T.text2}; font-weight:800; }
-        @media (max-width: 1000px){ .ve-bottom { grid-template-columns: 1fr !important; } }
-
-        .ve-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ve-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ve-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ve-drawer[data-open="true"] { transform:translateX(0); }
-        .ve-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ve-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ve-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ve-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ve-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .ve-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="ve-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="ve-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--vec" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="ve-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <VariablesScene
-                modo={modo}
-                tarjeta={tarjeta}
-                envio={envio}
-                conteos={conteos}
-                censoNonce={censoNonce}
-                censado={censado}
-                seleccion={seleccion}
-                resumen={resumen}
-                revelar={revelar}
-                accent={accent}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="ve-live-dot" style={{ ["--ved" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <VariablesScene
+            modo={modo}
+            tarjeta={tarjeta}
+            envio={envio}
+            conteos={conteos}
+            censoNonce={censoNonce}
+            censado={censado}
+            seleccion={seleccion}
+            resumen={resumen}
+            revelar={revelar}
+            accent={accent}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      leyenda={
+        modo !== "variables" ? (
+          <>
+            {CATEGORIAS.map((c, k) => (
+              <div key={c} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: "#e2e8f0" }}>
+                <span style={{ width: 11, height: 11, borderRadius: 3, background: COLORES_CAT[k] }} />
+                {c} {c === "1" ? "hermano" : "hermanos"}
               </div>
-              {modo !== "variables" && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {CATEGORIAS.map((c, k) => (
-                    <span key={c} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "rgba(4,10,22,0.72)", border: `1px solid ${T.line}`, fontSize: 11, fontWeight: 800, color: "#e2e8f0", whiteSpace: "nowrap" }}>
-                      <span style={{ width: 9, height: 9, borderRadius: 3, background: COLORES_CAT[k] }} />
-                      {c} {c === "1" ? "hermano" : "hermanos"}
-                    </span>
+            ))}
+          </>
+        ) : undefined
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              {estilos}
+              {controles}
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={sfx}
+              playPick={() => {
+                if (sonido) audioRef.current?.blip();
+              }}
+              mensajeAprobado="¡Aprobado! Ya distingues variables, poblaciones y muestras."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Los datos al servicio de las decisiones" icono="fa-chart-pie">
+                {parrafo(PROBLEMA)}
+              </Bloque>
+              <Bloque titulo={`Lectura A1 · ${TITULO_A1}`} icono="fa-book-open">
+                <div style={{ display: "grid", gap: 10 }}>
+                  {LECTURA_A1.map((p, i) => (
+                    <div key={i} style={{ color: T.text2, lineHeight: 1.55 }}>
+                      {p}
+                    </div>
                   ))}
                 </div>
-              )}
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ve-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ve-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ve-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="ve-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 10, flexWrap: "wrap" }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-            </div>
-            {control}
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-chart-pie" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Los datos al servicio de las decisiones</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12, maxHeight: 440, overflowY: "auto", paddingRight: 6 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-comments">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => (
+                    <li key={i}>{q}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {INSTRUCCIONES.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ol>
+              </Bloque>
+              <Bloque titulo="¿Sabías que? (lectura A1)" icono="fa-flask-vial">
+                {parrafo(SABIAS_A1)}
+              </Bloque>
+              <Bloque titulo="Actividad del glosario A5" icono="fa-pen-to-square">
+                {parrafo(ACTIVIDAD_A5)}
+                {parrafo("Las cuatro variables de la actividad están entre las tarjetas del clasificador.")}
+              </Bloque>
+              <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {GLOSARIO.map((gi, i) => (
+                    <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                      <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                      <span style={{ color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+                      <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
+                        <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
+                        {gi.ejemplo}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={VARIABLES_ESTADISTICA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1, sus preguntas y su recuadro, los hechos del quiz A4, el glosario A5 y el quiz A2 son <strong>verbatim</strong> del material de la plataforma. Las
+                variables del clasificador salen de esas mismas actividades. La escuela de 1 500 estudiantes es la del ejemplo del quiz A4; cuántos hermanos tiene cada uno es un{" "}
+                <strong>dato ilustrativo</strong> del laboratorio, fijado con semilla. Las muestras usan el generador aleatorio del navegador. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+/* ── Las medias de las encuestas, una fila por tamaño de muestra ─────────── */
+const X0 = 0.8;
+const X1 = 2.4;
+const xDe = (m: number) => 14 + ((Math.min(X1, Math.max(X0, m)) - X0) / (X1 - X0)) * 292;
 
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
+function DispersionMedias({ puntos, censado }: { puntos: Punto[]; censado: boolean }) {
+  return (
+    <svg viewBox="0 0 320 168" style={{ width: "100%", height: "auto", display: "block", borderRadius: 12, background: "rgba(2,12,28,0.5)", border: `1px solid ${T.line}` }} role="img" aria-label="Medias de las encuestas por tamaño de muestra">
+      {TAMANOS.map((t, r) => {
+        const y = 30 + r * 32;
+        return (
+          <g key={t}>
+            <line x1={14} x2={306} y1={y} y2={y} stroke="rgba(255,255,255,0.1)" />
+            <text x={16} y={y - 8} fontSize={13} fontWeight={800} fill={COL_N[r]}>
+              n = {t}
+            </text>
+            {puntos
+              .filter((p) => p.n === t)
+              .map((p, i) => (
+                <circle key={i} cx={xDe(p.media)} cy={y + ((i * 7) % 11) - 5} r={3.6} fill={COL_N[r]} fillOpacity={0.75} />
               ))}
-            </div>
-          </div>
+          </g>
+        );
+      })}
+      {censado && (
+        <g>
+          <line x1={xDe(PARAMETRO.media)} x2={xDe(PARAMETRO.media)} y1={8} y2={150} stroke="#fff" strokeDasharray="4 3" strokeWidth={1.6} />
+          <text x={xDe(PARAMETRO.media) + 5} y={14} fontSize={13} fontWeight={900} fill="#fff">
+            μ = {num(PARAMETRO.media, 2)}
+          </text>
+        </g>
+      )}
+      <text x={14} y={163} fontSize={13} fill="#94a3b8">
+        {num(X0, 1)}
+      </text>
+      <text x={306} y={163} fontSize={13} fill="#94a3b8" textAnchor="end">
+        {num(X1, 1)} hermanos (media)
+      </text>
+    </svg>
+  );
+}
+
+function Comparacion({ puntos }: { puntos: Punto[] }) {
+  const rango = (t: number) => {
+    const v = puntos.filter((p) => p.n === t).map((p) => p.media);
+    return v.length >= 5 ? { min: Math.min(...v), max: Math.max(...v) } : null;
+  };
+  const filas = TAMANOS.map((t) => ({ t, r: rango(t) })).filter((f) => f.r !== null);
+  if (filas.length < 2) {
+    return <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Pulsa «Repetir 20 veces» con n = 20 y luego con n = 500. Cada punto es la media de una encuesta.</div>;
+  }
+  return (
+    <div style={{ display: "grid", gap: 4, fontSize: 14, color: T.text2, ...NUM }}>
+      {filas.map(({ t, r }) => (
+        <div key={t}>
+          n = {t}: medias de {num(r!.min, 2)} a {num(r!.max, 2)} (ancho {num(r!.max - r!.min, 2)})
         </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ve-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-flask-vial" style={{ marginRight: 8, color: accent }} />
-              ¿Sabías que? (lectura A1)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{SABIAS_A1}</div>
-          </div>
-
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${T.line}`, background: "rgba(4,10,22,0.4)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-pen-to-square" style={{ marginRight: 8, color: accent }} />
-              Actividad del glosario A5
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{ACTIVIDAD_A5}</div>
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginTop: 8 }}>
-              <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-              Las cuatro variables de la actividad están entre las tarjetas del clasificador.
-            </div>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1, sus preguntas y su recuadro, los hechos del quiz A4, el glosario A5 y el quiz A2 son <strong>verbatim</strong> del material de la plataforma. Las
-          variables del clasificador salen de esas mismas actividades. La escuela de 1 500 estudiantes es la del ejemplo del quiz A4; cuántos hermanos tiene cada uno es un{" "}
-          <strong>dato ilustrativo</strong> del laboratorio, fijado con semilla. Las muestras usan el generador aleatorio del navegador. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sfx}
-        playPick={() => {
-          if (sonido) audioRef.current?.blip();
-        }}
-        mensajeAprobado="¡Aprobado! Ya distingues variables, poblaciones y muestras."
-      />
-
-      <div className="ve-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ve-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ve-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ve-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ve-drawer-body">
-          <FichaTeorica data={VARIABLES_ESTADISTICA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
+      ))}
+      <div style={{ color: "#fff", fontWeight: 700 }}>Mientras más grande n, más juntas caen las medias.</div>
     </div>
   );
 }

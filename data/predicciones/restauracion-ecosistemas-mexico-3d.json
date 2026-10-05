@@ -1,0 +1,12 @@
+{
+  "escena": "Un potrero abandonado se deja regenerar solo. Un deslizador pone el bosque maduro cerca o lejos, y la parcela crece con los años.",
+  "pregunta": "Si el bosque maduro queda a 2 km del potrero, ¿cómo está la parcela a los 40 años?",
+  "opciones": [
+    { "id": "a", "texto": "Ya es un bosque joven denso", "icono": "fa-tree" },
+    { "id": "b", "texto": "Sigue pobre: llegan pocas semillas", "icono": "fa-seedling" },
+    { "id": "c", "texto": "Igual que si estuviera pegado al bosque", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Los árboles nuevos nacen de semillas que traen aves y murciélagos desde el bosque. A 2 km casi no llegan, así que la regeneración natural se estanca. Ahí conviene plantar o sembrar islas de árboles.",
+  "comoComprobarlo": "En «Restaurar una parcela» deja la regeneración natural, sube la distancia al bosque a 2 000 m y corre la simulación hasta el año 40."
+}

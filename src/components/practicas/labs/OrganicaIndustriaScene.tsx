@@ -19,8 +19,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -63,6 +63,8 @@ export interface OrganicaIndustriaSceneProps {
   resaltar: GrupoId | null;
   resaltarOk: boolean;
   clasificados: string[];
+  // Probetas de la síntesis
+  probetas: Probetas;
 }
 
 type Pt = [number, number, number];
@@ -154,9 +156,12 @@ function terminar(m: THREE.InstancedMesh) {
   if (m.instanceColor) m.instanceColor.needsUpdate = true;
 }
 
-function Etiqueta({ pos, children, col, fs = 12, df = 10 }: { pos: Pt; children: ReactNode; col?: string; fs?: number; df?: number }) {
+/** Etiqueta fija de 14 px; en pantallas angostas se oculta (la info ya está en el panel). */
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
+  const angosto = useThree((st) => st.size.width < 640);
+  if (angosto) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -327,7 +332,59 @@ function Matraz({ color, activo }: { color: string; activo: boolean }) {
   );
 }
 
-function EscenaSintesis({ reaccion, corrida, fase, modoColor }: { reaccion: ReaccionId; corrida: number; fase: FaseSintesis; modoColor: string }) {
+export interface Probetas {
+  /** mol de cada reactivo y avance de la reacción (mol). */
+  molA: number;
+  molB: number;
+  avance: number;
+  coefP: number;
+  hayB: boolean;
+  /** Capacidad de la probeta, en mol (el máximo que permiten los deslizadores). */
+  tope: number;
+}
+
+const ALTO_PROBETA = 2.3;
+
+/** Probeta de moles: el nivel sube o baja con la cantidad; tras reaccionar, el reactivo limitante queda en cero. */
+function ProbetaMoles({ x, nombre, col, inicial, final, tope, fase, etiqueta = false }: { x: number; nombre: string; col: string; inicial: number; final: number; tope: number; fase: FaseSintesis; etiqueta?: boolean }) {
+  const liquido = useRef<THREE.Mesh>(null);
+  const nivel = useRef(inicial / Math.max(tope, 1e-9));
+  useFrame((_, dt) => {
+    const meta = (fase === "listo" ? inicial : final) / Math.max(tope, 1e-9);
+    const k = fase === "reaccionando" ? 0.7 : 6;
+    nivel.current += (meta - nivel.current) * Math.min(1, dt * k);
+    const h = Math.max(0.001, Math.min(1, nivel.current) * ALTO_PROBETA);
+    if (liquido.current) {
+      liquido.current.scale.y = h;
+      liquido.current.position.y = h / 2;
+    }
+  });
+  return (
+    <group position={[x, -3.3, 3.2]}>
+      <mesh position={[0, 0.06, 0]} receiveShadow>
+        <cylinderGeometry args={[0.5, 0.55, 0.12, 24]} />
+        <meshStandardMaterial color="#1e293b" roughness={0.5} />
+      </mesh>
+      <group position={[0, 0.12, 0]}>
+        <mesh ref={liquido}>
+          <cylinderGeometry args={[0.36, 0.36, 1, 24]} />
+          <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.25} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, ALTO_PROBETA / 2, 0]}>
+          <cylinderGeometry args={[0.42, 0.42, ALTO_PROBETA, 24, 1, true]} />
+          <meshStandardMaterial color="#cfe8ff" transparent opacity={0.12} depthWrite={false} side={THREE.DoubleSide} />
+        </mesh>
+      </group>
+      {etiqueta && (
+        <Etiqueta pos={[0, ALTO_PROBETA + 0.6, 0]} col={col}>
+          {nombre}
+        </Etiqueta>
+      )}
+    </group>
+  );
+}
+
+function EscenaSintesis({ reaccion, corrida, fase, modoColor, probetas }: { reaccion: ReaccionId; corrida: number; fase: FaseSintesis; modoColor: string; probetas: Probetas }) {
   const g = REACCIONES_GEO[reaccion];
   const r = REACCIONES.find((x) => x.id === reaccion)!;
   const esFerm = reaccion === "fermentacion";
@@ -343,8 +400,7 @@ function EscenaSintesis({ reaccion, corrida, fase, modoColor }: { reaccion: Reac
   const pos = useRef<Float32Array>(new Float32Array(n * 3));
   const etqR = useRef<(HTMLDivElement | null)[]>([]);
   const etqP = useRef<(HTMLDivElement | null)[]>([]);
-  const etqRompe = useRef<(HTMLDivElement | null)[]>([]);
-  const etqForma = useRef<(HTMLDivElement | null)[]>([]);
+  const angosto = useThree((st) => st.size.width < 640);
   const marca = useMemo(() => new Set(g.marca), [g]);
   const colModo = useMemo(() => new THREE.Color(modoColor), [modoColor]);
 
@@ -492,19 +548,13 @@ function EscenaSintesis({ reaccion, corrida, fase, modoColor }: { reaccion: Reac
     etqP.current.forEach((d) => {
       if (d) d.style.opacity = T >= 3.9 ? "1" : "0";
     });
-    etqRompe.current.forEach((d) => {
-      if (d) d.style.opacity = T < 1.9 ? "1" : "0";
-    });
-    etqForma.current.forEach((d) => {
-      if (d) d.style.opacity = T >= 3.5 ? "1" : "0";
-    });
     if (levadura.current) {
       const s = 1 + 0.03 * Math.sin(clock.elapsedTime * 1.8) + (T > T_MUEVE && T < T_PRODUCTOS + 0.5 ? 0.06 * Math.sin(T * 12) : 0);
       levadura.current.scale.setScalar(s);
     }
   });
 
-  const caja = (txt: ReactNode, col: string, fs = 11) => (
+  const caja = (txt: ReactNode, col: string, fs = 14) => (
     <div
       style={{
         padding: "4px 10px",
@@ -539,11 +589,6 @@ function EscenaSintesis({ reaccion, corrida, fase, modoColor }: { reaccion: Reac
               <torusGeometry args={[4.6, 0.05, 8, 96]} />
               <meshBasicMaterial color="#fcd34d" transparent opacity={0.35} />
             </mesh>
-            <Html position={[0, 5.4, 0]} center distanceFactor={11} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ padding: "3px 9px", borderRadius: 999, background: "rgba(4,10,22,0.8)", border: "1px solid #fcd34daa", color: "#fde68a", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>
-                Levadura (Saccharomyces cerevisiae)
-              </div>
-            </Html>
             <mesh position={[-1.6, -2.2, -2.2]}>
               <sphereGeometry args={[1.1, 24, 18]} />
               <meshStandardMaterial color="#a16207" transparent opacity={0.2} depthWrite={false} />
@@ -560,8 +605,8 @@ function EscenaSintesis({ reaccion, corrida, fase, modoColor }: { reaccion: Reac
           <meshBasicMaterial transparent opacity={0.28} depthWrite={false} toneMapped={false} />
         </instancedMesh>
 
-        {etiquetas.reactivos.map((x, k) => (
-          <Html key={`r${k}`} position={x.p!} center distanceFactor={11} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        {!angosto && etiquetas.reactivos.map((x, k) => (
+          <Html key={`r${k}`} position={x.p!} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
             <div
               ref={(d) => {
                 etqR.current[k] = d;
@@ -572,13 +617,12 @@ function EscenaSintesis({ reaccion, corrida, fase, modoColor }: { reaccion: Reac
                   {x.t.nombre} · <Formula f={x.t.formula} />
                 </>,
                 "rgba(255,255,255,0.25)",
-                11.5,
               )}
             </div>
           </Html>
         ))}
-        {etiquetas.productos.map((x, k) => (
-          <Html key={`p${k}`} position={x.p!} center distanceFactor={11} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        {!angosto && etiquetas.productos.filter((x, k, arr) => arr.findIndex((y) => y.t === x.t) === k).map((x, k) => (
+          <Html key={`p${k}`} position={x.p!} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
             <div
               ref={(d) => {
                 etqP.current[k] = d;
@@ -590,46 +634,16 @@ function EscenaSintesis({ reaccion, corrida, fase, modoColor }: { reaccion: Reac
                   {x.t.nombre} · <Formula f={x.t.formula} />
                 </>,
                 k === 0 ? `${VERDE}aa` : "rgba(255,255,255,0.25)",
-                11.5,
               )}
             </div>
           </Html>
         ))}
-        {etiquetas.rotos.length > 0 && (
-          <group>
-            {etiquetas.rotos.map((x, k) => (
-              <Html key={`x${k}`} position={x.p} center distanceFactor={11} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-                <div
-                  ref={(d) => {
-                    etqRompe.current[k] = d;
-                  }}
-                  style={{ display: "flex", gap: 4 }}
-                >
-                  {caja(`✂ ${x.t}`, ROJO, 10.5)}
-                </div>
-              </Html>
-            ))}
-          </group>
-        )}
-        {etiquetas.nuevos.map((x, k) => (
-          <Html key={`n${k}`} position={x.p} center distanceFactor={11} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-            <div
-              ref={(d) => {
-                etqForma.current[k] = d;
-              }}
-              style={{ opacity: 0 }}
-            >
-              {caja(`+ ${x.t}`, VERDE, 10.5)}
-            </div>
-          </Html>
-        ))}
       </group>
+      <ProbetaMoles x={-3.4} nombre="A" col="#38bdf8" inicial={probetas.molA} final={Math.max(0, probetas.molA - probetas.avance)} tope={probetas.tope} fase={fase} etiqueta />
+      {probetas.hayB && <ProbetaMoles x={-2.1} nombre="B" col="#f59e0b" inicial={probetas.molB} final={Math.max(0, probetas.molB - probetas.avance)} tope={probetas.tope} fase={fase} etiqueta />}
+      <ProbetaMoles x={3.0} nombre="Producto" col={VERDE} inicial={0} final={probetas.avance * probetas.coefP} tope={probetas.tope * probetas.coefP} fase={fase} />
       <group position={[8.2, -3.3, -5.2]} scale={1.05}>
         <Matraz color={esFerm ? "#fde047" : reaccion === "ester" ? "#fef08a" : "#e2e8f0"} activo={fase === "reaccionando"} />
-        <Etiqueta pos={[0, -0.45, 1.1]} fs={10.5} df={11}>
-          <i className="fa-solid fa-temperature-half" style={{ color: "#fb923c" }} />
-          {r.industria === "farmaceutica" ? "Matraz" : esFerm ? "Biorreactor" : "Matraz a reflujo"}
-        </Etiqueta>
       </group>
       <mesh position={[0, -3.3, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[9, 64]} />
@@ -1073,19 +1087,19 @@ function EscenaPolimeros({ polimero, unidades, nivel, extraEtq, modoColor }: { p
         </mesh>
       </group>
       {extraEtq && (
-        <Etiqueta pos={[5.2, 1.9, 0]} col={`${modoColor}aa`} fs={11} df={11}>
+        <Etiqueta pos={[5.2, 1.9, 0]} col={`${modoColor}aa`} fs={14}>
           <i className="fa-solid fa-ellipsis" style={{ color: modoColor }} />
           {extraEtq}
         </Etiqueta>
       )}
-      <Etiqueta pos={condensacion ? [-4.2, -0.9, 0.6] : [2.4, -0.8, 0.6]} fs={10.5} df={11} col={`${modoColor}88`}>
+      <Etiqueta pos={condensacion ? [-4.2, -0.9, 0.6] : [2.4, -0.8, 0.6]} fs={14} col={`${modoColor}88`}>
         <i className="fa-solid fa-link" style={{ color: modoColor }} />
         {condensacion ? `Enlaces ${pol.enlace.split(" ")[0]} en color` : "Punta activa de la cadena"}
       </Etiqueta>
       {RESERVAS[polimero].map((r, k) => (
         <Reserva key={`${polimero}-${k}`} mol={r.mol} p={r.p} i={k} />
       ))}
-      <Etiqueta pos={[3.4, 4.6, -4.6]} fs={11} df={11}>
+      <Etiqueta pos={[3.4, 4.6, -4.6]} fs={14}>
         <i className="fa-solid fa-flask" style={{ color: modoColor }} />
         Monómeros: {pol.monomeros.map((m) => m.nombre).join(" + ")}
       </Etiqueta>
@@ -1099,7 +1113,7 @@ function EscenaPolimeros({ polimero, unidades, nivel, extraEtq, modoColor }: { p
           <torusGeometry args={[0.93, 0.03, 8, 64]} />
           <meshBasicMaterial color={modoColor} />
         </mesh>
-        <Etiqueta pos={[0, 2.35, 0]} fs={10.5} df={11} col={`${modoColor}88`}>
+        <Etiqueta pos={[0, 2.35, 0]} fs={14} col={`${modoColor}88`}>
           <i className="fa-solid fa-cube" style={{ color: modoColor }} />
           Material resultante
         </Etiqueta>
@@ -1192,12 +1206,8 @@ function EscenaProductos({ productoId, resaltar, resaltarOk, clasificados, modoC
         <torusGeometry args={[1.38, 0.03, 8, 72]} />
         <meshStandardMaterial color={modoColor} emissive={modoColor} emissiveIntensity={0.25} />
       </mesh>
-      <Etiqueta pos={[-3.9, 1.6, 1.2]} col={`${modoColor}aa`} fs={12} df={11}>
-        <i className="fa-solid fa-atom" style={{ color: modoColor }} />
-        {pr.molEtq} · <Formula f={pr.formula} />
-      </Etiqueta>
       {resaltar && (
-        <Etiqueta pos={[3.9, 1.6, 1.2]} col={resaltarOk ? `${VERDE}aa` : "#fbbf24aa"} fs={12} df={11}>
+        <Etiqueta pos={[3.9, 1.6, 1.2]} col={resaltarOk ? `${VERDE}aa` : "#fbbf24aa"} fs={14}>
           {halo && halo.length ? `${GRUPOS[resaltar].etq} ${GRUPOS[resaltar].formula}` : `Sin ${GRUPOS[resaltar].etq.toLowerCase()}`}
         </Etiqueta>
       )}
@@ -1219,7 +1229,7 @@ function EscenaProductos({ productoId, resaltar, resaltarOk, clasificados, modoC
               <boxGeometry args={[3.44, 0.04, 0.04]} />
               <meshStandardMaterial color={d.color} emissive={d.color} emissiveIntensity={0.9} />
             </mesh>
-            <Etiqueta pos={[0, ALTO_PUESTO + 1.5, 0]} col={`${d.color}aa`} fs={12} df={11}>
+            <Etiqueta pos={[0, ALTO_PUESTO + 1.5, 0]} col={`${d.color}aa`} fs={14}>
               <i className={`fa-solid ${d.icono}`} style={{ color: d.color }} />
               {d.etq}
             </Etiqueta>
@@ -1243,9 +1253,6 @@ function EscenaProductos({ productoId, resaltar, resaltarOk, clasificados, modoC
           <group position={[0, 0.41, 0]} scale={1.05}>
             <Objeto tipo={pr.objeto} />
           </group>
-          <Etiqueta pos={[0, 2.4, 0]} fs={11} df={11}>
-            {pr.etq}
-          </Etiqueta>
         </group>
       )}
       <mesh position={[0, -3.3, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
@@ -1256,14 +1263,27 @@ function EscenaProductos({ productoId, resaltar, resaltarOk, clasificados, modoC
   );
 }
 
+/** En pantallas más altas que anchas, aleja la cámara para que el contenido quepa. */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const aspecto = useThree((st) => st.size.width / Math.max(1, st.size.height));
+  const base = useRef<THREE.Vector3 | null>(null);
+  useEffect(() => {
+    base.current ??= camera.position.clone();
+    const f = aspecto >= 1.15 ? 1 : Math.min(2, 1.15 / Math.max(0.4, aspecto));
+    camera.position.copy(base.current).multiplyScalar(f);
+  }, [camera, aspecto]);
+  return null;
+}
+
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
 export default function OrganicaIndustriaScene(p: OrganicaIndustriaSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "sintesis") return { pos: [0, 2.6, 12.6], target: [0, -0.7, 0] };
-    if (vista === "polimeros") return { pos: [0, 2.2, 13.4], target: [0, -0.4, 0] };
-    return { pos: [0, 4.2, 14.5], target: [0, 0.2, -1] };
+    if (vista === "sintesis") return { pos: [0, 2.2, 13.4], target: [0, -1.5, 0] };
+    if (vista === "polimeros") return { pos: [0, 2.0, 13.8], target: [0, -1.1, 0] };
+    return { pos: [0, 4.0, 15.5], target: [0, -0.5, -1] };
   }, [vista]);
 
   return (
@@ -1274,10 +1294,11 @@ export default function OrganicaIndustriaScene(p: OrganicaIndustriaSceneProps) {
       <Escenario acento="#38bdf8" suelo={-3.28} />
       <pointLight position={[-6, 3, 5]} intensity={18} color={modoColor} />
 
-      {vista === "sintesis" && <EscenaSintesis key={p.reaccion} reaccion={p.reaccion} corrida={p.corrida} fase={p.fase} modoColor={modoColor} />}
+      {vista === "sintesis" && <EscenaSintesis key={p.reaccion} reaccion={p.reaccion} corrida={p.corrida} fase={p.fase} modoColor={modoColor} probetas={p.probetas} />}
       {vista === "polimeros" && <EscenaPolimeros key={p.polimero} polimero={p.polimero} unidades={p.unidades} nivel={p.nivel} extraEtq={p.extraEtq} modoColor={modoColor} />}
       {vista === "productos" && <EscenaProductos productoId={p.productoId} resaltar={p.resaltar} resaltarOk={p.resaltarOk} clasificados={p.clasificados} modoColor={modoColor} />}
 
+      <Encuadre />
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={5} maxDistance={24} maxPolarAngle={Math.PI * 0.52} minPolarAngle={Math.PI * 0.12} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.35} luminanceThreshold={0.7} luminanceSmoothing={0.85} mipmapBlur />
