@@ -150,3 +150,19 @@
   .exp-fondo, .exp-entrar, .exp-telon-num, .exp-pop, .exp-tiembla { animation: none !important; }
   .exp-carta-int { transition: none; }
 }
+
+/* ── Predice: las tres apuestas ─────────────────────────────── */
+.exp-apuesta { position: relative; cursor: pointer; display: grid; justify-items: center; align-content: start; gap: 14px;
+  padding: 26px 18px 22px; min-height: 170px; border-radius: 22px; text-align: center; color: #fff;
+  border: 2px solid rgba(255,255,255,0.12); background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  transition: transform .18s ease, border-color .18s ease, opacity .25s ease, box-shadow .18s ease; }
+.exp-apuesta:not(:disabled):hover { transform: translateY(-4px); border-color: var(--expc); box-shadow: 0 16px 40px -18px var(--expc); }
+.exp-apuesta:focus-visible { outline: 3px solid var(--expc); outline-offset: 3px; }
+.exp-apuesta > i { font-size: 44px; color: var(--expc); }
+.exp-apuesta-letra { position: absolute; top: 12px; left: 14px; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+  font-size: 15px; font-weight: 900; background: rgba(255,255,255,0.1); }
+.exp-apuesta-txt { font-size: 17px; font-weight: 800; line-height: 1.3; }
+.exp-apuesta[data-on="true"] { border-color: var(--expc); background: color-mix(in srgb, var(--expc) 18%, transparent); cursor: default; }
+.exp-apuesta[data-apagada="true"] { opacity: .4; cursor: default; }
+.exp-apuesta-sello { font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px;
+  background: var(--expc); color: #04121f; }

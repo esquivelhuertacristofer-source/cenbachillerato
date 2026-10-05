@@ -72,8 +72,10 @@ const DOM = labs().filter((l) => esDom(l.archivo));
  * cajón, no el del laboratorio.
  */
 function tabsDeModo(cont: HTMLElement): HTMLElement[] {
-  return [...cont.querySelectorAll<HTMLElement>('button[class$="-tab"]')].filter(
-    (b) => !b.classList.contains("fc-tab")
+  // `.ls-modo` son los modos de los labs montados en el esqueleto (_shell);
+  // `.ls-tab` son las pestañas de su panel, que no cambian de modo.
+  return [...cont.querySelectorAll<HTMLElement>('button[class$="-tab"], button.ls-modo')].filter(
+    (b) => !b.classList.contains("fc-tab") && !b.classList.contains("ls-tab")
   );
 }
 

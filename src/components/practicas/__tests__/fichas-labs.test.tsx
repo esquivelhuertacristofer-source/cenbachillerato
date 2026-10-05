@@ -135,7 +135,8 @@ describe("persistencia de estrellas de los laboratorios", () => {
     // los laboratorios cuya marca sale de la lista de objetivos.
     const sinHook = shells.filter((f) => {
       const src = readFileSync(resolve(LABS_DIR, f), "utf8");
-      return src.includes("RETO_KEY") && !src.includes("useEstrellas") && !src.includes("TableroObjetivos");
+      // LabShell monta TableroObjetivos en su pestaña de misiones.
+      return src.includes("RETO_KEY") && !src.includes("useEstrellas") && !src.includes("TableroObjetivos") && !src.includes("<LabShell");
     });
     expect(sinHook).toEqual([]);
   });

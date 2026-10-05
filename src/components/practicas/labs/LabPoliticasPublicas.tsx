@@ -21,7 +21,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -45,8 +46,8 @@ type Modo = "ciclo" | "conceptos" | "glosario" | "texto";
 const PARES_GLOSARIO = GLOSARIO.map((g) => ({ ...g, ejemplo: g.etiquetas.join(" · ") }));
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "ciclo", label: "El ciclo de la política pública", icono: "fa-arrows-spin" },
-  { id: "conceptos", label: "Concepto y definición", icono: "fa-link" },
+  { id: "ciclo", label: "Ciclo", icono: "fa-arrows-spin" },
+  { id: "conceptos", label: "Conceptos", icono: "fa-link" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
@@ -58,7 +59,6 @@ export function LabPoliticasPublicas({ color }: PracticaLabProps) {
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -234,70 +234,24 @@ export function LabPoliticasPublicas({ color }: PracticaLabProps) {
   };
   const resetActual = modo === "texto" ? resetTexto : modo === "ciclo" ? resetCiclo : modo === "conceptos" ? resetConceptos : resetGlosario;
 
-  return (
-    <div style={{ color: T.text }}>
+  const lectura = `${modosHechos}/4 modos · ${bestEstrellas}★`;
+
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
       <style>{`
         @keyframes ppShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes ppPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .pp-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .pp-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .pp-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .pp-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .pp-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .pp-icobtn:hover { background:rgba(255,255,255,0.12); }
         .pp-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .pp-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .pp-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; user-select:none; max-width:min(100%,360px); text-align:left; line-height:1.4;
+          transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+        .pp-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+        .pp-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
         .pp-chip:active { cursor:grabbing; }
-        .pp-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .pp-row[data-shake="true"] { animation:ppShake .4s; border-color:${NO}; }
-        .pp-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .pp-slot { flex-shrink:0; min-width:200px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .pp-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); color:#fff; }
-        .pp-slotline { border-radius:13px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; padding:14px 16px; transition:all .16s;
-          display:flex; align-items:center; gap:12px; color:${T.text3}; font-size:13.5px; cursor:pointer; }
-        .pp-slotline[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); color:#fff; }
-        .pp-slotline[data-shake="true"] { animation:ppShake .4s; border-color:${NO}; }
-        .pp-step { border-radius:13px; border:1.5px solid ${OK}66; background:${OK}0f; padding:13px 16px; display:flex; align-items:center; gap:12px; animation:ppPop .25s ease; }
-        .pp-locked { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:13px 16px; display:flex; align-items:center; gap:12px; opacity:0.45; }
-        .pp-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .pp-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .pp-q:disabled{ cursor:default; }
-        .pp-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .pp-btn:hover { border-color:${T.lineStrong}; }
-        .pp-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .pp-row[data-shake="true"], .pp-slotline[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .pp-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .pp-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .pp-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .pp-drawer[data-open="true"] { transform:translateX(0); }
-        .pp-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .pp-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .pp-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .pp-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .pp-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .pp-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .pp-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .pp-row { --tono:188; position:relative;
+        .pp-row { --tono:188; position:relative; border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
           background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+        .pp-row[data-shake="true"] { animation:ppShake .4s; border-color:${NO}; }
+        .pp-row[data-done="true"] { border-color:${OK}66; background-color:${OK}0f;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
         .pp-row:nth-of-type(6n+1) { --tono:188; }
         .pp-row:nth-of-type(6n+2) { --tono:262; }
         .pp-row:nth-of-type(6n+3) { --tono:44; }
@@ -306,221 +260,197 @@ export function LabPoliticasPublicas({ color }: PracticaLabProps) {
         .pp-row:nth-of-type(6n+6) { --tono:18; }
         .pp-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
           background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .pp-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .pp-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .pp-chip:hover { transform:translateY(-2px); }
-        .pp-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+        .pp-slot { flex-shrink:0; min-width:min(100%,200px); min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+        .pp-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); color:#fff; }
+        .pp-slotline { border-radius:13px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; padding:14px 16px; transition:all .16s;
+          display:flex; align-items:center; gap:12px; color:${T.text3}; font-size:14px; cursor:pointer; }
+        .pp-slotline[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); color:#fff; }
+        .pp-slotline[data-shake="true"] { animation:ppShake .4s; border-color:${NO}; }
+        .pp-step { border-radius:13px; border:1.5px solid ${OK}66; background:${OK}0f; padding:13px 16px; display:flex; align-items:center; gap:12px; animation:ppPop .25s ease; }
+        .pp-locked { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:13px 16px; display:flex; align-items:center; gap:12px; opacity:0.45; }
+        .pp-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+        .pp-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+        .pp-q:disabled{ cursor:default; }
+        .pp-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+        .pp-btn:hover { border-color:${T.lineStrong}; }
         @media (prefers-reduced-motion: reduce){
+          .pp-row[data-shake="true"], .pp-slotline[data-shake="true"] { animation:none; }
           .pp-chip, .pp-chip:hover, .pp-chip[data-sel="true"] { transform:none; transition:none; }
         }
       `}</style>
 
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="pp-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="pp-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="pp-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="pp-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+      {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={POLITICAS_PUBLICAS_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
 
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="pp-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="pp-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="pp-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="pp-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="pp-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="pp-drawer-body">
-          <FichaTeorica data={POLITICAS_PUBLICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — ciclo */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={POLITICAS_PUBLICAS_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "ciclo" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Ordena el ciclo: del problema a la evaluación</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: cicloDone ? OK : T.text3 }}>
-                    {cicloPos}/{CICLO.length}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
-                  Arrastra la <strong style={{ color: T.text2 }}>siguiente etapa</strong> al hueco activo, en orden: identificación → diseño → adopción → implementación → evaluación.
-                </div>
-                {cicloLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Reconstruiste el ciclo de la política pública!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {cicloLibres.map((c) => (
-                      <button key={c.id} className="pp-chip" data-sel={selCic === c.id} onClick={() => setSelCic((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
-                        {c.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <CicloOrden selCic={selCic} shakeCic={shakeCic} cicloPos={cicloPos} onMatch={intentarCiclo} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — conceptos */}
-          {modo === "conceptos" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada concepto a su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: conceptosDone ? OK : T.text3 }}>
-                    {Object.keys(empCon).length}/{PARES.length}
-                  </span>
-                </div>
-                {conLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los 6 conceptos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {conLibres.map((p) => (
-                      <button key={p.id} className="pp-chip" data-sel={selCon === p.id} onClick={() => setSelCon((s) => (s === p.id ? null : p.id))} {...dragProps(p.id)}>
-                        <i className="fa-solid fa-link" style={{ fontSize: 11, color: T.text3 }} />
-                        {p.termino}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsConceptos selCon={selCon} shakeCon={shakeCon} empCon={empCon} onMatch={intentarCon} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — glosario */}
-          {modo === "glosario" && (
-            <EscribeTermino
-              key={glosIntento}
-              pares={PARES_GLOSARIO}
-              accent={accent}
-              rgba={color.rgba}
-              completado={glosarioDone}
-              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
-              onCompletado={() => {
-                setGlosarioDone(true);
-                sfxOk();
-                persistMejor(cicloDone, conceptosDone, true);
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
+      {/* MODO 1 — ciclo */}
+      {modo === "ciclo" && (
+        <Mesa>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+              <Eyebrow>Arrastra la siguiente etapa al hueco activo</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: cicloDone ? OK : T.text3 }}>
+                {cicloPos}/{CICLO.length}
+              </span>
             </div>
+            {cicloLibres.length === 0 ? (
+              <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                <i className="fa-solid fa-circle-check" /> ¡Reconstruiste el ciclo de la política pública!
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {cicloLibres.map((c) => (
+                  <button key={c.id} className="pp-chip" data-sel={selCic === c.id} onClick={() => setSelCic((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
+                    {c.texto}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-            <div className="pp-divider" />
+          <CicloOrden selCic={selCic} shakeCic={shakeCic} cicloPos={cicloPos} onMatch={intentarCiclo} dropProps={dropProps} />
+        </Mesa>
+      )}
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+      {/* MODO 2 — conceptos */}
+      {modo === "conceptos" && (
+        <Mesa>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+              <Eyebrow>Arrastra cada concepto a su definición</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: conceptosDone ? OK : T.text3 }}>
+                {Object.keys(empCon).length}/{PARES.length}
+              </span>
+            </div>
+            {conLibres.length === 0 ? (
+              <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                <i className="fa-solid fa-circle-check" /> ¡Emparejaste los 6 conceptos!
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {conLibres.map((p) => (
+                  <button key={p.id} className="pp-chip" data-sel={selCon === p.id} onClick={() => setSelCon((s) => (s === p.id ? null : p.id))} {...dragProps(p.id)}>
+                    <i className="fa-solid fa-link" style={{ fontSize: 14, color: T.text3 }} />
+                    {p.termino}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <RowsConceptos selCon={selCon} shakeCon={shakeCon} empCon={empCon} onMatch={intentarCon} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {/* MODO 3 — glosario */}
+      {modo === "glosario" && (
+        <EscribeTermino
+          key={glosIntento}
+          pares={PARES_GLOSARIO}
+          accent={accent}
+          rgba={color.rgba}
+          completado={glosarioDone}
+          instrucciones="Lee la definición y escribe el término."
+          onCompletado={() => {
+            setGlosarioDone(true);
+            sfxOk();
+            persistMejor(cicloDone, conceptosDone, true);
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+    </div>
+  );
+
+  return (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Dominas el ciclo de las políticas públicas!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Dominas el ciclo de las políticas públicas!" : "Termina los modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "ciclo" && (
-                <>Un problema solo entra al ciclo cuando llega a la <strong style={{ color: T.text }}>agenda gubernamental</strong>; la <strong style={{ color: T.text }}>implementación</strong> es donde más fallan las políticas en México.</>
-              )}
-              {modo === "conceptos" && (
-                <>Lee primero la definición y su ejemplo; luego suelta el <strong style={{ color: T.text }}>concepto</strong> que le corresponde.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y sus etiquetas y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_POLITICAS}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                  {modo === "ciclo" && (
+                    <>Un problema solo entra al ciclo cuando llega a la <strong style={{ color: T.text }}>agenda gubernamental</strong>; la <strong style={{ color: T.text }}>implementación</strong> es donde más fallan las políticas en México.</>
+                  )}
+                  {modo === "conceptos" && (
+                    <>Lee primero la definición y su ejemplo; luego suelta el <strong style={{ color: T.text }}>concepto</strong> que le corresponde.</>
+                  )}
+                  {modo === "glosario" && <>Lee la definición y sus etiquetas y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>}
+                  {modo === "texto" && <>Escribe la palabra que falta en cada hueco del texto.</>}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={POLITICAS_PUBLICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_POLITICAS}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
@@ -550,7 +480,7 @@ function CicloOrden({
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {CICLO.map((c, i) => {
         const num = (
-          <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, border: `1.5px solid ${T.lineStrong}`, color: T.text2 }}>
+          <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${T.lineStrong}`, color: T.text2 }}>
             {i + 1}
           </span>
         );
@@ -558,14 +488,14 @@ function CicloOrden({
           // ya colocado
           return (
             <div key={c.id} className="pp-step">
-              <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, background: OK, color: "#04121f" }}>
+              <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, background: OK, color: "#04121f" }}>
                 {i + 1}
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14.5, fontWeight: 700, color: "#fff", lineHeight: 1.35 }}>{c.texto}</div>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{c.detalle}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", lineHeight: 1.35 }}>{c.texto}</div>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{c.detalle}</div>
               </div>
-              <span style={{ fontSize: 10.5, fontWeight: 800, color: OK, border: `1px solid ${OK}55`, borderRadius: 6, padding: "3px 9px", textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: OK, border: `1px solid ${OK}55`, borderRadius: 6, padding: "3px 9px", textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
                 {c.etapa}
               </span>
             </div>
@@ -584,7 +514,7 @@ function CicloOrden({
             >
               {num}
               <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 9 }}>
-                <i className="fa-solid fa-arrow-down" style={{ fontSize: 12 }} />
+                <i className="fa-solid fa-arrow-down" style={{ fontSize: 14 }} />
                 <span style={{ fontWeight: 700 }}>Suelta aquí la siguiente etapa</span>
               </div>
             </div>
@@ -594,8 +524,8 @@ function CicloOrden({
         return (
           <div key={c.id} className="pp-locked">
             {num}
-            <span style={{ fontSize: 13, color: T.text3 }}>
-              <i className="fa-solid fa-lock" style={{ marginRight: 8, fontSize: 11 }} />
+            <span style={{ fontSize: 14, color: T.text3 }}>
+              <i className="fa-solid fa-lock" style={{ marginRight: 8, fontSize: 14 }} />
               Etapa {i + 1}
             </span>
           </div>
@@ -633,19 +563,19 @@ function RowsConceptos({
           >
             <div className="pp-slot" data-armed={!done && !!selCon} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "ppPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
+                <span style={{ animation: "ppPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
                   <i className="fa-solid fa-link" />
                   {p.termino}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> concepto
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> concepto
                 </span>
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{p.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{p.ejemplo}</div>
+              <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{p.definicion}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{p.ejemplo}</div>
             </div>
           </div>
         );
@@ -694,19 +624,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Seis afirmaciones sobre el diseño, la implementación y la evaluación de las políticas públicas, y el papel de la ciudadanía. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -715,11 +645,11 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -741,7 +671,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="pp-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 26, height: 26, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -750,7 +680,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -773,7 +703,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

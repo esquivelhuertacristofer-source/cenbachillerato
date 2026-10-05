@@ -40,6 +40,7 @@ import { DentroDeExpedicion } from "./expedicion-context";
 import { cargarFicha as cargarFichaDeLab } from "./fichas-registry.generated";
 import { fichaDeExpedicion } from "./terminos-de-ficha";
 import { imagenDeTermino } from "@/lib/practicas/terminos-imagen";
+import { PREDICCIONES, type Prediccion } from "./predicciones";
 
 /* ── Progreso ─────────────────────────────────────────────────────────── */
 
@@ -56,6 +57,8 @@ interface Progreso {
   notas: Nota[];
   errores: number;
   terminada: boolean;
+  /** La opción que apostó el alumno en «Predice». */
+  prediccion?: string | null;
 }
 
 const VACIO: Progreso = { hechos: [], notas: [], errores: 0, terminada: false };
@@ -83,7 +86,7 @@ function guardar(slug: string, p: Progreso) {
 
 /* ── Capítulos ────────────────────────────────────────────────────────── */
 
-type CapId = "prepara" | "laboratorio" | "comprueba";
+type CapId = "predice" | "prepara" | "laboratorio" | "comprueba";
 
 interface Capitulo {
   id: CapId;
@@ -148,9 +151,22 @@ export function Expedicion({ slug, titulo, descripcion, imagen, color, ficha: fi
   // de `glosario` (ver `fichaDeExpedicion`).
   const fichaExp = useMemo<FichaTeoricaData | null>(() => (ficha ? fichaDeExpedicion(ficha) : null), [ficha]);
 
+  // Con predicción, se entra apostando y no leyendo: «Predice» ocupa el lugar
+  // de «Prepárate» y los conceptos caen al cuaderno al apostar.
+  const pred = PREDICCIONES[slug] ?? null;
+
   const capitulos = useMemo<Capitulo[]>(() => {
     const lista: Capitulo[] = [];
-    if (fichaExp && fichaExp.conceptos.length > 0) {
+    if (pred) {
+      lista.push({
+        id: "predice",
+        titulo: "Predice",
+        lema: "¿Qué crees que va a pasar?",
+        consigna: "Elige una respuesta. No se califica: el laboratorio te dirá si acertaste.",
+        icono: "fa-wand-magic-sparkles",
+        guia: "Apuesta antes de mirar. Equivocarte aquí no cuesta nada y hace que el laboratorio te sorprenda.",
+      });
+    } else if (fichaExp && fichaExp.conceptos.length > 0) {
       lista.push({
         id: "prepara",
         titulo: "Prepárate",
@@ -164,7 +180,9 @@ export function Expedicion({ slug, titulo, descripcion, imagen, color, ficha: fi
       id: "laboratorio",
       titulo: "Laboratorio",
       lema: titulo.replace(/^Laboratorio( 3D)?\s*—\s*/i, ""),
-      consigna: "Experimenta con el laboratorio. Cuando termines sus objetivos, sigue al último capítulo.",
+      consigna: pred
+        ? `Comprueba tu apuesta. ${pred.comoComprobarlo}`
+        : "Experimenta con el laboratorio. Cuando termines sus objetivos, sigue al último capítulo.",
       icono: "fa-flask-vial",
       guia: "Aquí se aprende moviendo. Prueba, equivócate y vuelve a probar: para eso es el laboratorio.",
     });
@@ -179,7 +197,7 @@ export function Expedicion({ slug, titulo, descripcion, imagen, color, ficha: fi
       });
     }
     return lista;
-  }, [fichaExp, titulo]);
+  }, [fichaExp, titulo, pred]);
 
   // Se lee en el inicializador, no en un efecto: así el alumno que vuelve no ve
   // primero la portada «sin empezar» y luego un salto. La expedición se monta
@@ -504,6 +522,21 @@ export function Expedicion({ slug, titulo, descripcion, imagen, color, ficha: fi
                   )}
                 </div>
 
+                {cap.id === "predice" && pred && (
+                  <Predice
+                    pred={pred}
+                    color={color}
+                    elegida={progreso.prediccion ?? null}
+                    elegir={(op) => {
+                      actualizar((p) => ({ ...p, prediccion: op }));
+                      fichaExp?.conceptos.forEach((c) =>
+                        anotar({ id: `concepto:${c.termino}`, titulo: c.termino, texto: c.definicion, imagen: imagenDeTermino(slug, c.termino) }),
+                      );
+                      sonar("blip");
+                      completar();
+                    }}
+                  />
+                )}
                 {cap.id === "prepara" && fichaExp && (
                   <Prepara slug={slug} ficha={fichaExp} color={color} anotar={anotar} sonar={sonar} alTerminar={completar} yaHecho={hecho("prepara")} />
                 )}
@@ -511,6 +544,9 @@ export function Expedicion({ slug, titulo, descripcion, imagen, color, ficha: fi
                   <Laboratorio color={color} yaHecho={hecho("laboratorio")} alTerminar={completar}>
                     {children}
                   </Laboratorio>
+                )}
+                {cap.id === "comprueba" && pred && progreso.prediccion && (
+                  <Veredicto pred={pred} elegida={progreso.prediccion} color={color} />
                 )}
                 {cap.id === "comprueba" && fichaExp && (
                   <Comprueba
@@ -905,6 +941,70 @@ function Laboratorio({ color, yaHecho, alTerminar, children }: { color: AreaColo
       </p>
       <span hidden style={{ color: color.hex }} />
     </>
+  );
+}
+
+/* ── Capítulo 1 (con predicción): Predice ────────────────────────────── */
+
+function Predice({ pred, color, elegida, elegir }: { pred: Prediccion; color: AreaColor; elegida: string | null; elegir: (op: string) => void }) {
+  return (
+    <div style={{ display: "grid", gap: 20, maxWidth: 980, margin: "0 auto" }}>
+      <div className="exp-papel" style={{ padding: "22px 24px", textAlign: "center" }}>
+        {pred.escena && <p style={{ margin: "0 0 8px", fontSize: 16, color: "rgba(255,255,255,0.7)" }}>{pred.escena}</p>}
+        <p style={{ margin: 0, fontSize: "clamp(20px, 3.2vw, 28px)", fontWeight: 900, lineHeight: 1.25 }}>{pred.pregunta}</p>
+      </div>
+      <div style={{ display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))" }}>
+        {pred.opciones.map((op, k) => {
+          const on = elegida === op.id;
+          return (
+            <button
+              key={op.id}
+              type="button"
+              className="exp-apuesta"
+              data-on={on}
+              data-apagada={elegida !== null && !on}
+              disabled={elegida !== null}
+              onClick={() => elegir(op.id)}
+              style={{ ["--expc" as string]: color.hex }}
+            >
+              <span className="exp-apuesta-letra">{String.fromCharCode(65 + k)}</span>
+              <i className={`fa-solid ${op.icono}`} aria-hidden />
+              <span className="exp-apuesta-txt">{op.texto}</span>
+              {on && <span className="exp-apuesta-sello">Tu apuesta</span>}
+            </button>
+          );
+        })}
+      </div>
+      {elegida && (
+        <p style={{ textAlign: "center", margin: 0, fontSize: 16, color: "rgba(255,255,255,0.75)" }}>
+          <i className="fa-solid fa-flask-vial" style={{ color: color.hex, marginRight: 8 }} aria-hidden />
+          Apostado. Ahora entra al laboratorio y compruébalo.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Después del laboratorio: se revela si la apuesta era la buena y por qué. */
+function Veredicto({ pred, elegida, color }: { pred: Prediccion; elegida: string; color: AreaColor }) {
+  const acerto = elegida === pred.correcta;
+  const buena = pred.opciones.find((o) => o.id === pred.correcta);
+  const tuya = pred.opciones.find((o) => o.id === elegida);
+  const tono = acerto ? "#34D399" : "#FBBF24";
+  return (
+    <div className="exp-papel" style={{ padding: "18px 22px", marginBottom: 22, borderColor: `${tono}88`, display: "grid", gap: 10 }}>
+      <p style={{ margin: 0, fontSize: 13, fontWeight: 900, letterSpacing: ".12em", textTransform: "uppercase", color: tono }}>
+        <i className={`fa-solid ${acerto ? "fa-circle-check" : "fa-lightbulb"}`} style={{ marginRight: 8 }} aria-hidden />
+        {acerto ? "Tu predicción era correcta" : "El laboratorio te llevó la contraria"}
+      </p>
+      <p style={{ margin: 0, fontSize: 17, fontWeight: 800 }}>
+        {acerto ? buena?.texto : <>Apostaste «{tuya?.texto}». La respuesta es: {buena?.texto}.</>}
+      </p>
+      <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.55, color: "rgba(255,255,255,0.78)" }}>
+        <strong style={{ color: color.hex }}>¿Por qué? </strong>
+        {pred.porque}
+      </p>
+    </div>
   );
 }
 

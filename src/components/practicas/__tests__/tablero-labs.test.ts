@@ -15,7 +15,8 @@ const MARCA = "/* Identidad del tablero */";
 function bloqueTablero(src: string): string | null {
   const i = src.indexOf(MARCA);
   if (i < 0) return null;
-  const fin = src.indexOf("`}</style>", i);
+  // El bloque cierra el `<style>` o la plantilla de una función `css()`.
+  const fin = Math.min(...["`}</style>", "`;"].map((t) => src.indexOf(t, i)).filter((n) => n >= 0));
   return src
     .slice(i, fin)
     // `${...}` no existe para el analizador: se sustituye por un valor plausible.
