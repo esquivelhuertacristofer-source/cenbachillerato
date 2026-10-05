@@ -24,7 +24,7 @@ function UACPageSkeleton({ accentColor }: { accentColor: string }) {
       {/* Nav skeleton */}
       <div
         style={{
-          padding: "28px 48px",
+          padding: "16px clamp(20px, 4vw, 48px)",
           borderBottom: "1px solid rgba(255,255,255,0.07)",
           display: "flex",
           alignItems: "center",
@@ -37,29 +37,29 @@ function UACPageSkeleton({ accentColor }: { accentColor: string }) {
         />
       </div>
       {/* Hero skeleton */}
-      <div style={{ padding: "64px 48px 48px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ padding: "40px clamp(20px, 4vw, 48px) 32px", display: "flex", flexDirection: "column", gap: 16 }}>
         <div
           className="animate-pulse"
           style={{ width: 80, height: 12, borderRadius: 6, background: `rgba(${accentColor},0.15)` }}
         />
         <div
           className="animate-pulse"
-          style={{ width: 420, height: 64, borderRadius: 12, background: "rgba(255,255,255,0.07)" }}
+          style={{ width: 420, maxWidth: "100%", height: 44, borderRadius: 12, background: "rgba(255,255,255,0.07)" }}
         />
         <div
           className="animate-pulse"
-          style={{ width: 300, height: 10, borderRadius: 999, background: "rgba(255,255,255,0.06)", marginTop: 8 }}
+          style={{ width: 300, maxWidth: "100%", height: 10, borderRadius: 999, background: "rgba(255,255,255,0.06)", marginTop: 8 }}
         />
       </div>
       {/* Timeline skeleton */}
-      <div style={{ padding: "0 48px" }}>
+      <div style={{ padding: "0 clamp(20px, 4vw, 48px)" }}>
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
             className="animate-pulse"
             style={{
-              height: 280,
-              borderRadius: 48,
+              height: 200,
+              borderRadius: 24,
               background: "rgba(255,255,255,0.04)",
               border: "1px solid rgba(255,255,255,0.06)",
               marginBottom: 24,
@@ -182,36 +182,27 @@ export default function UACPage() {
       {/* ── Sticky nav ─── */}
       <nav className="uac-v2-nav">
         <Link href="/hub" className="uac-v2-back-link">
-          <i className="fa-solid fa-chevron-left" style={{ fontSize: 12 }} />
+          <i className="fa-solid fa-chevron-left" style={{ fontSize: 13 }} />
           Mi Hub
         </Link>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ textAlign: "right" }}>
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 800,
-                textTransform: "uppercase",
-                letterSpacing: "0.2em",
-                color: "rgba(255,255,255,0.28)",
-              }}
-            >
-              {codigo}
-            </div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{uac.nombre}</div>
+        <div className="uac-v2-nav-meta">
+          <div className="uac-v2-nav-meta-text">
+            <div className="uac-v2-nav-codigo">{codigo}</div>
+            <div className="uac-v2-nav-nombre">{uac.nombre}</div>
           </div>
           <div
             style={{
-              width: 40,
-              height: 40,
+              flexShrink: 0,
+              width: 36,
+              height: 36,
               borderRadius: 12,
               background: `rgba(${cfg.accentRgb},0.15)`,
               border: `1px solid rgba(${cfg.accentRgb},0.25)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 20,
+              fontSize: 18,
             }}
           >
             {cfg.emoji}
@@ -278,22 +269,22 @@ export default function UACPage() {
 
           <motion.p
             style={{
-              marginTop: 20,
-              fontSize: 15,
-              color: "rgba(255,255,255,0.40)",
+              marginTop: 14,
+              fontSize: 16,
+              color: "rgba(255,255,255,0.62)",
               maxWidth: 520,
-              lineHeight: 1.65,
+              lineHeight: 1.6,
             }}
             initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 3 }}
           >
             {completadas} de {total > 0 ? total : uac.totalProgresionesEsperadas} propósitos formativos
-            completados. Avanzá secuencialmente para desbloquear cada etapa del aprendizaje.
+            completados.
           </motion.p>
 
           <motion.div
-            style={{ marginTop: 26, display: "flex", gap: 12, flexWrap: "wrap" }}
+            style={{ marginTop: 22, display: "flex", gap: 12, flexWrap: "wrap" }}
             initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 4 }}
@@ -318,7 +309,7 @@ export default function UACPage() {
                 background: `rgba(${cfg.accentRgb},0.12)`,
                 border: `1px solid rgba(${cfg.accentRgb},0.22)`,
                 color: cfg.accent, textDecoration: "none",
-                borderRadius: 999, padding: "11px 20px", fontSize: 13, fontWeight: 700,
+                borderRadius: 999, padding: "11px 20px", fontSize: 14, fontWeight: 700,
               }}
             >
               <i className="fa-solid fa-book-open" style={{ fontSize: 12 }} />
@@ -342,15 +333,15 @@ export default function UACPage() {
       {/* ── Progresiones ─── */}
       <main className="uac-v2-timeline">
         <h2 className="uac-v2-timeline-header" style={{ marginTop: 0 }}>
-          <i className="fa-solid fa-route" style={{ color: cfg.accent, fontSize: 22 }} />
-          Ruta de Aprendizaje
+          <i className="fa-solid fa-route" style={{ color: cfg.accent, fontSize: 18 }} />
+          Ruta de aprendizaje
           <div className="uac-v2-timeline-line" />
           {total > 0 && (
             <span
               style={{
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 700,
-                color: "rgba(255,255,255,0.35)",
+                color: "rgba(255,255,255,0.55)",
                 whiteSpace: "nowrap",
               }}
             >
@@ -362,19 +353,19 @@ export default function UACPage() {
         {progresiones.length === 0 ? (
           <div
             style={{
-              borderRadius: 32,
+              borderRadius: 24,
               border: "1px solid rgba(255,255,255,0.07)",
               background: "rgba(255,255,255,0.02)",
-              padding: "60px 48px",
+              padding: "clamp(32px, 6vw, 56px) clamp(20px, 4vw, 48px)",
               textAlign: "center",
               color: "rgba(255,255,255,0.30)",
             }}
           >
-            <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
-            <p style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.50)" }}>
+            <div style={{ fontSize: 40, marginBottom: 14 }}>⏳</div>
+            <p style={{ fontSize: 17, fontWeight: 700, color: "rgba(255,255,255,0.70)" }}>
               Contenido en preparación
             </p>
-            <p style={{ fontSize: 13, marginTop: 8, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 15, marginTop: 8, lineHeight: 1.6, color: "rgba(255,255,255,0.55)" }}>
               Los propósitos formativos de {uac.nombre} estarán disponibles próximamente.
             </p>
           </div>

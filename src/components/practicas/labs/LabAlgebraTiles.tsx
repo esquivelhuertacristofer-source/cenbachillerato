@@ -150,7 +150,7 @@ function LabAlgebraTilesBase({ color, varianteInicial }: PracticaLabProps & { va
     { txt: "Traduce una frase al lenguaje algebraico", done: vioLenguaje },
     { txt: "Clasifica una expresión (monomio…polinomio)", done: vioClasificacion },
     { txt: "Multiplica binomios con el modelo de área", done: vioOperaciones },
-    { txt: "Evalúa una expresión para un valor de x", done: evaluo },
+    { txt: "Evalúa una expresión para un valor de x", done: evaluo, modo: "lenguaje" },
     { txt: "Resuelve el reto evaluable", done: aprobados.lenguaje || aprobados.clasificacion || aprobados.operaciones },
   ];
   const sceneFallback = (

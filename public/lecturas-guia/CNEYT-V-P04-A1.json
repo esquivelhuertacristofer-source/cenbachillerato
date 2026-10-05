@@ -33,7 +33,7 @@
       "titulo": "Ondas sísmicas y la alerta SASMEX",
       "idea": "Las ondas P llegan antes que las S; SASMEX las detecta y avisa a la CDMX antes del golpe destructivo.",
       "visual": { "tipo": "pasos", "items": [
-        { "titulo": "Ocurre el sismo", "texto": "Se generan ondas P (≈ 8 km/s) y ondas S (≈ 4 km/s)." },
+        { "titulo": "Ocurre el sismo", "texto": "Se generan ondas P (≈ 6 km/s en la corteza) y ondas S (≈ 4 km/s)." },
         { "titulo": "Sensores en la costa", "texto": "En Guerrero y Oaxaca detectan primero las ondas P." },
         { "titulo": "Alerta a la velocidad de la luz", "texto": "Una señal de radio o celular llega a la Ciudad de México." },
         { "titulo": "Margen de 40 a 120 s", "texto": "Tiempo para evacuar, detener el metro y preparar hospitales antes de las ondas S." }

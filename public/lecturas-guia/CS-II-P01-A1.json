@@ -19,10 +19,10 @@
     {
       "parrafos": [1],
       "titulo": "El GINI: cómo se reparte el ingreso",
-      "idea": "Mientras más cerca de 1 está el GINI, más desigual es el país; México tiene un GINI alto, cerca de 0.42.",
+      "idea": "Mientras más cerca de 1 está el GINI, más desigual es el país; México tiene un GINI alto, cerca de 0.41.",
       "visual": { "tipo": "datos", "items": [
         { "valor": "0", "etiqueta": "igualdad perfecta: todos tienen lo mismo", "barra": 0 },
-        { "valor": "~0.42", "etiqueta": "México: desigualdades importantes", "barra": 42 },
+        { "valor": "~0.41", "etiqueta": "México: desigualdades importantes", "barra": 42 },
         { "valor": "1", "etiqueta": "desigualdad total: una persona tiene todo", "barra": 100 }
       ] },
       "comprueba": { "pregunta": "El país A tiene GINI de 0.30 y el país B de 0.50. ¿Cuál reparte el ingreso de forma más desigual?", "opciones": ["El país A", "Los dos igual", "El país B"], "correcta": 2, "porque": "Mientras más se acerca el GINI a 1, mayor es la desigualdad; 0.50 está más cerca de 1 que 0.30." }

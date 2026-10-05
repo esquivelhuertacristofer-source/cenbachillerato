@@ -300,8 +300,8 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
     { txt: `Señala el giro y la huella de «${a1.titulo}»`, done: marcasListas(a1.id) },
     { txt: `Separa los ${FRAGMENTOS.length} fragmentos en sus tres capas`, done: capasDone },
     { txt: `Resuelve los ${ENCARGOS.length} encargos de voz narrativa`, done: vozDone },
-    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: `Aprueba el reto evaluable (${QUIZ.puntajeMinimo}%)`, done: quizAprobado },
   ];
 

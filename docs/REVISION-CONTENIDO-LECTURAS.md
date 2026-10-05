@@ -8,6 +8,18 @@ en la BD.
 Cuando se corrija una lectura y cambie el número de párrafos, su guía deja de aplicarse y la lectura
 se ve como antes. Ese caso lo detecta `npx tsx scripts/validar-lecturas-guia.ts`.
 
+> **ESTADO 2026-10-05 — CORREGIDO EN BD.** Por orden del usuario se aplicó todo lo de abajo con
+> `scripts/corregir-lecturas-2026-10.mjs` (63 lecturas). Además se restauraron tildes y eñes en 21
+> actividades (sobre todo de Matemáticas VI), se reemplazaron 35 recuadros fuera de tema (inglés con datos de
+> Informática y matemáticas con Luis Miramontes) por datos del tema, y se regrabó la voz de los 72 párrafos
+> afectados. Las cifras se verificaron en fuentes oficiales: SENER/PRODESEN (351 TWh y 24 % limpia en 2023),
+> SEMARNAT DBGIR 2020 (120 128 t/día), CONEVAL (Gini 0.413 en 2022), INAH (165 museos y 187 zonas) e INEGI
+> ENDUTIH 2023 (81.2 %). Respaldo previo: `Documentos/Respaldos-CEN/supabase-datos-2026-10-05-18-31.json.gz`.
+>
+> **Se dejó sin tocar a propósito:** ATP 38 frente a 36 (ambas cifras aparecen en los libros y cada
+> lectura explica la suya), el 9.6 % de reciclaje (no se pudo verificar) y los pesos de evidencia de
+> hipótesis históricas (son juicio didáctico).
+
 ## Ciencias (CNEYT)
 - **CNEYT-II-P06-A1 [2]:** «~76 %» de la energía primaria de México viene de fósiles (SENER 2023). Los balances de SENER suelen dar 85–90 %.
 - **CNEYT-II-P02-A1 [4]:** atribuye 324 TWh (2023) a la CFE. Parece ser la generación de todo el país.

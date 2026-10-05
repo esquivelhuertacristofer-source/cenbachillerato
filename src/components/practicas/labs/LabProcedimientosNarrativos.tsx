@@ -372,8 +372,8 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
     { txt: `Reparte los ${INFORMACIONES.length} datos entre las voces que pueden darlos`, done: infosResueltas >= INFORMACIONES.length },
     { txt: `Clasifica los ${FRAGMENTOS_RITMO.length} fragmentos por su ritmo`, done: ritmoDone },
     { txt: `Resuelve las ${CONVERSIONES.length} conversiones de diálogo`, done: dialogoDone },
-    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: `Aprueba el reto evaluable (${QUIZ.puntajeMinimo}%)`, done: quizAprobado },
   ];
 

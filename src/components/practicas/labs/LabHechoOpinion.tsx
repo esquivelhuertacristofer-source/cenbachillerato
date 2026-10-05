@@ -320,7 +320,7 @@ export function LabHechoOpinion({ color }: PracticaLabProps) {
     { txt: "Acierta el propósito de los tres textos", done: propositosDone },
     { txt: `Clasifica los ${ENUNCIADOS.length} enunciados de la actividad`, done: clasificarDone },
     { txt: `Caza la marca de las ${MARCAS.length} oraciones`, done: marcasDone },
-    { txt: "Completa el texto con los cuatro términos", done: huecosDone },
+    { txt: "Completa el texto con los cuatro términos", done: huecosDone, modo: "texto" },
     { txt: "Aprueba el reto evaluable", done: quizAprobado },
     { txt: "Termina con 2 errores o menos", done: todoHecho && partida.errores <= 2 },
   ];

@@ -28,6 +28,7 @@ import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabShell, Bloque, BotonHerramienta, Deslizador } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { LabSfx } from "./lab-audio";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { DILEMA_TRANVIA_FICHA } from "./dilema-tranvia-ficha";
@@ -461,11 +462,11 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { txt: string; done: boolean }[] = [
+  const objetivos: ObjetivoLab[] = [
     { txt: "Mueve el número de personas en la vía y mira cómo cambian los veredictos de cada teoría", done: movioN },
     { txt: "Decidir las cuatro variantes del tranvía con una razón coherente", done: coherentes.length === VARIANTES.length },
     { txt: "Poner 1 y 10 personas en la vía y ver qué teorías cambian su veredicto", done: vioN1 && vioN10 },
-    { txt: "Analizar tu consistencia entre prever un daño y usar a alguien", done: analizo },
+    { txt: "Analizar tu consistencia entre prever un daño y usar a alguien", done: analizo, modo: "tranvia" },
     { txt: "Identificar a los afectados y separar hechos de valores en un dilema cotidiano", done: casosAnalizados.size > 0 },
     { txt: "Construir argumentos bien formados en dos dilemas distintos", done: Object.keys(logros).length >= 2 },
     { txt: "Construir un argumento para cada postura en un mismo dilema", done: Object.values(logros).some((l) => (l?.length ?? 0) >= 2) },

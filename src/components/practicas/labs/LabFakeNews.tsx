@@ -235,7 +235,7 @@ export function LabFakeNews({ color }: PracticaLabProps) {
     { txt: "Desmonta la foto reciclada con búsqueda inversa", done: fotoDesmontada },
     { txt: "Verifica las 6 publicaciones del feed", done: feedHecho },
     { txt: "Acierta 5 de 6 con evidencia que lo respalde", done: buenos >= 5 },
-    { txt: "Escribe los términos del glosario sin ayuda", done: glosarioDone },
+    { txt: "Escribe los términos del glosario sin ayuda", done: glosarioDone, modo: "glosario" },
     { txt: "Resuelve el reto de comprensión", done: quizAprobado },
   ];
 

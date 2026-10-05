@@ -217,7 +217,7 @@ export function LabNavegacionSegura({ color }: PracticaLabProps) {
     { txt: "Termina con el dispositivo protegido y pocos datos expuestos", done: sim.cerrado && sim.seguridad >= 60 && sim.datos <= 20 },
     { txt: "Clasifica las 12 prácticas como seguras o riesgosas", done: practicasDone },
     { txt: "Empareja las 3 amenazas con su defensa", done: amenazasDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

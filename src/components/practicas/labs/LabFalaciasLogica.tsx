@@ -225,7 +225,7 @@ export function LabFalaciasLogica({ color }: PracticaLabProps) {
     { txt: "Detecta la falacia (o su ausencia) en 5 de los 6 mensajes", done: debate.aciertos >= 5 },
     { txt: "Clasifica los 8 argumentos por su falacia", done: falaciasDone },
     { txt: "Separa los 6 razonamientos en válidos y falacias", done: validezDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

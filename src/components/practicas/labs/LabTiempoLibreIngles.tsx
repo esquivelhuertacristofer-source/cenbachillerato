@@ -346,7 +346,7 @@ export function LabTiempoLibreIngles({ color }: PracticaLabProps) {
     { txt: "Caza la trampa «She doesn't plays»", done: trampaVista },
     { txt: `Coloca los ${FRASES_ADVERBIO.length} adverbios de frecuencia`, done: frecuenciaDone },
     { txt: "Coloca un adverbio después de «to be»", done: toBeHecha },
-    { txt: "Completa el párrafo de IN-II-P02-A2", done: textoDone },
+    { txt: "Completa el párrafo de IN-II-P02-A2", done: textoDone, modo: "texto" },
     { txt: "Encadena 5 aciertos seguidos", done: partida.mejorRacha >= 5 },
     { txt: "Aprueba el reto evaluable", done: quizAprobado },
   ];

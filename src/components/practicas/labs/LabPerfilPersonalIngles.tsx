@@ -387,8 +387,8 @@ export function LabPerfilPersonalIngles({ color }: PracticaLabProps) {
     { txt: "Construye la negativa y las dos preguntas con to be", done: tobeFormasDone },
     { txt: "Presenta a Sofía en tercera persona (she / her)", done: terceraSofia },
     { txt: "Presenta a Mateo en tercera persona (he / his)", done: terceraMateo },
-    { txt: "Escribe los 6 términos del formulario en inglés", done: glosarioDone },
-    { txt: "Completa el texto de A2", done: textoDone },
+    { txt: "Escribe los 6 términos del formulario en inglés", done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de A2", done: textoDone, modo: "texto" },
     { txt: "Acierta los 4 hechos verdadero o falso (A5)", done: hechosDone },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];

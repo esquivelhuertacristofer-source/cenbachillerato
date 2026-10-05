@@ -284,8 +284,8 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
     { txt: `Coloca las ${SOLICITUDES.length} solicitudes en su letra de ARCO`, done: arcoDone },
     { txt: `Detecta las ${EXCESOS_TOTALES} cláusulas que piden de más`, done: excesosDone },
     { txt: `Audita las ${CLAUSULAS.length} cláusulas del aviso`, done: avisoDone },
-    { txt: `Escribe los ${GLOSARIO.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: `Escribe los ${GLOSARIO.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: `Acierta los ${HECHOS.length} hechos verdadero o falso`, done: hechosDone },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];

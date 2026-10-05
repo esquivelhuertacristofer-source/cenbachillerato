@@ -218,7 +218,7 @@ export function LabMexicoEnElMundo({ color }: PracticaLabProps) {
     { txt: "Logra comercio y autonomía sin depender de un solo socio", done: simMeta },
     { txt: "Ordena la línea del tiempo de la Reforma al nearshoring", done: lineaDone },
     { txt: "Clasifica los 8 procesos en su siglo (XIX/XX/XXI)", done: siglosDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

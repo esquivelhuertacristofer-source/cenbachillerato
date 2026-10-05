@@ -342,9 +342,9 @@ export function LabEquilibrio({ color }: PracticaLabProps) {
       }
       lectura={lectura}
       objetivos={[
-        { txt: "En el modo Constante, sube los productos hasta que Q pase de Kc y mira hacia dónde se desplaza", done: qSobreKc },
-        { txt: "En el modo Le Châtelier, aprieta el pistón al máximo y mira qué color domina", done: apretoPiston },
-        { txt: "Observa el equilibrio dinámico en las cuatro fases de la animación", done: vioEquilibrio },
+        { txt: "En el modo Constante, sube los productos hasta que Q pase de Kc y mira hacia dónde se desplaza", done: qSobreKc, modo: "constante" },
+        { txt: "En el modo Le Châtelier, aprieta el pistón al máximo y mira qué color domina", done: apretoPiston, modo: "lechatelier" },
+        { txt: "Observa el equilibrio dinámico en las cuatro fases de la animación", done: vioEquilibrio, modo: "reversible" },
         { txt: "Usa la calculadora para comparar Q con Kc en la reacción H₂ + I₂ ⇌ 2 HI", done: cambioConc },
         { txt: "Predice el desplazamiento con Le Châtelier", done: probaPerturb },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },

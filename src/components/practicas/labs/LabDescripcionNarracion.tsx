@@ -373,8 +373,8 @@ export function LabDescripcionNarracion({ color }: PracticaLabProps) {
     { txt: `Coloca los ${CASOS.length} conectores temporales`, done: conectoresDone },
     { txt: `Señala los ${ITEMS_VERBO.length} verbos que hunden la frase`, done: verbosSenaladosDone },
     { txt: `Sustituye los ${ITEMS_VERBO.length} verbos por uno preciso`, done: verbosDone },
-    { txt: `Escribe los ${GLOSARIO.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: `Escribe los ${GLOSARIO.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: `Acierta los ${HECHOS.length} hechos verdadero o falso`, done: hechosDone },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];

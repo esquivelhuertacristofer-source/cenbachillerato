@@ -107,9 +107,10 @@ function Cil({ p, r, h, c, rot, rough = 0.7 }: { p: Pt; r: number; h: number; c:
   );
 }
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12, fondo = "rgba(4,10,22,0.86)" }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; fondo?: string }) {
+/** Tamaño fijo en píxeles, sin distanceFactor (la letra ya no crece ni se encoge con la cámara). `df` se ignora. */
+function Etiqueta({ pos, children, col, fs = 12, fondo = "rgba(4,10,22,0.86)" }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; fondo?: string }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -132,10 +133,11 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12, fondo = "rgba(4,10,22,
   );
 }
 
-function Burbuja({ pos, children, df = 10, ancho = 240, borde = "#ffffff", fs = 13, oscura = false }: { pos: Pt; children: ReactNode; df?: number; ancho?: number; borde?: string; fs?: number; oscura?: boolean }) {
+/** Tamaño fijo en píxeles, sin distanceFactor (la letra ya no crece ni se encoge con la cámara). `df` se ignora. */
+function Burbuja({ pos, children, ancho = 240, borde = "#ffffff", fs = 13, oscura = false }: { pos: Pt; children: ReactNode; df?: number; ancho?: number; borde?: string; fs?: number; oscura?: boolean }) {
   const fondo = oscura ? "#0b1628" : "#ffffff";
   return (
-    <HtmlAncho position={pos} center distanceFactor={df} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+    <HtmlAncho position={pos} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ position: "relative", width: ancho, display: "flex", justifyContent: "center" }}>
         <div
           style={{
@@ -386,7 +388,7 @@ function ProductoPuesto({ id, i, sel, comprado, activo, enLista, onPick, modoCol
         <ringGeometry args={[0.44, 0.52, 40]} />
         <meshBasicMaterial color={modoColor} toneMapped={false} transparent opacity={0.9} />
       </mesh>
-      <Html position={[0, i % 2 === 0 ? -0.26 : -0.6, 0.72]} center distanceFactor={9} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <Html position={[0, i % 2 === 0 ? -0.26 : -0.6, 0.72]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
             padding: "3px 9px",
@@ -579,7 +581,7 @@ function EscenaMercado({ comprados, seleccionado, elegible, dichoVendedor, dicho
         <group ref={billete} position={[0.55, 0.54, 0.1]}>
           <Caja3 p={[0, 0, 0]} s={[0.5, 0.02, 0.25]} c={pagado ? "#bbf7d0" : "#a7f3d0"} sombra={false} />
         </group>
-        <Html position={[0, 1.17, 0.06]} center distanceFactor={8} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+        <Html position={[0, 1.17, 0.06]} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ width: 176, padding: "6px 8px", color: "#f8fafc", fontFamily: "ui-monospace, monospace", fontSize: 14, lineHeight: 1.35 }}>
             <div style={{ fontWeight: 900, fontSize: 14, borderBottom: "1px dashed rgba(255,255,255,0.4)", marginBottom: 3, display: "flex", justifyContent: "space-between" }}>
               <span>TICKET</span>
@@ -856,7 +858,7 @@ function Plataforma({ lado, dIdx, revel, elegida, resuelto, activo, onLado, modo
         <ringGeometry args={[1.62, 1.8, 64]} />
         <meshBasicMaterial ref={aro} color={esta && resuelto ? OK : modoColor} transparent opacity={0} toneMapped={false} />
       </mesh>
-      <HtmlAncho position={[0, 3.15, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <HtmlAncho position={[0, 3.15, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ width: 210, display: "flex", flexDirection: "column", alignItems: "center", gap: 5, opacity: otra ? 0.55 : 1 }}>
           <div style={{ padding: "5px 12px", borderRadius: 999, background: "rgba(4,10,22,0.9)", border: `2px solid ${col}`, color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
             <span style={{ color: esta ? col : modoColor, marginRight: 6 }}>{lado}</span>
@@ -904,7 +906,7 @@ function EscenaElegir({ dilemaIdx, reveladas, elegida, resuelto, oracion, estado
         ))}
         <Caja3 p={[0, 1.75, 0]} s={[3.4, 1.5, 0.1]} c="#b08457" />
         <Caja3 p={[0, 1.75, -0.02]} s={[3.56, 1.66, 0.08]} c="#78350f" />
-        <HtmlAncho position={[0, 1.78, 0.08]} center distanceFactor={9} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+        <HtmlAncho position={[0, 1.78, 0.08]} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ width: 250, padding: "10px 12px", background: "#fffbeb", borderRadius: 4, boxShadow: "0 8px 18px -8px #000", textAlign: "center", transform: "rotate(-1.5deg)" }}>
             <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.12em", color: "#b45309" }}>COMMUNITY MEETING · NEED {dilemaIdx + 1}/4</div>
             <div style={{ fontSize: 15.5, fontWeight: 900, color: "#1c1917", lineHeight: 1.25, marginTop: 5 }}>
@@ -924,7 +926,7 @@ function EscenaElegir({ dilemaIdx, reveladas, elegida, resuelto, oracion, estado
         <group key={k}>
           <Persona pos={[x as number, 0, z as number]} rotY={r as number} camisa={c as string} pelo={k % 2 ? "#3f2a1d" : "#111827"} coleta={k % 2 === 0} animo={resuelto ? "feliz" : "neutro"} escala={0.95} />
           {resuelto && (
-            <Html position={[x as number, 2.2, z as number]} center distanceFactor={10} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+            <Html position={[x as number, 2.2, z as number]} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
               <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#fff", border: `2px solid ${OK}`, color: OK, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>
                 <i className="fa-solid fa-thumbs-up" />
               </div>
@@ -939,7 +941,7 @@ function EscenaElegir({ dilemaIdx, reveladas, elegida, resuelto, oracion, estado
         {elegida ? `You chose ${elegida}` : "A or B?"}
       </Etiqueta>
       {(oracion || elegida) && (
-        <HtmlAncho position={[0, 4.35, -2.9]} center distanceFactor={10} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
+        <HtmlAncho position={[0, 4.35, -2.9]} center zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ whiteSpace: "nowrap", padding: "8px 16px", borderRadius: 14, background: "rgba(4,10,22,0.9)", border: `2px solid ${colOracion}`, color: oracion ? "#fff" : "rgba(255,255,255,0.55)", fontSize: 16, fontWeight: 900, boxShadow: `0 0 26px -8px ${colOracion}` }}>
             {estadoOracion === "ok" && <i className="fa-solid fa-circle-check" style={{ color: OK, marginRight: 8 }} />}
             {oracion || "I'd rather… because…"}
@@ -1072,7 +1074,7 @@ function CajaEntregada({ idx, nombre }: { idx: number; nombre: string }) {
       <mesh position={[0, 0.15, 0.302]} geometry={CAJA} scale={[0.14, 0.14, 0.01]}>
         <meshBasicMaterial color="#e11d48" />
       </mesh>
-      <Html position={[0, -0.12, 0.33]} center distanceFactor={9} zIndexRange={[16, 0]} style={{ pointerEvents: "none" }}>
+      <Html position={[0, -0.12, 0.33]} center zIndexRange={[16, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ padding: "1px 6px", borderRadius: 5, background: "rgba(255,250,240,0.95)", color: "#1c1917", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>{nombre}</div>
       </Html>
     </group>
@@ -1128,7 +1130,7 @@ function EscenaAcopio({ vecinoIdx, fase, dichoTu, caja, estadoCaja, entregados, 
       ))}
       <Caja3 p={[0, 1.7, -3.35]} s={[13, 3.4, 0.14]} c="#e7e5e4" />
       <Caja3 p={[-6.43, 1.7, -0.9]} s={[0.14, 3.4, 5]} c="#d6d3d1" />
-      <HtmlAncho position={[0, 3.05, -3.25]} center distanceFactor={10} zIndexRange={[12, 0]} style={{ pointerEvents: "none" }}>
+      <HtmlAncho position={[0, 3.05, -3.25]} center zIndexRange={[12, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ padding: "6px 18px", borderRadius: 8, background: "#0f766e", color: "#fff", fontWeight: 900, fontSize: 15, whiteSpace: "nowrap", boxShadow: "0 8px 20px -10px #000", border: "2px solid #99f6e4" }}>
           <i className="fa-solid fa-hand-holding-heart" style={{ marginRight: 8, color: "#fbcfe8" }} />
           COMMUNITY HELP CENTER · Centro de acopio Las Flores
@@ -1168,7 +1170,7 @@ function EscenaAcopio({ vecinoIdx, fase, dichoTu, caja, estadoCaja, entregados, 
       <group ref={vec}>
         <Persona pos={[-2.75, 0, 1.45]} rotY={0.55} camisa={v.camisa} pelo={v.cabello} canoso={v.id === "chuy"} coleta={v.coleta} animo={animo} />
       </group>
-      <Html position={[-2.75, 2.15, 1.45]} center distanceFactor={10} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+      <Html position={[-2.75, 2.15, 1.45]} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#fff", border: `2px solid ${colAnimo}`, color: colAnimo, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19 }}>
           <i className={`fa-solid ${icono}`} />
         </div>

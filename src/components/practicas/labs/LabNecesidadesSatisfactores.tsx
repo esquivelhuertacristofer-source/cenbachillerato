@@ -245,7 +245,7 @@ export function LabNecesidadesSatisfactores({ color }: PracticaLabProps) {
     { txt: "Compra un pseudo-satisfactor y cierra el mes para ver su efecto", done: vioPseudo },
     { txt: "Clasifica las 9 tarjetas (necesidad / satisfactor)", done: clasificarDone },
     { txt: "Empareja las 4 necesidades con su satisfactor", done: emparejarDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

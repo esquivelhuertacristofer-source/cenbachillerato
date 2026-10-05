@@ -404,8 +404,8 @@ export function LabLecturaCritica({ color }: PracticaLabProps) {
     { txt: `Di a quién le conviene cada conclusión (${CASOS.length} casos)`, done: interesesDone },
     { txt: `Separa crítica del argumento y ataque a la persona (${TOTAL_REACCIONES})`, done: reaccionesDone },
     { txt: "Sostén las tres posturas con evidencia del texto", done: posturaDone },
-    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto con los cinco términos", done: huecosDone },
+    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto con los cinco términos", done: huecosDone, modo: "texto" },
     { txt: "Aprueba el reto evaluable", done: quizAprobado },
     { txt: "Termina con 2 errores o menos", done: todoHecho && partida.errores <= 2 },
   ];

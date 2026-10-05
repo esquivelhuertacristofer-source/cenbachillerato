@@ -90,12 +90,11 @@ export function ActivityShell({
   phaseLabel,
   actividadesProg,
   children,
-  nivel_revision,
+  nivel_revision: _nivelRevision,
   practicaHref,
 }: ActivityShellProps) {
   const tc = getTipoConfig(tipo);
   const isCompleta = estado === "completada";
-  const isBorrador = nivel_revision === "borrador";
   const herramientas = herramientasPorArea(uacCodigo);
   const tiempoMin = TIEMPO_MIN[tipo] ?? 8;
   const semestreUac = ROMAN_TO_N[uacCodigo.split("-").pop() ?? ""] ?? null;
@@ -266,8 +265,14 @@ export function ActivityShell({
           .ash-hero { padding: 32px 20px 36px !important; }
           .ash-nav { padding: 14px 20px !important; }
           .ash-body { padding: 28px 20px 80px !important; }
-          .ash-title { font-size: 26px !important; }
-          .ash-icon { width: 56px !important; height: 56px !important; font-size: 24px !important; border-radius: 16px !important; }
+          .ash-title { font-size: 23px !important; line-height: 1.12 !important; }
+          /* En celular el encabezado no puede comerse la primera pantalla:
+             fuera el ícono grande y las píldoras secundarias (tipo, minutos). */
+          .ash-icon { display: none !important; }
+          .ash-pill-sec { display: none !important; }
+          .ash-hero { padding: 20px 16px 22px !important; }
+          .ash-body { padding: 20px 16px 80px !important; }
+          .ash-body img.imagen-amb { max-height: 150px !important; height: 150px !important; object-fit: cover !important; }
           .ash-foot { flex-direction: column; }
           .ash-foot-next { align-items: flex-start; text-align: left; }
         }
@@ -365,7 +370,7 @@ export function ActivityShell({
                   }}>
                     A{ordenNum} · {phaseLabel}
                   </span>
-                  <span style={{
+                  <span className="ash-pill-sec" style={{
                     fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em",
                     color: "rgba(255,255,255,0.40)", padding: "5px 14px",
                     background: "rgba(255,255,255,0.05)",
@@ -375,7 +380,7 @@ export function ActivityShell({
                     <i className={`fa-solid ${tc.faIcon}`} style={{ marginRight: 6, fontSize: 9 }} />
                     {tc.label}
                   </span>
-                  <span style={{
+                  <span className="ash-pill-sec" style={{
                     fontSize: 12, fontWeight: 700, letterSpacing: "0.10em",
                     color: "rgba(255,255,255,0.40)", padding: "5px 14px",
                     background: "rgba(255,255,255,0.05)",
@@ -398,18 +403,9 @@ export function ActivityShell({
                       Completada
                     </span>
                   )}
-                  {isBorrador && (
-                    <span style={{
-                      fontSize: 12, fontWeight: 700, letterSpacing: "0.10em",
-                      color: "#CA8A04", padding: "5px 14px",
-                      background: "rgba(202,138,4,0.10)",
-                      border: "1px solid rgba(202,138,4,0.25)",
-                      borderRadius: 999,
-                    }}>
-                      <i className="fa-solid fa-pen-ruler" style={{ marginRight: 5, fontSize: 9 }} />
-                      En revisión pedagógica
-                    </span>
-                  )}
+                  {/* «En revisión pedagógica» (nivel_revision = borrador) era metadato
+                      interno y lo veían los alumnos en 1 937 de 2 189 actividades:
+                      ya no se muestra en la vista del alumno. */}
                 </div>
 
                 {/* Title */}

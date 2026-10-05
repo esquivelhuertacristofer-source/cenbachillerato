@@ -374,8 +374,8 @@ export function LabPasadoViajeIngles({ color }: PracticaLabProps) {
     { txt: `Lleva el autobús por las ${RELATO.length} paradas del viaje, en orden`, done: ordenDone },
     { txt: `Caza las ${INTRUSOS.length} oraciones que rompen el tiempo verbal`, done: intrusosDone },
     { txt: `Escribe las ${ESCRITURA.length} formas verbales (simple o continuous)`, done: escribirDone },
-    { txt: "Completa el texto de A2 (past simple)", done: texto2Done },
-    { txt: "Completa el texto de A6 (past continuous)", done: texto6Done },
+    { txt: "Completa el texto de A2 (past simple)", done: texto2Done, modo: "texto" },
+    { txt: "Completa el texto de A6 (past continuous)", done: texto6Done, modo: "texto" },
     { txt: "Aprueba el reto evaluable", done: quizAprobado },
     { txt: "Termina con 2 errores o menos", done: todoHecho && partida.errores <= 2 },
   ];

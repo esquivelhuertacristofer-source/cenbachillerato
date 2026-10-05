@@ -198,7 +198,7 @@ export function LabGeometriaAnalitica({ color }: PracticaLabProps) {
       }
       lectura={lectura}
       objetivos={[
-        { txt: "Mueve P₂ y mira cómo los cuadrados verde y morado llenan el naranja (Pitágoras)", done: modo === "distancia" && (x2 !== X2_DEF || y2 !== Y2_DEF) },
+        { txt: "Mueve P₂ y mira cómo los cuadrados verde y morado llenan el naranja (Pitágoras)", done: modo === "distancia" && (x2 !== X2_DEF || y2 !== Y2_DEF), modo: "distancia" },
         { txt: "Arma el triángulo 3-4-5: Δx = 3 y Δy = 4, ¿cuánto vale d?", done: Math.abs(g.dx) === 3 && Math.abs(g.dy) === 4 },
         { txt: "Mueve P₁ y P₂ sobre el plano cartesiano", done: x1 !== X1_DEF || y1 !== Y1_DEF || x2 !== X2_DEF || y2 !== Y2_DEF },
         { txt: "Mira el triángulo rectángulo: la distancia es su hipotenusa (Pitágoras)", done: mostrarTriangulo },

@@ -42,7 +42,7 @@
     {
       "parrafos": [4],
       "titulo": "Energía limpia en México",
-      "idea": "México genera unos 324 TWh al año y desarrolla energía eólica, solar y geotérmica en distintas regiones.",
+      "idea": "México genera unos 351 TWh al año y desarrolla energía eólica, solar y geotérmica en distintas regiones.",
       "visual": { "tipo": "comparar", "columnas": [
         { "titulo": "Eólica", "puntos": ["Istmo de Tehuantepec, Oaxaca"] },
         { "titulo": "Solar", "puntos": ["Desierto de Sonora"] },

@@ -1,5 +1,16 @@
 'use client';
 
+/**
+ * COMPLETA LOS ESPACIOS — el texto se lee como un párrafo normal y cada espacio
+ * es un campo dentro de la línea, numerado y del ancho de la respuesta.
+ *
+ * Diseño (misma familia que LecturaGuiada): bloques con borde suave, acento de
+ * la materia, letra legible (cuerpo 17 px, nada debajo de 13 px) y CSS en clases
+ * propias. Las pistas ya no flotan sobre el texto (se salían de la pantalla en
+ * celular): se abren en una franja bajo el párrafo. Al comprobar, cada espacio
+ * se colorea y abajo aparece la revisión espacio por espacio.
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TextCursor, Check, X, Lightbulb, RotateCcw, ArrowRight, Loader2, Eye, CheckCircle } from 'lucide-react';
@@ -59,170 +70,217 @@ function esRespuestaCorrecta(respuesta: string, hueco: HuecoFillBlanks, distingu
   return false;
 }
 
+/**
+ * Banco de palabras escrito dentro de las instrucciones («…del cuadro: am / is /
+ * are» · «Choose from: better, usually, always»). Solo se acepta una lista de 3+
+ * términos cortos; una frase después de dos puntos («Recuerda: tras estos…») no.
+ * Si el banco cierra las instrucciones, se devuelven también las instrucciones
+ * sin la lista para no repetirla.
+ */
+function extraerBanco(instrucciones: string): { banco: string[]; texto: string } {
+  const banco: string[] = [];
+  let texto = instrucciones;
+  const regex = /:\s*([^:.()]+)/g;
+  let m: RegExpExecArray | null;
+  let segmentos = 0;
+  let ultimoAlFinal = false;
+  let inicioUltimo = -1;
+  while ((m = regex.exec(instrucciones)) !== null) {
+    const items = (m[1] ?? '').split(/\s*[\/,]\s*/).map(s => s.trim()).filter(Boolean);
+    const esLista = items.length >= 3 && items.every(s => s.length <= 24 && s.split(/\s+/).length <= 4);
+    if (!esLista) continue;
+    segmentos++;
+    for (const it of items) if (!banco.includes(it)) banco.push(it);
+    const resto = instrucciones.slice(m.index + m[0].length).trim();
+    ultimoAlFinal = resto === '' || resto === '.';
+    inicioUltimo = m.index;
+  }
+  if (segmentos === 1 && ultimoAlFinal && inicioUltimo > 0) {
+    texto = `${instrucciones.slice(0, inicioUltimo).trim()}:`;
+  }
+  return { banco, texto };
+}
+
+const CSS = `
+.fb { display:flex; flex-direction:column; gap:20px; font-family:var(--font-epilogue), sans-serif; }
+.fb-bloque { border-radius:22px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.025); }
+.fb-aviso { display:flex; align-items:center; gap:12px; padding:14px 18px; border-radius:16px; background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.28); }
+.fb-aviso p { margin:0; font-size:15px; font-weight:700; color:#A5B4FC; line-height:1.4; }
+.fb-amb { position:relative; overflow:hidden; border-radius:20px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); }
+.fb-amb img { display:block; width:100%; height:clamp(140px, 30vw, 220px); object-fit:cover; }
+.fb-amb::after { content:''; position:absolute; inset:0; pointer-events:none; background:linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.08) 45%, transparent 70%); }
+.fb-amb-sin { height:clamp(120px, 24vw, 160px); display:flex; align-items:center; justify-content:center; gap:12px; border-color:rgba(var(--fb-rgb),0.25); background:linear-gradient(135deg, rgba(var(--fb-rgb),0.14), rgba(var(--fb-rgb),0.04)); }
+.fb-amb-sin i { font-size:28px; color:rgba(var(--fb-rgb),0.6); }
+.fb-amb-sin::after { display:none; }
+.fb-cab { padding:18px 22px; display:flex; gap:14px; align-items:flex-start; border-color:rgba(var(--fb-rgb),0.22); background:rgba(var(--fb-rgb),0.06); }
+.fb-cab-ico { width:40px; height:40px; border-radius:12px; flex-shrink:0; display:grid; place-items:center; background:rgba(var(--fb-rgb),0.15); color:var(--fb-c); }
+.fb-rotulo { margin:0 0 4px; font-size:13px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:var(--fb-c); }
+.fb-instr { margin:0; font-size:16px; line-height:1.5; font-weight:600; color:#fff; }
+.fb-estado { margin:6px 0 0; font-size:14px; font-weight:600; color:rgba(255,255,255,0.6); }
+.fb-banco { margin-top:12px; display:flex; flex-wrap:wrap; gap:8px; }
+.fb-chip { min-height:38px; padding:6px 14px; border-radius:999px; border:1px solid rgba(var(--fb-rgb),0.35); background:rgba(var(--fb-rgb),0.10); color:#fff; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; transition:background .15s, opacity .15s; }
+.fb-chip:hover:not(:disabled) { background:rgba(var(--fb-rgb),0.20); }
+.fb-chip[data-usada="si"] { opacity:0.5; }
+.fb-chip:disabled { cursor:default; }
+.fb-texto { padding:clamp(20px,4vw,34px) clamp(18px,4vw,38px); }
+.fb-texto p { margin:0; max-width:72ch; font-size:17px; line-height:2.15; color:rgba(255,255,255,0.88); white-space:pre-line; overflow-wrap:break-word; }
+.fb-h { display:inline-flex; align-items:center; gap:4px; vertical-align:baseline; white-space:nowrap; max-width:100%; margin:0 2px; }
+.fb-num { display:inline-grid; place-items:center; min-width:22px; height:22px; padding:0 4px; border-radius:999px; font-size:13px; font-weight:800; line-height:1; background:rgba(var(--fb-rgb),0.16); color:var(--fb-c); }
+.fb-h[data-r="bien"] .fb-num { background:rgba(74,222,128,0.18); color:#4ADE80; }
+.fb-h[data-r="mal"] .fb-num { background:rgba(248,113,113,0.18); color:#F87171; }
+.fb-in { max-width:min(100%, 60vw); min-width:4.5ch; height:1.75em; padding:0 8px; border:none; border-bottom:2px solid rgba(255,255,255,0.32); border-radius:8px 8px 2px 2px; background:rgba(255,255,255,0.06); color:#fff; font-size:17px; font-weight:700; font-family:inherit; text-align:center; outline:none; box-sizing:content-box; transition:border-color .2s, background .2s, color .2s; }
+.fb-in::placeholder { color:rgba(255,255,255,0.3); font-weight:600; }
+.fb-in:focus { border-bottom-color:var(--fb-c); background:rgba(var(--fb-rgb),0.12); box-shadow:0 0 0 2px rgba(var(--fb-rgb),0.30); }
+.fb-h[data-lleno="si"] .fb-in { border-bottom-color:var(--fb-c); }
+.fb-h[data-r="bien"] .fb-in { border-bottom-color:#4ADE80; color:#4ADE80; background:rgba(74,222,128,0.08); }
+.fb-h[data-r="mal"] .fb-in { border-bottom-color:#F87171; color:#FCA5A5; background:rgba(248,113,113,0.08); }
+.fb-h[data-r="revelada"] .fb-in { border-bottom-color:#FB923C; color:#FDBA74; background:rgba(251,146,60,0.08); }
+.fb-pbtn { display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%; border:none; background:rgba(255,255,255,0.08); color:var(--fb-c); cursor:pointer; flex-shrink:0; }
+.fb-pbtn:hover, .fb-pbtn[aria-expanded="true"] { background:rgba(var(--fb-rgb),0.22); }
+.fb-pista { display:flex; align-items:flex-start; gap:10px; margin-top:18px; padding:12px 14px; border-radius:14px; background:rgba(var(--fb-rgb),0.10); border-left:4px solid var(--fb-c); }
+.fb-pista p { margin:0; flex:1; font-size:16px; line-height:1.45; color:#fff; white-space:normal; }
+.fb-pista b { color:var(--fb-c); }
+.fb-pista svg { flex-shrink:0; margin-top:3px; color:var(--fb-c); }
+.fb-pista button { border:none; background:transparent; color:rgba(255,255,255,0.6); cursor:pointer; padding:4px; min-width:32px; min-height:32px; display:grid; place-items:center; border-radius:8px; }
+.fb-avance { display:flex; align-items:center; gap:14px; }
+.fb-barra { flex:1; height:6px; border-radius:999px; background:rgba(255,255,255,0.08); overflow:hidden; }
+.fb-barra > div { height:100%; border-radius:999px; background:var(--fb-c); transition:width .3s ease; }
+.fb-avance span { font-size:14px; font-weight:700; color:rgba(255,255,255,0.6); white-space:nowrap; }
+.fb-res { padding:18px 22px; display:flex; align-items:center; gap:16px; }
+.fb-res[data-ok="si"] { background:rgba(74,222,128,0.08); border-color:rgba(74,222,128,0.30); border-left:4px solid #4ADE80; }
+.fb-res[data-ok="no"] { background:rgba(251,146,60,0.07); border-color:rgba(251,146,60,0.25); border-left:4px solid #FB923C; }
+.fb-res-txt { flex:1; }
+.fb-res-txt small { display:block; font-size:13px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px; }
+.fb-res[data-ok="si"] small { color:#4ADE80; }
+.fb-res[data-ok="no"] small { color:#FB923C; }
+.fb-res-txt strong { font-size:clamp(20px,3vw,24px); color:#fff; }
+.fb-rev { padding:16px 20px; }
+.fb-rev ol { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.fb-rev li { display:flex; align-items:baseline; gap:10px; font-size:15px; line-height:1.45; color:rgba(255,255,255,0.82); }
+.fb-rev li .fb-num { flex-shrink:0; }
+.fb-rev li svg { flex-shrink:0; align-self:center; }
+.fb-rev s { color:rgba(255,255,255,0.5); }
+.fb-rev em { font-style:normal; font-weight:700; color:#4ADE80; }
+.fb-acciones { display:flex; flex-direction:column; gap:10px; }
+.fb-dos { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.fb-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:52px; padding:14px 20px; border-radius:16px; border:none; font-size:16px; font-weight:800; font-family:inherit; cursor:pointer; transition:filter .15s, transform .15s, background .2s; }
+.fb-btn-pri { background:var(--fb-c); color:#011126; }
+.fb-btn-pri:hover:not(:disabled) { filter:brightness(1.08); transform:translateY(-1px); }
+.fb-btn-pri:disabled { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.45); cursor:not-allowed; }
+.fb-btn-sec { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.14); color:rgba(255,255,255,0.85); font-weight:700; }
+.fb-btn-sec:hover { background:rgba(255,255,255,0.10); }
+.fb-btn:focus-visible, .fb-chip:focus-visible, .fb-pbtn:focus-visible { outline:2px solid var(--fb-c); outline-offset:3px; }
+.fb-spin { animation:fb-spin 1s linear infinite; }
+@keyframes fb-spin { to { transform:rotate(360deg); } }
+@media (max-width:640px) {
+  .fb-cab { padding:16px; }
+  .fb-texto p { font-size:16.5px; line-height:2.2; }
+  .fb-in { font-size:16.5px; }
+  .fb-dos { grid-template-columns:1fr; }
+}
+`;
+
 // ── HuecoInput ─────────────────────────────────────────────────────────────────
 
 interface HuecoInputProps {
   indice: number;
   valor: string;
   onChange: (v: string) => void;
+  onFocus: () => void;
+  inputRef: (el: HTMLInputElement | null) => void;
   verificado: boolean;
   reveladas: boolean;
   esCorrecta: boolean | null;
   respuestaCorrecta: string;
-  pista?: string;
+  tienePista: boolean;
   pistaVisible: boolean;
   onTogglePista: () => void;
-  areaHex: string;
-  areaRgba: string;
   shakingAll: boolean;
   disabled: boolean;
   reducedMotion: boolean;
 }
 
 function HuecoInput({
-  indice, valor, onChange, verificado, reveladas,
-  esCorrecta, respuestaCorrecta, pista, pistaVisible, onTogglePista,
-  areaHex, areaRgba, shakingAll, disabled, reducedMotion,
+  indice, valor, onChange, onFocus, inputRef, verificado, reveladas,
+  esCorrecta, respuestaCorrecta, tienePista, pistaVisible, onTogglePista,
+  shakingAll, disabled, reducedMotion,
 }: HuecoInputProps) {
-  const [focused, setFocused] = useState(false);
   const valorMostrado = reveladas ? respuestaCorrecta : valor;
-
-  const borderColor = reveladas ? '#F97316'
-    : esCorrecta === true ? '#4ADE80'
-    : esCorrecta === false ? '#F87171'
-    : focused || valor ? areaHex
-    : 'rgba(255,255,255,0.28)';
-
-  const textColor = reveladas ? '#F97316'
-    : esCorrecta === true ? '#4ADE80'
-    : esCorrecta === false ? '#F87171'
-    : 'rgba(255,255,255,0.92)';
-
-  const anchoEstimado = Math.max(respuestaCorrecta.length * 0.65 + 2, 4);
+  const r = reveladas ? 'revelada' : esCorrecta === true ? 'bien' : esCorrecta === false ? 'mal' : undefined;
+  // Ancho del campo ≈ largo de la respuesta esperada (como antes), en caracteres.
+  const ancho = Math.max(respuestaCorrecta.length * 0.75 + 1, 4.5);
 
   return (
-    <span style={{ display: 'inline-block', position: 'relative', margin: '0 2px', verticalAlign: 'baseline' }}>
-      <motion.span
-        style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-        animate={shakingAll && esCorrecta === false && !verificado === false && !reducedMotion
-          ? { x: [0, -7, 7, -5, 5, -3, 3, 0] }
-          : { x: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <input
-          type="text"
-          value={valorMostrado}
-          onChange={e => onChange(e.target.value)}
-          readOnly={disabled || reveladas || verificado}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          placeholder="···"
-          aria-label={`Hueco ${indice + 1}`}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            borderBottom: `2.5px solid ${borderColor}`,
-            width: `${anchoEstimado}ch`,
-            minWidth: 60,
-            color: textColor,
-            fontSize: 18,
-            fontWeight: 700,
-            fontFamily: 'var(--font-epilogue), sans-serif',
-            textAlign: 'center',
-            padding: '2px 6px',
-            outline: 'none',
-            transition: 'border-color 0.2s, color 0.2s, width 0.15s',
-            boxSizing: 'border-box',
-          }}
-        />
-
-        {/* Check/X inline icons */}
-        <AnimatePresence mode="wait">
-          {esCorrecta === true && (
-            <motion.span key="check"
-              initial={reducedMotion ? { opacity: 1 } : { scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={springs.bouncy}
-              style={{ display: 'inline-flex', flexShrink: 0 }}
-            >
-              <Check size={14} style={{ color: '#4ADE80' }} />
-            </motion.span>
-          )}
-          {esCorrecta === false && !reveladas && (
-            <motion.span key="x"
-              initial={reducedMotion ? { opacity: 1 } : { scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={springs.bouncy}
-              style={{ display: 'inline-flex', flexShrink: 0 }}
-            >
-              <X size={14} style={{ color: '#F87171' }} />
-            </motion.span>
-          )}
-        </AnimatePresence>
-
-        {/* Pista button */}
-        {pista && !verificado && !reveladas && (
-          <button
-            onClick={onTogglePista}
-            aria-label={`Pista para hueco ${indice + 1}`}
-            style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-              background: 'rgba(255,255,255,0.10)', border: 'none', cursor: 'pointer',
-              transition: 'background 0.2s',
-            }}
-          >
-            <Lightbulb size={10} style={{ color: areaHex }} />
-          </button>
-        )}
-      </motion.span>
-
-      {/* Pista tooltip */}
-      <AnimatePresence>
-        {pistaVisible && pista && (
-          <motion.div
-            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: -4, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.95 }}
-            transition={springs.smooth}
-            style={{
-              position: 'absolute',
-              bottom: '100%', left: '50%', transform: 'translateX(-50%)',
-              marginBottom: 8, zIndex: 20,
-              padding: '8px 12px', borderRadius: 10,
-              background: `rgba(${areaRgba}, 0.15)`,
-              border: `1px solid rgba(${areaRgba}, 0.40)`,
-              whiteSpace: 'nowrap',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            <span style={{ fontSize: 12, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Lightbulb size={11} style={{ color: areaHex, flexShrink: 0 }} />
-              {pista}
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Wrong answer correction label */}
-      {esCorrecta === false && !reveladas && (
-        <motion.div
-          initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          style={{
-            position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
-            marginTop: 4, whiteSpace: 'nowrap', zIndex: 10,
-          }}
+    <motion.span
+      className="fb-h"
+      data-r={r}
+      data-lleno={valor.trim() ? 'si' : undefined}
+      animate={shakingAll && esCorrecta === false && !reducedMotion
+        ? { x: [0, -6, 6, -4, 4, 0] }
+        : { x: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <span className="fb-num" aria-hidden="true">{indice + 1}</span>
+      <input
+        ref={inputRef}
+        className="fb-in"
+        type="text"
+        value={valorMostrado}
+        onChange={e => onChange(e.target.value)}
+        onFocus={onFocus}
+        readOnly={disabled || reveladas || verificado}
+        placeholder="…"
+        aria-label={`Hueco ${indice + 1}`}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
+        style={{ width: `${ancho}ch` }}
+      />
+      {esCorrecta === true && !reveladas && <Check size={18} color="#4ADE80" aria-label="Correcto" />}
+      {esCorrecta === false && !reveladas && <X size={18} color="#F87171" aria-label="Incorrecto" />}
+      {tienePista && !verificado && !reveladas && !disabled && (
+        <button
+          type="button"
+          className="fb-pbtn"
+          onClick={onTogglePista}
+          aria-expanded={pistaVisible}
+          aria-label={`Pista para hueco ${indice + 1}`}
         >
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-            ✓{' '}<span style={{ color: '#4ADE80', fontWeight: 700 }}>{respuestaCorrecta}</span>
-          </span>
-        </motion.div>
+          <Lightbulb size={15} />
+        </button>
       )}
-    </span>
+    </motion.span>
+  );
+}
+
+// ── Imagen de ambientación ─────────────────────────────────────────────────────
+
+function Ambientacion({ url, tematica, titulo }: { url: string; tematica: string; titulo: string }) {
+  const [imgError, setImgError] = useState(false);
+  const [imgTematicaError, setImgTematicaError] = useState(false);
+  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
+  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática.
+  const tieneImagen = url.length > 0 && !/placeholder/i.test(url) && !imgError;
+  if (tieneImagen) {
+    return (
+      <div className="fb-amb">
+        <img src={url} alt={titulo} onError={() => setImgError(true)} />
+      </div>
+    );
+  }
+  if (!imgTematicaError) {
+    return (
+      <div className="fb-amb">
+        <img src={tematica} alt={titulo} onError={() => setImgTematicaError(true)} />
+      </div>
+    );
+  }
+  // Fallback honesto si tampoco hay imagen temática en disco: bloque sin <img> roto.
+  return (
+    <div className="fb-amb fb-amb-sin" aria-hidden="true">
+      <TextCursor size={30} />
+    </div>
   );
 }
 
@@ -237,14 +295,9 @@ export function FillBlanksActivity({
   const distingue = contenido.distingue_mayusculas ?? false;
   const partes = parsearTexto(contenido.texto_con_huecos);
   const numHuecos = contenido.huecos.length;
+  const instrucciones = contenido.instrucciones ?? 'Completa los espacios con la palabra correcta';
+  const { banco, texto: instruccionesSinBanco } = extraerBanco(instrucciones);
 
-  const [imgError, setImgError] = useState(false);
-  const [imgTematicaError, setImgTematicaError] = useState(false);
-  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
-  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
-  // (evita una petición 404 y el ícono de imagen rota).
-  const urlImagen = contenido.url_imagen ?? '';
-  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
   // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
   const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
 
@@ -268,7 +321,9 @@ export function FillBlanksActivity({
   const [pistaVisible, setPistaVisible] = useState<number | null>(null);
   const [shakingAll, setShakingAll] = useState(false);
   const [entregando, setEntregando] = useState(false);
+  const [activo, setActivo] = useState<number | null>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => () => { if (shakeTimer.current) clearTimeout(shakeTimer.current); }, []);
 
@@ -286,10 +341,24 @@ export function FillBlanksActivity({
   const resultados = Array.from({ length: numHuecos }, (_, i) => getEsCorrecta(i));
   const aciertos = verificado ? resultados.filter(r => r === true).length : 0;
   const todosCorrectos = verificado && aciertos === numHuecos;
+  const editable = !verificado && !reveladas && !modoRevision;
 
   function actualizarRespuesta(i: number, valor: string) {
     if (verificado || reveladas) return;
     setRespuestas(prev => { const n = [...prev]; n[i] = valor; return n; });
+  }
+
+  /** Toca una palabra del banco → va al espacio activo (o al primero vacío). */
+  function usarDelBanco(palabra: string) {
+    if (!editable) return;
+    const destino = activo ?? respuestas.findIndex(r => r.trim() === '');
+    if (destino < 0 || destino >= numHuecos) return;
+    actualizarRespuesta(destino, palabra);
+    // Siguiente espacio vacío después del que se llenó.
+    const sig = respuestas.findIndex((r, i) => i > destino && r.trim() === '');
+    const foco = sig >= 0 ? sig : destino;
+    setActivo(foco);
+    inputs.current[foco]?.focus();
   }
 
   function handleVerificar() {
@@ -333,150 +402,67 @@ export function FillBlanksActivity({
     if (!completada || (res && !res.ok)) setEntregando(false);
   }
 
-  const card: React.CSSProperties = {
-    borderRadius: 20,
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
-  };
+  const pistaActual = pistaVisible !== null ? contenido.huecos[pistaVisible]?.pista : undefined;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <style>{`
-        .fb-pista-btn:hover { background: rgba(255,255,255,0.18) !important; }
-        .fb-btn-pri:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
-        .fb-btn-pri:active:not(:disabled) { transform: translateY(0); }
-        .fb-btn-pri:focus-visible { outline: 2px solid rgba(255,255,255,0.50); outline-offset: 3px; }
-        .fb-btn-sec:hover { background: rgba(255,255,255,0.10) !important; }
-        .fb-btn-sec:focus-visible { outline: 2px solid rgba(255,255,255,0.40); outline-offset: 3px; }
-      `}</style>
+    <div
+      className="fb"
+      style={{ '--fb-c': color.hex, '--fb-rgb': color.rgba } as React.CSSProperties}
+    >
+      <style>{CSS}</style>
 
-      {/* Revision banner */}
+      {/* Aviso de revisión */}
       {modoRevision && (
-        <motion.div
-          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={springs.gentle}
-          style={{
-            padding: '14px 20px', borderRadius: 14,
-            background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.28)',
-            display: 'flex', alignItems: 'center', gap: 12,
-          }}
-        >
-          <Eye size={16} style={{ color: '#818CF8', flexShrink: 0 }} />
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#818CF8', margin: 0 }}>
+        <div className="fb-aviso">
+          <Eye size={18} color="#A5B4FC" style={{ flexShrink: 0 }} />
+          <p>
             {revisionSinDetalle
               ? 'Entrega registrada — la revisión detallada no está disponible'
               : 'Ya completaste esta actividad · Revisando tus respuestas anteriores'}
           </p>
-        </motion.div>
-      )}
-
-      {/* Imagen de ambientación */}
-      {tieneImagen ? (
-        <motion.div
-          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={springs.smooth}
-          style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}
-        >
-          <img
-            src={urlImagen}
-            alt={actividad.titulo}
-            style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
-            onError={() => setImgError(true)}
-          />
-        </motion.div>
-      ) : !imgTematicaError ? (
-        <motion.div
-          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={springs.smooth}
-          style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}
-        >
-          <img
-            src={imagenTematica}
-            alt={actividad.titulo}
-            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
-            onError={() => setImgTematicaError(true)}
-          />
-          <div
-            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
-          />
-          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
-            {actividad.titulo}
-          </p>
-        </motion.div>
-      ) : (
-        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
-        <motion.div
-          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={springs.smooth}
-          style={{
-            borderRadius: 16,
-            border: `1px solid rgba(${color.rgba},0.25)`,
-            background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
-            height: 180,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-          }}
-        >
-          <i className={`fa-solid ${color.faIcon}`} style={{ fontSize: 34, color: `rgba(${color.rgba},0.55)` }} />
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
-            {actividad.titulo}
-          </p>
-        </motion.div>
-      )}
-
-      {/* Hero */}
-      <motion.div
-        initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ ...springs.smooth, delay: 0.05 }}
-        style={{
-          ...card,
-          padding: '22px 28px',
-          background: `rgba(${color.rgba}, 0.07)`,
-          border: `1.5px solid rgba(${color.rgba}, 0.18)`,
-          display: 'flex', alignItems: 'center', gap: 14,
-        }}
-      >
-        <div style={{
-          width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-          background: `rgba(${color.rgba}, 0.14)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <TextCursor size={20} style={{ color: color.hex }} />
         </div>
-        <div>
-          <p style={{ fontSize: 13, fontWeight: 700, color: color.hex, margin: '0 0 3px' }}>
-            {contenido.instrucciones ?? 'Completá los huecos con la palabra correcta'}
-          </p>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', margin: 0 }}>
+      )}
+
+      <Ambientacion url={contenido.url_imagen ?? ''} tematica={imagenTematica} titulo={actividad.titulo} />
+
+      {/* Consigna + banco de palabras */}
+      <div className="fb-bloque fb-cab">
+        <div className="fb-cab-ico" aria-hidden="true"><TextCursor size={20} /></div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p className="fb-rotulo">Completa los espacios</p>
+          <p className="fb-instr">{instruccionesSinBanco}</p>
+          <p className="fb-estado">
             {revisionSinDetalle
               ? 'Entrega registrada'
               : verificado ? `${aciertos} / ${numHuecos} correctos` : `${llenos} / ${numHuecos} huecos completados`}
           </p>
+          {banco.length > 0 && (
+            <div className="fb-banco" role="group" aria-label="Banco de palabras">
+              {banco.map(p => {
+                const usada = respuestas.some(r => r.trim().toLowerCase() === p.toLowerCase());
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    className="fb-chip"
+                    data-usada={usada ? 'si' : undefined}
+                    disabled={!editable}
+                    // Conserva el foco del espacio activo al tocar la palabra.
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={() => usarDelBanco(p)}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
-      </motion.div>
+      </div>
 
-      {/* Text with inline blanks */}
-      <motion.div
-        initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ ...springs.smooth, delay: 0.1 }}
-        style={{
-          ...card,
-          padding: '36px 40px',
-          fontSize: 18, lineHeight: 2.4,
-          color: 'rgba(255,255,255,0.85)',
-          fontFamily: 'var(--font-epilogue), sans-serif',
-        }}
-      >
-        <p style={{ margin: 0, lineHeight: 2.6 }}>
+      {/* Texto con los espacios dentro de la línea */}
+      <div className="fb-bloque fb-texto">
+        <p>
           {partes.map((parte, i) => {
             if (parte.tipo === 'texto') {
               return <span key={i}>{parte.contenido}</span>;
@@ -490,15 +476,15 @@ export function FillBlanksActivity({
                 indice={idx}
                 valor={respuestas[idx] ?? ''}
                 onChange={v => actualizarRespuesta(idx, v)}
+                onFocus={() => setActivo(idx)}
+                inputRef={el => { inputs.current[idx] = el; }}
                 verificado={verificado}
                 reveladas={reveladas}
                 esCorrecta={getEsCorrecta(idx)}
                 respuestaCorrecta={hueco.respuesta_correcta}
-                pista={hueco.pista}
+                tienePista={!!hueco.pista}
                 pistaVisible={pistaVisible === idx}
                 onTogglePista={() => setPistaVisible(p => p === idx ? null : idx)}
-                areaHex={color.hex}
-                areaRgba={color.rgba}
                 shakingAll={shakingAll}
                 disabled={modoRevision}
                 reducedMotion={reducedMotion}
@@ -506,187 +492,129 @@ export function FillBlanksActivity({
             );
           })}
         </p>
-      </motion.div>
 
-      {/* Progress counter — oculto en revisión: en el estado neutral (sin
-          respuestas guardadas) "0 / N completados" sugeriría trabajo perdido */}
+        {/* Pista del espacio elegido: bajo el párrafo, nunca encima del texto */}
+        {pistaActual && pistaVisible !== null && !verificado && (
+          <div className="fb-pista" aria-live="polite">
+            <Lightbulb size={18} />
+            <p><b>Pista · espacio {pistaVisible + 1}:</b> {pistaActual}</p>
+            <button type="button" onClick={() => setPistaVisible(null)} aria-label="Cerrar pista">
+              <X size={18} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Avance — oculto en revisión: en el estado neutral (sin respuestas
+          guardadas) "0 / N completados" sugeriría trabajo perdido */}
       {!verificado && !modoRevision && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div className="fb-avance">
           <div
+            className="fb-barra"
             role="progressbar"
             aria-valuenow={llenos}
             aria-valuemin={0}
             aria-valuemax={numHuecos}
             aria-label={`${llenos} de ${numHuecos} huecos completados`}
-            style={{
-              flex: 1, height: 5, borderRadius: 999,
-              background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
-            }}
           >
-            <motion.div
-              animate={{ width: `${pct}%` }}
-              transition={reducedMotion ? { duration: 0 } : { ...springs.gentle }}
-              style={{ height: '100%', borderRadius: 999, background: color.hex }}
-            />
+            <div style={{ width: `${pct}%` }} />
           </div>
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.40)', whiteSpace: 'nowrap' }}>
-            {llenos} / {numHuecos} completados
-          </span>
+          <span>{llenos} / {numHuecos} completados</span>
         </div>
       )}
 
-      {/* Score after verification */}
+      {/* Resultado + revisión espacio por espacio */}
       <AnimatePresence>
         {verificado && (
           <motion.div
-            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
+            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={springs.gentle}
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            style={{
-              ...card,
-              padding: '22px 28px',
-              background: todosCorrectos ? 'rgba(74,222,128,0.10)' : 'rgba(251,146,60,0.08)',
-              border: `1.5px solid ${todosCorrectos ? 'rgba(74,222,128,0.30)' : 'rgba(251,146,60,0.25)'}`,
-              borderLeft: `4px solid ${todosCorrectos ? '#4ADE80' : '#FB923C'}`,
-              display: 'flex', alignItems: 'center', gap: 18,
-            }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
           >
-            <div style={{ flex: 1 }}>
-              <p style={{
-                fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.18em',
-                color: todosCorrectos ? '#4ADE80' : '#FB923C', margin: '0 0 4px',
-              }}>
-                {todosCorrectos ? '¡Todos correctos!' : 'Resultado'}
-              </p>
-              <p style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: 0, fontFamily: 'var(--font-epilogue), sans-serif' }}>
-                {aciertos} / {numHuecos} aciertos
-              </p>
+            <div
+              className="fb-bloque fb-res"
+              data-ok={todosCorrectos ? 'si' : 'no'}
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <div className="fb-res-txt">
+                <small>{todosCorrectos ? '¡Todos correctos!' : 'Resultado'}</small>
+                <strong>{aciertos} / {numHuecos} aciertos</strong>
+              </div>
+              {todosCorrectos && <CheckCircle size={36} color="#4ADE80" aria-hidden="true" />}
             </div>
-            {todosCorrectos && (
-              <motion.div
-                initial={reducedMotion ? { opacity: 1 } : { scale: 0, rotate: -90 }}
-                animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                transition={springs.bouncy}
-              >
-                <CheckCircle size={44} style={{ color: '#4ADE80' }} />
-              </motion.div>
+
+            {!todosCorrectos && (
+              <div className="fb-bloque fb-rev">
+                <ol aria-label="Revisión por espacio">
+                  {contenido.huecos.map((h, i) => {
+                    const ok = resultados[i] === true;
+                    const tuya = (respuestas[i] ?? '').trim();
+                    return (
+                      <li key={i}>
+                        <span className="fb-num" aria-hidden="true">{i + 1}</span>
+                        {ok ? <Check size={16} color="#4ADE80" /> : <X size={16} color="#F87171" />}
+                        <span>
+                          {ok
+                            ? <>{tuya}</>
+                            : <>{tuya ? <s>{tuya}</s> : <s>(vacío)</s>} → <em>{h.respuesta_correcta}</em></>}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
             )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* CTAs */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {/* Verify */}
-        {!verificado && !modoRevision && (
-          <motion.button
-            className="fb-btn-pri"
-            onClick={handleVerificar}
-            disabled={!todosLlenos}
-            whileHover={todosLlenos && !reducedMotion ? { y: -2 } : {}}
-            whileTap={todosLlenos && !reducedMotion ? { scale: 0.98 } : {}}
-            transition={springs.snappy}
-            style={{
-              width: '100%', padding: '18px 32px', borderRadius: 16, border: 'none',
-              cursor: todosLlenos ? 'pointer' : 'not-allowed',
-              fontSize: 14, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em',
-              background: todosLlenos ? color.hex : 'rgba(255,255,255,0.08)',
-              color: todosLlenos ? '#011126' : 'rgba(255,255,255,0.25)',
-              boxShadow: todosLlenos ? `0 12px 32px rgba(${color.rgba}, 0.28)` : 'none',
-              fontFamily: 'var(--font-epilogue), sans-serif',
-              transition: 'background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.15s',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            }}
-          >
-            <Check size={16} />
-            Verificar respuestas
-          </motion.button>
-        )}
-
-        {/* Wrong: Retry + Reveal */}
-        {verificado && !todosCorrectos && !reveladas && !modoRevision && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <motion.button
-              className="fb-btn-sec"
-              onClick={handleReintentar}
-              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...springs.gentle, delay: 0.1 }}
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              style={{
-                width: '100%', padding: '16px 24px', borderRadius: 14,
-                border: '1.5px solid rgba(255,255,255,0.12)',
-                cursor: 'pointer', fontSize: 14, fontWeight: 700,
-                background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.78)',
-                fontFamily: 'var(--font-epilogue), sans-serif',
-                transition: 'background 0.2s, transform 0.15s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              }}
+      {/* Acciones */}
+      {!modoRevision && (
+        <div className="fb-acciones">
+          {!verificado && (
+            <button
+              type="button"
+              className="fb-btn fb-btn-pri"
+              onClick={handleVerificar}
+              disabled={!todosLlenos}
             >
-              <RotateCcw size={15} />
-              Volver a intentar
-            </motion.button>
-            <motion.button
-              className="fb-btn-sec"
-              onClick={() => setReveladas(true)}
-              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...springs.gentle, delay: 0.18 }}
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              style={{
-                width: '100%', padding: '16px 24px', borderRadius: 14,
-                border: '1.5px solid rgba(255,255,255,0.08)',
-                cursor: 'pointer', fontSize: 14, fontWeight: 700,
-                background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.52)',
-                fontFamily: 'var(--font-epilogue), sans-serif',
-                transition: 'background 0.2s, transform 0.15s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              }}
+              <Check size={18} />
+              {todosLlenos
+                ? 'Verificar respuestas'
+                : numHuecos - llenos === 1 ? 'Falta 1 espacio' : `Faltan ${numHuecos - llenos} espacios`}
+            </button>
+          )}
+
+          {verificado && !todosCorrectos && !reveladas && (
+            <div className="fb-dos">
+              <button type="button" className="fb-btn fb-btn-sec" onClick={handleReintentar}>
+                <RotateCcw size={17} />
+                Volver a intentar
+              </button>
+              <button type="button" className="fb-btn fb-btn-sec" onClick={() => setReveladas(true)}>
+                <Eye size={17} />
+                Ver respuestas correctas
+              </button>
+            </div>
+          )}
+
+          {(todosCorrectos || reveladas) && (
+            <button
+              type="button"
+              className="fb-btn fb-btn-pri"
+              onClick={handleEntregar}
+              disabled={entregando}
             >
-              <Eye size={15} />
-              Ver respuestas correctas
-            </motion.button>
-          </div>
-        )}
-
-        {/* Continuar (all correct or revealed) */}
-        {(todosCorrectos || reveladas) && !modoRevision && (
-          <motion.button
-            className="fb-btn-pri"
-            onClick={handleEntregar}
-            disabled={entregando}
-            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={springs.bouncy}
-            whileHover={!entregando && !reducedMotion ? { y: -2, scale: 1.01 } : {}}
-            whileTap={!entregando && !reducedMotion ? { scale: 0.98 } : {}}
-            style={{
-              width: '100%', padding: '18px 32px', borderRadius: 16, border: 'none',
-              cursor: entregando ? 'not-allowed' : 'pointer',
-              fontSize: 14, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em',
-              background: entregando ? 'rgba(74,222,128,0.18)' : color.hex,
-              color: entregando ? '#4ADE80' : '#011126',
-              boxShadow: entregando ? 'none' : `0 12px 32px rgba(${color.rgba}, 0.28)`,
-              fontFamily: 'var(--font-epilogue), sans-serif',
-              transition: 'background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.15s',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            }}
-          >
-            {entregando
-              ? <><Loader2 size={16} style={{ animation: 'fb-spin 1s linear infinite' }} /> Registrando...</>
-              : <><ArrowRight size={16} /> Continuar</>}
-          </motion.button>
-        )}
-      </div>
-
-      <style>{`
-        @keyframes fb-spin { to { transform: rotate(360deg); } }
-      `}</style>
+              {entregando
+                ? <><Loader2 size={18} className="fb-spin" /> Registrando...</>
+                : <><ArrowRight size={18} /> Continuar</>}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

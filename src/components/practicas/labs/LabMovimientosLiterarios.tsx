@@ -233,7 +233,7 @@ export function LabMovimientosLiterarios({ color }: PracticaLabProps) {
     { txt: "Resuelve una pieza de frontera (con rasgos de dos movimientos)", done: vioFrontera },
     { txt: "Clasifica las 10 obras por su movimiento", done: obrasDone },
     { txt: "Empareja los 5 rasgos con su movimiento", done: rasgosDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

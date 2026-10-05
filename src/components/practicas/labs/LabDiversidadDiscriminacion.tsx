@@ -285,7 +285,7 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
     { txt: `Termina con la convivencia en ${CONV_META} o más`, done: meta },
     { txt: "Clasifica las 9 tarjetas (organización / discriminación)", done: clasificarDone },
     { txt: "Empareja los 5 conceptos con su idea", done: conceptosDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

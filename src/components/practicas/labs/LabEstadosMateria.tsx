@@ -383,9 +383,9 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
   const objetivos = [
     { txt: "Arrastra el mechero o el hielo a la sustancia", done: experimentado },
     { txt: "Encuentra la meseta: sigue entrando calor y la temperatura se queda quieta", done: enMeseta },
-    { txt: "Enfría hasta ver la red cristalina (sólido)", done: fase === "solido" },
-    { txt: "Funde la sustancia (líquido)", done: fase === "liquido" },
-    { txt: "Sigue calentando hasta evaporar (gas)", done: fase === "gas" },
+    { txt: "Enfría hasta ver la red cristalina (sólido)", done: fase === "solido", modo: "solido" },
+    { txt: "Funde la sustancia (líquido)", done: fase === "liquido", modo: "liquido" },
+    { txt: "Sigue calentando hasta evaporar (gas)", done: fase === "gas", modo: "gas" },
     { txt: "Lleva la energía cinética al máximo", done: agitacion > 0.92 },
     { txt: "Resuelve el reto de estados de la materia", done: ejercicioAprobado },
   ];

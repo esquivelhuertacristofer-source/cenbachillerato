@@ -274,7 +274,7 @@ export function LabPh({ color }: PracticaLabProps) {
         { txt: "Mide el pH de una sustancia", done: medido },
         { txt: "Observa cómo cambia el indicador de col morada", done: medido && ph !== 7 },
         { txt: "Arrastra la bureta de NaOH para titular", done: arrastro },
-        { txt: "Alcanza el punto de equivalencia (neutralización)", done: modo === "neutralizar" && gotas >= GOTAS_EQ },
+        { txt: "Alcanza el punto de equivalencia (neutralización)", done: modo === "neutralizar" && gotas >= GOTAS_EQ, modo: "neutralizar" },
         { txt: "Titula el ácido fuerte y el débil: compara en qué pH cae cada equivalencia", done: eqVistas.length >= 2 },
         { txt: "Calcula los iones H⁺ (escala logarítmica)", done: predicho },
         { txt: "Aprueba el cuestionario de la actividad A4", done: ejercicioAprobado },

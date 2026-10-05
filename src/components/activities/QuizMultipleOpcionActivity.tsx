@@ -1,14 +1,31 @@
 'use client';
 
+/**
+ * QUIZ DE OPCIÓN MÚLTIPLE — una pregunta a la vez.
+ *
+ * Cada respuesta se corrige al instante con su explicación; el alumno pasa a
+ * la siguiente cuando quiere (WCAG 2.2.1, sin avance automático). Los puntos
+ * permiten volver a las preguntas ya vistas y al final hay una pantalla de
+ * resultado con aciertos, lo que se falló y el botón para entregar.
+ *
+ * La calificación no cambia: puntaje = aciertos / total (redondeado), aprobada
+ * con `puntaje_minimo_aprobacion` (70 por omisión) y `onProgreso` recibe las
+ * mismas `respuestas` (índice de pregunta → índice de opción elegida).
+ */
+
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ListChecks, Check, X, RotateCcw, ArrowRight, Trophy, Sparkles, Clock } from 'lucide-react';
-import { springs, stagger as staggerTokens } from '@/lib/motion/tokens';
+import { motion } from 'motion/react';
+import { ListChecks, Check, RotateCcw, ArrowRight, Trophy, Sparkles, Clock, Eye, X } from 'lucide-react';
+import { springs } from '@/lib/motion/tokens';
 import { useReducedMotion } from '@/lib/motion/hooks';
 import { celebrate, fireworks } from '@/lib/motion/celebrate';
 import type { ActividadQuizMultipleOpcion, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
 import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
+import {
+  QUIZ_CSS, quizVars, PortadaQuiz, ProgresoQuiz, RetroQuiz, NavQuiz,
+  asomarArriba, enfocarLuego, type ResultadoPunto,
+} from './QuizPasoAPaso';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -23,13 +40,8 @@ interface Props {
   respuestasIntento?: Record<string, string>;
 }
 
-type Fase = 'inicio' | 'quiz' | 'resumen';
-type EstadoOpcion = 'default' | 'correct' | 'incorrect' | 'reveal' | 'dimmed';
-
-interface RespuestaRegistrada {
-  seleccionada: number;
-  correcta: boolean;
-}
+type Fase = 'quiz' | 'resumen';
+type EstadoOpcion = 'bien' | 'mal' | 'revela' | 'apagada' | undefined;
 
 // ── CounterAnimation ───────────────────────────────────────────────────────────
 
@@ -56,98 +68,10 @@ function CounterAnimation({ to, duracion = 1.2, sufijo = '' }: { to: number; dur
   return <>{count}{sufijo}</>;
 }
 
-// ── TiempoFormat ───────────────────────────────────────────────────────────────
-
 function formatTiempo(s: number): string {
   const m = Math.floor(s / 60);
   const sec = s % 60;
   return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
-}
-
-// ── OpcionCard ─────────────────────────────────────────────────────────────────
-
-interface OpcionCardProps {
-  letra: string;
-  texto: string;
-  estado: EstadoOpcion;
-  onClick: () => void;
-  disabled: boolean;
-  seleccionada: boolean;
-}
-
-function OpcionCard({ letra, texto, estado, onClick, disabled, seleccionada }: OpcionCardProps) {
-  const reducedMotion = useReducedMotion();
-
-  const estilos: Record<EstadoOpcion, { bg: string; border: string; letraBg: string; letraColor: string; textColor: string }> = {
-    default: {
-      bg: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(255,255,255,0.09)',
-      letraBg: 'rgba(255,255,255,0.08)', letraColor: 'rgba(255,255,255,0.45)', textColor: 'rgba(255,255,255,0.78)',
-    },
-    correct: {
-      bg: 'rgba(74,222,128,0.12)', border: '2px solid rgba(74,222,128,0.50)',
-      letraBg: 'rgba(74,222,128,0.22)', letraColor: '#4ADE80', textColor: '#fff',
-    },
-    incorrect: {
-      bg: 'rgba(248,113,113,0.12)', border: '2px solid rgba(248,113,113,0.50)',
-      letraBg: 'rgba(248,113,113,0.22)', letraColor: '#F87171', textColor: '#fff',
-    },
-    reveal: {
-      bg: 'rgba(74,222,128,0.06)', border: '1.5px solid rgba(74,222,128,0.28)',
-      letraBg: 'rgba(74,222,128,0.14)', letraColor: '#4ADE80', textColor: 'rgba(255,255,255,0.80)',
-    },
-    dimmed: {
-      bg: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.05)',
-      letraBg: 'rgba(255,255,255,0.05)', letraColor: 'rgba(255,255,255,0.25)', textColor: 'rgba(255,255,255,0.35)',
-    },
-  };
-
-  const s = estilos[estado];
-
-  return (
-    <motion.button
-      onClick={onClick}
-      disabled={disabled}
-      aria-pressed={seleccionada}
-      aria-label={`Opción ${letra}: ${texto}`}
-      whileHover={!disabled && !reducedMotion ? { scale: 1.015, y: -2 } : {}}
-      whileTap={!disabled && !reducedMotion ? { scale: 0.98 } : {}}
-      animate={estado === 'correct' && !reducedMotion ? { scale: [1, 1.025, 1] } : { scale: 1 }}
-      transition={estado === 'correct' ? springs.bouncy : springs.snappy}
-      style={{
-        width: '100%', display: 'flex', alignItems: 'center', gap: 16,
-        padding: '18px 22px', borderRadius: 18,
-        background: s.bg, border: s.border,
-        cursor: disabled ? 'default' : 'pointer',
-        textAlign: 'left',
-        fontFamily: "var(--font-epilogue), sans-serif",
-        outline: 'none',
-        transition: 'background 0.2s ease, border-color 0.2s ease',
-      }}
-      className="quiz-opcion"
-    >
-      {/* Letter circle */}
-      <div style={{
-        width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: s.letraBg, color: s.letraColor,
-        fontSize: estado === 'correct' || estado === 'incorrect' || estado === 'reveal' ? 18 : 15,
-        fontWeight: 900, transition: 'background 0.2s ease, color 0.2s ease',
-      }}>
-        {estado === 'correct' || estado === 'reveal'
-          ? <Check size={20} />
-          : estado === 'incorrect'
-            ? <X size={20} />
-            : letra}
-      </div>
-      {/* Text */}
-      <span style={{
-        fontSize: 16, fontWeight: 600, color: s.textColor,
-        lineHeight: 1.45, transition: 'color 0.2s ease',
-      }}>
-        {texto}
-      </span>
-    </motion.button>
-  );
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────
@@ -161,715 +85,335 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, uacCodigo, c
   const modoRevision = estado === 'completada';
   const fireworksFired = useRef(false);
 
-  // Reconstruct previous answers for revision mode. Si `respuestas` llegó null
-  // o vacío desde la BD (intentos históricos, o detalle almacenado fuera de la
+  // Respuestas previas para el modo revisión. Si `respuestas` llegó null o
+  // vacío desde la BD (intentos históricos, o detalle almacenado fuera de la
   // fila), NO fabricamos respuestas con '-1': eso marcaba todo como incorrecto
-  // y el resumen mostraba un "0 aciertos" engañoso, como si el alumno hubiera
-  // fallado todo. En ese caso el resumen cae al estado neutral (ver abajo).
-  const tieneRespuestasGuardadas = !!respuestasIntento && Object.keys(respuestasIntento).length > 0;
-  const initialRespuestasArr: RespuestaRegistrada[] = modoRevision && respuestasIntento && tieneRespuestasGuardadas
-    ? preguntas.map((p, i) => {
-        const seleccionada = parseInt(respuestasIntento[String(i)] ?? '-1', 10);
-        return { seleccionada, correcta: seleccionada === p.respuesta_correcta };
-      })
-    : [];
+  // y el resumen mostraba un "0 aciertos" engañoso. En ese caso el resumen cae
+  // al estado neutral (ver abajo). Si hay respuestas pero falta alguna
+  // pregunta, esa sí queda en -1 ("sin respuesta registrada"), como antes.
+  const [guardadas] = useState<Record<number, number>>(() => {
+    const tiene = !!respuestasIntento && Object.keys(respuestasIntento).length > 0;
+    if (!modoRevision || !respuestasIntento || !tiene) return {};
+    const out: Record<number, number> = {};
+    preguntas.forEach((_, i) => {
+      out[i] = parseInt(respuestasIntento[String(i)] ?? '-1', 10);
+    });
+    return out;
+  });
 
-  const [fase, setFase] = useState<Fase>(modoRevision ? 'resumen' : 'inicio');
-  const [preguntaActual, setPreguntaActual] = useState(0);
-  const [respuestasArr, setRespuestasArr] = useState<RespuestaRegistrada[]>(initialRespuestasArr);
-  const [respuestaActual, setRespuestaActual] = useState<number | null>(null);
-  const [verificada, setVerificada] = useState(false);
-  const [tiempoInicio, setTiempoInicio] = useState(0);
+  const [fase, setFase] = useState<Fase>(modoRevision || total === 0 ? 'resumen' : 'quiz');
+  const [actual, setActual] = useState(0);
+  const [respuestas, setRespuestas] = useState<Record<number, number>>(guardadas);
   const [entregado, setEntregado] = useState(false);
-  // Guard síncrono contra doble-clic: el estado `verificada` llega tarde entre
-  // dos clics en el mismo tick, lo que duplicaba la respuesta y atascaba la
-  // transición de AnimatePresence. lockRef bloquea de inmediato.
-  const lockRef = useRef(false);
-  const [tiempoFin, setTiempoFin] = useState(0);
-  const [imgError, setImgError] = useState(false);
-  const [imgTematicaError, setImgTematicaError] = useState(false);
+  // Tras «Volver a hacer» ya no es la revisión del intento guardado.
+  const [rehaciendo, setRehaciendo] = useState(false);
+  const [tiempoTotal, setTiempoTotal] = useState(0);
+  const inicioRef = useRef(0);
+  // Guard síncrono contra doble clic: el estado llega un render tarde entre
+  // dos clics en el mismo tick y duplicaba la respuesta. lockRef bloquea de
+  // inmediato la pregunta en curso.
+  const lockRef = useRef<number | null>(null);
+  const raizRef = useRef<HTMLDivElement>(null);
+  const sigRef = useRef<HTMLButtonElement>(null);
 
-  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
-  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
-  // (evita una petición 404 y el ícono de imagen rota).
-  const urlImagen = contenido.url_imagen ?? '';
-  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
-  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const revisionGuardada = modoRevision && !rehaciendo;
   const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
 
-  // fireworks on resumen si score >= 80
+  useEffect(() => {
+    inicioRef.current = Date.now();
+  }, []);
+
+  const resultados: ResultadoPunto[] = preguntas.map((p, i) =>
+    respuestas[i] === undefined ? undefined : respuestas[i] === p.respuesta_correcta ? 'bien' : 'mal',
+  );
+  const aciertos = resultados.filter((r) => r === 'bien').length;
+  const pct = total > 0 ? Math.round((aciertos / total) * 100) : 0;
+
+  // Las preguntas se responden en orden: los puntos hasta la primera sin
+  // responder se pueden tocar; con todas respondidas (o en revisión), todos.
+  const primeraPendiente = preguntas.findIndex((_, i) => respuestas[i] === undefined);
+  const frontera = primeraPendiente === -1 ? total : primeraPendiente;
+  const habilitado = (i: number) => i <= frontera;
+
+  // fireworks en el resumen si score >= 80
   useEffect(() => {
     if (fase === 'resumen' && !fireworksFired.current) {
-      const aciertos = (respuestasArr.length > 0 ? respuestasArr : initialRespuestasArr)
-        .filter(r => r.correcta).length;
-      const pct = total > 0 ? Math.round((aciertos / total) * 100) : 0;
       if (pct >= 80 && !reducedMotion) {
         fireworksFired.current = true;
         setTimeout(() => { void fireworks(); }, 400);
       }
     }
-  // `aciertos`/`total` are computed from stable `respuestasArr`; only `fase` is reactive here — adding the others would re-trigger on every answer selection.
+  // `pct` se calcula de respuestas ya estables; solo `fase` es reactiva aquí —
+  // añadir lo demás volvería a disparar en cada respuesta.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fase]);
 
-  function handleEmpezar() {
-    lockRef.current = false;
+  function irA(i: number) {
+    setActual(i);
     setFase('quiz');
-    setTiempoInicio(Date.now());
-    setPreguntaActual(0);
-    setRespuestasArr([]);
-    setRespuestaActual(null);
-    setVerificada(false);
+    asomarArriba(raizRef.current, !reducedMotion);
+  }
+
+  function verResumen() {
+    if (tiempoTotal === 0 && !revisionGuardada) {
+      setTiempoTotal(Math.round((Date.now() - inicioRef.current) / 1000));
+    }
+    setFase('resumen');
+    asomarArriba(raizRef.current, !reducedMotion);
   }
 
   function handleSeleccion(indice: number) {
-    if (lockRef.current || verificada) return;
-    lockRef.current = true;
-    const pregunta = preguntas[preguntaActual]!;
-    const correcta = indice === pregunta.respuesta_correcta;
-
-    setRespuestaActual(indice);
-    setVerificada(true);
-    setRespuestasArr(prev => [...prev, { seleccionada: indice, correcta }]);
-
+    if (respuestas[actual] !== undefined || lockRef.current === actual) return;
+    lockRef.current = actual;
+    const correcta = indice === preguntas[actual]?.respuesta_correcta;
+    setRespuestas((r) => ({ ...r, [actual]: indice }));
     if (correcta && !reducedMotion) {
       void celebrate('small');
     }
-    // El avance ya NO es automático: el alumno lee la retroalimentación a su
-    // propio ritmo y pulsa "Siguiente" cuando esté listo (WCAG 2.2.1 — sin
-    // límite de tiempo). lockRef se libera al avanzar.
-  }
-
-  function handleAvanzar() {
-    if (!verificada) return;
-    if (preguntaActual + 1 >= total) {
-      setTiempoFin(Date.now());
-      setFase('resumen');
-    } else {
-      setPreguntaActual(prev => prev + 1);
-      setRespuestaActual(null);
-      setVerificada(false);
-    }
-    lockRef.current = false;
+    // El avance NO es automático: el alumno lee la retroalimentación a su
+    // ritmo y pulsa "Siguiente" cuando esté listo (WCAG 2.2.1).
+    enfocarLuego(sigRef);
   }
 
   function handleReiniciar() {
-    lockRef.current = false;
+    lockRef.current = null;
     fireworksFired.current = false;
-    setFase('quiz');
-    setPreguntaActual(0);
-    setRespuestasArr([]);
-    setRespuestaActual(null);
-    setVerificada(false);
-    setTiempoInicio(Date.now());
-    setTiempoFin(0);
+    inicioRef.current = Date.now();
+    setRehaciendo(true);
+    setRespuestas({});
+    setActual(0);
+    setTiempoTotal(0);
     setEntregado(false);
+    setFase('quiz');
+    asomarArriba(raizRef.current, !reducedMotion);
   }
 
   function handleEntregar() {
     if (entregado) return;
-    const arr = respuestasArr.length > 0 ? respuestasArr : initialRespuestasArr;
-    const aciertos = arr.filter(r => r.correcta).length;
-    const puntaje = total > 0 ? Math.round((aciertos / total) * 100) : 0;
     setEntregado(true);
     onProgreso?.({
       actividadId: actividad.id ?? '',
-      completada: puntaje >= minPuntaje,
-      puntaje,
-      respuestas: arr.reduce<Record<number, number>>((acc, r, i) => ({ ...acc, [i]: r.seleccionada }), {}),
+      completada: pct >= minPuntaje,
+      puntaje: pct,
+      respuestas: preguntas.reduce<Record<number, number>>((acc, _, i) => ({ ...acc, [i]: respuestas[i] ?? -1 }), {}),
     });
   }
+
+  const portada = (
+    <PortadaQuiz
+      urlImagen={contenido.url_imagen ?? ''}
+      imagenTematica={imagenTematica}
+      titulo={actividad.titulo}
+      icono={<ListChecks size={26} />}
+    />
+  );
+
+  const bannerRevision = revisionGuardada && (
+    <div className="qz-aviso">
+      <Check size={18} />
+      <span><b>Ya completaste este quiz.</b> Esta es una revisión.</span>
+    </div>
+  );
 
   // ── RESUMEN ──────────────────────────────────────────────────────────────────
 
   if (fase === 'resumen') {
-    const arr = respuestasArr.length > 0 ? respuestasArr : initialRespuestasArr;
     // Estado neutral de revisión: el intento existe pero no hay respuestas
-    // guardadas que reconstruir (arr solo queda vacío en ese caso — fuera de
-    // revisión, al resumen siempre se llega con respuestas). No inventamos
-    // aciertos ni porcentajes: reconocemos la entrega y ofrecemos rehacer.
-    const sinDetalleRevision = modoRevision && arr.length === 0;
-    const aciertos = arr.filter(r => r.correcta).length;
-    const pct = total > 0 ? Math.round((aciertos / total) * 100) : 0;
-    const tiempoTotal = tiempoInicio > 0 && tiempoFin > 0
-      ? Math.round((tiempoFin - tiempoInicio) / 1000) : 0;
-    const aprobado = pct >= minPuntaje;
-
-    const containerVariants = {
-      hidden: { opacity: reducedMotion ? 1 : 0 },
-      visible: {
-        opacity: 1,
-        transition: reducedMotion ? {} : { staggerChildren: staggerTokens.normal, delayChildren: 0.15 },
-      },
-    };
-    const itemVariants = reducedMotion
-      ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
-      : { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { ...springs.gentle } } };
+    // guardadas que reconstruir. No inventamos aciertos ni porcentajes:
+    // reconocemos la entrega y ofrecemos rehacer.
+    const sinDetalleRevision = revisionGuardada && Object.keys(respuestas).length === 0;
 
     if (sinDetalleRevision) {
       return (
-        <motion.div
-          initial="hidden" animate="visible" variants={containerVariants}
-          style={{ display: 'flex', flexDirection: 'column', gap: 28 }}
-        >
-          <style>{`
-            .quiz-btn-sec:focus-visible { outline: 2px solid rgba(255,255,255,0.50); outline-offset: 3px; }
-          `}</style>
-
-          {/* Modo revisión banner */}
-          <motion.div variants={itemVariants} style={{
-            padding: '14px 20px', borderRadius: 14,
-            background: `rgba(${color.rgba}, 0.08)`,
-            border: `1px solid rgba(${color.rgba}, 0.22)`,
-            display: 'flex', alignItems: 'center', gap: 12, fontSize: 13,
-          }}>
-            <Check size={16} color={color.hex} style={{ flexShrink: 0 }} />
-            <div>
-              <span style={{ fontWeight: 700, color: '#fff' }}>Ya completaste este quiz.</span>
-              {' '}
-              <span style={{ color: 'rgba(255,255,255,0.50)' }}>Esta es una revisión.</span>
-            </div>
-          </motion.div>
-
-          {/* Aviso neutral: la entrega existe pero su detalle no está disponible */}
-          <motion.div
-            variants={itemVariants}
-            style={{
-              borderRadius: 28, padding: 'clamp(32px,5vw,52px) clamp(24px,5vw,48px)',
-              textAlign: 'center',
-              background: `rgba(${color.rgba}, 0.05)`,
-              border: `1.5px solid rgba(${color.rgba}, 0.18)`,
-            }}
-          >
-            <ListChecks size={56} color={color.hex} style={{ margin: '0 auto 20px', display: 'block', opacity: 0.85 }} />
-            <h2 style={{
-              fontSize: 'clamp(1.4rem,3.5vw,1.9rem)', fontWeight: 900, color: '#fff',
-              margin: '0 0 12px', letterSpacing: '-0.04em',
-              fontFamily: "var(--font-epilogue), sans-serif",
-            }}>
-              Entrega registrada
-            </h2>
-            <p style={{
-              fontSize: 15, color: 'rgba(255,255,255,0.55)', margin: '0 auto',
-              maxWidth: 460, lineHeight: 1.6,
-            }}>
+        <div ref={raizRef} className="qz" style={quizVars(color)}>
+          <style>{QUIZ_CSS}</style>
+          {bannerRevision}
+          <section className="qz-bloque qz-neutral">
+            <ListChecks size={44} />
+            <h2>Entrega registrada</h2>
+            <p>
               La revisión detallada no está disponible para este intento.
               Puedes volver a hacer el quiz si quieres repasarlo.
             </p>
-          </motion.div>
-
-          {/* CTA: solo "Volver a hacer" — sin "Continuar", porque re-entregar
-              sin respuestas registraría un puntaje de 0 que no corresponde. */}
-          <motion.div variants={itemVariants} style={{ display: 'flex' }}>
-            <motion.button
-              className="quiz-btn-sec"
-              onClick={handleReiniciar}
-              whileHover={reducedMotion ? {} : { scale: 1.02, y: -2 }}
-              whileTap={reducedMotion ? {} : { scale: 0.98 }}
-              transition={springs.snappy}
-              style={{
-                flex: 1, minWidth: 160,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '16px 28px', borderRadius: 16, border: '1.5px solid rgba(255,255,255,0.12)',
-                background: 'rgba(255,255,255,0.05)', cursor: 'pointer',
-                fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.10em',
-                color: 'rgba(255,255,255,0.65)', fontFamily: "var(--font-epilogue), sans-serif",
-                outline: 'none',
-              }}
-            >
-              <RotateCcw size={14} />
-              Volver a hacer
-            </motion.button>
-          </motion.div>
-        </motion.div>
+          </section>
+          {/* Solo "Volver a hacer": re-entregar sin respuestas registraría un
+              puntaje de 0 que no corresponde. */}
+          <div className="qz-acciones">
+            <button type="button" className="qz-btn" onClick={handleReiniciar}>
+              <RotateCcw size={18} /> Volver a hacer
+            </button>
+          </div>
+        </div>
       );
     }
 
+    const aprobado = pct >= minPuntaje;
+    const fallos = preguntas
+      .map((p, i) => ({ p, i, sel: respuestas[i] }))
+      .filter(({ p, sel }) => sel !== p.respuesta_correcta);
+
     return (
-      <motion.div
-        initial="hidden" animate="visible" variants={containerVariants}
-        style={{ display: 'flex', flexDirection: 'column', gap: 28 }}
-      >
-        <style>{`
-          .quiz-btn-sec:focus-visible { outline: 2px solid rgba(255,255,255,0.50); outline-offset: 3px; }
-          .quiz-btn-pri:focus-visible { outline: 2px solid var(--quiz-color); outline-offset: 3px; }
-        `}</style>
+      <div ref={raizRef} className="qz" style={quizVars(color)}>
+        <style>{QUIZ_CSS}</style>
+        {bannerRevision}
+        <ProgresoQuiz actual={null} resultados={resultados} habilitado={habilitado} onIr={irA} />
 
-        {/* Modo revisión banner */}
-        {modoRevision && (
-          <motion.div variants={itemVariants} style={{
-            padding: '14px 20px', borderRadius: 14,
-            background: `rgba(${color.rgba}, 0.08)`,
-            border: `1px solid rgba(${color.rgba}, 0.22)`,
-            display: 'flex', alignItems: 'center', gap: 12, fontSize: 13,
-          }}>
-            <Check size={16} color={color.hex} style={{ flexShrink: 0 }} />
-            <div>
-              <span style={{ fontWeight: 700, color: '#fff' }}>Ya completaste este quiz.</span>
-              {' '}
-              <span style={{ color: 'rgba(255,255,255,0.50)' }}>Esta es una revisión.</span>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Score hero */}
-        <motion.div
-          variants={itemVariants}
-          style={{
-            borderRadius: 28, padding: 'clamp(32px,5vw,52px) clamp(24px,5vw,48px)',
-            textAlign: 'center',
-            background: aprobado ? 'rgba(74,222,128,0.07)' : 'rgba(248,113,113,0.07)',
-            border: aprobado ? '1.5px solid rgba(74,222,128,0.22)' : '1.5px solid rgba(248,113,113,0.20)',
-          }}
+        <motion.section
+          className="qz-bloque qz-resultado"
+          data-r={aprobado ? 'bien' : 'mal'}
+          initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={reducedMotion ? { duration: 0 } : springs.gentle}
         >
-          <motion.div
-            initial={reducedMotion ? {} : { scale: 0, rotate: -10 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={reducedMotion ? {} : { ...springs.bouncy, delay: 0.3 }}
-            style={{ marginBottom: 20 }}
-          >
+          <h2 className="qz-res-titulo">
             {aprobado
-              ? <Trophy size={64} color={color.hex} style={{ margin: '0 auto' }} />
-              : <Sparkles size={64} color="rgba(255,255,255,0.35)" style={{ margin: '0 auto' }} />
-            }
-          </motion.div>
-
-          <h2 style={{
-            fontSize: 'clamp(1.5rem,4vw,2.2rem)', fontWeight: 900, color: '#fff',
-            margin: '0 0 12px', letterSpacing: '-0.04em',
-            fontFamily: "var(--font-epilogue), sans-serif",
-          }}>
+              ? <Trophy size={24} color={color.hex} />
+              : <Sparkles size={24} color="rgba(255,255,255,0.55)" />}
             {aprobado ? '¡Excelente trabajo!' : 'Buen intento'}
           </h2>
-
-          <motion.div
-            initial={reducedMotion ? {} : { scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={reducedMotion ? {} : { ...springs.bouncy, delay: 0.5 }}
-            style={{
-              fontSize: 'clamp(4rem,10vw,6rem)', fontWeight: 900, color: color.hex,
-              lineHeight: 1, letterSpacing: '-0.05em',
-              fontFamily: "var(--font-epilogue), sans-serif",
-            }}
-          >
-            <CounterAnimation to={pct} sufijo="%" />
-          </motion.div>
-
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', margin: '12px 0 0' }}>
+          <p className="qz-pct"><CounterAnimation to={pct} sufijo="%" /></p>
+          <p className="qz-res-sub">
             {aciertos} de {total} correctas · Mínimo aprobatorio: {minPuntaje}%
           </p>
-
-          {/* Stats row */}
-          <div style={{
-            display: 'flex', justifyContent: 'center', gap: 24,
-            marginTop: 28, flexWrap: 'wrap',
-          }}>
-            {[
-              { label: 'Aciertos', value: `${aciertos}/${total}`, Icon: Check },
-              { label: 'Tiempo', value: tiempoTotal > 0 ? formatTiempo(tiempoTotal) : '—', Icon: Clock },
-            ].map(({ label, value, Icon }) => (
-              <div key={label} style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                padding: '16px 24px', borderRadius: 16, minWidth: 90,
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}>
-                <Icon size={16} color={color.hex} />
-                <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>{value}</div>
-                <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.40)' }}>{label}</div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Per-question breakdown */}
-        <motion.div variants={itemVariants} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {preguntas.map((p, i) => {
-            const r = arr[i];
-            const isOk = r?.correcta ?? false;
-            return (
-              <div key={i} style={{
-                borderRadius: 16, padding: '16px 20px',
-                background: isOk ? 'rgba(74,222,128,0.05)' : 'rgba(248,113,113,0.05)',
-                border: isOk ? '1px solid rgba(74,222,128,0.18)' : '1px solid rgba(248,113,113,0.18)',
-                display: 'flex', alignItems: 'flex-start', gap: 14,
-              }}>
-                <div style={{
-                  width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: isOk ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.15)',
-                  color: isOk ? '#4ADE80' : '#F87171',
-                }}>
-                  {isOk ? <Check size={14} /> : <X size={14} />}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.82)', margin: '0 0 4px', lineHeight: 1.4 }}>
-                    {p.enunciado}
-                  </p>
-                  {!isOk && r && r.seleccionada >= 0 && (
-                    <p style={{ fontSize: 12, color: '#4ADE80', margin: '0 0 2px' }}>
-                      Correcta: {LETTERS[p.respuesta_correcta]} — {p.opciones[p.respuesta_correcta]}
-                    </p>
-                  )}
-                  {p.retroalimentacion && (
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', margin: 0, fontStyle: 'italic' }}>
-                      {p.retroalimentacion}
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </motion.div>
-
-        {/* CTAs */}
-        <motion.div
-          variants={itemVariants}
-          style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}
-        >
-          <motion.button
-            className="quiz-btn-sec"
-            onClick={handleReiniciar}
-            whileHover={reducedMotion ? {} : { scale: 1.02, y: -2 }}
-            whileTap={reducedMotion ? {} : { scale: 0.98 }}
-            transition={springs.snappy}
-            style={{
-              '--quiz-color': color.hex,
-              flex: 1, minWidth: 160,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              padding: '16px 28px', borderRadius: 16, border: '1.5px solid rgba(255,255,255,0.12)',
-              background: 'rgba(255,255,255,0.05)', cursor: 'pointer',
-              fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.10em',
-              color: 'rgba(255,255,255,0.65)', fontFamily: "var(--font-epilogue), sans-serif",
-              outline: 'none',
-            } as React.CSSProperties}
-          >
-            <RotateCcw size={14} />
-            Volver a hacer
-          </motion.button>
-
-          {!entregado ? (
-            <motion.button
-              className="quiz-btn-pri"
-              onClick={handleEntregar}
-              whileHover={reducedMotion ? {} : { scale: 1.02, y: -2 }}
-              whileTap={reducedMotion ? {} : { scale: 0.98 }}
-              transition={springs.snappy}
-              style={{
-                '--quiz-color': color.hex,
-                flex: 1, minWidth: 160,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '16px 28px', borderRadius: 16, border: 'none',
-                background: color.hex, cursor: 'pointer',
-                fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.10em',
-                color: '#011126', fontFamily: "var(--font-epilogue), sans-serif",
-                boxShadow: `0 10px 28px rgba(${color.rgba}, 0.28)`,
-                outline: 'none',
-              } as React.CSSProperties}
-            >
-              Continuar
-              <ArrowRight size={14} />
-            </motion.button>
-          ) : (
-            <div style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              padding: '16px 28px', borderRadius: 16,
-              background: 'rgba(74,222,128,0.10)', border: '1px solid rgba(74,222,128,0.22)',
-              fontSize: 14, fontWeight: 800, color: '#4ADE80',
-            }}>
-              <Check size={16} />
-              Quiz entregado
+          {tiempoTotal > 0 && (
+            <div className="qz-chips">
+              <span className="qz-chip"><Clock size={16} color={color.hex} /> {formatTiempo(tiempoTotal)} <small>de tiempo</small></span>
             </div>
           )}
-        </motion.div>
-      </motion.div>
-    );
-  }
+        </motion.section>
 
-  // ── INICIO ───────────────────────────────────────────────────────────────────
+        <section className="qz-bloque qz-repaso">
+          <h3>{fallos.length > 0 ? `Para repasar (${fallos.length})` : 'Para repasar'}</h3>
+          {fallos.length === 0 ? (
+            <p className="qz-repaso-ok">No fallaste ninguna pregunta. ¡Muy bien!</p>
+          ) : (
+            fallos.map(({ p, i, sel }) => (
+              <div key={i} className="qz-fallo">
+                <p className="qz-fallo-enun">{i + 1}. {p.enunciado}</p>
+                <p className="qz-fallo-dato">
+                  Tu respuesta:{' '}
+                  <span className="qz-tuya">
+                    {sel === undefined || sel < 0
+                      ? 'Sin respuesta registrada'
+                      : `${LETTERS[sel] ?? sel + 1} — ${p.opciones[sel] ?? ''}`}
+                  </span>
+                </p>
+                <p className="qz-fallo-dato">
+                  Correcta:{' '}
+                  <span className="qz-buena">
+                    {LETTERS[p.respuesta_correcta] ?? p.respuesta_correcta + 1} — {p.opciones[p.respuesta_correcta]}
+                  </span>
+                </p>
+                {p.retroalimentacion && <p className="qz-fallo-exp">{p.retroalimentacion}</p>}
+              </div>
+            ))
+          )}
+        </section>
 
-  if (fase === 'inicio') {
-    return (
-      <motion.div
-        initial={reducedMotion ? {} : { opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={reducedMotion ? {} : springs.gentle}
-        style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          textAlign: 'center', gap: 32,
-          padding: 'clamp(40px,6vw,64px) clamp(24px,5vw,48px)',
-          borderRadius: 28,
-          border: `1.5px solid rgba(${color.rgba}, 0.18)`,
-          background: `rgba(${color.rgba}, 0.04)`,
-        }}
-      >
-        <style>{`
-          .quiz-start-btn:focus-visible { outline: 2px solid var(--quiz-color); outline-offset: 3px; }
-          .quiz-opcion:focus-visible { outline: 2px solid var(--quiz-opt-color, #A78BFA); outline-offset: 3px; }
-        `}</style>
-
-        {/* Imagen de portada del quiz */}
-        {tieneImagen ? (
-          <div style={{ width: '100%', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}>
-            <img
-              src={urlImagen}
-              alt={actividad.titulo}
-              style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
-              onError={() => setImgError(true)}
-            />
-          </div>
-        ) : !imgTematicaError ? (
-          <div style={{ width: '100%', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}>
-            <img
-              src={imagenTematica}
-              alt={actividad.titulo}
-              style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
-              onError={() => setImgTematicaError(true)}
-            />
-            <div
-              style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
-            />
-            <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
-              {actividad.titulo}
-            </p>
-          </div>
-        ) : (
-          // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
-          <div
-            style={{
-              width: '100%',
-              borderRadius: 16,
-              border: `1px solid rgba(${color.rgba},0.25)`,
-              background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
-              height: 180,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 10,
-            }}
-          >
-            <ListChecks size={34} color={color.hex} style={{ opacity: 0.55 }} />
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
-              {actividad.titulo}
-            </p>
-          </div>
-        )}
-
-        <motion.div
-          initial={reducedMotion ? {} : { scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={reducedMotion ? {} : { ...springs.bouncy, delay: 0.1 }}
-          style={{
-            width: 100, height: 100, borderRadius: 28,
-            background: `rgba(${color.rgba}, 0.12)`,
-            border: `2px solid rgba(${color.rgba}, 0.25)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <ListChecks size={48} color={color.hex} />
-        </motion.div>
-
-        <div>
-          <p style={{
-            fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.25em',
-            color: color.hex, marginBottom: 10,
-          }}>
-            Quiz de comprensión
-          </p>
-          <h2 style={{
-            fontSize: 'clamp(1.5rem,4vw,2rem)', fontWeight: 900, color: '#fff',
-            margin: '0 0 12px', letterSpacing: '-0.03em',
-            fontFamily: "var(--font-epilogue), sans-serif",
-          }}>
-            {actividad.titulo}
-          </h2>
-          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
-            {total} pregunta{total !== 1 ? 's' : ''} · Responde con cuidado
-          </p>
+        <div className="qz-acciones">
+          {total > 0 && (
+            <button type="button" className="qz-btn" onClick={() => irA(0)}>
+              <Eye size={18} /> Revisar preguntas
+            </button>
+          )}
+          <button type="button" className="qz-btn" onClick={handleReiniciar}>
+            <RotateCcw size={18} /> Volver a hacer
+          </button>
+          {!entregado ? (
+            <button type="button" className="qz-btn qz-btn-pri" onClick={handleEntregar}>
+              Entregar y continuar <ArrowRight size={18} />
+            </button>
+          ) : (
+            <div className="qz-hecho" role="status">
+              <Check size={18} /> Quiz entregado
+            </div>
+          )}
         </div>
-
-        <motion.button
-          className="quiz-start-btn"
-          onClick={handleEmpezar}
-          whileHover={reducedMotion ? {} : { scale: 1.03, y: -3 }}
-          whileTap={reducedMotion ? {} : { scale: 0.97 }}
-          transition={springs.snappy}
-          style={{
-            '--quiz-color': color.hex,
-            padding: '18px 48px', borderRadius: 18, border: 'none',
-            background: color.hex, color: '#011126', cursor: 'pointer',
-            fontSize: 15, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em',
-            fontFamily: "var(--font-epilogue), sans-serif",
-            boxShadow: `0 12px 32px rgba(${color.rgba}, 0.30)`,
-            display: 'flex', alignItems: 'center', gap: 10, outline: 'none',
-          } as React.CSSProperties}
-        >
-          Empezar
-          <ArrowRight size={16} />
-        </motion.button>
-      </motion.div>
+      </div>
     );
   }
 
   // ── QUIZ (una pregunta por pantalla) ─────────────────────────────────────────
 
-  const pregunta = preguntas[preguntaActual]!;
-  const progPct = ((preguntaActual) / total) * 100;
-  const progPctFinal = ((preguntaActual + 1) / total) * 100;
+  const pregunta = preguntas[actual];
+  if (!pregunta) return null;
+  const sel = respuestas[actual];
+  const verificada = sel !== undefined;
+  const esUltima = actual + 1 >= total;
 
   function getEstadoOpcion(i: number): EstadoOpcion {
-    if (!verificada) return 'default';
-    const isSelected = respuestaActual === i;
+    if (!verificada || !pregunta) return undefined;
+    const isSelected = sel === i;
     const isCorrect = i === pregunta.respuesta_correcta;
-    if (isSelected && isCorrect) return 'correct';
-    if (isSelected && !isCorrect) return 'incorrect';
-    if (!isSelected && isCorrect) return 'reveal';
-    return 'dimmed';
+    if (isSelected && isCorrect) return 'bien';
+    if (isSelected && !isCorrect) return 'mal';
+    if (!isSelected && isCorrect) return 'revela';
+    return 'apagada';
   }
 
+  const acerto = sel === pregunta.respuesta_correcta;
+  const letraCorrecta = LETTERS[pregunta.respuesta_correcta] ?? String(pregunta.respuesta_correcta + 1);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <style>{`
-        .quiz-opcion:focus-visible { outline: 2px solid var(--quiz-opt-color, #A78BFA); outline-offset: 3px; }
-        .quiz-start-btn:focus-visible { outline: 2px solid var(--quiz-color); outline-offset: 3px; }
-      `}</style>
+    <div ref={raizRef} className="qz" style={quizVars(color)}>
+      <style>{QUIZ_CSS}</style>
+      {bannerRevision}
+      {portada}
+      <ProgresoQuiz actual={actual} resultados={resultados} habilitado={habilitado} onIr={irA} />
 
-      {/* Progress bar + counter */}
-      <div>
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10,
-        }}>
-          <span style={{
-            fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.18em',
-            color: 'rgba(255,255,255,0.38)',
-          }}>
-            Pregunta {preguntaActual + 1} de {total}
-          </span>
-        </div>
-        <div
-          role="progressbar"
-          aria-valuenow={preguntaActual + 1}
-          aria-valuemin={1}
-          aria-valuemax={total}
-          aria-label={`Pregunta ${preguntaActual + 1} de ${total}`}
-          style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}
-        >
-          <motion.div
-            initial={{ width: `${progPct}%` }}
-            animate={{ width: verificada ? `${progPctFinal}%` : `${progPct}%` }}
-            transition={reducedMotion ? {} : springs.smooth}
-            style={{ height: '100%', borderRadius: 999, background: color.hex }}
-          />
-        </div>
-      </div>
+      <motion.article
+        key={actual}
+        className="qz-bloque qz-pregunta"
+        initial={reducedMotion ? false : { opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={reducedMotion ? { duration: 0 } : springs.smooth}
+      >
+        <p className="qz-enunciado">{pregunta.enunciado}</p>
 
-      {/* Question with AnimatePresence */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={preguntaActual}
-          initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: -40 }}
-          transition={reducedMotion ? { duration: 0.2 } : springs.smooth}
-          style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
-        >
-          {/* Enunciado */}
-          <div style={{
-            borderRadius: 22,
-            border: '1px solid rgba(255,255,255,0.08)',
-            background: 'rgba(255,255,255,0.04)',
-            padding: 'clamp(24px,4vw,36px)',
-          }}>
-            <p style={{
-              fontSize: 'clamp(1.25rem,2.5vw,1.75rem)',
-              fontWeight: 700, color: 'rgba(255,255,255,0.96)',
-              margin: 0, lineHeight: 1.45, letterSpacing: '-0.02em',
-              fontFamily: "var(--font-epilogue), sans-serif",
-            }}>
-              {pregunta.enunciado}
-            </p>
-          </div>
-
-          {/* Opciones */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {pregunta.opciones.map((opcion, i) => (
-              <OpcionCard
+        <div className="qz-ops" role="group" aria-label="Opciones">
+          {pregunta.opciones.map((opcion, i) => {
+            const r = getEstadoOpcion(i);
+            const letra = LETTERS[i] ?? String(i + 1);
+            return (
+              <button
                 key={i}
-                letra={LETTERS[i] ?? String(i + 1)}
-                texto={opcion}
-                estado={getEstadoOpcion(i)}
-                onClick={() => handleSeleccion(i)}
+                type="button"
+                className="qz-op"
+                data-r={r}
                 disabled={verificada}
-                seleccionada={respuestaActual === i}
-              />
-            ))}
-          </div>
-
-          {/* Feedback */}
-          <AnimatePresence>
-            {verificada && (
-              <motion.div
-                initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={reducedMotion ? { duration: 0.2 } : springs.gentle}
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-                style={{
-                  padding: '18px 22px', borderRadius: 16,
-                  borderLeft: `4px solid ${respuestaActual === pregunta.respuesta_correcta ? '#4ADE80' : '#F87171'}`,
-                  background: respuestaActual === pregunta.respuesta_correcta
-                    ? 'rgba(74,222,128,0.08)' : 'rgba(248,113,113,0.08)',
-                }}
+                aria-pressed={sel === i}
+                aria-label={`Opción ${letra}: ${opcion}`}
+                onClick={() => handleSeleccion(i)}
               >
-                <div style={{
-                  fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em',
-                  color: respuestaActual === pregunta.respuesta_correcta ? '#4ADE80' : '#F87171',
-                  marginBottom: pregunta.retroalimentacion ? 8 : 0,
-                }}>
-                  {respuestaActual === pregunta.respuesta_correcta ? '¡Correcto!' : 'Respuesta incorrecta'}
-                </div>
-                {pregunta.retroalimentacion && (
-                  <p style={{
-                    fontSize: 15, color: 'rgba(255,255,255,0.75)',
-                    margin: 0, lineHeight: 1.6,
-                    fontFamily: "var(--font-epilogue), sans-serif",
-                  }}>
-                    {pregunta.retroalimentacion}
-                  </p>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <span className="qz-letra" aria-hidden="true">
+                  {r === 'bien' || r === 'revela' ? <Check size={18} /> : r === 'mal' ? <X size={18} /> : letra}
+                </span>
+                <span>{opcion}</span>
+              </button>
+            );
+          })}
+        </div>
 
-          {/* Avance manual — el alumno controla cuándo pasar (WCAG 2.2.1) */}
-          {verificada && (
-            <motion.button
-              className="quiz-start-btn"
-              onClick={handleAvanzar}
-              autoFocus
-              whileHover={reducedMotion ? {} : { scale: 1.02, y: -2 }}
-              whileTap={reducedMotion ? {} : { scale: 0.98 }}
-              transition={springs.snappy}
-              style={{
-                '--quiz-color': color.hex,
-                alignSelf: 'flex-end',
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '14px 32px', borderRadius: 16, border: 'none',
-                background: color.hex, color: '#011126', cursor: 'pointer',
-                fontSize: 14, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.10em',
-                fontFamily: "var(--font-epilogue), sans-serif",
-                boxShadow: `0 10px 28px rgba(${color.rgba}, 0.28)`, outline: 'none',
-              } as React.CSSProperties}
-            >
-              {preguntaActual + 1 >= total ? 'Ver resultados' : 'Siguiente pregunta'}
-              <ArrowRight size={16} />
-            </motion.button>
-          )}
-        </motion.div>
-      </AnimatePresence>
+        {verificada && (
+          <RetroQuiz
+            bien={acerto}
+            titulo={sel < 0 ? 'Sin respuesta registrada' : acerto ? '¡Correcto!' : 'Respuesta incorrecta'}
+            correcta={!acerto
+              ? <>La correcta es la <b>{letraCorrecta}</b>: {pregunta.opciones[pregunta.respuesta_correcta]}</>
+              : undefined}
+            explicacion={pregunta.retroalimentacion}
+          />
+        )}
+
+        <NavQuiz
+          puedeAnterior={actual > 0}
+          onAnterior={() => irA(actual - 1)}
+          puedeSiguiente={verificada}
+          onSiguiente={() => (esUltima ? verResumen() : irA(actual + 1))}
+          esUltima={esUltima}
+          sigRef={sigRef}
+        />
+      </motion.article>
     </div>
   );
 }

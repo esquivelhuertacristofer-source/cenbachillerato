@@ -443,8 +443,8 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
     { txt: `Descarta los ${TOTAL_EXTREMOS} temas demasiado anchos o angostos`, done: extremosOk >= TOTAL_EXTREMOS },
     { txt: `Arma las ${PAREJAS.length} parejas de relatos que comparten tema`, done: parejasHechas.length >= PAREJAS.length },
     { txt: "Nombra el tema que comparte cada pareja", done: temasParejaOk >= PAREJAS.length },
-    { txt: `Escribe los ${GLOSARIO.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: `Escribe los ${GLOSARIO.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: `Acierta los ${HECHOS.length} hechos verdadero o falso`, done: hechosDone },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];

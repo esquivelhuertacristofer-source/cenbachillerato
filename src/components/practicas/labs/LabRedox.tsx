@@ -292,8 +292,8 @@ export function LabRedox({ color }: PracticaLabProps) {
       }
       lectura={lectura}
       objetivos={[
-        { txt: "Cierra el circuito de la pila y enciende el foco", done: focoEncendido },
-        { txt: "Explora el modo Óxido-reducción y sigue el viaje de los electrones", done: siguioRedox },
+        { txt: "Cierra el circuito de la pila y enciende el foco", done: focoEncendido, modo: "pila" },
+        { txt: "Explora el modo Óxido-reducción y sigue el viaje de los electrones", done: siguioRedox, modo: "redox" },
         { txt: "Explora el modo Combustión", done: !!vistos.combustion },
         { txt: "Quema un combustible más energético que el metano y compara la llama", done: combNombre !== "Metano" },
         { txt: "Explora el modo Pila galvánica", done: !!vistos.pila },

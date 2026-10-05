@@ -268,7 +268,7 @@ export function LabSubgenerosNarrativos({ color }: PracticaLabProps) {
     { txt: "Cumple 3 encargos distintos sin contradicciones", done: tallerDone },
     { txt: `Clasifica las ${OBRAS.length} obras y rasgos por subgénero`, done: obrasDone },
     { txt: `Empareja los ${RASGOS.length} subgéneros con su rasgo`, done: rasgosDone },
-    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone },
+    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

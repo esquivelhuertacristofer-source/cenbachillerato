@@ -233,7 +233,7 @@ export function LabResenaCritica({ color }: PracticaLabProps) {
     { txt: "Publica una reseña convincente: credibilidad y utilidad de 70 o más, sin fallas", done: buenaPublicada },
     { txt: "Ordena los 4 componentes de la estructura", done: estructuraDone },
     { txt: "Clasifica las 8 frases en resumen/juicio", done: clasesDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

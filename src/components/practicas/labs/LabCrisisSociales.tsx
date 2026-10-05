@@ -276,7 +276,7 @@ export function LabCrisisSociales({ color }: PracticaLabProps) {
     { txt: "Cierra la crisis con confianza de 70 o más y conflictividad de 25 o menos", done: fin?.id === "contenida" },
     { txt: "Clasifica los 9 elementos de la crisis", done: clasificarDone },
     { txt: "Empareja los 4 actores con su papel", done: actoresDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

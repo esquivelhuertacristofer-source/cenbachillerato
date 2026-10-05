@@ -169,11 +169,11 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
 
   // ── Objetivos guiados (se marcan en vivo) ──────────────────────────
   const objetivos = [
-    { txt: "Elige el Campo nevado y deja correr 6 generaciones: ¿qué pelaje queda?", done: modo === "conejos" && ambienteId === "nieve" && genActual >= 6 },
-    { txt: "Sube la presión depredadora a Alta y compara qué tan rápido cambia la población", done: modo === "conejos" && predacionId === "alta" && genActual >= 4 },
-    { txt: "Recorre los tres modos del visor de la evolución", done: modo === "evidencias" },
+    { txt: "Elige el Campo nevado y deja correr 6 generaciones: ¿qué pelaje queda?", done: modo === "conejos" && ambienteId === "nieve" && genActual >= 6, modo: "conejos" },
+    { txt: "Sube la presión depredadora a Alta y compara qué tan rápido cambia la población", done: modo === "conejos" && predacionId === "alta" && genActual >= 4, modo: "conejos" },
+    { txt: "Recorre los tres modos del visor de la evolución", done: modo === "evidencias", modo: "evidencias" },
     { txt: "Avanza generaciones y observa cambiar las frecuencias alélicas", done: genActual >= 1 },
-    { txt: "Compara los tipos de selección y las evidencias", done: modo === "tipos" || modo === "evidencias" },
+    { txt: "Compara los tipos de selección y las evidencias", done: modo === "tipos" || modo === "evidencias", modo: ["tipos", "evidencias"] },
     { txt: "Resuelve el reto evaluable de la actividad A4", done: ejercicioAprobado },
   ];
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban

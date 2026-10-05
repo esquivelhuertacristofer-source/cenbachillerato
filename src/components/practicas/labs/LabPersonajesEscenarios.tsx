@@ -230,7 +230,7 @@ export function LabPersonajesEscenarios({ color }: PracticaLabProps) {
     { txt: "Lleva la misma escena a los 3 escenarios y compara la tensión", done: tresEscenarios },
     { txt: "Clasifica los 9 personajes por su rol", done: personajesDone },
     { txt: "Clasifica los 9 escenarios por su ambiente", done: escenariosDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

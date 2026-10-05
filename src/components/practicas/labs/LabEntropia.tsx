@@ -131,7 +131,7 @@ export function LabEntropia({ color }: PracticaLabProps) {
 
   const objetivos = [
     { txt: "Mezcla dos gases y ve que no se separan", done: vioMezcla && activo },
-    { txt: "Pon en contacto lo caliente y lo frío: la barra sube hasta el equilibrio", done: vioContacto },
+    { txt: "Pon en contacto lo caliente y lo frío: la barra sube hasta el equilibrio", done: vioContacto, modo: "calor" },
     { txt: "Deja que el calor fluya al equilibrio", done: vioCalor },
     { txt: "Ordena un cristal cerca de 0 K", done: vioCristal },
     { txt: "Acércate al cero absoluto (S → 0)", done: enfrioCerca },

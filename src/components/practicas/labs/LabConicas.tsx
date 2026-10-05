@@ -202,8 +202,8 @@ export function LabConicas({ color }: PracticaLabProps) {
         { txt: "Deja el punto Q justo SOBRE la curva: su distancia al centro debe ser igual a r", done: esCirc && c.estadoQ === "sobre" },
         { txt: "Mueve el centro (h, k) de la circunferencia y mira cómo cambia su ecuación", done: h !== H_DEF || k !== K_DEF },
         { txt: "Cambia el radio y comprueba que todos los puntos siguen equidistando del centro", done: r !== R_DEF },
-        { txt: "Pasa a la parábola y localiza su foco y su directriz", done: modo === "parabola" },
-        { txt: "Cambia p y comprueba que d(P, foco) y d(P, directriz) siempre son iguales", done: modo === "parabola" && p !== P_DEF },
+        { txt: "Pasa a la parábola y localiza su foco y su directriz", done: modo === "parabola", modo: "parabola" },
+        { txt: "Cambia p y comprueba que d(P, foco) y d(P, directriz) siempre son iguales", done: modo === "parabola" && p !== P_DEF, modo: "parabola" },
         { txt: "Mueve el punto Q sobre la curva y compara sus dos distancias", done: qx !== QX_DEF || qy !== QY_DEF },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}

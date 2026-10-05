@@ -52,7 +52,7 @@ export interface LabShellProps {
   escena: ReactNode;
   /** Botones de la escena (sonido, reproducir, reiniciar…), arriba a la derecha. */
   herramientas?: ReactNode;
-  /** Leyenda breve sobre la escena; en el celular se oculta. */
+  /** Leyenda breve sobre la escena; en pantallas angostas se vuelve una tira compacta. */
   leyenda?: ReactNode;
   /** Selector de modo/escenario, sobre la escena. */
   modos?: { opciones: ModoShell[]; valor: string; cambiar: (id: string) => void };
@@ -70,9 +70,49 @@ export interface LabShellProps {
   dom?: boolean;
 }
 
+/** ¿La misión se puede cumplir en el modo `modo`? Sin `modo` declarado, en todos. */
+function misionEnModo(o: ObjetivoLab, modo: string): boolean {
+  if (o.modo === undefined) return true;
+  return typeof o.modo === "string" ? o.modo === modo : o.modo.includes(modo);
+}
+
+/**
+ * Qué misión enseña la barra de la escena.
+ *
+ * El defecto que arregla: la barra enseñaba siempre la primera pendiente de la
+ * lista, aunque fuera de otro modo (en «Polea» pedía el ángulo del plano
+ * inclinado, que ahí no se puede hacer). Ahora:
+ *   1. la primera pendiente que se pueda cumplir en el modo ACTUAL;
+ *   2. si el modo actual ya no tiene pendientes, la primera pendiente de otro
+ *      modo, y se dice a qué modo cambiar (`cambiarA`).
+ * Las misiones que declaran un modo que el selector no ofrece se tratan como
+ * válidas en cualquier modo, para no esconder nada que no se pueda alcanzar.
+ * Sin selector de modos, o sin misiones ligadas a modo, es la regla de siempre.
+ */
+export function elegirMision(
+  objetivos: readonly ObjetivoLab[],
+  logros: readonly boolean[],
+  modos?: { opciones: readonly ModoShell[]; valor: string },
+): { indice: number; cambiarA: ModoShell | null } {
+  const primera = logros.findIndex((l) => !l);
+  if (primera === -1 || !modos) return { indice: primera, cambiarA: null };
+  const ids = new Set(modos.opciones.map((m) => m.id));
+  const valida = (o: ObjetivoLab): ObjetivoLab => {
+    if (o.modo === undefined) return o;
+    const lista = typeof o.modo === "string" ? [o.modo] : o.modo;
+    return lista.some((m) => ids.has(m)) ? o : { ...o, modo: undefined };
+  };
+  const pendientes = objetivos.map((o, i) => ({ o: valida(o), i })).filter(({ i }) => !logros[i]);
+  const aqui = pendientes.find(({ o }) => misionEnModo(o, modos.valor));
+  if (aqui) return { indice: aqui.i, cambiarA: null };
+  const otra = pendientes[0]!;
+  const destinoId = typeof otra.o.modo === "string" ? otra.o.modo : otra.o.modo?.find((m) => ids.has(m));
+  return { indice: otra.i, cambiarA: modos.opciones.find((m) => m.id === destinoId) ?? null };
+}
+
 export function LabShell({ accent, rgba, escena, herramientas, leyenda, modos, lectura, objetivos, retoKey, pestanas, dom = false }: LabShellProps) {
   const { logros, cumplidos, total } = useLogros(objetivos.map((o) => o.done));
-  const actual = logros.findIndex((l) => !l);
+  const { indice: actual, cambiarA } = elegirMision(objetivos, logros, modos);
   const todas = actual === -1;
 
   const [tab, setTab] = useState(pestanas[0]?.id ?? "misiones");
@@ -181,6 +221,13 @@ export function LabShell({ accent, rgba, escena, herramientas, leyenda, modos, l
                 objetivos[actual]!.txt
               )}
             </div>
+            {!todas && cambiarA && modos && (
+              <button type="button" className="ls-cambia" onClick={() => modos.cambiar(cambiarA.id)}>
+                {cambiarA.icono && <i className={`fa-solid ${cambiarA.icono}`} aria-hidden />}
+                Cambia a modo «{cambiarA.etiqueta}»
+                <i className="fa-solid fa-arrow-right" aria-hidden />
+              </button>
+            )}
           </div>
           {lectura && <div className="ls-lectura">{lectura}</div>}
         </div>
@@ -313,6 +360,10 @@ const CSS = `
 .ls-puntos span[data-on="true"] { background:${OK}; }
 .ls-puntos span[data-actual="true"] { background:var(--lsa); }
 .ls-mision-txt { font-size:16px; font-weight:800; color:#fff; line-height:1.3; }
+.ls-cambia { cursor:pointer; justify-self:start; display:inline-flex; align-items:center; gap:8px; margin-top:4px; padding:7px 12px;
+  border-radius:10px; border:1px solid var(--lsa); background:rgba(4,10,22,0.7); color:#fff; font-size:14px; font-weight:800; }
+.ls-cambia:hover { background:rgba(var(--lsr),0.3); }
+.ls-cambia i { color:var(--lsa); }
 .ls-link { cursor:pointer; border:none; background:none; padding:0; color:${OK}; font:inherit; text-decoration:underline; }
 .ls-lectura { font-size:14px; font-weight:700; color:#e6eefb; line-height:1.4; text-shadow:0 1px 6px rgba(0,0,0,0.8); }
 .ls-aviso { position:absolute; top:70px; left:50%; transform:translateX(-50%); z-index:5; display:flex; align-items:center; gap:8px;
@@ -374,7 +425,14 @@ const CSS = `
   .ls-stage[data-dom="true"] .ls-escena { overflow:visible; }
   .ls-panel { max-height:none; }
   .ls-cuerpo { overflow:visible; }
-  .ls-leyenda { display:none; }
+  /* Leyenda compacta: una tira bajo el selector de modos, en renglón corrido.
+     Varios laboratorios tienen ahí su medidor central; ocultarla dejaba la
+     escena sin lectura, y una sola fila con desplazamiento lo escondía a la
+     derecha. Si no cabe en un renglón, se parte; nunca se oculta. */
+  .ls-leyenda { top:66px; display:flex; flex-wrap:wrap; align-items:center; gap:4px 14px; padding:6px 10px;
+    max-width:calc(100% - 24px); max-height:45%; overflow:auto; scrollbar-width:none; }
+  .ls-leyenda > * { flex:0 0 auto; margin-top:0 !important; }
+  .ls-leyenda *:not(svg):not(svg *) { font-size:13px !important; line-height:1.25; }
 }
 @media (max-width: 560px) {
   .ls-top { flex-direction:column; align-items:stretch; }
@@ -382,5 +440,7 @@ const CSS = `
   .ls-stage[data-dom="true"] .ls-top { flex-direction:row; flex-wrap:wrap; }
   .ls-mision-txt { font-size:15px; }
   .ls-lectura { display:none; }
+  /* a la derecha baja la columna de herramientas */
+  .ls-stage:not([data-dom="true"]) .ls-leyenda { max-width:calc(100% - 80px); }
 }
 `;

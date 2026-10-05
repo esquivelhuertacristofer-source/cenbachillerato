@@ -148,9 +148,9 @@ export function LabAnalisis({ color }: PracticaLabProps) {
 
   const objetivos = [
     { txt: "Barre la sonda y mira a f subir y luego bajar: la tangente cambia de inclinación en el crítico", done: vio.sube && vio.baja },
-    { txt: "Salta al máximo local (x = −1) y lee f'(a) ≈ 0", done: focoActivo === "max" },
-    { txt: "Salta al mínimo local (x = 3) y confirma f''(a) > 0", done: focoActivo === "min" },
-    { txt: "Salta al punto de inflexión (x = 1) y verifica cambio de concavidad", done: focoActivo === "infl" },
+    { txt: "Salta al máximo local (x = −1) y lee f'(a) ≈ 0", done: focoActivo === "max", modo: "max" },
+    { txt: "Salta al mínimo local (x = 3) y confirma f''(a) > 0", done: focoActivo === "min", modo: "min" },
+    { txt: "Salta al punto de inflexión (x = 1) y verifica cambio de concavidad", done: focoActivo === "infl", modo: "infl" },
     { txt: "Barre la sonda con Play para ver las tres curvas en movimiento", done: playing },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];

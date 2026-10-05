@@ -232,7 +232,7 @@ export function LabExposicionOral({ color }: PracticaLabProps) {
     { txt: "Logra una atención promedio de 70 o más, sin ningún momento bajo 55", done: exitoLogrado },
     { txt: "Clasifica los 6 escenarios por su formato", done: formatosDone },
     { txt: "Empareja los 6 conceptos con su definición", done: conceptosDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

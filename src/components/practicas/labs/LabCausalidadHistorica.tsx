@@ -221,7 +221,7 @@ export function LabCausalidadHistorica({ color }: PracticaLabProps) {
     { txt: "Detecta una causa que no explica el evento y descártala", done: descarteHecho },
     { txt: "Clasifica los 9 hechos por tipo de causa", done: causasDone },
     { txt: "Distingue explicaciones mono y multicausales", done: explicacionDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

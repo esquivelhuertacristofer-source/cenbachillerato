@@ -1,12 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+/**
+ * QUIZ VERDADERO O FALSO — una afirmación a la vez.
+ *
+ * Antes apilaba las 10 afirmaciones en una página larga y la retroalimentación
+ * solo aparecía al final. Ahora: una afirmación por pantalla, la respuesta se
+ * corrige al instante con su explicación, los puntos permiten volver a las ya
+ * vistas y al final hay una pantalla de resultado con lo que se falló.
+ *
+ * La calificación no cambia: puntaje = aciertos / total (redondeado), aprobada
+ * con `puntaje_minimo_aprobacion` (70 por omisión) y `onProgreso` recibe las
+ * mismas `respuestas` (índice → booleano) al pulsar «Enviar respuestas».
+ */
+
+import { useRef, useState } from 'react';
+import { motion } from 'motion/react';
+import { CircleHelp, Check, X, Send, Eye, Info } from 'lucide-react';
+import { springs } from '@/lib/motion/tokens';
+import { useReducedMotion } from '@/lib/motion/hooks';
 import type { ActividadQuizVerdaderoFalso, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
 import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
+import {
+  QUIZ_CSS, quizVars, PortadaQuiz, ProgresoQuiz, RetroQuiz, NavQuiz,
+  asomarArriba, enfocarLuego, type ResultadoPunto,
+} from './QuizPasoAPaso';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
-const FONT = 'var(--font-epilogue), sans-serif';
 
 interface Props {
   actividad: ActividadQuizVerdaderoFalso;
@@ -14,207 +34,275 @@ interface Props {
   /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
   uacCodigo?: string;
   color?: AreaColor;
+  /**
+   * Opcionales: con `estado === 'completada'` y las respuestas guardadas del
+   * intento, el quiz abre en modo revisión (resultado + todas las preguntas
+   * navegables, sin volver a enviar).
+   */
+  estado?: 'no_iniciada' | 'en_progreso' | 'completada';
+  respuestasIntento?: Record<string, string | boolean>;
 }
 
-export function QuizVerdaderoFalsoActivity({ actividad, onProgreso, uacCodigo, color = FALLBACK_COLOR }: Props) {
+type Fase = 'quiz' | 'resultado';
+
+/** Las respuestas guardadas llegan como booleanos o como texto 'true'/'false'. */
+function leerGuardadas(r: Props['respuestasIntento'], total: number): Record<number, boolean> {
+  const out: Record<number, boolean> = {};
+  if (!r) return out;
+  for (let i = 0; i < total; i++) {
+    const v = r[String(i)];
+    if (v === true || v === 'true') out[i] = true;
+    else if (v === false || v === 'false') out[i] = false;
+  }
+  return out;
+}
+
+const textoValor = (v: boolean) => (v ? 'Verdadero' : 'Falso');
+
+export function QuizVerdaderoFalsoActivity({
+  actividad, onProgreso, uacCodigo, color = FALLBACK_COLOR, estado, respuestasIntento,
+}: Props) {
   const { contenido } = actividad;
-  const [respuestas, setRespuestas] = useState<Record<number, boolean>>({});
-  const [enviado, setEnviado] = useState(false);
-  const [imgError, setImgError] = useState(false);
-  const [imgTematicaError, setImgTematicaError] = useState(false);
+  const preguntas = contenido.preguntas;
+  const total = preguntas.length;
+  const minPuntaje = contenido.puntaje_minimo_aprobacion ?? 70;
+  const reducedMotion = useReducedMotion();
+  const modoRevision = estado === 'completada';
 
-  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
-  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
-  // (evita una petición 404 y el ícono de imagen rota).
-  const urlImagen = contenido.url_imagen ?? '';
-  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
-  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const [guardadas] = useState(() => (modoRevision ? leerGuardadas(respuestasIntento, total) : {}));
+  const revisionConDetalle = modoRevision && Object.keys(guardadas).length > 0;
+
+  const [respuestas, setRespuestas] = useState<Record<number, boolean>>(guardadas);
+  const [enviado, setEnviado] = useState(revisionConDetalle);
+  const [fase, setFase] = useState<Fase>(revisionConDetalle || total === 0 ? 'resultado' : 'quiz');
+  const [actual, setActual] = useState(0);
+  // Guard síncrono contra doble clic en la misma afirmación (el estado llega
+  // un render tarde).
+  const lockRef = useRef<number | null>(null);
+  const raizRef = useRef<HTMLDivElement>(null);
+  const sigRef = useRef<HTMLButtonElement>(null);
+
   const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
-
-  const total = contenido.preguntas.length;
   const respondidas = Object.keys(respuestas).length;
+
+  // Las afirmaciones se responden en orden: la primera sin responder es la
+  // frontera; los puntos hasta ella se pueden tocar. En revisión, todos.
+  const primeraPendiente = preguntas.findIndex((_, i) => respuestas[i] === undefined);
+  const frontera = primeraPendiente === -1 ? total : primeraPendiente;
+  const habilitado = (i: number) => enviado || i <= frontera;
+
+  const resultados: ResultadoPunto[] = preguntas.map((p, i) =>
+    respuestas[i] === undefined ? undefined : respuestas[i] === p.respuesta ? 'bien' : 'mal',
+  );
 
   function calcularPuntaje() {
     let correctas = 0;
-    contenido.preguntas.forEach((p, i) => {
+    preguntas.forEach((p, i) => {
       if (respuestas[i] === p.respuesta) correctas++;
     });
     return total > 0 ? Math.round((correctas / total) * 100) : 100;
   }
 
   function handleEnviar() {
-    if (respondidas < total) return;
+    if (enviado || respondidas < total) return;
     const puntaje = calcularPuntaje();
     setEnviado(true);
     onProgreso?.({
       actividadId: actividad.id ?? '',
-      completada: puntaje >= (contenido.puntaje_minimo_aprobacion ?? 70),
+      completada: puntaje >= minPuntaje,
       puntaje,
       respuestas,
     });
   }
 
-  const puntaje = enviado ? calcularPuntaje() : null;
-  const aprobado = puntaje !== null && puntaje >= (contenido.puntaje_minimo_aprobacion ?? 70);
+  function irA(i: number) {
+    setActual(i);
+    setFase('quiz');
+    asomarArriba(raizRef.current, !reducedMotion);
+  }
+
+  function verResultado() {
+    setFase('resultado');
+    asomarArriba(raizRef.current, !reducedMotion);
+  }
+
+  function handleResponder(valor: boolean) {
+    if (enviado || respuestas[actual] !== undefined || lockRef.current === actual) return;
+    lockRef.current = actual;
+    setRespuestas((r) => ({ ...r, [actual]: valor }));
+    enfocarLuego(sigRef);
+  }
+
+  const portada = (
+    <PortadaQuiz
+      urlImagen={contenido.url_imagen ?? ''}
+      imagenTematica={imagenTematica}
+      titulo={actividad.titulo}
+      icono={<CircleHelp size={26} />}
+    />
+  );
+
+  const avisoRevision = modoRevision && (
+    <div className="qz-aviso">
+      <Info size={18} />
+      {revisionConDetalle ? (
+        <span><b>Ya completaste esta actividad.</b> Esta es una revisión de tus respuestas.</span>
+      ) : (
+        <span><b>Entrega registrada.</b> La revisión detallada no está disponible; puedes responder de nuevo para repasar.</span>
+      )}
+    </div>
+  );
+
+  // ── RESULTADO ────────────────────────────────────────────────────────────────
+
+  if (fase === 'resultado') {
+    const puntaje = calcularPuntaje();
+    const aciertos = resultados.filter((r) => r === 'bien').length;
+    const aprobado = puntaje >= minPuntaje;
+    const fallos = preguntas
+      .map((p, i) => ({ p, i }))
+      .filter(({ p, i }) => respuestas[i] !== p.respuesta);
+
+    return (
+      <div ref={raizRef} className="qz" style={quizVars(color)}>
+        <style>{QUIZ_CSS}</style>
+        {avisoRevision}
+        {portada}
+        <ProgresoQuiz actual={null} resultados={resultados} habilitado={habilitado} onIr={irA} />
+
+        <motion.section
+          className="qz-bloque qz-resultado"
+          data-r={aprobado ? 'bien' : 'mal'}
+          initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={reducedMotion ? { duration: 0 } : springs.gentle}
+        >
+          <h2 className="qz-res-titulo">
+            {aprobado ? <Check size={22} color="#4ADE80" /> : <X size={22} color="#F87171" />}
+            {aprobado ? 'Aprobado' : 'Sigue intentando'}
+          </h2>
+          <p className="qz-pct">{puntaje}%</p>
+          <p className="qz-res-sub">
+            {aciertos} de {total} correctas · Mínimo aprobatorio: {minPuntaje}%
+          </p>
+        </motion.section>
+
+        <section className="qz-bloque qz-repaso">
+          <h3>{fallos.length > 0 ? `Para repasar (${fallos.length})` : 'Para repasar'}</h3>
+          {fallos.length === 0 ? (
+            <p className="qz-repaso-ok">No fallaste ninguna afirmación. ¡Muy bien!</p>
+          ) : (
+            fallos.map(({ p, i }) => (
+              <div key={i} className="qz-fallo">
+                <p className="qz-fallo-enun">{i + 1}. {p.enunciado}</p>
+                <p className="qz-fallo-dato">
+                  Tu respuesta:{' '}
+                  <span className="qz-tuya">
+                    {respuestas[i] === undefined ? 'Sin respuesta registrada' : textoValor(respuestas[i]!)}
+                  </span>
+                  {' · '}Correcta: <span className="qz-buena">{textoValor(p.respuesta)}</span>
+                </p>
+                {p.retroalimentacion && <p className="qz-fallo-exp">{p.retroalimentacion}</p>}
+              </div>
+            ))
+          )}
+        </section>
+
+        <div className="qz-acciones">
+          <button type="button" className="qz-btn" onClick={() => irA(0)}>
+            <Eye size={18} /> Revisar preguntas
+          </button>
+          {!enviado ? (
+            <button
+              type="button"
+              className="qz-btn qz-btn-pri"
+              onClick={handleEnviar}
+              disabled={respondidas < total}
+            >
+              <Send size={18} /> Enviar respuestas ({respondidas}/{total})
+            </button>
+          ) : (
+            <div className="qz-hecho" role="status">
+              <Check size={18} /> Respuestas enviadas
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── UNA AFIRMACIÓN A LA VEZ ──────────────────────────────────────────────────
+
+  const pregunta = preguntas[actual];
+  if (!pregunta) return null;
+  const elegida = respuestas[actual];
+  const respondida = elegida !== undefined;
+  // En revisión puede haber afirmaciones sin respuesta guardada: se muestran
+  // corregidas igual (con la correcta a la vista), sin botón activo.
+  const corregida = respondida || enviado;
+  const esUltima = actual + 1 >= total;
 
   return (
-    <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
+    <div ref={raizRef} className="qz" style={quizVars(color)}>
+      <style>{QUIZ_CSS}</style>
+      {avisoRevision}
+      {portada}
+      <ProgresoQuiz actual={actual} resultados={resultados} habilitado={habilitado} onIr={irA} />
 
-      {/* Imagen de ambientación */}
-      {tieneImagen ? (
-        <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}>
-          <img
-            src={urlImagen}
-            alt={actividad.titulo}
-            style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
-            onError={() => setImgError(true)}
+      <motion.article
+        key={actual}
+        className="qz-bloque qz-pregunta"
+        initial={reducedMotion ? false : { opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={reducedMotion ? { duration: 0 } : springs.smooth}
+      >
+        <p className="qz-enunciado">{pregunta.enunciado}</p>
+
+        <div className="qz-vf" role="group" aria-label="¿Verdadero o falso?">
+          {([true, false] as const).map((valor) => {
+            const esta = elegida === valor;
+            const r = !corregida
+              ? undefined
+              : valor === pregunta.respuesta
+                ? (esta ? 'bien' : 'revela')
+                : (esta ? 'mal' : 'apagada');
+            return (
+              <button
+                key={String(valor)}
+                type="button"
+                className="qz-op"
+                data-r={r}
+                disabled={corregida}
+                aria-pressed={esta}
+                onClick={() => handleResponder(valor)}
+              >
+                {r === 'bien' || r === 'revela' ? <Check size={20} /> : r === 'mal' ? <X size={20} /> : null}
+                {textoValor(valor)}
+              </button>
+            );
+          })}
+        </div>
+
+        {corregida && (
+          <RetroQuiz
+            bien={elegida === pregunta.respuesta}
+            titulo={!respondida ? 'Sin respuesta registrada' : undefined}
+            correcta={elegida !== pregunta.respuesta
+              ? <>La afirmación es <b>{pregunta.respuesta ? 'verdadera' : 'falsa'}</b>.</>
+              : undefined}
+            explicacion={pregunta.retroalimentacion}
           />
-        </div>
-      ) : !imgTematicaError ? (
-        <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}>
-          <img
-            src={imagenTematica}
-            alt={actividad.titulo}
-            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
-            onError={() => setImgTematicaError(true)}
-          />
-          <div
-            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
-          />
-          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
-            {actividad.titulo}
-          </p>
-        </div>
-      ) : (
-        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
-        <div
-          style={{
-            borderRadius: 16,
-            border: `1px solid rgba(${color.rgba},0.25)`,
-            background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
-            height: 180,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-          }}
-        >
-          <i className="fa-solid fa-circle-question" style={{ fontSize: 34, color: `rgba(${color.rgba},0.55)` }} />
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
-            {actividad.titulo}
-          </p>
-        </div>
-      )}
+        )}
 
-      {enviado && puntaje !== null && (
-        <div
-          style={{
-            borderRadius: 16,
-            border: `1px solid ${aprobado ? 'rgba(74,222,128,0.30)' : 'rgba(248,113,113,0.30)'}`,
-            background: aprobado ? 'rgba(74,222,128,0.10)' : 'rgba(248,113,113,0.10)',
-            padding: '20px 16px',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ fontSize: 30, fontWeight: 800, margin: 0, color: aprobado ? '#4ADE80' : '#F87171' }}>{puntaje}%</p>
-          <p style={{ fontSize: 14, margin: '4px 0 0', color: aprobado ? '#4ADE80' : '#F87171' }}>
-            {aprobado ? 'Aprobado ✓' : 'Sigue intentando'}
-          </p>
-        </div>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {contenido.preguntas.map((pregunta, pi) => {
-          const seleccionada = respuestas[pi];
-          const esCorrecta = enviado && seleccionada === pregunta.respuesta;
-
-          return (
-            <div
-              key={pi}
-              style={{
-                borderRadius: 16,
-                border: `1px solid ${enviado ? (esCorrecta ? 'rgba(74,222,128,0.30)' : 'rgba(248,113,113,0.30)') : 'rgba(255,255,255,0.08)'}`,
-                background: enviado ? (esCorrecta ? 'rgba(74,222,128,0.07)' : 'rgba(248,113,113,0.07)') : 'rgba(255,255,255,0.04)',
-                padding: 20,
-              }}
-            >
-              <p style={{ margin: '0 0 12px', fontWeight: 600, color: '#fff', fontSize: 15, lineHeight: 1.5 }}>
-                {pi + 1}. {pregunta.enunciado}
-              </p>
-              <div style={{ display: 'flex', gap: 12 }}>
-                {([true, false] as const).map((valor) => {
-                  const seleccionadaEsta = seleccionada === valor;
-                  const correctaEsta = enviado && valor === pregunta.respuesta;
-                  const errorEsta = enviado && seleccionadaEsta && valor !== pregunta.respuesta;
-
-                  let bg = 'transparent';
-                  let borderColor = 'rgba(255,255,255,0.12)';
-                  let textColor = 'rgba(255,255,255,0.70)';
-                  if (correctaEsta) {
-                    bg = 'rgba(74,222,128,0.14)'; borderColor = 'rgba(74,222,128,0.55)'; textColor = '#4ADE80';
-                  } else if (errorEsta) {
-                    bg = 'rgba(248,113,113,0.14)'; borderColor = 'rgba(248,113,113,0.55)'; textColor = '#F87171';
-                  } else if (seleccionadaEsta) {
-                    bg = `rgba(${color.rgba},0.14)`; borderColor = color.hex; textColor = '#fff';
-                  }
-
-                  return (
-                    <button
-                      key={String(valor)}
-                      disabled={enviado}
-                      onClick={() => setRespuestas(r => ({ ...r, [pi]: valor }))}
-                      style={{
-                        flex: 1,
-                        borderRadius: 12,
-                        border: `1.5px solid ${borderColor}`,
-                        background: bg,
-                        color: textColor,
-                        padding: '11px 0',
-                        fontSize: 14,
-                        fontWeight: 700,
-                        fontFamily: FONT,
-                        cursor: enviado ? 'default' : 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      {valor ? 'Verdadero' : 'Falso'}
-                    </button>
-                  );
-                })}
-              </div>
-              {enviado && pregunta.retroalimentacion && (
-                <p style={{ margin: '10px 0 0', fontSize: 12.5, fontStyle: 'italic', color: 'rgba(255,255,255,0.55)' }}>
-                  {pregunta.retroalimentacion}
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {!enviado && (
-        <button
-          onClick={handleEnviar}
-          disabled={respondidas < total}
-          style={{
-            width: '100%',
-            borderRadius: 12,
-            border: 'none',
-            background: color.hex,
-            color: '#011126',
-            padding: '14px 0',
-            fontSize: 14,
-            fontWeight: 700,
-            fontFamily: FONT,
-            cursor: respondidas < total ? 'not-allowed' : 'pointer',
-            opacity: respondidas < total ? 0.4 : 1,
-            transition: 'opacity 0.15s ease',
-          }}
-        >
-          Enviar respuestas ({respondidas}/{total})
-        </button>
-      )}
+        <NavQuiz
+          puedeAnterior={actual > 0}
+          onAnterior={() => irA(actual - 1)}
+          puedeSiguiente={corregida}
+          onSiguiente={() => (esUltima ? verResultado() : irA(actual + 1))}
+          esUltima={esUltima}
+          sigRef={sigRef}
+        />
+      </motion.article>
     </div>
   );
 }

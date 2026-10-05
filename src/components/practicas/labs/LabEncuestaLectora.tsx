@@ -270,7 +270,7 @@ export function LabEncuestaLectora({ color }: PracticaLabProps) {
     { txt: "Registra la lectura que ocurre en la calle", done: Boolean(codificado["p7"]?.soporte) },
     { txt: "Contesta las 5 preguntas de lectura de la gráfica", done: graficaDone },
     { txt: "Reconoce lo que la gráfica NO te dice", done: g5Ok },
-    { txt: "Completa el texto sobre tipos de texto", done: textoDone },
+    { txt: "Completa el texto sobre tipos de texto", done: textoDone, modo: "texto" },
     { txt: "Aprueba el cuestionario de la progresión", done: quizAprobado },
     { txt: "Encadena 8 aciertos seguidos sin fallar", done: partida.mejorRacha >= 8 },
   ];

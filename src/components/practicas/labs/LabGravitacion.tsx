@@ -143,11 +143,11 @@ export function LabGravitacion({ color }: PracticaLabProps) {
   const modoCol = modoActual.col;
 
   const objetivos = [
-    { txt: "Duplica la distancia Tierra–Luna y comprueba que la fuerza baja a la cuarta parte", done: modo === "fuerza" && Math.abs(ratioF - 0.25) < 0.03 },
-    { txt: "Explora la fuerza gravitacional Tierra–Luna (modo Fuerza)", done: modo === "fuerza" && r !== R_DEF },
-    { txt: "Compara el peso en distintos cuerpos celestes (modo Peso)", done: modo === "peso" || modo === "orbita" },
-    { txt: "Descubre la órbita geoestacionaria Mexsat (modo Órbita)", done: modo === "orbita" },
-    { txt: "Lleva el satélite a 35 786 km de altura: su período es de 24 h y parece fijo", done: modo === "orbita" && orb.geo },
+    { txt: "Duplica la distancia Tierra–Luna y comprueba que la fuerza baja a la cuarta parte", done: modo === "fuerza" && Math.abs(ratioF - 0.25) < 0.03, modo: "fuerza" },
+    { txt: "Explora la fuerza gravitacional Tierra–Luna (modo Fuerza)", done: modo === "fuerza" && r !== R_DEF, modo: "fuerza" },
+    { txt: "Compara el peso en distintos cuerpos celestes (modo Peso)", done: modo === "peso" || modo === "orbita", modo: ["peso", "orbita"] },
+    { txt: "Descubre la órbita geoestacionaria Mexsat (modo Órbita)", done: modo === "orbita", modo: "orbita" },
+    { txt: "Lleva el satélite a 35 786 km de altura: su período es de 24 h y parece fijo", done: modo === "orbita" && orb.geo, modo: "orbita" },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
 

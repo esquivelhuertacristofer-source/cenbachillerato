@@ -268,7 +268,7 @@ export function LabRelacionesPoder({ color }: PracticaLabProps) {
     { txt: "Reúne una coalición con más del 55 % de balance y llévala al cabildo", done: simGana },
     { txt: "Clasifica los 7 ejemplos por categoría de análisis", done: clasificarDone },
     { txt: "Empareja los 6 conceptos con su definición", done: conceptosDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

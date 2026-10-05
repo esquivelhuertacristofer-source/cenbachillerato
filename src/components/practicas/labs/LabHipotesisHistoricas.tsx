@@ -271,7 +271,7 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
     { txt: "Resuelve el caso del Imperio Mexica contrastando dos fuentes", done: !!resolucion[CASOS[1]!.id] },
     { txt: "Clasifica las 8 fuentes en primaria o secundaria", done: fuentesDone },
     { txt: "Ordena los 4 pasos del método histórico", done: metodoDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

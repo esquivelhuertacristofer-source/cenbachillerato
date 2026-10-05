@@ -407,7 +407,7 @@ export function LabInstruccionesIngles({ color }: PracticaLabProps) {
     { txt: "Ejecuta una secuencia mal ordenada y mira el desastre", done: falloVisto },
     { txt: "Repara los 2 procedimientos desordenados", done: secuenciasOk >= PROCEDIMIENTOS.length },
     { txt: "Arma las 6 preguntas indirectas", done: nIndirectas >= INDIRECTAS.length },
-    { txt: "Completa el texto de la receta (A2)", done: textoDone },
+    { txt: "Completa el texto de la receta (A2)", done: textoDone, modo: "texto" },
     { txt: "Aprueba el quiz de imperativos y conectores (A3)", done: quizAprobado },
     { txt: `Escucha ${META_ESCUCHAS} frases en inglés`, done: escuchas >= META_ESCUCHAS },
   ];

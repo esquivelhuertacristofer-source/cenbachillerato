@@ -387,7 +387,7 @@ export function LabIdeasClave({ color }: PracticaLabProps) {
     { txt: "Arma el esquema de los 3 textos", done: esquemasHechos >= TEXTOS.length },
     { txt: `Diagnostica los ${RESUMENES.length} resúmenes`, done: Object.keys(ubicRes).length >= RESUMENES.length },
     { txt: "Detecta los 2 resúmenes de copia literal", done: copiasHechas },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];
 

@@ -305,8 +305,8 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
     { txt: `Reescribe las ${CASOS_REGISTRO.length} frases en registro escrito`, done: versionesDone },
     { txt: `Decide qué se pierde en los ${CASOS_REGISTRO.length} traslados`, done: perdidasDone },
     { txt: `Clasifica las ${VOCES.length} voces por su lengua de origen`, done: vocesDone },
-    { txt: `Escribe los ${GLOSARIO.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: `Escribe los ${GLOSARIO.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: `Acierta los ${HECHOS.length} hechos verdadero o falso`, done: hechosDone },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];

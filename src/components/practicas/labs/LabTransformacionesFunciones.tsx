@@ -185,8 +185,8 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
       }
       lectura={lectura}
       objetivos={[
-        { txt: "Lanza el balón (⚽) con a < 0: la parábola es su trayectoria", done: balon && modo === "cuadratica" && a < 0 },
-        { txt: "Lleva el vértice a (3, 4): mueve h hasta 3 y deja k = 4", done: modo === "cuadratica" && h === 3 && k === 4 },
+        { txt: "Lanza el balón (⚽) con a < 0: la parábola es su trayectoria", done: balon && modo === "cuadratica" && a < 0, modo: "cuadratica" },
+        { txt: "Lleva el vértice a (3, 4): mueve h hasta 3 y deja k = 4", done: modo === "cuadratica" && h === 3 && k === 4, modo: "cuadratica" },
         { txt: "Muestra la función padre y compárala con la transformada", done: mostrarPadre },
         { txt: "Desplaza la gráfica hacia arriba o hacia abajo (cambia k)", done: k !== K_DEF },
         { txt: "Desplázala a los lados (cambia h) y cuida el signo", done: h !== H_DEF },

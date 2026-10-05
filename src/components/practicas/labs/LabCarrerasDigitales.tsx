@@ -228,7 +228,7 @@ export function LabCarrerasDigitales({ color }: PracticaLabProps) {
     { txt: `Ilumina al menos ${META_PERFILES} perfiles digitales con tu ruta`, done: metaAlguna },
     { txt: "Clasifica los 8 perfiles por su área digital", done: areaDone },
     { txt: "Empareja los 4 perfiles con su función", done: funcionesDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

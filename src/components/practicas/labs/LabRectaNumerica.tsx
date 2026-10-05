@@ -148,7 +148,7 @@ export function LabRectaNumerica({ color }: PracticaLabProps) {
   const sumando = op === "suma";
 
   const objetivos = [
-    { txt: "Activa el opuesto y desliza el número: mira cómo su reflejo cruza el cero", done: vioEspejo },
+    { txt: "Activa el opuesto y desliza el número: mira cómo su reflejo cruza el cero", done: vioEspejo, modo: "ubicar" },
     { txt: "Mueve un número sobre la recta", done: movioA },
     { txt: "Coloca un número negativo (izquierda del cero)", done: vioNegativo },
     { txt: "Activa el opuesto y el valor absoluto", done: vioOpuesto && vioAbsoluto },

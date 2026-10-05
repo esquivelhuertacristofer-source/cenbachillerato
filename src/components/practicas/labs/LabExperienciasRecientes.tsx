@@ -507,7 +507,7 @@ export function LabExperienciasRecientes({ color }: PracticaLabProps) {
     { txt: `Coloca en su sitio los ${MK_POSICION.length} marcadores (ever, never, already, yet, just)`, done: posDone },
     { txt: `Decide entre for y since en los ${MK_DESDE.length} casos`, done: desdeDone },
     { txt: `Cuenta las ${EXPERIENCIAS.length} experiencias con fecha y sin fecha`, done: fechaDone },
-    { txt: `Completa el párrafo de A2 con sus ${HUECOS_A2.huecos.length} formas verbales`, done: textoDone },
+    { txt: `Completa el párrafo de A2 con sus ${HUECOS_A2.huecos.length} formas verbales`, done: textoDone, modo: "texto" },
     { txt: `Escucha ${META_ESCUCHAS} frases en inglés`, done: escuchados >= META_ESCUCHAS },
     { txt: "Abre la ficha teórica y revisa la lectura A1", done: teoriaVista },
     { txt: "Aprueba el reto evaluable (quiz A4)", done: quizAprobado },

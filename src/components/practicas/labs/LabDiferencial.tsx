@@ -150,9 +150,9 @@ export function LabDiferencial({ color }: PracticaLabProps) {
   const errMax = Math.max(linLectura(caso, caso.xmin).error, linLectura(caso, caso.xmax).error, 1e-9);
 
   const objetivos = [
-    { txt: "Acerca x al punto base a hasta que el error sea menor que 0.001", done: modo === "valor" && lv.error < 0.001 },
-    { txt: "Aleja x del punto base y mira cómo la brecha roja crece (error mayor que 0.1)", done: modo === "valor" && lv.error > 0.1 },
-    { txt: "Mueve el punto x y compara la curva con su recta tangente", done: modo === "valor" && xPos !== 12 },
+    { txt: "Acerca x al punto base a hasta que el error sea menor que 0.001", done: modo === "valor" && lv.error < 0.001, modo: "valor" },
+    { txt: "Aleja x del punto base y mira cómo la brecha roja crece (error mayor que 0.1)", done: modo === "valor" && lv.error > 0.1, modo: "valor" },
+    { txt: "Mueve el punto x y compara la curva con su recta tangente", done: modo === "valor" && xPos !== 12, modo: "valor" },
     { txt: "Cambia de caso (raíz, exponencial…) y repite la linealización", done: casoId !== "raiz" },
     { txt: "Activa el modo Estimar un error (esfera) y mueve el radio", done: modo !== "valor" },
     { txt: "Cambia la incertidumbre dr y observa cómo se propaga al volumen", done: dr !== DR_BASE },

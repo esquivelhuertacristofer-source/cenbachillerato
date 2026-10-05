@@ -305,7 +305,7 @@ export function LabTiposGraficas({ color }: PracticaLabProps) {
     { txt: "Publica una gráfica clara en 4 de los 6 casos", done: claras >= 4 },
     { txt: "Empareja los 5 tipos de gráfica con su propósito", done: tiposDone },
     { txt: "Clasifica los 7 escenarios por su gráfica", done: escenariosDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

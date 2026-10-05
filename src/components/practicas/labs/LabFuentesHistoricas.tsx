@@ -188,7 +188,7 @@ export function LabFuentesHistoricas({ color }: PracticaLabProps) {
     { txt: "Clasifica las 8 fuentes por su tipo", done: tiposDone },
     { txt: "Empareja los 5 criterios con su pregunta", done: criteriosDone },
     { txt: "Cierra el caso con la línea de tiempo bien reconstruida", done: cerrado && correctos(linea) === EVENTOS.length },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

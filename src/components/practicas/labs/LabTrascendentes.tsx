@@ -141,8 +141,8 @@ export function LabTrascendentes({ color }: PracticaLabProps) {
     { txt: "Barre la sonda x = a por todo el dominio: la tangente gira y el punto ámbar traza f'", done: barrido >= 0.85 },
     { txt: "Elige una función y observa su derivada en la escena", done: funcId !== FUNC_DEF || aPos !== func(FUNC_DEF).aDef },
     { txt: "Mueve la sonda x = a y comprueba pendiente = altura de f'", done: aPos !== func(funcId).aDef },
-    { txt: "Prueba la regla del producto y la de la cadena", done: funcId === "expprod" || funcId === "senocadena" },
-    { txt: "Prueba la derivada del logaritmo", done: funcId === "logaritmo" },
+    { txt: "Prueba la regla del producto y la de la cadena", done: funcId === "expprod" || funcId === "senocadena", modo: ["expprod", "senocadena"] },
+    { txt: "Prueba la derivada del logaritmo", done: funcId === "logaritmo", modo: "logaritmo" },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
 

@@ -216,8 +216,8 @@ export function LabRespiracion({ color }: PracticaLabProps) {
       lectura={lectura}
       objetivos={[
         { txt: "Observa las cuatro fases de la glucólisis en el modo Glucólisis", done: modo !== "glucolisis" || paso > 0 },
-        { txt: "Recorre las etapas de Krebs y cadena transportadora (Aerobia)", done: modo === "aerobia" || modo === "comparar" },
-        { txt: "Compara aerobia vs fermentación en el modo Comparar", done: modo === "comparar" },
+        { txt: "Recorre las etapas de Krebs y cadena transportadora (Aerobia)", done: modo === "aerobia" || modo === "comparar", modo: ["aerobia", "comparar"] },
+        { txt: "Compara aerobia vs fermentación en el modo Comparar", done: modo === "comparar", modo: "comparar" },
         { txt: "En Comparar, baja el oxígeno a 0 %: ¿cuántas monedas de ATP quedan?", done: o2Pct === 0 },
         { txt: "Usa la calculadora para ver el balance de ATP, O₂ y CO₂", done: molGlucosa !== 5 || rutaId !== "aerobia" },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },

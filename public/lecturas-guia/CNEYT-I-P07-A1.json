@@ -12,10 +12,10 @@
       "idea": "El relato escolar suele mostrar solo a hombres de élite y deja fuera aportaciones clave de mujeres.",
       "visual": { "tipo": "comparar", "columnas": [
         { "titulo": "Rosalind Franklin", "puntos": ["Tomó la Foto 51 del ADN", "Watson y Crick la usaron sin su permiso", "El reconocimiento fue para ellos"] },
-        { "titulo": "Lise Meitner", "puntos": ["Descubrió la fisión nuclear", "Excluida del Nobel que recibió Otto Hahn"] },
-        { "titulo": "Hedy Lamarr", "puntos": ["Actriz de Hollywood", "Inventó la comunicación por espectro disperso", "Base del WiFi y Bluetooth"] }
+        { "titulo": "Lise Meitner", "puntos": ["Clave en el descubrimiento de la fisión nuclear", "Excluida del Nobel que recibió Otto Hahn"] },
+        { "titulo": "Hedy Lamarr", "puntos": ["Actriz de Hollywood", "Coinventó la comunicación por salto de frecuencia", "Precursora del WiFi y el Bluetooth"] }
       ] },
-      "comprueba": { "pregunta": "¿Qué científica fue excluida del Premio Nobel por el descubrimiento de la fisión nuclear?", "opciones": ["Rosalind Franklin", "Hedy Lamarr", "Lise Meitner"], "correcta": 2, "porque": "Lise Meitner descubrió la fisión nuclear, pero el Nobel lo recibió su colega Otto Hahn." }
+      "comprueba": { "pregunta": "¿Qué científica fue excluida del Premio Nobel por el descubrimiento de la fisión nuclear?", "opciones": ["Rosalind Franklin", "Hedy Lamarr", "Lise Meitner"], "correcta": 2, "porque": "Lise Meitner fue clave en el descubrimiento de la fisión nuclear, pero el Nobel lo recibió su colega Otto Hahn." }
     },
     {
       "parrafos": [2, 3],

@@ -36,6 +36,13 @@ const OK = "#34D399";
 export interface ObjetivoLab {
   txt: string;
   done: boolean;
+  /**
+   * Modo (o modos) del LabShell en que esta misión se puede cumplir. Sin él,
+   * la misión vale en cualquier modo. Con él, la barra de la escena solo la
+   * muestra estando en ese modo; si el modo actual ya no tiene pendientes,
+   * la propone con un «Cambia a modo …».
+   */
+  modo?: string | readonly string[];
 }
 
 export function estrellasPorObjetivos(cumplidos: number, total: number): number {

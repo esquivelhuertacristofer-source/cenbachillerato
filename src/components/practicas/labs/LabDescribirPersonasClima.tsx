@@ -384,7 +384,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
     { txt: `Viste a las ${PRONOSTICOS.length} personas según su pronóstico`, done: atuendosDone },
     { txt: "Justifica cada atuendo con la oración correcta", done: oracionesDone },
     { txt: `Escribe las ${AHORA.length} formas de wear (ahora frente a normalmente)`, done: ahoraDone },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: "Aprueba el reto evaluable", done: quizAprobado },
     { txt: "Termina con 2 errores o menos", done: todoHecho && partida.errores <= 2 },
   ];

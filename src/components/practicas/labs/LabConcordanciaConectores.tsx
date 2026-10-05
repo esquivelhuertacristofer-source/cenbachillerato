@@ -167,7 +167,7 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
     { txt: "Repara las 4 oraciones con error de concordancia", done: reparadoDone },
     { txt: "Elige un conector que voltee el sentido y lee la reacción", done: volteoSentido },
     { txt: "Coloca los 4 conectores en su lugar", done: conectoresDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

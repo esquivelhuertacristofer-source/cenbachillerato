@@ -446,7 +446,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
     { txt: "Ordena un intercambio completo sin un solo fallo", done: limpioAlguno },
     { txt: `Clasifica las ${FICHAS_REGISTRO.length} fichas en formal e informal`, done: registroDone },
     { txt: `Escucha ${META_ESCUCHAS} expresiones en inglés`, done: escuchados >= META_ESCUCHAS },
-    { txt: `Completa el diálogo de A2 con sus ${AULA_INGLES_HUECOS.huecos.length} palabras`, done: textoDone },
+    { txt: `Completa el diálogo de A2 con sus ${AULA_INGLES_HUECOS.huecos.length} palabras`, done: textoDone, modo: "texto" },
     { txt: "Abre la ficha teórica y revisa la lectura A1", done: teoriaVista },
     { txt: "Aprueba el reto evaluable (quiz A4)", done: quizAprobado },
     { txt: "Termina la sesión con 2 errores o menos", done: todoHecho && partida.errores <= 2 },

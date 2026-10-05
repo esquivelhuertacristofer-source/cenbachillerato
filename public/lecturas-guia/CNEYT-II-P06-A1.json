@@ -22,7 +22,7 @@
       "titulo": "Fósiles, renovables y sus retos",
       "idea": "México depende sobre todo de combustibles fósiles; las renovables no emiten CO2 al generar, pero son intermitentes.",
       "visual": { "tipo": "datos", "fuente": "SENER, 2023", "items": [
-        { "valor": "≈ 76%", "etiqueta": "energía primaria de combustibles fósiles", "barra": 76 }
+        { "valor": "≈ 76%", "etiqueta": "electricidad generada con combustibles fósiles", "barra": 76 }
       ] },
       "comprueba": { "pregunta": "Un pueblo usa solo paneles solares. ¿Qué problema enfrenta de noche?", "opciones": ["Emiten mucho CO2", "La intermitencia: sin sol no generan", "Se descomponen con el frío"], "correcta": 1, "porque": "Las renovables presentan intermitencia: el sol no brilla de noche; por eso se desarrolla el almacenamiento en baterías." }
     },

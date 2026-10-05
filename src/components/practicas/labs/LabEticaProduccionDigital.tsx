@@ -233,7 +233,7 @@ export function LabEticaProduccionDigital({ color }: PracticaLabProps) {
     { txt: "Publica una campaña responsable, sin incidentes", done: metaAlguna },
     { txt: "Clasifica las 10 prácticas como éticas o no", done: juicioDone },
     { txt: "Empareja los 6 conceptos con su definición", done: conceptosDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

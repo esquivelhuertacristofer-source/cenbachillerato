@@ -227,10 +227,10 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
       }
       lectura={lecturaCorta}
       objetivos={[
-        { txt: "Arma un cruce monohíbrido y lee la proporción 3:1 en el cuadro de Punnett", done: modo === "monohibrido" },
+        { txt: "Arma un cruce monohíbrido y lee la proporción 3:1 en el cuadro de Punnett", done: modo === "monohibrido", modo: "monohibrido" },
         { txt: "Cambia la herencia a incompleta o codominancia y mira cómo cambia el fenotipo", done: herencia !== "completa" },
-        { txt: "Pasa al cruce dihíbrido y encuentra la proporción 9:3:3:1", done: modo === "dihibrido" },
-        { txt: "Explora la herencia ligada al sexo (daltonismo)", done: modo === "ligado" },
+        { txt: "Pasa al cruce dihíbrido y encuentra la proporción 9:3:3:1", done: modo === "dihibrido", modo: "dihibrido" },
+        { txt: "Explora la herencia ligada al sexo (daltonismo)", done: modo === "ligado", modo: "ligado" },
         { txt: "Genera 100 descendientes y compara lo observado con lo esperado", done: genero100 },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}

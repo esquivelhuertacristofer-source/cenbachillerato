@@ -293,7 +293,7 @@ export function LabTiempoHistorico({ color }: PracticaLabProps) {
     { txt: "Cambia a escala de siglo y descubre qué sucesos dejan de distinguirse", done: hEmpate },
     { txt: "Clasifica los 6 casos por su duración (Braudel)", done: duracionDone },
     { txt: "Ordena la línea del tiempo cronológico", done: lineaDone },
-    { txt: "Escribe los 6 conceptos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 conceptos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

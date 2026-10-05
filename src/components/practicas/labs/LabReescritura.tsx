@@ -348,8 +348,8 @@ export function LabReescritura({ color }: PracticaLabProps) {
     { txt: `Aplica las ${MARCAS.length} marcas del corrector`, done: Object.keys(maResueltas).length >= MARCAS.length },
     { txt: `Resuelve las ${VERSIONES.length} parejas antes/después`, done: versionesHechas >= VERSIONES.length },
     { txt: "Comprueba que el propósito manda (las 2 parejas gemelas)", done: gemelosHechos },
-    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto de la progresión", done: textoDone },
+    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de la progresión", done: textoDone, modo: "texto" },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];
 

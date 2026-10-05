@@ -244,11 +244,11 @@ export function LabCalor({ color }: PracticaLabProps) {
       lectura={lectura}
       objetivos={[
         { txt: "Prueba un aislante (madera o aire): ¿tarda más el calor en llegar al centro?", done: probaAislante },
-        { txt: "Sigue la conducción: el calor avanza partícula a partícula", done: siguioCond },
+        { txt: "Sigue la conducción: el calor avanza partícula a partícula", done: siguioCond, modo: "conduccion" },
         { txt: "Cambia el material y compara qué tan rápido conduce", done: matNombre !== "Cobre" },
         { txt: "Observa la convección: el fluido caliente sube y el frío baja", done: !!vistos.conveccion },
         { txt: "Observa la radiación: viaja sin necesidad de medio", done: !!vistos.radiacion },
-        { txt: "Sube el cuerpo a más de 1 200 K y mira cómo se intensifican las ondas", done: subioTemp },
+        { txt: "Sube el cuerpo a más de 1 200 K y mira cómo se intensifican las ondas", done: subioTemp, modo: "radiacion" },
         { txt: "Compara los tres mecanismos uno al lado del otro", done: !!vistos.comparar },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}

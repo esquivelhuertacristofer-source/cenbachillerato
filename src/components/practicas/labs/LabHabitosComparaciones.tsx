@@ -411,7 +411,7 @@ export function LabHabitosComparaciones({ color }: PracticaLabProps) {
     { txt: "Traduce las 3 negaciones a su comparativo", done: equivDone },
     { txt: "Completa las 6 estructuras de preferencia", done: prefDone },
     { txt: "Distingue would rather … than de prefer … to", done: ratherDone },
-    { txt: "Completa el texto con huecos de A2", done: textoDone },
+    { txt: "Completa el texto con huecos de A2", done: textoDone, modo: "texto" },
     { txt: "Acierta los 5 hechos verdadero o falso (A4)", done: hechosDone },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];

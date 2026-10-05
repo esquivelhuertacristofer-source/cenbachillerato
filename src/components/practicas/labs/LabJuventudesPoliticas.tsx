@@ -244,7 +244,7 @@ export function LabJuventudesPoliticas({ color }: PracticaLabProps) {
     { txt: "Logra que el cabildo conserve el centro juvenil", done: cabildoOk },
     { txt: "Clasifica los 8 ejemplos por forma de participación", done: clasificarDone },
     { txt: "Empareja los 5 conceptos con su definición", done: conceptosDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

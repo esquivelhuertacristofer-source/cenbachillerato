@@ -249,10 +249,10 @@ export function LabEstructuraReaccion({ color }: PracticaLabProps) {
       }
       lectura={lectura}
       objetivos={[
-        { txt: "Identifica reactivos, flecha y productos en la anatomía de la ecuación", done: modo === "anatomia" && idx >= 2 },
-        { txt: "Verifica la conservación de la materia contando átomos a ambos lados", done: modo === "conservacion" },
+        { txt: "Identifica reactivos, flecha y productos en la anatomía de la ecuación", done: modo === "anatomia" && idx >= 2, modo: "anatomia" },
+        { txt: "Verifica la conservación de la materia contando átomos a ambos lados", done: modo === "conservacion", modo: "conservacion" },
         { txt: "En Conservación, sube un coeficiente y mira qué barras se descuadran", done: !conteo.balanceada },
-        { txt: "Distingue coeficiente (número grande) de subíndice (número pequeño)", done: modo === "simbologia" },
+        { txt: "Distingue coeficiente (número grande) de subíndice (número pequeño)", done: modo === "simbologia", modo: "simbologia" },
         { txt: "Recorre la reacción paso a paso", done: paso > 0 },
         { txt: "Compara con otra reacción además de la combustión del metano", done: reaccionId !== "combustion-metano" },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },

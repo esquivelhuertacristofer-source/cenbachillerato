@@ -208,8 +208,8 @@ export function LabLimites({ color }: PracticaLabProps) {
         { txt: "Acerca x tanto a a que f(x) llegue a L (la distancia casi se cierra)", done: muyCerca },
         { txt: "Acerca x al punto a y observa hacia dónde va f(x)", done: xPos !== caso(casoId).xDef },
         { txt: "Acércate por los dos lados: por la izquierda y por la derecha", done: lado !== LADO_DEF },
-        { txt: "Llega al caso indeterminado 0/0 y factoriza", done: casoId === "indeterminada" },
-        { txt: "Llega al límite notable sen(x)/x → 1", done: casoId === "notable" },
+        { txt: "Llega al caso indeterminado 0/0 y factoriza", done: casoId === "indeterminada", modo: "indeterminada" },
+        { txt: "Llega al límite notable sen(x)/x → 1", done: casoId === "notable", modo: "notable" },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}
       pestanas={[

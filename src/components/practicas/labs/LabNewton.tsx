@@ -224,9 +224,9 @@ export function LabNewton({ color }: PracticaLabProps) {
       }
       lectura={lecturaCorta}
       objetivos={[
-        { txt: "Encuentra el ángulo exacto en que la caja empieza a deslizar", done: umbralHallado },
-        { txt: "Analiza el plano inclinado: el peso se reparte en dos componentes", done: modo === "inclinado" },
-        { txt: "Pasa al plano horizontal y al sistema de polea", done: modo === "horizontal" || modo === "polea" },
+        { txt: "Encuentra el ángulo exacto en que la caja empieza a deslizar", done: umbralHallado, modo: "inclinado" },
+        { txt: "Analiza el plano inclinado: el peso se reparte en dos componentes", done: modo === "inclinado", modo: "inclinado" },
+        { txt: "Pasa al plano horizontal y al sistema de polea", done: modo === "horizontal" || modo === "polea", modo: ["horizontal", "polea"] },
         { txt: "Consigue el equilibrio: ΣF = 0 y el cuerpo no acelera", done: !d.mueve },
         { txt: "Rompe el equilibrio: ΣF ≠ 0 y aparece la aceleración a = ΣF/m", done: d.mueve },
         { txt: "Resuelve el reto evaluable de la actividad", done: ejercicioAprobado },

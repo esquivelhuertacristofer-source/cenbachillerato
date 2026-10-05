@@ -397,8 +397,8 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
     { txt: "Archiva los 6 en la carpeta de su materia", done: archivoDone },
     { txt: "Ordena los 8 pasos del trabajo", done: ordenDone },
     { txt: "Asigna la herramienta de cada paso", done: toolsDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
-    { txt: "Completa el texto de A6", done: textoDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto de A6", done: textoDone, modo: "texto" },
     { txt: "Acierta los 4 hechos verdadero o falso", done: hechosDone },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];

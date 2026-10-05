@@ -256,13 +256,13 @@ export function LabContinuidad({ color }: PracticaLabProps) {
       }
       lectura={lectura}
       objetivos={[
-        { txt: "Acerca x al punto a por ambos lados: ¿los dos puntos coinciden en la altura?", done: acerco },
-        { txt: "Mueve x y observa las 3 condiciones de continuidad en acción", done: movio },
+        { txt: "Acerca x al punto a por ambos lados: ¿los dos puntos coinciden en la altura?", done: acerco, modo: "continuidad" },
+        { txt: "Mueve x y observa las 3 condiciones de continuidad en acción", done: movio, modo: "continuidad" },
         { txt: "Examina la discontinuidad evitable (el hueco que se puede tapar)", done: vistos.includes("evitable") },
         { txt: "Examina la discontinuidad de salto y la esencial (asíntota)", done: vistos.includes("salto") || vistos.includes("esencial") },
         { txt: "Compara con una función continua en todo su dominio", done: vistos.includes("continua") },
         { txt: "Verifica el TVI: g(1) < 0 < g(2) garantiza raíz en (1,2)", done: tviVisto },
-        { txt: "En el TVI pon N = 0 y localiza la raíz de g", done: raizHallada },
+        { txt: "En el TVI pon N = 0 y localiza la raíz de g", done: raizHallada, modo: "tvi" },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}
       pestanas={[

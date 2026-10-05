@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { springs, stagger } from "@/lib/motion/tokens";
 import { useReducedMotion } from "@/lib/motion/hooks";
-import { TIPOS_RECURSO, getTipoRecursoMeta } from "@/lib/mccems/tipos-recurso";
+import { TIPOS_RECURSO, getTipoRecursoMeta, type TipoRecursoMeta } from "@/lib/mccems/tipos-recurso";
 import type { ProgresionBrowser } from "@/lib/queries/hub-browser";
 
 interface Destino {
@@ -28,8 +28,32 @@ interface Props {
   horizontal?: boolean;
 }
 
+/**
+ * Los 5 tipos manipulables (2026-09) aún no viven en `TIPOS_RECURSO`; sin esto
+ * cada uno caía en el fallback y la rejilla mostraba «Otros 0/2», «Otros 0/1»,
+ * «Otros 0/1»… repetidos. Aquí reciben nombre propio en español.
+ */
+const TIPOS_EXTRA: TipoRecursoMeta[] = [
+  { tipo: "ordenar_secuencia",     label: "Ordenar",        singular: "Ordenar",        icon: "fa-arrow-down-1-9",    color: "#C084FC" },
+  { tipo: "relacionar_columnas",   label: "Relacionar",     singular: "Relacionar",     icon: "fa-arrows-left-right", color: "#22D3EE" },
+  { tipo: "clasificar_categorias", label: "Clasificar",     singular: "Clasificar",     icon: "fa-layer-group",       color: "#FACC15" },
+  { tipo: "caso_decision",         label: "Casos",          singular: "Caso",           icon: "fa-signs-post",        color: "#E879F9" },
+  { tipo: "reto_cronometrado",     label: "Reto con tiempo", singular: "Reto con tiempo", icon: "fa-stopwatch",       color: "#FB7185" },
+];
+
+const TODOS_LOS_TIPOS = [...TIPOS_RECURSO, ...TIPOS_EXTRA];
+const META_POR_TIPO = new Map(TODOS_LOS_TIPOS.map((t) => [t.tipo, t]));
+
+/** Clave única para todo tipo sin nombre: se agrupan en UN solo «Otros». */
+const CLAVE_OTROS = "otro";
+
+/** Etiqueta, ícono y color de un tipo de actividad (nunca un «Otros» por tipo). */
+export function metaDeTipo(tipo: string): TipoRecursoMeta {
+  return META_POR_TIPO.get(tipo) ?? getTipoRecursoMeta(CLAVE_OTROS);
+}
+
 /** Orden canónico de los tipos para que el mosaico sea estable y legible. */
-const PESO_TIPO = new Map(TIPOS_RECURSO.map((t, i) => [t.tipo, i]));
+const PESO_TIPO = new Map(TODOS_LOS_TIPOS.map((t, i) => [t.tipo, i]));
 
 /**
  * Agrega las actividades de toda la materia por tipo y calcula, para cada uno,
@@ -43,14 +67,15 @@ function agregarPorTipo(progresiones: ProgresionBrowser[]): TipoAgg[] {
 
   for (const prog of progresiones) {
     for (const act of prog.actividades) {
+      const clave = META_POR_TIPO.has(act.tipo) ? act.tipo : CLAVE_OTROS;
       const cur =
-        acc.get(act.tipo) ?? { total: 0, completadas: 0, primera: null, pendiente: null };
+        acc.get(clave) ?? { total: 0, completadas: 0, primera: null, pendiente: null };
       cur.total += 1;
       if (act.estado === "completada") cur.completadas += 1;
       const aqui: Destino = { numero: prog.numero, orden: act.orden };
       if (!cur.primera) cur.primera = aqui;
       if (!cur.pendiente && act.estado !== "completada") cur.pendiente = aqui;
-      acc.set(act.tipo, cur);
+      acc.set(clave, cur);
     }
   }
 
@@ -78,14 +103,14 @@ export default function AccesosMateria({ progresiones, codigoUAC, accent, horizo
       transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 3 }}
     >
       <div className="uac-mosaico-head">
-        <i className="fa-solid fa-table-cells-large" style={{ color: accent, fontSize: 13 }} />
+        <i className="fa-solid fa-table-cells-large" style={{ color: accent, fontSize: 14 }} />
         <span>Contenido de la materia</span>
         {horizontal && <span className="uac-mosaico-head-line" aria-hidden />}
       </div>
 
       <div className="uac-mosaico-grid">
         {tipos.map((t) => {
-          const meta = getTipoRecursoMeta(t.tipo);
+          const meta = metaDeTipo(t.tipo);
           const hecho = t.completadas >= t.total;
           return (
             <Link
@@ -109,7 +134,7 @@ export default function AccesosMateria({ progresiones, codigoUAC, accent, horizo
                 <span className="uac-mosaico-tile-count">
                   {hecho ? (
                     <>
-                      <i className="fa-solid fa-circle-check" style={{ color: "#4ADE80", fontSize: 9 }} />{" "}
+                      <i className="fa-solid fa-circle-check" style={{ color: "#4ADE80", fontSize: 12 }} />{" "}
                       {t.total}
                     </>
                   ) : (
@@ -123,9 +148,9 @@ export default function AccesosMateria({ progresiones, codigoUAC, accent, horizo
       </div>
 
       <Link href="/hub/recursos" className="uac-mosaico-foot">
-        <i className="fa-solid fa-compass" style={{ fontSize: 12 }} />
+        <i className="fa-solid fa-compass" style={{ fontSize: 13 }} />
         Centro de recursos
-        <i className="fa-solid fa-arrow-right" style={{ fontSize: 10, marginLeft: "auto", opacity: 0.7 }} />
+        <i className="fa-solid fa-arrow-right" style={{ fontSize: 12, marginLeft: "auto", opacity: 0.7 }} />
       </Link>
     </motion.aside>
   );

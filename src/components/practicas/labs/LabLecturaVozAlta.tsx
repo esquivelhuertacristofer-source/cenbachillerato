@@ -323,7 +323,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
   /* ── objetivos de la sesión ───────────────────────────────────────────── */
   const todoHecho = partituraDone && ritmoDone && diagDone && opiDone && glosarioDone && textoDone;
   const objetivos = [
-    { txt: "Escucha la lectura de corrido y con puntuación", done: oidoCorrido && oidoPuntuado },
+    { txt: "Escucha la lectura de corrido y con puntuación", done: oidoCorrido && oidoPuntuado, modo: "partitura" },
     { txt: "Lee muy rápido y muy lento y mira a la oyente", done: rapidoVisto && lentoVisto },
     { txt: `Marca los ${TEXTOS[0]!.puntos.length} puntos de la nota informativa`, done: TEXTOS[0]!.puntos.every((p) => !!puestos[p.id]) },
     { txt: `Marca los ${TEXTOS[1]!.puntos.length} puntos del texto literario`, done: TEXTOS[1]!.puntos.every((p) => !!puestos[p.id]) },
@@ -331,8 +331,8 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
     { txt: `Ajusta el ritmo de los ${FRAGMENTOS.length} fragmentos`, done: ritmoDone },
     { txt: `Diagnostica las ${LECTURAS.length} lecturas ajenas`, done: diagDone },
     { txt: `Emite las ${LECTURAS.length} opiniones fundamentadas`, done: opiDone },
-    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone },
-    { txt: "Completa el texto con los cuatro elementos", done: textoDone },
+    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
+    { txt: "Completa el texto con los cuatro elementos", done: textoDone, modo: "texto" },
     { txt: "Aprueba el reto evaluable", done: quizAprobado },
     { txt: "Termina con 2 errores o menos", done: todoHecho && partida.errores <= 2 },
   ];

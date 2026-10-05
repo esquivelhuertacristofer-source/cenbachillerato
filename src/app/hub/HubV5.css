@@ -203,10 +203,11 @@
 
 /* ── UAC page nav bar ─────────────────────────────────────── */
 .uac-v2-nav {
-  padding: 28px 48px;
+  padding: 14px 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -219,12 +220,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.08em;
   color: var(--hub-text-muted);
   text-decoration: none;
+  white-space: nowrap;
   transition: all 0.25s;
 }
 
@@ -233,9 +236,39 @@
   transform: translateX(-4px);
 }
 
+/* Materia en la barra: código + nombre, recortado con «…» si no cabe */
+.uac-v2-nav-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.uac-v2-nav-meta-text {
+  text-align: right;
+  min-width: 0;
+}
+
+.uac-v2-nav-codigo {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.uac-v2-nav-nombre {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── UAC page hero ────────────────────────────────────────── */
 .uac-v2-hero {
-  padding: 60px 0 40px;
+  padding: 40px 0 32px;
   position: relative;
   overflow: hidden;
 }
@@ -318,11 +351,11 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 10px;
-  font-weight: 900;
+  font-size: 13px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .uac-mosaico-grid {
@@ -336,7 +369,7 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
-  min-height: 58px;
+  min-height: 56px;
   padding: 10px 12px;
   border-radius: 14px;
   text-decoration: none;
@@ -352,14 +385,14 @@
 }
 
 .uac-mosaico-ico {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .uac-mosaico-tile-body {
@@ -370,7 +403,7 @@
 }
 
 .uac-mosaico-tile-label {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.88);
   line-height: 1.18;
@@ -383,10 +416,10 @@
 }
 
 .uac-mosaico-tile-count {
-  font-size: 10px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.42);
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.02em;
 }
 
 .uac-mosaico-foot {
@@ -397,9 +430,9 @@
   padding: 11px 14px;
   border-radius: 14px;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.70);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.07);
   transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
@@ -426,7 +459,7 @@
 }
 
 .uac-mosaico--horizontal .uac-mosaico-head {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .uac-mosaico--horizontal .uac-mosaico-head-line {
@@ -445,7 +478,7 @@
 }
 
 .uac-mosaico--horizontal .uac-mosaico-tile {
-  flex: 1 1 150px;
+  flex: 1 1 160px;
 }
 
 .uac-mosaico--horizontal .uac-mosaico-foot {
@@ -473,21 +506,24 @@
 }
 
 .uac-v2-tag {
-  font-size: 11px;
-  font-weight: 900;
+  font-size: 13px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.4em;
-  margin-bottom: 20px;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
   display: block;
 }
 
+/* Proporcionado: «Ciencias Naturales, Experimentales y Tecnología V» ocupaba
+   4 líneas a ~70 px. Ahora 2 líneas en escritorio y ~3 en celular. */
 .uac-v2-h1 {
-  font-size: clamp(40px, 5.5vw, 72px);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 0.92;
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
   color: var(--hub-text);
-  margin-bottom: 28px;
+  margin-bottom: 20px;
+  overflow-wrap: anywhere;
 }
 
 .uac-v2-progress-row {
@@ -499,7 +535,7 @@
 
 .uac-v2-prog-track {
   flex: 1;
-  height: 10px;
+  height: 8px;
   background: rgba(255, 255, 255, 0.10);
   border-radius: 999px;
   overflow: hidden;
@@ -512,10 +548,10 @@
 }
 
 .uac-v2-prog-val {
-  font-size: 28px;
-  font-weight: 900;
+  font-size: 22px;
+  font-weight: 800;
   font-family: var(--font-epilogue), sans-serif;
-  min-width: 60px;
+  min-width: 52px;
 }
 
 /* ── Timeline section ─────────────────────────────────────── */
@@ -526,14 +562,14 @@
 }
 
 .uac-v2-timeline-header {
-  font-size: 28px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 800;
+  letter-spacing: -0.015em;
   color: var(--hub-text);
-  margin-bottom: 48px;
+  margin-bottom: 28px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .uac-v2-timeline-line {
@@ -565,10 +601,30 @@
     font-size: 32px;
   }
   .uac-v2-h1 {
-    font-size: 36px;
+    font-size: 26px;
   }
   .uac-mosaico-grid {
     grid-template-columns: 1fr 1fr;
+  }
+  .uac-v2-hero {
+    padding: 28px 0 24px;
+  }
+  .uac-v2-nav {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .uac-v2-back-link {
+    font-size: 12px;
+  }
+  .uac-v2-nav-nombre {
+    font-size: 13px;
+  }
+  .uac-mosaico--horizontal .uac-mosaico-tile {
+    flex-basis: 140px;
+  }
+  .uac-mosaico--horizontal .uac-mosaico-foot {
+    align-self: stretch;
+    max-width: none;
   }
   .hub-v2-page {
     padding-top: 32px;

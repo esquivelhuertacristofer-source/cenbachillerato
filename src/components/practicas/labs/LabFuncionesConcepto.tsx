@@ -200,8 +200,8 @@ export function LabFuncionesConcepto({ color }: PracticaLabProps) {
       objetivos={[
         { txt: "Prueba tres entradas distintas y observa que cada una da una sola salida", done: probadas.length >= 3 },
         { txt: "Mueve la entrada x y observa la única salida f(x)", done: xPos !== r.xDef },
-        { txt: "Aplica la prueba de la línea vertical en modo ¿Es función?", done: modo === "test" },
-        { txt: "Encuentra una relación que NO es función (la recta vertical la corta dos veces)", done: modo === "test" && !r.esFuncion && cortes > 1 },
+        { txt: "Aplica la prueba de la línea vertical en modo ¿Es función?", done: modo === "test", modo: "test" },
+        { txt: "Encuentra una relación que NO es función (la recta vertical la corta dos veces)", done: modo === "test" && !r.esFuncion && cortes > 1, modo: "test" },
         { txt: "Compara al menos dos relaciones distintas", done: relId !== REL_DEF },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}

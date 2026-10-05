@@ -23,6 +23,7 @@
 import { resolve, relative, join } from "path";
 import { existsSync, readdirSync, statSync, readFileSync, writeFileSync } from "fs";
 import { execFile } from "child_process";
+import { createHash } from "crypto";
 import { VOZ_BASE } from "../src/lib/voz/ruta-voz";
 
 const ORIGEN = resolve(process.cwd(), "../video-pipeline/voz-out");
@@ -33,6 +34,15 @@ const PREFIJO = "bachillerato-voz";
 const TODO = process.argv.includes("--todo");
 const DRY = process.argv.includes("--dry");
 const VERIFICAR = process.argv.includes("--verificar");
+/** --recientes=N: fuerza los MP3 modificados en los últimos N minutos (p. ej. tras regrabar). */
+const RECIENTES_MIN = Number((process.argv.find((a) => a.startsWith("--recientes=")) ?? "").split("=")[1] || 0);
+
+/**
+ * El índice guarda una huella del CONTENIDO, no el tamaño. Con el tamaño, un
+ * clip regrabado que dura lo mismo (p. ej. «abioticamente» → «abióticamente»)
+ * pesa los mismos bytes y nunca se volvía a subir: en R2 quedaba la voz vieja.
+ */
+const huella = (f: string) => createHash("sha1").update(readFileSync(f)).digest("hex").slice(0, 16);
 
 /** Seis a la vez: donde deja de mejorar y empieza a saturar una subida doméstica. */
 const A_LA_VEZ = 6;
@@ -88,7 +98,7 @@ async function main() {
   const archivos = mp3s(ORIGEN);
   if (archivos.length === 0) throw new Error("No hay MP3 que subir");
 
-  const indice: Record<string, number> = existsSync(INDICE)
+  const indice: Record<string, number | string> = existsSync(INDICE)
     ? JSON.parse(readFileSync(INDICE, "utf8"))
     : {};
 
@@ -105,10 +115,17 @@ async function main() {
     return;
   }
 
+  const limite = RECIENTES_MIN > 0 ? Date.now() - RECIENTES_MIN * 60_000 : Infinity;
+  let migrados = 0;
   const pendientes = archivos.filter((f) => {
     const rel = relative(ORIGEN, f).split("\\").join("/");
-    return TODO || indice[rel] !== statSync(f).size;
+    if (TODO || statSync(f).mtimeMs >= limite) return true;
+    const previo = indice[rel];
+    // Índice viejo (tamaño): si coincide, se adopta la huella sin volver a subir.
+    if (typeof previo === "number" && previo === statSync(f).size) { indice[rel] = huella(f); migrados++; return false; }
+    return previo !== huella(f);
   });
+  if (migrados) writeFileSync(INDICE, JSON.stringify(indice), "utf8");
 
   console.log(
     `${archivos.length} MP3 en disco | ${pendientes.length} por subir a ${BUCKET}/${PREFIJO}/` +
@@ -121,7 +138,7 @@ async function main() {
     const rel = relative(ORIGEN, f).split("\\").join("/");
     try {
       await put(`${BUCKET}/${PREFIJO}/${rel}`, f);
-      indice[rel] = statSync(f).size;
+      indice[rel] = huella(f);
       hechos++;
       if (hechos % 50 === 0) {
         console.log(`  ${hechos}/${pendientes.length}  ${rel}`);

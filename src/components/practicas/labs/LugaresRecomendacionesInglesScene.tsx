@@ -129,9 +129,10 @@ function M({
   );
 }
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Tamaño fijo en píxeles, sin distanceFactor (la letra ya no crece ni se encoge con la cámara). `df` se ignora. */
+function Etiqueta({ pos, children, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -155,9 +156,10 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
 }
 
 /** Globo de diálogo con ancho máximo (texto en varias líneas). */
-function Globo({ pos, children, col, df = 10, fs = 13, ancho = 300 }: { pos: Pt; children: ReactNode; col: string; df?: number; fs?: number; ancho?: number }) {
+/** Tamaño fijo en píxeles, sin distanceFactor (la letra ya no crece ni se encoge con la cámara). `df` se ignora. */
+function Globo({ pos, children, col, fs = 13, ancho = 300 }: { pos: Pt; children: ReactNode; col: string; df?: number; fs?: number; ancho?: number }) {
   return (
-    <HtmlAncho position={pos} center distanceFactor={df} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+    <HtmlAncho position={pos} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           width: "max-content",
@@ -167,7 +169,7 @@ function Globo({ pos, children, col, df = 10, fs = 13, ancho = 300 }: { pos: Pt;
           background: "rgba(4,10,22,0.92)",
           border: `2px solid ${col}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(fs, 14),
           fontWeight: 800,
           lineHeight: 1.35,
           textAlign: "center",
@@ -188,7 +190,7 @@ function Letrero({ p, texto, detalle, col = "#fef08a", rotY = 0, alto = 0.62 }: 
       <M geo={CAJA} p={[0, alto + 0.08, 0.02]} s={[0.46, 0.2, 0.03]} c={col} rough={0.5} />
       <M geo={CAJA} p={[0, alto + 0.08, 0.037]} s={[0.4, 0.035, 0.005]} c="#b91c1c" sombra={false} />
       {detalle && (
-        <Html position={[0, alto + 0.34, 0.05]} center distanceFactor={6.5} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+        <Html position={[0, alto + 0.34, 0.05]} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ padding: "2px 7px", borderRadius: 5, background: "#fef3c7", border: "1.5px solid #b91c1c", color: "#7f1d1d", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap", letterSpacing: "0.03em" }}>{texto}</div>
         </Html>
       )}
@@ -506,10 +508,10 @@ function DMercado({ detalle }: DioramaProps) {
         <M geo={CAJA} p={[0.66, 1.36, 0.13]} s={[0.46, 0.14, 0.02]} c="#f8fafc" sombra={false} />
         {detalle && (
           <>
-            <Html position={[0, 1.6, 0.16]} center distanceFactor={6.5} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+            <Html position={[0, 1.6, 0.16]} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
               <div style={{ color: "#9d174d", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>CRAFTS MARKET</div>
             </Html>
-            <Html position={[0.66, 1.36, 0.16]} center distanceFactor={6.5} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+            <Html position={[0.66, 1.36, 0.16]} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
               <div style={{ padding: "1px 6px", borderRadius: 4, background: "#fef3c7", border: "1.5px solid #b91c1c", color: "#7f1d1d", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>CASH ONLY</div>
             </Html>
           </>
@@ -570,7 +572,7 @@ function DMuseo({ detalle }: DioramaProps) {
       {/* Letrero MUSEUM encima de la entrada */}
       <M geo={CAJA} p={posDe(l, "sign")[0]!} s={[0.92, 0.22, 0.04]} c="#312e81" />
       {detalle && (
-        <Html position={[0, 1.6, 1.0]} center distanceFactor={6.5} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+        <Html position={[0, 1.6, 1.0]} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ color: "#fde68a", fontSize: 14, fontWeight: 900, letterSpacing: "0.12em", whiteSpace: "nowrap" }}>MUSEUM</div>
         </Html>
       )}
@@ -1147,7 +1149,7 @@ function EscenaDescribir({ lugarIdx, resalta, resaltaEstado, resaltaNonce, oraci
         <D detalle />
         {resalta && resaltaEstado && <Marcas key={`${resalta}-${resaltaNonce}`} l={l} clave={resalta} estado={resaltaEstado} nonce={resaltaNonce} />}
       </group>
-      <HtmlAncho position={[0, 0.25, 4.35]} center distanceFactor={10} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
+      <HtmlAncho position={[0, 0.25, 4.35]} center zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", borderRadius: 12, background: "rgba(4,10,22,0.9)", border: `1.5px solid ${l.color}`, color: "#fff", whiteSpace: "nowrap" }}>
           <i className={`fa-solid ${l.icono}`} style={{ color: l.color, fontSize: 16 }} />
           <span style={{ fontSize: 15, fontWeight: 900 }}>{l.nombre}</span>

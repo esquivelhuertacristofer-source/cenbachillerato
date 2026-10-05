@@ -50,7 +50,7 @@ export function ImagenAmbientacion({
   if (tienePropia) {
     return (
       <div style={marco}>
-        <img
+        <img className="imagen-amb"
           src={url}
           alt={titulo}
           style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
@@ -63,7 +63,7 @@ export function ImagenAmbientacion({
   if (!errorTematica) {
     return (
       <div style={marco}>
-        <img
+        <img className="imagen-amb"
           src={tematica}
           alt={titulo}
           style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}

@@ -400,11 +400,11 @@ export function LabOrigenVida({ color }: PracticaLabProps) {
         }
         lectura={lectura}
         objetivos={[
-          { txt: "Enciende la chispa y deja pasar 3 días: ¿cuántos aminoácidos aparecen en la trampa?", done: modo === "miller" && chispa && dias >= 3 },
-          { txt: "Haz correr el experimento de Miller-Urey hasta ver aminoácidos", done: modo === "miller" && nAmino > 0 },
-          { txt: "Apaga la chispa: sin energía no hay síntesis", done: modo === "miller" && !chispa },
-          { txt: "Compara los ambientes: caldo, ventilas hidrotermales y panspermia", done: modo === "ambientes" && ambiente !== "caldo" },
-          { txt: "Explora el mundo ARN: una molécula que guarda y cataliza", done: modo === "mundoarn" },
+          { txt: "Enciende la chispa y deja pasar 3 días: ¿cuántos aminoácidos aparecen en la trampa?", done: modo === "miller" && chispa && dias >= 3, modo: "miller" },
+          { txt: "Haz correr el experimento de Miller-Urey hasta ver aminoácidos", done: modo === "miller" && nAmino > 0, modo: "miller" },
+          { txt: "Apaga la chispa: sin energía no hay síntesis", done: modo === "miller" && !chispa, modo: "miller" },
+          { txt: "Compara los ambientes: caldo, ventilas hidrotermales y panspermia", done: modo === "ambientes" && ambiente !== "caldo", modo: "ambientes" },
+          { txt: "Explora el mundo ARN: una molécula que guarda y cataliza", done: modo === "mundoarn", modo: "mundoarn" },
           { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
         ]}
         pestanas={[

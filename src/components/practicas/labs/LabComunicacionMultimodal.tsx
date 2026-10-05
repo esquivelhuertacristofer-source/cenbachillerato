@@ -275,7 +275,7 @@ export function LabComunicacionMultimodal({ color }: PracticaLabProps) {
     { txt: `Logra claridad, alcance y accesibilidad de ${UMBRAL} o más`, done: eficazDone },
     { txt: "Clasifica los 8 elementos por modo semiótico", done: modalidadDone },
     { txt: "Empareja los 5 conceptos con su definición", done: conceptosDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

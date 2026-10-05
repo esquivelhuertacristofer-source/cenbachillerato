@@ -414,8 +414,8 @@ export function LabConvivenciaDigital({ color }: PracticaLabProps) {
     { txt: `Lee las tres señales en los ${CASOS.length} casos`, done: senalesDone },
     { txt: `Elige la respuesta proporcional en los ${CASOS.length} casos`, done: accionesDone },
     { txt: `Reescribe en firme los ${REESCRITURAS.length} mensajes`, done: reescribirDone },
-    { txt: "Completa el texto con los cuatro términos", done: textoDone },
-    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone },
+    { txt: "Completa el texto con los cuatro términos", done: textoDone, modo: "texto" },
+    { txt: `Escribe los ${PARES.length} términos del glosario`, done: glosarioDone, modo: "glosario" },
     { txt: "Aprueba el reto evaluable", done: quizAprobado },
     { txt: "Termina con 2 errores o menos", done: todoHecho && partida.errores <= 2 },
   ];

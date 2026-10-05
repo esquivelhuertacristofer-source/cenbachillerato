@@ -216,7 +216,7 @@ export function LabSentidoHistorico({ color }: PracticaLabProps) {
     { txt: "Cuelga 3 situaciones del pueblo de su raíz y mira subir el medidor", done: nConex >= 3 },
     { txt: "Empareja los 6 fenómenos con su raíz histórica", done: raicesDone },
     { txt: "Clasifica los 8 casos por su forma de mirar el pasado", done: miradasDone },
-    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

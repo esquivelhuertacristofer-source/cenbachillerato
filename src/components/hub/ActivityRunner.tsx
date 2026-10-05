@@ -225,7 +225,7 @@ export function ActivityRunner({
     );
   } else if (tipo === "quiz_verdadero_falso") {
     activity = (
-      <QuizVerdaderoFalsoActivity actividad={{ ...base, tipo: "quiz_verdadero_falso", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
+      <QuizVerdaderoFalsoActivity actividad={{ ...base, tipo: "quiz_verdadero_falso", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} estado={estado} respuestasIntento={respuestasIntento ?? undefined} />
     );
   } else if (tipo === "fill_blanks") {
     activity = (

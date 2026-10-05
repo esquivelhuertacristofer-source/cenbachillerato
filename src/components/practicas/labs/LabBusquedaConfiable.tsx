@@ -249,7 +249,7 @@ export function LabBusquedaConfiable({ color }: PracticaLabProps) {
     { txt: "Elige 3 fuentes confiables y saca 8 o más en tu tarea", done: lograNota },
     { txt: "Clasifica los 9 indicios (estrategia / alerta)", done: senalesDone },
     { txt: "Empareja las 5 estrategias con su pregunta", done: estrategiasDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone, modo: "glosario" },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];

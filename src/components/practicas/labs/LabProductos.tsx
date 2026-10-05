@@ -128,7 +128,7 @@ export function LabProductos({ color }: PracticaLabProps) {
   const reset = () => { setSep(0); setResetNonce((n) => n + 1); };
 
   const objetivos = [
-    { txt: "Despieza el cuadrado y descubre cuánto falta si solo sumas a² + b²", done: despiezoCuadrado },
+    { txt: "Despieza el cuadrado y descubre cuánto falta si solo sumas a² + b²", done: despiezoCuadrado, modo: "cuadrado" },
     { txt: "Mueve los lados a y b y observa la figura", done: movioLados },
     { txt: "Despieza la figura para ver cada término", done: despiezo },
     { txt: "Explora el cubo (a + b)³ en 3D", done: vioCubo },

@@ -74,16 +74,16 @@ export default function ProgresionTimeline({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 16,
-                margin: "12px 0 28px",
-                color: "rgba(255,255,255,0.34)",
-                fontSize: 12,
+                gap: 12,
+                margin: "8px 0 22px",
+                color: "rgba(255,255,255,0.50)",
+                fontSize: 13,
                 fontWeight: 800,
                 textTransform: "uppercase",
-                letterSpacing: "0.18em",
+                letterSpacing: "0.1em",
               }}
             >
-              <i className="fa-solid fa-plus" style={{ fontSize: 11 }} />
+              <i className="fa-solid fa-plus" style={{ fontSize: 12 }} />
               Contenido complementario · no oficial 2025
               <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.10)" }} />
             </div>
