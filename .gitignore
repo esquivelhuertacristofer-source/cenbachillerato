@@ -71,3 +71,7 @@ scripts/.capturas-labs/
 scripts/.tablero/
 scripts/.rescate/
 scripts/.verif/
+
+# Respaldos locales de la BD (datos de alumnos): nunca al repo
+respaldos/
+respaldo-rest/

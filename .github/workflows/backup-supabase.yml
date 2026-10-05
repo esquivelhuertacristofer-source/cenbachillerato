@@ -31,9 +31,15 @@ name: Backup diario de Supabase
 #      "New repository secret" → nombre EXACTO `SUPABASE_DB_URL`, valor la
 #      cadena completa del paso 2-3.
 #
-# Si este repo todavía no se ha subido a GitHub, este archivo simplemente no
-# se ejecuta (no hay cron sin remoto) — queda listo para el momento en que se
-# suba y se configure el secret, sin requerir ningún otro cambio.
+# CAMINO ALTERNO (2026-10-05): del 2026-07 al 2026-10 este workflow falló TODOS
+# los días porque nunca se creó SUPABASE_DB_URL — no hubo ni un respaldo. Ahora
+# basta con CUALQUIERA de estos dos secrets:
+#   · SUPABASE_DB_URL            → pg_dump completo (esquema + RLS + auth + datos).
+#   · SUPABASE_SERVICE_ROLE_KEY  → respaldo de DATOS de todas las tablas de
+#     `public` por la API REST (scripts/respaldo-supabase-rest.mjs). Usa además
+#     el secret NEXT_PUBLIC_SUPABASE_URL, que ya existe para el CI. El esquema se
+#     reconstruye desde supabase/migrations/; las cuentas de auth NO van aquí.
+# Con los dos, se hacen los dos (dos copias independientes).
 # ============================================================================
 
 on:
@@ -52,17 +58,59 @@ permissions:
 
 jobs:
   backup:
-    name: pg_dump → artifact
+    name: Respaldo → artifact
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
-      - name: Validar que el secret SUPABASE_DB_URL está configurado
+      - name: Ver qué secrets hay
+        id: modo
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPA_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
         run: |
-          if [ -z "${{ secrets.SUPABASE_DB_URL }}" ]; then
-            echo "::error::Falta el secret SUPABASE_DB_URL. Ver el comentario al inicio de este archivo (.github/workflows/backup-supabase.yml) para crearlo."
+          PG=false; REST=false
+          [ -n "$DB_URL" ] && PG=true
+          [ -n "$SERVICE_KEY" ] && [ -n "$SUPA_URL" ] && REST=true
+          echo "pg=$PG" >> "$GITHUB_OUTPUT"
+          echo "rest=$REST" >> "$GITHUB_OUTPUT"
+          echo "pg_dump: $PG · REST: $REST"
+          if [ "$PG" = false ] && [ "$REST" = false ]; then
+            echo "::error::No hay con qué respaldar. Crea el secret SUPABASE_SERVICE_ROLE_KEY (la llave service_role del proyecto) o SUPABASE_DB_URL. Ver el comentario al inicio de .github/workflows/backup-supabase.yml."
             exit 1
           fi
+
+      - uses: actions/checkout@v4
+        if: steps.modo.outputs.rest == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.modo.outputs.rest == 'true'
+        with:
+          node-version: "22"
+
+      - name: Respaldo de datos por REST (todas las tablas de public)
+        if: steps.modo.outputs.rest == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          node scripts/respaldo-supabase-rest.mjs respaldo-rest
+          TAMANO=$(stat -c%s respaldo-rest/*.json.gz)
+          if [ "$TAMANO" -lt 1024 ]; then
+            echo "::error::El respaldo REST pesa solo ${TAMANO} bytes — probablemente falló."
+            exit 1
+          fi
+
+      - name: Subir respaldo REST como artifact
+        if: steps.modo.outputs.rest == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.DUMP_NOMBRE }}
+          path: ${{ env.DUMP_RUTA }}
+          retention-days: 30
+          compression-level: 0
 
       # ubuntu-latest trae postgresql-client desactualizado respecto a los
       # proyectos nuevos de Supabase (Postgres 17). Un pg_dump más viejo que
@@ -71,19 +119,19 @@ jobs:
       # la versión 17 exacta del cliente desde el repositorio oficial de
       # PostgreSQL (apt.postgresql.org) en vez de confiar en el apt de Ubuntu.
       - name: Instalar cliente de PostgreSQL 17 (pg_dump)
+        if: steps.modo.outputs.pg == 'true'
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends wget ca-certificates gnupg lsb-release
-          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-            | sudo gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
-            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc             | sudo gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main"             | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends postgresql-client-17
           pg_dump --version
 
       - name: Generar dump comprimido
+        if: steps.modo.outputs.pg == 'true'
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
@@ -91,43 +139,27 @@ jobs:
           FECHA="$(date -u +%Y%m%d-%H%M)"
           NOMBRE="supabase-backup-${FECHA}.sql.gz"
 
-          # Formato plano (--format=plain, el default) en vez de --format=custom:
-          # se restaura con `psql -f` sin necesitar pg_restore ni recordar
-          # flags adicionales — más a prueba de balas para una emergencia
-          # operada por alguien que no vive en Postgres a diario.
-          # --no-owner / --no-privileges: el dump se piensa para restaurar en
-          # un proyecto de recuperación con roles distintos a los del
-          # original; sin estas banderas la restauración fallaría intentando
-          # reasignar dueños/permisos que no existen ahí.
-          pg_dump "$SUPABASE_DB_URL" \
-            --format=plain \
-            --no-owner \
-            --no-privileges \
-          | gzip -9 > "${NOMBRE}"
+          # Formato plano: se restaura con `psql -f` sin pg_restore.
+          # --no-owner / --no-privileges: para restaurar en un proyecto de
+          # recuperación con roles distintos a los del original.
+          pg_dump "$SUPABASE_DB_URL"             --format=plain             --no-owner             --no-privileges           | gzip -9 > "${NOMBRE}"
 
-          # Sanity check mínimo: un dump de 0 bytes (o casi) sugiere que
-          # pg_dump falló silenciosamente o que la conexión no trajo nada.
           TAMANO=$(stat -c%s "${NOMBRE}")
           if [ "$TAMANO" -lt 1024 ]; then
             echo "::error::El dump generado (${NOMBRE}) pesa solo ${TAMANO} bytes — probablemente falló. Revisar el log de pg_dump arriba."
             exit 1
           fi
 
-          echo "DUMP_NOMBRE=${NOMBRE}" >> "$GITHUB_ENV"
+          echo "PGDUMP_NOMBRE=${NOMBRE}" >> "$GITHUB_ENV"
           echo "Dump generado: ${NOMBRE} (${TAMANO} bytes)"
 
       - name: Subir dump como artifact
+        if: steps.modo.outputs.pg == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.DUMP_NOMBRE }}
-          path: ${{ env.DUMP_NOMBRE }}
-          # 30 días de retención: suficiente para detectar un problema y
-          # volver a un punto anterior sin acumular indefinidamente contra el
-          # cupo Free de GitHub Actions Storage (500 MB). Con la BD de
-          # Supabase muy por debajo del techo de 500 MB (ver
-          # scripts/monitoreo-supabase.sql), 30 dumps diarios caben sin
-          # problema — igual conviene vigilarlo si la BD crece mucho.
+          name: ${{ env.PGDUMP_NOMBRE }}
+          path: ${{ env.PGDUMP_NOMBRE }}
+          # 30 días: cabe de sobra en el cupo Free de Actions Storage (500 MB).
           retention-days: 30
-          # El .sql.gz ya viene comprimido con gzip -9; volver a comprimirlo
-          # en el zip del artifact no ahorra espacio y solo gasta CPU del runner.
+          # El .gz ya viene comprimido; recomprimir solo gasta CPU.
           compression-level: 0
