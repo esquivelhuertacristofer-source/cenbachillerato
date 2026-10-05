@@ -1,0 +1,10 @@
+{
+  "slug": "licencias-software",
+  "items": [
+    { "clave": "cabina-radio", "formato": "16:9", "estilo": "foto", "escena": "Cabina de una radio escolar pequeña con dos micrófonos sobre brazos articulados, una consola de mezcla con perillas, audífonos sobre la mesa y dos computadoras de escritorio con las pantallas apagadas, paredes con paneles de espuma acústica" },
+    { "clave": "foto-plaza", "formato": "16:9", "estilo": "foto", "escena": "Plaza de un pueblo mexicano al atardecer, kiosco de hierro al centro, bancas, árboles podados y cielo naranja, pocas personas caminando a lo lejos" },
+    { "clave": "foto-guitarra", "formato": "16:9", "estilo": "foto", "escena": "Guitarra acústica recargada en un banco de madera sobre un escenario pequeño iluminado por un foco cálido, fondo oscuro" },
+    { "clave": "foto-mural", "formato": "16:9", "estilo": "foto", "escena": "Mural colorido pintado en la pared de una calle de barrio con flores, pájaros y montañas, una banqueta y un poste al frente" },
+    { "clave": "foto-escenario", "formato": "16:9", "estilo": "foto", "escena": "Escenario de un auditorio escolar vacío con telón rojo abierto, piso de madera y luces apagadas, butacas vacías en primer plano" }
+  ]
+}
