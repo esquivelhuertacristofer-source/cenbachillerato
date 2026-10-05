@@ -8,7 +8,9 @@
  *
  * Dos modos:
  *  · CONTINUIDAD — el alumno elige una función (evitable / salto / esencial /
- *    continua), mueve el punto x y un semáforo evalúa las 3 condiciones en x = a.
+ *    continua), mueve el punto x hacia a y dos sondas (izquierda y derecha) a la
+ *    misma distancia de a muestran si los lados llegan a la misma altura; un
+ *    semáforo evalúa las 3 condiciones en x = a.
  *    Caso ancla verbatim: f(x) = (x²−4)/(x−2), evitable en x = 2 (lim = 4,
  *    reparable con F(2) = 4).
  *  · TVI — g(x) = x³ − x − 1 en [1,2]; g(1) = −1 < 0 < 5 = g(2), así que existe
@@ -17,21 +19,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import type { CSSProperties } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { CONTINUIDAD_FICHA } from "./continuidad-tres-condiciones-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./continuidad-tres-condiciones-data";
 import { LabSfx } from "./lab-audio";
 import {
-  FUNCIONES, func, evalFunc, condiciones, conUnidad, valOInf,
+  FUNCIONES, func, evalFunc, condiciones, valOInf,
   TVI, bisectN,
   IDEAS, DATOS, fmt0, fmt1, fmt2,
   MODO_DEF, FUNC_DEF, type Modo, type FuncId,
 } from "./continuidad-data";
-
-import { TableroObjetivos } from "./_objetivos";
 
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-continuidad-tres-condiciones-reto";
@@ -41,7 +43,7 @@ const ContinuidadScene = dynamic(() => import("./ContinuidadScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-traffic-light fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Dibujando el plano…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Dibujando el plano…</span>
     </div>
   ),
 });
@@ -49,6 +51,8 @@ const ContinuidadScene = dynamic(() => import("./ContinuidadScene"), {
 const X_COL = "#fbbf24";
 const OK_COL = "#34D399";
 const HOLE_COL = "#f87171";
+const IZQ_COL = "#60a5fa";
+const DER_COL = "#f472b6";
 
 export function LabContinuidad({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -60,11 +64,17 @@ export function LabContinuidad({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
+
+  // Misiones: lo hecho NO se des-cumple al cambiar de modo o de función.
+  const [movio, setMovio] = useState(false);
+  const [acerco, setAcerco] = useState(false);
+  const [vistos, setVistos] = useState<FuncId[]>([FUNC_DEF]);
+  const [tviVisto, setTviVisto] = useState(false);
+  const [raizHallada, setRaizHallada] = useState(false);
 
   const toggleSonido = useCallback(async () => {
     if (!audioRef.current) audioRef.current = new LabSfx();
@@ -137,6 +147,7 @@ export function LabContinuidad({ color }: PracticaLabProps) {
     if (sonido) audioRef.current?.blip();
     setPlaying(false);
     setModo(m);
+    if (m === "tvi") setTviVisto(true);
     bump();
   };
   const elegirFunc = (id: FuncId) => {
@@ -144,6 +155,7 @@ export function LabContinuidad({ color }: PracticaLabProps) {
     setPlaying(false);
     setFuncId(id);
     setXPos(func(id).xDef);
+    setVistos((v) => (v.includes(id) ? v : [...v, id]));
     bump();
   };
   const reset = () => {
@@ -157,8 +169,20 @@ export function LabContinuidad({ color }: PracticaLabProps) {
 
   // valores en vivo (modo continuidad)
   const yVal = evalFunc(funcId, xPos);
+  const delta = Math.max(Math.abs(xPos - f.a), 0.02);
+  const yIzq = evalFunc(funcId, f.a - delta);
+  const yDer = evalFunc(funcId, f.a + delta);
   // valores en vivo (modo TVI)
   const cTvi = bisectN(nObj);
+
+  // Ajustes durante el render (patrón de React): marcan hitos sin des-cumplirlos.
+  if (modo === "continuidad" && !movio && xPos !== f.xDef) setMovio(true);
+  if (modo === "continuidad" && !acerco && Math.abs(xPos - f.a) <= 0.2) setAcerco(true);
+  if (modo === "tvi" && !raizHallada && Math.abs(nObj) <= 0.05) setRaizHallada(true);
+
+  const txtVal = (y: number) => (Number.isFinite(y) ? fmt2(y) : "no existe");
+  const sondaOk = (y: number) => Number.isFinite(y) && Math.abs(y) < 1e3;
+  const veredicto = f.continua ? OK_COL : HOLE_COL;
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -168,7 +192,7 @@ export function LabContinuidad({ color }: PracticaLabProps) {
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>
         {modo === "tvi" ? "Teorema del Valor Intermedio" : f.titulo}
       </div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 420, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 420, lineHeight: 1.5 }}>
         {modo === "tvi"
           ? "Tu equipo no puede mostrar la escena en 3D, pero la idea sigue: g es continua en [1,2], g(1)=−1 y g(2)=5, así que existe c∈(1,2) con g(c)=0."
           : `Tu equipo no puede mostrar la escena en 3D, pero la idea sigue: ${f.tipoLabel}. ${f.contexto}`}
@@ -176,154 +200,79 @@ export function LabContinuidad({ color }: PracticaLabProps) {
     </div>
   );
 
+  const lectura = modo === "continuidad"
+    ? <>x = {fmt2(xPos)} → f(x) = {txtVal(yVal)}</>
+    : <>N = {fmt2(nObj)} → existe c ≈ {fmt2(cTvi)}</>;
+
+  const chip = (activo: boolean, col: string): CSSProperties => ({
+    cursor: "pointer", padding: "9px 12px", borderRadius: 12, fontSize: 14, fontWeight: 800,
+    border: `1px solid ${activo ? col : T.line}`, background: activo ? `${col}26` : T.inset, color: activo ? "#fff" : T.text2,
+    display: "inline-flex", alignItems: "center", gap: 7, minHeight: 40,
+  });
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulseCont { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulseCont 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-chip { cursor:pointer; padding:8px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; text-align:left; display:flex; align-items:center; gap:7px; }
-        .ex-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .ex-chip[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.18); color:#fff; }
-        .ex-seg { cursor:pointer; flex:1; padding:9px 12px; border-radius:10px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:7px; }
-        .ex-seg[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.2); color:#fff; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 62vh, 720px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#0b2233 0%,#08131f 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <ContinuidadScene modo={modo} funcId={funcId} xPos={xPos} nObj={nObj} accent={accent} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${accent}aa`, width: 9, height: 9, borderRadius: "50%", background: accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>
-                {modo === "tvi" ? "g(x) = x³ − x − 1" : f.expr}
-              </span>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <ContinuidadScene modo={modo} funcId={funcId} xPos={xPos} nObj={nObj} accent={accent} resetNonce={resetNonce} />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: [
+          { id: "continuidad", etiqueta: "Continuidad", icono: "fa-traffic-light" },
+          { id: "tvi", etiqueta: "Valor Intermedio", icono: "fa-arrow-down-up-across-line" },
+        ],
+        valor: modo,
+        cambiar: (id) => elegirModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Animar el acercamiento"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={
+        modo === "continuidad" ? (
+          <>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+              {conds.map((cd) => (
+                <span key={cd.etiqueta} title={cd.texto} style={{ width: 22, height: 22, borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#04121f", background: cd.cumple ? OK_COL : HOLE_COL }}>
+                  <i className={`fa-solid ${cd.cumple ? "fa-check" : "fa-xmark"}`} />
+                </span>
+              ))}
+              <span>{f.continua ? "continua en a" : "discontinua en a"}</span>
             </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Animar"}>
-                <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+              <span style={{ color: IZQ_COL }}>● izq</span> {sondaOk(yIzq) ? fmt2(yIzq) : "—"} · <span style={{ color: DER_COL }}>● der</span> {sondaOk(yDer) ? fmt2(yDer) : "—"}
             </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              {modo === "continuidad" ? (
-                <>
-                  <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                    <i className="fa-solid fa-location-crosshairs" style={{ color: X_COL, marginRight: 7 }} />
-                    x = <strong style={{ color: X_COL }}>{fmt2(xPos)}</strong>
-                    &nbsp;&nbsp;→&nbsp;&nbsp;
-                    f(x) = <strong style={{ color: Number.isFinite(yVal) ? OK_COL : HOLE_COL }}>{Number.isFinite(yVal) ? fmt2(yVal) : "no definida"}</strong>
-                  </div>
-                  <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>
-                    {f.continua
-                      ? `En x = ${fmt0(f.a)} se cumplen las tres condiciones: f es continua ahí.`
-                      : `En x = ${fmt0(f.a)} falla la continuidad → ${f.tipoLabel}.`}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                    <i className="fa-solid fa-arrows-up-down" style={{ color: X_COL, marginRight: 7 }} />
-                    N = <strong style={{ color: Math.abs(nObj) < 1e-9 ? OK_COL : X_COL }}>{fmt2(nObj)}</strong>
-                    &nbsp;&nbsp;→&nbsp;&nbsp;
-                    existe c = <strong style={{ color: OK_COL }}>{fmt2(cTvi)}</strong> con g(c) = N
-                  </div>
-                  <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>
-                    {Math.abs(nObj) < 1e-9
-                      ? `N = 0: el punto c ≈ ${fmt2(cTvi)} es la raíz de g en (1,2).`
-                      : `Como g es continua y N está entre g(1) = −1 y g(2) = 5, siempre hay un c en (1,2).`}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Controles */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            {/* selector de modo */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-              <button className="ex-seg" data-on={modo === "continuidad"} onClick={() => elegirModo("continuidad")}>
-                <i className="fa-solid fa-traffic-light" /> Continuidad (3 condiciones)
-              </button>
-              <button className="ex-seg" data-on={modo === "tvi"} onClick={() => elegirModo("tvi")}>
-                <i className="fa-solid fa-arrow-down-up-across-line" /> Valor Intermedio (TVI)
-              </button>
-            </div>
-
-            {modo === "continuidad" ? (
-              <>
-                <Eyebrow>
-                  <i className="fa-solid fa-location-crosshairs" style={{ marginRight: 8, color: accent }} />
-                  Mueve x y observa f(x) acercarse al punto de análisis
-                </Eyebrow>
+          </>
+        ) : (
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>g(1) = −1 &lt; N &lt; g(2) = 5</div>
+        )
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Acerca x al punto a por ambos lados: ¿los dos puntos coinciden en la altura?", done: acerco },
+        { txt: "Mueve x y observa las 3 condiciones de continuidad en acción", done: movio },
+        { txt: "Examina la discontinuidad evitable (el hueco que se puede tapar)", done: vistos.includes("evitable") },
+        { txt: "Examina la discontinuidad de salto y la esencial (asíntota)", done: vistos.includes("salto") || vistos.includes("esencial") },
+        { txt: "Compara con una función continua en todo su dominio", done: vistos.includes("continua") },
+        { txt: "Verifica el TVI: g(1) < 0 < g(2) garantiza raíz en (1,2)", done: tviVisto },
+        { txt: "En el TVI pon N = 0 y localiza la raíz de g", done: raizHallada },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: modo === "continuidad" ? (
+            <>
+              <Bloque titulo="Acércate al punto a" icono="fa-location-crosshairs">
                 <Deslizador
                   label="posición de x"
                   icon="fa-location-crosshairs"
@@ -333,24 +282,51 @@ export function LabContinuidad({ color }: PracticaLabProps) {
                   onChange={(v) => { setPlaying(false); setXPos(v); }}
                   hintL={fmt1(f.domMin)} hintR={fmt1(f.domMax)}
                 />
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px" }}>
-                  ELIGE UNA FUNCIÓN
-                </div>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Los puntos azul y rosa están a la misma distancia de x = {fmt0(f.a)}, uno por cada lado. Si terminan a la misma altura, el límite existe.
+                </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                   {FUNCIONES.map((ff) => (
-                    <button key={ff.id} className="ex-chip" data-on={funcId === ff.id} onClick={() => elegirFunc(ff.id)} title={ff.titulo}>
-                      <i className={`fa-solid ${ff.icono}`} style={{ color: ff.color }} />
+                    <button key={ff.id} type="button" style={chip(funcId === ff.id, ff.color)} onClick={() => elegirFunc(ff.id)} title={ff.titulo}>
+                      <i className={`fa-solid ${ff.icono}`} style={{ color: ff.color }} aria-hidden />
                       {ff.label}
                     </button>
                   ))}
                 </div>
-              </>
-            ) : (
-              <>
-                <Eyebrow>
-                  <i className="fa-solid fa-arrows-up-down" style={{ marginRight: 8, color: accent }} />
-                  Mueve el valor objetivo N entre g(1) = −1 y g(2) = 5
-                </Eyebrow>
+              </Bloque>
+              <Bloque titulo={`Semáforo en x = ${fmt0(f.a)}`} icono="fa-traffic-light">
+                {conds.map((cd) => (
+                  <div key={cd.etiqueta} style={{ display: "flex", gap: 10, alignItems: "center", padding: "9px 12px", borderRadius: 11, background: cd.cumple ? `${OK_COL}12` : `${HOLE_COL}10`, border: `1px solid ${cd.cumple ? OK_COL : HOLE_COL}44` }}>
+                    <span style={{ width: 26, height: 26, borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#04121f", background: cd.cumple ? OK_COL : HOLE_COL, flexShrink: 0 }}>
+                      <i className={`fa-solid ${cd.cumple ? "fa-check" : "fa-xmark"}`} aria-hidden />
+                    </span>
+                    <span><strong>({cd.etiqueta})</strong> {cd.texto}</span>
+                  </div>
+                ))}
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${veredicto}55`, background: `${veredicto}12` }}>
+                  {f.continua
+                    ? `Las tres se cumplen: f es CONTINUA en x = ${fmt0(f.a)}.`
+                    : `Falla al menos una: discontinuidad ${f.tipoLabel}.`}
+                  {f.reparable && f.reparacion ? ` Se repara: ${f.reparacion}` : ""}
+                  {!f.continua && !f.reparable ? " No es reparable." : ""}
+                </p>
+              </Bloque>
+              <Bloque titulo="Lecturas" icono="fa-gauge-high">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="x" value={fmt2(xPos)} col={X_COL} />
+                  <Dato label="f(x)" value={txtVal(yVal)} col={Number.isFinite(yVal) ? OK_COL : HOLE_COL} />
+                  <Dato label="f(a − δ), izquierda" value={sondaOk(yIzq) ? fmt2(yIzq) : "no existe"} col={IZQ_COL} />
+                  <Dato label="f(a + δ), derecha" value={sondaOk(yDer) ? fmt2(yDer) : "no existe"} col={DER_COL} />
+                  <Dato label="lím izq" value={valOInf(f.limIzq, f.infIzq)} col={X_COL} />
+                  <Dato label="lím der" value={valOInf(f.limDer, f.infDer)} col={X_COL} />
+                  <Dato label={`f(${fmt0(f.a)})`} value={f.fa !== null ? fmt2(f.fa) : "no existe"} col={f.fa !== null ? OK_COL : HOLE_COL} />
+                  <Dato label="¿continua en a?" value={f.continua ? "sí" : "no"} col={veredicto} />
+                </div>
+              </Bloque>
+            </>
+          ) : (
+            <>
+              <Bloque titulo="Valor objetivo N" icono="fa-arrows-up-down">
                 <Deslizador
                   label="valor objetivo N"
                   icon="fa-arrows-up-down"
@@ -360,257 +336,92 @@ export function LabContinuidad({ color }: PracticaLabProps) {
                   onChange={(v) => { setPlaying(false); setNObj(v); }}
                   hintL="−1 = g(1)" hintR="5 = g(2)"
                 />
-                <div style={{ marginTop: 14, padding: "11px 14px", borderRadius: 12, border: `1px solid ${OK_COL}55`, background: `${OK_COL}12`, fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
-                  <i className="fa-solid fa-check" style={{ color: OK_COL, marginRight: 8 }} />
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${OK_COL}55`, background: `${OK_COL}12` }}>
                   Para cualquier N en [−1, 5] siempre existe un <strong style={{ color: OK_COL }}>c ∈ (1,2)</strong> con g(c) = N. En N = 0, ese c ≈ {fmt2(bisectN(0))} es la raíz de g.
+                </p>
+              </Bloque>
+              <Bloque titulo="Lecturas" icono="fa-gauge-high">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="g(1)" value={fmt0(TVI.ga)} col={HOLE_COL} />
+                  <Dato label="g(2)" value={fmt0(TVI.gb)} col={OK_COL} />
+                  <Dato label="N (objetivo)" value={fmt2(nObj)} col={X_COL} />
+                  <Dato label="c con g(c) = N" value={fmt2(cTvi)} col={OK_COL} />
                 </div>
-              </>
-            )}
-          </div>
-
-          {/* Semáforo de continuidad (modo continuidad) / pasos TVI */}
-          {modo === "continuidad" ? (
-            <div style={{ ...card, padding: "18px 22px 20px" }}>
-              <Eyebrow>
-                <i className="fa-solid fa-traffic-light" style={{ marginRight: 8, color: accent }} />
-                Las 3 condiciones de continuidad en x = {fmt0(f.a)}
-              </Eyebrow>
-              <div style={{ display: "grid", gap: 9 }}>
-                {conds.map((cd) => (
-                  <div key={cd.etiqueta} style={{ display: "flex", gap: 11, alignItems: "center", padding: "10px 13px", borderRadius: 11, background: cd.cumple ? `${OK_COL}12` : `${HOLE_COL}10`, border: `1px solid ${cd.cumple ? OK_COL : HOLE_COL}44` }}>
-                    <div style={{ width: 26, height: 26, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#04121f", background: cd.cumple ? OK_COL : HOLE_COL, flexShrink: 0 }}>
-                      <i className={`fa-solid ${cd.cumple ? "fa-check" : "fa-xmark"}`} />
-                    </div>
-                    <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.4 }}>
-                      <strong>({cd.etiqueta})</strong> {cd.texto}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginTop: 12, padding: "11px 14px", borderRadius: 12, border: `1px solid ${f.continua ? OK_COL : HOLE_COL}55`, background: `${f.continua ? OK_COL : HOLE_COL}12`, fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
-                <i className={`fa-solid ${f.continua ? "fa-circle-check" : "fa-circle-exclamation"}`} style={{ color: f.continua ? OK_COL : HOLE_COL, marginRight: 8 }} />
-                {f.continua
-                  ? `Las tres se cumplen → f es CONTINUA en x = ${fmt0(f.a)}.`
-                  : `Falla al menos una → discontinuidad ${f.tipoLabel}.`}
-                {f.reparable && f.reparacion ? ` Se repara: ${f.reparacion}` : ""}
-                {!f.continua && !f.reparable ? " No es reparable." : ""}
-              </div>
-            </div>
-          ) : (
-            <div style={{ ...card, padding: "18px 22px 20px" }}>
-              <Eyebrow>
-                <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-                Teorema del Valor Intermedio — ¿hay raíz en (1, 2)?
-              </Eyebrow>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 14 }}>
-                <Readout label="g(1)" value={fmt0(TVI.ga)} col={HOLE_COL} size={18} />
-                <Readout label="g(2)" value={fmt0(TVI.gb)} col={OK_COL} size={18} />
-                <Readout label="N (objetivo)" value={fmt2(nObj)} col={X_COL} size={16} />
-                <Readout label="c con g(c)=N" value={fmt2(cTvi)} col={OK_COL} size={16} />
-              </div>
-              <div style={{ display: "grid", gap: 9 }}>
-                {TVI.pasos.map((p) => (
-                  <div key={p.etiqueta} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                    <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{p.etiqueta}</div>
-                    <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p.texto}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Veredicto / resultado */}
-          {modo === "continuidad" ? (
-            <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${f.continua ? OK_COL : HOLE_COL}66`, background: `${f.continua ? OK_COL : HOLE_COL}12` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: f.color }}>
-                  <i className={`fa-solid ${f.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>{f.tipoLabel}</div>
-                  <div style={{ fontSize: 12.5, color: f.continua ? OK_COL : HOLE_COL, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{f.expr}</div>
-                </div>
-              </div>
-              <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{f.contexto}</div>
-              {/* límites laterales */}
-              <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-                <MiniVal label="lím izq" value={valOInf(f.limIzq, f.infIzq)} col={X_COL} />
-                <MiniVal label="lím der" value={valOInf(f.limDer, f.infDer)} col={X_COL} />
-                <MiniVal label={`f(${fmt0(f.a)})`} value={f.fa !== null ? fmt2(f.fa) : "no existe"} col={f.fa !== null ? OK_COL : HOLE_COL} />
-              </div>
-            </div>
-          ) : (
-            <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${OK_COL}66`, background: `${OK_COL}12` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: "#a78bfa" }}>
-                  <i className="fa-solid fa-arrow-down-up-across-line" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Teorema del Valor Intermedio</div>
-                  <div style={{ fontSize: 12.5, color: OK_COL, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{TVI.expr} en [1, 2]</div>
-                </div>
-              </div>
-              <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{TVI.contexto}</div>
-            </div>
-          )}
-
-          {/* Resolución paso a paso (modo continuidad) */}
-          {modo === "continuidad" && (
-            <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: `1px solid ${accent}40`, background: `rgba(${color.rgba},0.08)` }}>
-              <Eyebrow>
-                <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-                Análisis paso a paso
-              </Eyebrow>
-              <div style={{ display: "grid", gap: 9 }}>
-                {f.pasos.map((p) => (
-                  <div key={p.etiqueta} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                    <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{p.etiqueta}</div>
-                    <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p.texto}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Tipos de discontinuidad (referencia) */}
-          <div style={{ ...card, padding: "20px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-shapes" style={{ marginRight: 8, color: accent }} />
-              Los tipos de discontinuidad
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              <TipoRef icono="fa-circle-notch" col="#FB923C" titulo="Evitable (removible)" texto="El límite existe pero f(a) no, o difiere. Se repara redefiniendo f(a) = límite." />
-              <TipoRef icono="fa-stairs" col="#60A5FA" titulo="De salto (1.ª especie)" texto="Los límites laterales existen pero son distintos. La función salta (tarifas CFE)." />
-              <TipoRef icono="fa-bolt" col="#F472B6" titulo="Esencial (2.ª especie)" texto="Un límite lateral es infinito o no existe (asíntota vertical, como 1/x). No se repara." />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos ──────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <TableroObjetivos
-          retoKey={RETO_KEY}
-          accent={accent}
-          objetivos={[
-            { txt: "Mueve x y observa las 3 condiciones de continuidad en acción", done: xPos !== f.xDef },
-            { txt: "Examina la discontinuidad evitable (el hueco que se puede tapar)", done: modo === "continuidad" && funcId === "evitable" },
-            { txt: "Examina la discontinuidad de salto y la esencial (asíntota)", done: funcId === "salto" || funcId === "esencial" },
-            { txt: "Compara con una función continua en todo su dominio", done: funcId === "continua" },
-            { txt: "Verifica el TVI: g(1) < 0 < g(2) garantiza raíz en (1,2)", done: modo === "tvi" },
-            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ]}
-        />
-      </div>
-
-      {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-gauge-high" style={{ marginRight: 8, color: accent }} />
-            Lecturas
-          </Eyebrow>
-          {modo === "continuidad" ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="posición x" value={fmt2(xPos)} col={X_COL} size={15} />
-              <Readout label="f(x)" value={Number.isFinite(yVal) ? conUnidad(yVal, "", 2) : "—"} col={Number.isFinite(yVal) ? OK_COL : HOLE_COL} size={15} />
-              <Readout label={`punto a`} value={fmt0(f.a)} col={X_COL} size={15} />
-              <Readout label="¿continua en a?" value={f.continua ? "sí" : "no"} col={f.continua ? OK_COL : HOLE_COL} size={16} />
-            </div>
-          ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="g(1)" value={fmt0(TVI.ga)} col={HOLE_COL} size={16} />
-              <Readout label="g(2)" value={fmt0(TVI.gb)} col={OK_COL} size={16} />
-              <Readout label="N objetivo" value={fmt2(nObj)} col={X_COL} size={15} />
-              <Readout label="c (g(c)=N)" value={fmt2(cTvi)} col={OK_COL} size={16} />
-            </div>
-          )}
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Cálculo <strong>exacto</strong>: f(x), los límites laterales, las 3 condiciones y la raíz del TVI (por bisección sobre g(x) = x³ − x − 1) salen de la fórmula real. El caso ancla <strong>(x²−4)/(x−2)</strong> y el TVI sobre <strong>g en [1,2]</strong> son verbatim del enunciado A2; los ejemplos de salto y esencial son <strong>didácticos</strong> (alineados con la infografía A1). El plano se dibuja a escala propia por caso para mostrar valores reales; el anillo abierto señala dónde el límite no se alcanza y la línea punteada en la esencial marca la asíntota vertical.
-        </span>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={CONTINUIDAD_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
-  );
-}
-
-/* ── Mini valor (límites laterales) ───────────────────────────────────────── */
-function MiniVal({ label, value, col }: { label: string; value: string; col: string }) {
-  return (
-    <div style={{ padding: "8px 10px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${col}33` }}>
-      <div style={{ fontSize: 10, color: T.text3, fontWeight: 800, marginBottom: 2 }}>{label}</div>
-      <div style={{ fontSize: 13.5, fontWeight: 900, color: col, fontFamily: "ui-monospace, monospace" }}>{value}</div>
-    </div>
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo={modo === "tvi" ? "Teorema del Valor Intermedio" : f.tipoLabel} icono={modo === "tvi" ? "fa-arrow-down-up-across-line" : f.icono}>
+                <strong style={{ fontFamily: "ui-monospace, monospace", color: modo === "tvi" ? OK_COL : veredicto }}>{modo === "tvi" ? `${TVI.expr} en [1, 2]` : f.expr}</strong>
+                <p style={{ margin: 0, color: T.text2 }}>{modo === "tvi" ? TVI.contexto : f.contexto}</p>
+              </Bloque>
+              <Bloque titulo={modo === "tvi" ? "Pasos del TVI" : "Análisis paso a paso"} icono="fa-list-ol">
+                {(modo === "tvi" ? TVI.pasos : f.pasos).map((p) => (
+                  <div key={p.etiqueta} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "9px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+                    <span style={{ width: 24, height: 24, borderRadius: 6, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{p.etiqueta}</span>
+                    <span style={{ minWidth: 0 }}>{p.texto}</span>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Los tipos de discontinuidad" icono="fa-shapes">
+                <TipoRef icono="fa-circle-notch" col="#FB923C" titulo="Evitable (removible)" texto="El límite existe pero f(a) no, o difiere. Se repara redefiniendo f(a) = límite." />
+                <TipoRef icono="fa-stairs" col="#60A5FA" titulo="De salto (1.ª especie)" texto="Los límites laterales existen pero son distintos. La función salta (tarifas CFE)." />
+                <TipoRef icono="fa-bolt" col="#F472B6" titulo="Esencial (2.ª especie)" texto="Un límite lateral es infinito o no existe (asíntota vertical, como 1/x). No se repara." />
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos" icono="fa-gauge-high">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={CONTINUIDAD_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                Cálculo <strong>exacto</strong>: f(x), los límites laterales, las 3 condiciones y la raíz del TVI (por bisección sobre g(x) = x³ − x − 1) salen de la fórmula real. El caso ancla <strong>(x²−4)/(x−2)</strong> y el TVI sobre <strong>g en [1,2]</strong> son verbatim del enunciado A2; los ejemplos de salto y esencial son <strong>didácticos</strong> (alineados con la infografía A1). El plano se dibuja a escala propia por caso; el anillo abierto señala dónde el límite no se alcanza y la línea punteada en la esencial marca la asíntota vertical.
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
@@ -619,41 +430,12 @@ function TipoRef({ icono, col, titulo, texto }: { icono: string; col: string; ti
   return (
     <div style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: T.glass, border: `1px solid ${col}33` }}>
       <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: col, background: `${col}1e`, flexShrink: 0 }}>
-        <i className={`fa-solid ${icono}`} />
+        <i className={`fa-solid ${icono}`} aria-hidden />
       </div>
       <div>
-        <div style={{ fontSize: 12, fontWeight: 900, color: "#fff" }}>{titulo}</div>
-        <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{texto}</div>
+        <div style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{titulo}</div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>{texto}</div>
       </div>
-    </div>
-  );
-}
-
-/* ── Deslizador reutilizable ─────────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  const fill = `${((Math.min(max, Math.max(min, value)) - min) / (max - min)) * 100}%`;
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-      </div>
-      <input type="range" className="ex-range" min={min} max={max} step={step} value={Math.min(max, Math.max(min, value))}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--exc" as string]: colr, ["--exfill" as string]: fill }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
     </div>
   );
 }

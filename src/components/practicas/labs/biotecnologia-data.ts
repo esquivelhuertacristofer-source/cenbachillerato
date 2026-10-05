@@ -515,3 +515,36 @@ export const QUIZ_A2: QuizEvaluable = {
     },
   ],
 };
+
+/* ════════════════════════════════════════════════════════════════════════
+   AYUDANTES DEL EXPERIMENTO «DESLIZA LA ARN GUÍA» (solo se agregan helpers)
+   La hebra de trabajo es el protospacer + PAM con unas bases de ADN a cada
+   lado. La guía se puede deslizar: Cas9 solo corta si TODAS las bases de la
+   guía encajan con la diana y justo después viene el PAM (NGG).
+   ════════════════════════════════════════════════════════════════════════ */
+
+/** Bases de ADN a la izquierda y derecha del sitio diana (esquemáticas). */
+export const FLANCO_IZQ: Base[] = ["T", "A", "C", "T"];
+export const FLANCO_DER: Base[] = ["C", "A", "T", "C"];
+/** Cuántas bases se puede deslizar la guía hacia cada lado. */
+export const DESFASE_MAX = 4;
+
+export interface AnalisisGuia {
+  /** Para cada base de la guía: ¿encaja con la hebra que tiene debajo? */
+  flags: boolean[];
+  encajan: number;
+  total: number;
+  /** ¿Justo después de la guía hay un PAM 5'-NGG-3'? */
+  pam: boolean;
+  /** Cas9 corta solo si todo encaja y hay PAM. */
+  corta: boolean;
+}
+export function analizarGuia(desfase: number): AnalisisGuia {
+  const largo: Base[] = [...FLANCO_IZQ, ...HEBRA_TOP, ...FLANCO_DER];
+  const ini = FLANCO_IZQ.length + desfase;
+  const flags = PROTOSPACER.map((b, i) => largo[ini + i] === b);
+  const pamIdx = ini + PROTOSPACER.length;
+  const pam = largo[pamIdx + 1] === "G" && largo[pamIdx + 2] === "G";
+  const encajan = flags.filter(Boolean).length;
+  return { flags, encajan, total: PROTOSPACER.length, pam, corta: encajan === PROTOSPACER.length && pam };
+}

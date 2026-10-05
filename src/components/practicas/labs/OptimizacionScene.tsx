@@ -21,7 +21,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -78,18 +78,21 @@ function hacerMapa(v: Vista) {
 
 /* ── Etiqueta flotante ────────────────────────────────────────────────────── */
 function Etiqueta({
-  pos, color, children, size = 11.5, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, dx = 0, dy = 0,
 }: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
+  pos: Pt; color: string; children: React.ReactNode; dx?: number; dy?: number;
 }) {
+  // Tamaño fijo en píxeles (sin distanceFactor) y desplazamiento fijo en pantalla.
   return (
-    <Html position={pos} center distanceFactor={16} pointerEvents="none">
-      <div style={{
-        whiteSpace: "nowrap", padding: "4px 9px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
-      }}>
-        {children}
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: `translate(${dx}px,${dy}px)` }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 14,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
       </div>
     </Html>
   );
@@ -110,7 +113,6 @@ function Plano({ v }: { v: Vista }) {
 
   const ejeX: Pt[] = [S(v.xmin, v.ymin), S(v.xmax, v.ymin)];
   const ejeY: Pt[] = [S(v.xmin, v.ymin), S(v.xmin, v.ymax)];
-  const fmtTick = (n: number) => n.toLocaleString("es-MX", { maximumFractionDigits: 0 }).replace("-", "−");
 
   return (
     <group>
@@ -120,15 +122,6 @@ function Plano({ v }: { v: Vista }) {
 
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={[BX + 0.5, -BY, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.xlabel}</Etiqueta>
-      <Etiqueta pos={[-BX, BY + 0.5, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.ylabel}</Etiqueta>
-
-      {v.xticks.filter((t) => t !== v.xmin).map((t) => (
-        <Etiqueta key={`tx${t}`} pos={[sx(t), -BY - 0.34, 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
-      {v.yticks.filter((t) => t !== v.ymin).map((t) => (
-        <Etiqueta key={`ty${t}`} pos={[-BX - 0.66, sy(t), 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
     </group>
   );
 }
@@ -157,7 +150,7 @@ function CurvaTrazo({ which, v, color, width, dashed }: {
 }
 
 /* ── Marcador fijo del MÍNIMO sobre la curva total ────────────────────────── */
-function Minimo({ v }: { v: Vista }) {
+function Minimo({ v, angosto }: { v: Vista; angosto: boolean }) {
   const { sx, S } = useMemo(() => hacerMapa(v), [v]);
   const P = S(R_OPT, A_OPT);
   return (
@@ -168,9 +161,11 @@ function Minimo({ v }: { v: Vista }) {
         <sphereGeometry args={[0.17, 22, 22]} />
         <meshStandardMaterial color="#fff" emissive={OPT_COL} emissiveIntensity={1.8} toneMapped={false} />
       </mesh>
-      <Etiqueta pos={[P[0], P[1] + 0.62, 0.05]} color={OPT_COL} size={11}>
-        mínimo ({fmt2(R_OPT)}, {fmt1(A_OPT)})
-      </Etiqueta>
+      {!angosto && (
+        <Etiqueta pos={P} color={OPT_COL} dy={-32}>
+          mínimo {fmt1(A_OPT)}
+        </Etiqueta>
+      )}
     </group>
   );
 }
@@ -180,9 +175,9 @@ function Minimo({ v }: { v: Vista }) {
  * del puntero se interseca con el plano de costo (XY, z=0) y se invierte el
  * mapeo sx → r, acotado a [R_MIN, R_MAX]. */
 function SondaActiva({
-  v, rPos, arrastrable, onScrubR, onGrab, setDragging,
+  v, rPos, arrastrable, onScrubR, onGrab, setDragging, angosto, esc,
 }: {
-  v: Vista; rPos: number;
+  v: Vista; rPos: number; angosto: boolean; esc: number;
   arrastrable?: boolean;
   onScrubR?: (r: number) => void;
   onGrab?: () => void;
@@ -203,13 +198,14 @@ function SondaActiva({
   // segmento de la tangente recortado a la vista (el React Compiler lo memoiza)
   const tanSeg: Pt[] = clipRecta(mt, bt, v).map(([x, y]) => S(x, y));
 
+  const cercaMin = Math.abs(rPos - R_OPT) < 0.5;
   const vis = Number.isFinite(a) && a >= v.ymin && a <= v.ymax && rPos >= v.xmin && rPos <= v.xmax;
   const P = S(rPos, a);
 
   // invierte el rayo del puntero → r (el plano de costo vive en X = PLANE_X)
   const scrub = (e: ThreeEvent<PointerEvent>) => {
     if (!e.ray.intersectPlane(_planeCost, _hitC)) return;
-    const localX = _hitC.x - PLANE_X;
+    const localX = _hitC.x / esc - PLANE_X;
     const frac = (localX + BX) / (2 * BX);
     const dx = v.xmin + frac * (v.xmax - v.xmin);
     const r = Math.min(R_MAX, Math.max(R_MIN, dx));
@@ -243,7 +239,6 @@ function SondaActiva({
   return (
     <group>
       <Line points={[[sx(rPos), -BY, 0], [sx(rPos), BY, 0]]} color={R_COL} lineWidth={1.5} dashed dashSize={0.16} gapSize={0.12} transparent opacity={0.5} />
-      <Etiqueta pos={[sx(rPos), -BY - 0.4, 0]} color={R_COL} size={10.5} bg="rgba(6,16,31,0.85)">r = {fmt2(rPos)}</Etiqueta>
 
       {tanSeg.length === 2 && (
         <CurvaTubo puntos={[tanSeg[0]!, tanSeg[1]!]} color={OPT_COL} grosor={0.054} />
@@ -284,9 +279,11 @@ function SondaActiva({
               <meshStandardMaterial color="#fff" emissive={TOTAL_COL} emissiveIntensity={1.9} toneMapped={false} />
             </mesh>
           </group>
-          <Etiqueta pos={[P[0] + 0.2, P[1] + 0.6, 0.05]} color={TOTAL_COL} size={11.5} bg="rgba(6,16,31,0.95)">
-            A({fmt2(rPos)}) = {fmt1(a)}
-          </Etiqueta>
+          {!angosto && !cercaMin && (
+            <Etiqueta pos={P} color={TOTAL_COL} dx={20} dy={-34}>
+              A = {fmt1(a)}
+            </Etiqueta>
+          )}
         </>
       )}
     </group>
@@ -333,7 +330,7 @@ function Chispas({ rPos, cerca }: { rPos: number; cerca: boolean }) {
 }
 
 /* ── Cilindro físico (lata sin tapa): radio r, altura h por la restricción ──── */
-function Lata({ rPos }: { rPos: number }) {
+function Lata({ rPos, angosto }: { rPos: number; angosto: boolean }) {
   const giro = useRef<THREE.Group>(null);
   useFrame((_, dt) => {
     if (giro.current) giro.current.rotation.y += dt * 0.35;
@@ -378,9 +375,8 @@ function Lata({ rPos }: { rPos: number }) {
       </group>
 
       {/* etiquetas de medidas (fuera del giro) */}
-      <Etiqueta pos={[0, hW + 0.62, 0]} color={R_COL} size={11.5}>r = {fmt2(rPos)} cm</Etiqueta>
-      <Etiqueta pos={[rW + 0.9, hW / 2, 0]} color={LAT_COL} size={11}>h = {fmt2(hDeR(rPos))} cm</Etiqueta>
-      <Etiqueta pos={[0, -0.62, 0]} color={TOTAL_COL} size={10.5} bg="rgba(6,16,31,0.9)">V = 1000 cm³ (fijo)</Etiqueta>
+      <Etiqueta pos={[0, hW, 0]} color={R_COL} dy={-28}>r = {fmt2(rPos)} cm</Etiqueta>
+      {!angosto && <Etiqueta pos={[rW, hW / 2, 0]} color={LAT_COL} dx={60}>h = {fmt2(hDeR(rPos))} cm</Etiqueta>}
     </group>
   );
 }
@@ -389,6 +385,12 @@ function Lata({ rPos }: { rPos: number }) {
 function Contenido({ rPos, showDecomp, accent, resetNonce, arrastrable, onScrubR, onGrab }: OptimizacionSceneProps) {
   const v = VISTA;
   const [dragging, setDragging] = useState(false);
+  // En pantallas angostas la escena se achica para caber y se ocultan los rótulos anchos
+  // (la misma información está en el panel).
+  const ancho = useThree((st) => st.size.width);
+  const alto = useThree((st) => st.size.height);
+  const angosto = ancho < 640;
+  const esc = Math.min(1, ((2 * 16 * Math.tan((44 / 2) * Math.PI / 180) * (ancho / Math.max(1, alto))) / 15.5));
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -397,9 +399,9 @@ function Contenido({ rPos, showDecomp, accent, resetNonce, arrastrable, onScrubR
       <Escenario acento={accent} suelo={-BY - 0.5} />
 
 
-      <group key={resetNonce}>
+      <group key={resetNonce} scale={esc}>
         {/* cilindro físico (izquierda) */}
-        <Lata rPos={rPos} />
+        <Lata rPos={rPos} angosto={angosto} />
 
         {/* plano de costo (derecha) */}
         <group position={[PLANE_X, 0, 0]}>
@@ -407,10 +409,10 @@ function Contenido({ rPos, showDecomp, accent, resetNonce, arrastrable, onScrubR
           {showDecomp && <CurvaTrazo which="base" v={v} color={BASE_COL} width={2.6} dashed />}
           {showDecomp && <CurvaTrazo which="lateral" v={v} color={LAT_COL} width={2.6} dashed />}
           <CurvaTrazo which="total" v={v} color={TOTAL_COL} width={4.5} />
-          <Minimo v={v} />
+          <Minimo v={v} angosto={angosto} />
           <SondaActiva
             v={v} rPos={rPos}
-            arrastrable={arrastrable} onScrubR={onScrubR} onGrab={onGrab} setDragging={setDragging}
+            arrastrable={arrastrable} onScrubR={onScrubR} onGrab={onGrab} setDragging={setDragging} angosto={angosto} esc={esc}
           />
         </group>
       </group>
@@ -425,7 +427,7 @@ function Contenido({ rPos, showDecomp, accent, resetNonce, arrastrable, onScrubR
         maxDistance={34}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[-0.5, 0, 0]}
+        target={[-0.5, -0.4, 0]}
       />
 
       <EffectComposer enableNormalPass={false}>
@@ -438,7 +440,7 @@ function Contenido({ rPos, showDecomp, accent, resetNonce, arrastrable, onScrubR
 
 export default function OptimizacionScene(props: OptimizacionSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [1, 4, 21], fov: 44 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [1, 3, 16] , fov: 44 }}>
       <Contenido {...props} />
     </Canvas>
   );

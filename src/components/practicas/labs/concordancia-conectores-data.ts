@@ -134,3 +134,135 @@ export const QUIZ: QuizItem[] = [
 /** Dato verbatim de A1 (la coherencia como claridad comunicativa). */
 export const DATO_CONCORDANCIA =
   "El uso correcto de conectores y concordancia no es solo gramática formal: es una herramienta de claridad comunicativa. Cuando escribimos de forma coherente, el lector puede seguir nuestro razonamiento sin esfuerzo adicional.";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * SIMULADOR (2026-10): el texto del alumno cambia lo que entiende el lector.
+ * Personas y escuelas ficticias; el contenido curricular de arriba no cambia.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Lo que el lector «ve» en su cabeza al leer una forma. */
+export interface OpcionAviso {
+  forma: string;
+  /** Lectura LITERAL del lector (por qué se entiende o no). */
+  lectura: string;
+  /** Imagen mental: ícono, cuántos y si queda una duda. */
+  vis: { icono: string; n: number; duda: boolean };
+}
+
+export interface EscenaAviso {
+  /** id de la `Reparacion` a la que pertenece. */
+  id: string;
+  /** Formas posibles: la incorrecta (`mal`), la correcta (`bien`) y un distractor. */
+  opciones: OpcionAviso[];
+}
+
+export const AVISO_LECTOR = { nombre: "Profa. Lupita", rol: "Tutora de 1.º B (ficticia)" };
+export const AVISO_GRUPO = "Aviso del 1.º B para la tutora (escuela ficticia «Secundaria Cerro Alto»)";
+
+export const AVISOS: EscenaAviso[] = [
+  {
+    id: "r-ninos",
+    opciones: [
+      { forma: "fue", lectura: "«Fue» es singular: solo fue UNO de los niños. No sabe cuál ni dónde están los demás.", vis: { icono: "fa-child", n: 1, duda: true } },
+      { forma: "fueron", lectura: "Todo el grupo de niños fue al parque. Queda claro.", vis: { icono: "fa-child", n: 4, duda: false } },
+      { forma: "fuimos", lectura: "«Fuimos» incluye a quien escribe: ya no sabe si tú también estabas en el parque.", vis: { icono: "fa-child", n: 4, duda: true } },
+    ],
+  },
+  {
+    id: "r-casas",
+    opciones: [
+      { forma: "casa", lectura: "«Las casa»: ¿es una casa o son varias? El artículo dice plural y el sustantivo, singular.", vis: { icono: "fa-house", n: 1, duda: true } },
+      { forma: "casas", lectura: "Varias casas, todas grandes. Queda claro.", vis: { icono: "fa-house", n: 3, duda: false } },
+      { forma: "casos", lectura: "«Las casos»: no sabe si hablas de casas o de casos; el artículo y el sustantivo no coinciden.", vis: { icono: "fa-folder", n: 2, duda: true } },
+    ],
+  },
+  {
+    id: "r-patio",
+    opciones: [
+      { forma: "corrió", lectura: "«Corrió» es singular: solo UNO corrió. ¿Y los demás niños qué hacían?", vis: { icono: "fa-person-running", n: 1, duda: true } },
+      { forma: "corrieron", lectura: "Todos los niños corrieron en el patio. Queda claro.", vis: { icono: "fa-person-running", n: 4, duda: false } },
+      { forma: "corriste", lectura: "«Corriste» habla de ti: entiende que TÚ corriste, no los niños.", vis: { icono: "fa-person-running", n: 1, duda: true } },
+    ],
+  },
+  {
+    id: "r-blanca",
+    opciones: [
+      { forma: "blanco", lectura: "«Blanco» es masculino: no sabe qué es blanco, porque «casa» es femenino. ¿Algo más en la casa?", vis: { icono: "fa-house", n: 1, duda: true } },
+      { forma: "blanca", lectura: "La casa (una) es blanca y amplia. Queda claro.", vis: { icono: "fa-house", n: 1, duda: false } },
+      { forma: "blancas", lectura: "«Blancas» es plural: piensa que hay varias casas, no una.", vis: { icono: "fa-house", n: 3, duda: true } },
+    ],
+  },
+];
+
+/** Opción de conector con su efecto en el sentido. */
+export interface OpcionConector {
+  conector: string;
+  /** Qué relación expresa de verdad entre A y B. */
+  relacion: "causa" | "causa-invertida" | "adicion" | "contraste" | "comparacion" | "consecuencia";
+  lectura: string;
+}
+
+export interface EscenaConector {
+  /** id de la `Frase` a la que pertenece. */
+  id: string;
+  ideaA: string;
+  ideaB: string;
+  quien: string;
+  opciones: OpcionConector[];
+}
+
+export const RELACION_INFO: Record<OpcionConector["relacion"], { etiqueta: string; icono: string }> = {
+  causa: { etiqueta: "B es la causa de A", icono: "fa-arrow-left-long" },
+  "causa-invertida": { etiqueta: "A causó B (al revés)", icono: "fa-arrow-right-long" },
+  adicion: { etiqueta: "A y además B", icono: "fa-plus" },
+  contraste: { etiqueta: "A choca con B", icono: "fa-bolt" },
+  comparacion: { etiqueta: "A se parece a B", icono: "fa-equals" },
+  consecuencia: { etiqueta: "A tiene como efecto B", icono: "fa-arrow-right-long" },
+};
+
+export const ESCENAS_CONECTOR: EscenaConector[] = [
+  {
+    id: "f-porque",
+    ideaA: "Llegué tarde",
+    ideaB: "El autobús se descompuso",
+    quien: "Tutora Lupita (ficticia)",
+    opciones: [
+      { conector: "porque", relacion: "causa", lectura: "El autobús se descompuso y por eso llegaste tarde. Te cree." },
+      { conector: "aunque", relacion: "contraste", lectura: "Dices que llegaste tarde A PESAR de que el autobús se descompuso. No tiene sentido: no te cree." },
+      { conector: "por lo tanto", relacion: "causa-invertida", lectura: "Entiende que llegaste tarde y POR ESO se descompuso el autobús. Suena a que fue tu culpa." },
+    ],
+  },
+  {
+    id: "f-ademas",
+    ideaA: "Estudié mucho",
+    ideaB: "Repasé con mis compañeros",
+    quien: "Prof. Rodrigo (ficticio)",
+    opciones: [
+      { conector: "además", relacion: "adicion", lectura: "Hiciste dos cosas: estudiar y también repasar en grupo. Se nota el esfuerzo." },
+      { conector: "sin embargo", relacion: "contraste", lectura: "Lo lee como contradicción: estudiaste mucho, SIN EMBARGO repasaste. ¿Repasar estaba mal?" },
+      { conector: "porque", relacion: "causa", lectura: "Dice que estudiaste mucho PORQUE repasaste. Cambia el orden: no entiende cuál fue primero." },
+    ],
+  },
+  {
+    id: "f-como",
+    ideaA: "Este texto es claro",
+    ideaB: "Un río que fluye sin obstáculos",
+    quien: "Mateo, de tu equipo (ficticio)",
+    opciones: [
+      { conector: "como", relacion: "comparacion", lectura: "Compara el texto con un río: claro y sin tropiezos. Mateo lo imagina." },
+      { conector: "porque", relacion: "causa", lectura: "Mateo cree que el texto es claro PORQUE un río fluye. La razón no tiene lógica." },
+      { conector: "pero", relacion: "contraste", lectura: "«Pero» anuncia un problema que nunca llega: Mateo piensa que el texto tiene fallas." },
+    ],
+  },
+  {
+    id: "f-y",
+    ideaA: "No traje la tarea",
+    ideaB: "No pude participar",
+    quien: "Tutora Lupita (ficticia)",
+    opciones: [
+      { conector: "y", relacion: "consecuencia", lectura: "No trajiste la tarea y, por lo tanto, no participaste. Todo encaja." },
+      { conector: "pero", relacion: "contraste", lectura: "«Pero» promete algo que contradice lo anterior; la tutora espera un 'sí participé' que no llega." },
+      { conector: "porque", relacion: "causa", lectura: "Entiende que NO trajiste la tarea porque no pudiste participar: causa y efecto al revés." },
+    ],
+  },
+];

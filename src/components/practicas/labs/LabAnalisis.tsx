@@ -19,17 +19,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, OK, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { ANALISIS_FICHA } from "./extremos-inflexion-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./extremos-inflexion-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import {
   VISTA, PUNTOS, punto, evalF, evalD1, evalD2, clasificar, tangente, rectaStr,
-  INTERVALOS, PASOS, IDEAS, DATOS, F_EXPR, D1_EXPR, D2_EXPR, fmt2, fmt3,
+  INTERVALOS, PASOS, IDEAS, DATOS, F_EXPR, D1_EXPR, D2_EXPR, fmt1, fmt2, fmt3,
   type FocoId,
 } from "./analisis-data";
 
@@ -60,10 +59,11 @@ export function LabAnalisis({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
+  // Para la misión central: ¿vio crecer y decrecer a f al barrer la sonda?
+  const [vio, setVio] = useState({ sube: false, baja: false });
   const audioRef = useRef<LabSfx | null>(null);
 
   const toggleSonido = useCallback(async () => {
@@ -141,23 +141,19 @@ export function LabAnalisis({ color }: PracticaLabProps) {
   if (cl.concavaArriba) lecturaConc = `f''(${fmt2(aPos)}) = ${fmt2(d2)} > 0 → cóncava hacia ARRIBA (∪).`;
   else if (cl.concavaAbajo) lecturaConc = `f''(${fmt2(aPos)}) = ${fmt2(d2)} < 0 → cóncava hacia ABAJO (∩).`;
 
+  // Ajuste durante el render: recuerda si ya vio a f crecer y decrecer.
+  if ((cl.creciente && !vio.sube) || (cl.decreciente && !vio.baja)) {
+    setVio({ sube: vio.sube || cl.creciente, baja: vio.baja || cl.decreciente });
+  }
+
   const objetivos = [
+    { txt: "Barre la sonda y mira a f subir y luego bajar: la tangente cambia de inclinación en el crítico", done: vio.sube && vio.baja },
     { txt: "Salta al máximo local (x = −1) y lee f'(a) ≈ 0", done: focoActivo === "max" },
     { txt: "Salta al mínimo local (x = 3) y confirma f''(a) > 0", done: focoActivo === "min" },
     { txt: "Salta al punto de inflexión (x = 1) y verifica cambio de concavidad", done: focoActivo === "infl" },
     { txt: "Barre la sonda con Play para ver las tres curvas en movimiento", done: playing },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -165,356 +161,198 @@ export function LabAnalisis({ color }: PracticaLabProps) {
         <i className="fa-solid fa-chart-line" />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{F_EXPR}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 420, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 420, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la idea sigue: f&apos; = 0 da los críticos x = −1 y x = 3; f&apos;&apos; los clasifica (máximo en −1, mínimo en 3) y f&apos;&apos; = 0 marca la inflexión en x = 1.
       </div>
     </div>
   );
 
+  const lecturaCorta = cl.cerca
+    ? <>{cl.cerca.tipo} en x = {fmt2(cl.cerca.x)}</>
+    : <>x = {fmt2(aPos)}: f {cl.creciente ? "crece" : cl.decreciente ? "decrece" : "se aplana"}, {cl.concavaArriba ? "∪" : cl.concavaAbajo ? "∩" : "inflexión"}</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulseAn { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulseAn 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-chip { cursor:pointer; padding:8px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; text-align:left; display:flex; align-items:center; gap:7px; }
-        .ex-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .ex-chip[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.18); color:#fff; }
-        .ex-toggle { cursor:pointer; padding:7px 11px; border-radius:10px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text3}; font-size:12px; font-weight:800; transition:all .15s; display:flex; align-items:center; gap:7px; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 62vh, 720px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#0b2233 0%,#08131f 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <AnalisisScene aPos={aPos} show1={show1} show2={show2} accent={accent} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${accent}aa`, width: 9, height: 9, borderRadius: "50%", background: accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{F_EXPR}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Barrer la sonda (x = a)"}>
-                <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Leyenda curvas */}
-            <div style={{ position: "absolute", top: 60, left: 16, display: "flex", flexDirection: "column", gap: 6, padding: "9px 12px", borderRadius: 12, background: "rgba(4,10,22,0.7)", border: `1px solid ${T.line}`, backdropFilter: "blur(8px)" }}>
-              <LegItem col={F_COL} txt="f(x)" />
-              {show1 && <LegItem col={D1_COL} txt="f'(x)" dashed />}
-              {show2 && <LegItem col={D2_COL} txt="f''(x)" dashed />}
-              <LegItem col={TAN_COL} txt="tangente en a" />
-            </div>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                {cl.cerca ? (
-                  <>
-                    <i className={`fa-solid ${cl.cerca.icono}`} style={{ color: cl.cerca.color, marginRight: 7 }} />
-                    {cl.cerca.tipo} en x = {fmt2(cl.cerca.x)} — {cl.cerca.criterio}
-                  </>
-                ) : (
-                  <>
-                    <i className="fa-solid fa-ruler-combined" style={{ color: TAN_COL, marginRight: 7 }} />
-                    {lecturaCrec}
-                  </>
-                )}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{lecturaConc}</div>
-            </div>
-          </div>
-
-          {/* Controles */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-crosshairs" style={{ marginRight: 8, color: accent }} />
-              Salta a un punto notable o mueve la sonda x = a
-            </Eyebrow>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
-              {PUNTOS.map((p) => (
-                <button key={p.id} className="ex-chip" data-on={focoActivo === p.id} onClick={() => irA(p.id)} title={p.detalle}>
-                  <i className={`fa-solid ${p.icono}`} style={{ color: p.color }} />
-                  {p.tipo} (x = {fmt2(p.x)})
-                </button>
-              ))}
-              <button className="ex-chip" data-on={focoActivo === "libre"} onClick={() => irA("libre")} title="Exploración libre">
-                <i className="fa-solid fa-hand-pointer" style={{ color: A_COL }} />
-                Libre
-              </button>
-            </div>
-            <Deslizador
-              label="sonda  x = a"
-              icon="fa-crosshairs"
-              colr={A_COL}
-              valor={fmt2(aPos)}
-              min={VISTA.xmin} max={VISTA.xmax} step={0.02} value={aPos}
-              onChange={(v) => { setPlaying(false); setAPos(v); }}
-              hintL={fmt2(VISTA.xmin)} hintR={fmt2(VISTA.xmax)}
-            />
-            <div style={{ display: "flex", gap: 9, marginTop: 16 }}>
-              <button className="ex-toggle" style={show1 ? { borderColor: `${D1_COL}88`, background: `${D1_COL}1e`, color: "#fff" } : undefined} onClick={() => setShow1((s) => !s)}>
-                <i className={`fa-solid ${show1 ? "fa-eye" : "fa-eye-slash"}`} style={{ color: D1_COL }} />
-                f&apos;(x)
-              </button>
-              <button className="ex-toggle" style={show2 ? { borderColor: `${D2_COL}88`, background: `${D2_COL}1e`, color: "#fff" } : undefined} onClick={() => setShow2((s) => !s)}>
-                <i className={`fa-solid ${show2 ? "fa-eye" : "fa-eye-slash"}`} style={{ color: D2_COL }} />
-                f&apos;&apos;(x)
-              </button>
-            </div>
-          </div>
-
-          {/* Cómo se leen f, f' y f'' juntas */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-layer-group" style={{ marginRight: 8, color: accent }} />
-              Las tres alturas en x = {fmt2(aPos)}
-            </Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-              <MiniVal label={`f(${fmt2(aPos)})`} value={fmt2(fa)} col={F_COL} />
-              <MiniVal label={`f'(${fmt2(aPos)}) (pendiente)`} value={fmt2(d1)} col={D1_COL} />
-              <MiniVal label={`f''(${fmt2(aPos)}) (concavidad)`} value={fmt2(d2)} col={D2_COL} />
-            </div>
-            <div style={{ marginTop: 12, padding: "11px 14px", borderRadius: 12, border: `1px solid ${TAN_COL}55`, background: `${TAN_COL}12`, fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
-              <i className="fa-solid fa-ruler-combined" style={{ color: TAN_COL, marginRight: 8 }} />
-              La tangente a f en x = {fmt2(aPos)} es <strong style={{ color: TAN_COL, fontFamily: "ui-monospace, monospace" }}>{rectaStr(mt, bt)}</strong>; su pendiente es <strong style={{ color: D1_COL }}>f&apos;({fmt2(aPos)}) = {fmt3(d1)}</strong>.
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* La función y sus derivadas */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${F_COL}66`, background: `${F_COL}12` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: F_COL }}>
-                <i className="fa-solid fa-chart-line" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>La función y sus derivadas</div>
-            </div>
-            <div style={{ display: "grid", gap: 7 }}>
-              <ExprRow col={F_COL} txt={F_EXPR} />
-              <ExprRow col={D1_COL} txt={D1_EXPR} />
-              <ExprRow col={D2_COL} txt={D2_EXPR} />
-            </div>
-            <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-              {PUNTOS.map((p) => (
-                <div key={p.id} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "9px 11px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${p.color}44` }}>
-                  <i className={`fa-solid ${p.icono}`} style={{ color: p.color, marginTop: 2 }} />
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 900, color: "#fff" }}>{p.tipo} ({fmt2(p.x)}, {fmt2(p.y)})</div>
-                    <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.4 }}>{p.criterio}</div>
-                  </div>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <AnalisisScene aPos={aPos} show1={show1} show2={show2} accent={accent} resetNonce={resetNonce} />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: [
+          ...PUNTOS.map((p) => ({ id: p.id as string, etiqueta: p.tipo, icono: p.icono })),
+          { id: "libre", etiqueta: "Libre", icono: "fa-hand-pointer" },
+        ],
+        valor: focoActivo,
+        cambiar: (id) => irA(id as FocoId),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Barrer la sonda (x = a)"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={
+        <>
+          <LegItem col={F_COL} txt="f(x)" />
+          {show1 && <LegItem col={D1_COL} txt="f'(x)" dashed />}
+          {show2 && <LegItem col={D2_COL} txt="f''(x)" dashed />}
+          <LegItem col={TAN_COL} txt="tangente" />
+          <MedidorPendiente d1={d1} d2={d2} />
+        </>
+      }
+      lectura={lecturaCorta}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo="Mueve la sonda x = a" icono="fa-crosshairs">
+                <Deslizador
+                  label="sonda  x = a"
+                  icon="fa-crosshairs"
+                  colr={A_COL}
+                  valor={fmt2(aPos)}
+                  min={VISTA.xmin} max={VISTA.xmax} step={0.02} value={aPos}
+                  onChange={(v) => { setPlaying(false); setAPos(v); }}
+                  hintL={fmt2(VISTA.xmin)} hintR={fmt2(VISTA.xmax)}
+                />
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  <button type="button" onClick={() => setShow1((s) => !s)} style={{ ...BTN_VER, borderColor: show1 ? D1_COL : "rgba(255,255,255,0.18)" }}>
+                    <i className={`fa-solid ${show1 ? "fa-eye" : "fa-eye-slash"}`} style={{ color: D1_COL }} aria-hidden />
+                    f&apos;(x)
+                  </button>
+                  <button type="button" onClick={() => setShow2((s) => !s)} style={{ ...BTN_VER, borderColor: show2 ? D2_COL : "rgba(255,255,255,0.18)" }}>
+                    <i className={`fa-solid ${show2 ? "fa-eye" : "fa-eye-slash"}`} style={{ color: D2_COL }} aria-hidden />
+                    f&apos;&apos;(x)
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Resolución paso a paso (verbatim A2) */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: `1px solid ${accent}40`, background: `rgba(${color.rgba},0.08)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Análisis completo — paso a paso
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {PASOS.map((p) => (
-                <div key={p.etiqueta} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{p.etiqueta}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p.texto}</div>
+              </Bloque>
+              <Bloque titulo={`Las tres alturas en x = ${fmt2(aPos)}`} icono="fa-layer-group">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label={`f(${fmt2(aPos)})`} value={fmt2(fa)} col={F_COL} />
+                  <Dato label="f'(a) pendiente" value={fmt2(d1)} col={D1_COL} />
+                  <Dato label="f''(a) concavidad" value={fmt2(d2)} col={D2_COL} />
+                  <Dato label="sonda a" value={fmt2(aPos)} col={A_COL} />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Intervalos (verbatim A2 (d)) */}
-          <div style={{ ...card, padding: "20px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-arrows-left-right-to-line" style={{ marginRight: 8, color: accent }} />
-              Intervalos de la función
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              <Intervalo col="#34D399" icono="fa-arrow-trend-up" titulo="Creciente (f' > 0)" texto={INTERVALOS.crece} />
-              <Intervalo col="#F87171" icono="fa-arrow-trend-down" titulo="Decreciente (f' < 0)" texto={INTERVALOS.decrece} />
-              <Intervalo col="#C084FC" icono="fa-arrow-down-wide-short" titulo="Cóncava abajo (f'' < 0, ∩)" texto={INTERVALOS.concavaAbajo} />
-              <Intervalo col="#7dd3fc" icono="fa-arrow-up-wide-short" titulo="Cóncava arriba (f'' > 0, ∪)" texto={INTERVALOS.concavaArriba} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-gauge-high" style={{ marginRight: 8, color: accent }} />
-            Lecturas
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-            <Readout label="sonda a" value={fmt2(aPos)} col={A_COL} size={15} />
-            <Readout label="f(a)" value={fmt2(fa)} col={F_COL} size={15} />
-            <Readout label="f'(a)" value={fmt2(d1)} col={D1_COL} size={15} />
-            <Readout label="f''(a)" value={fmt2(d2)} col={D2_COL} size={15} />
-          </div>
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Cálculo <strong>exacto</strong>: la función <strong>f(x) = x³ − 3x² − 9x + 5</strong> y sus derivadas son verbatim del enunciado A2, y todos los valores (críticos x = −1 y x = 3, inflexión x = 1, máximo (−1, 10), mínimo (3, −22), inflexión (1, −6) e intervalos) son <strong>simbólicos cerrados</strong> resueltos a mano. La curva de f&apos; localiza los críticos donde toca el eje y la de f&apos;&apos; da la concavidad; el plano usa una escala vertical comprimida para que las tres curvas quepan, así que en los bordes f&apos; y f&apos;&apos; salen del recuadro visible.
-        </span>
-      </div>
-
-      {/* ── Objetivos ──────────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {objetivos.map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-              <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-              <span style={{ fontWeight: logrosLab[i] ? 700 : 500, ...NUM }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ─────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${TAN_COL}55`, background: `${TAN_COL}12` }}>
+                  {cl.cerca ? `${cl.cerca.tipo} en x = ${fmt2(cl.cerca.x)} — ${cl.cerca.criterio}. ` : `${lecturaCrec} `}
+                  {lecturaConc} La tangente es <strong style={{ color: TAN_COL, fontFamily: "ui-monospace, monospace" }}>{rectaStr(mt, bt)}</strong>; su pendiente es <strong style={{ color: D1_COL }}>f&apos;({fmt2(aPos)}) = {fmt3(d1)}</strong>.
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={ANALISIS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="La función y sus derivadas" icono="fa-chart-line">
+                <div style={{ display: "grid", gap: 7 }}>
+                  <ExprRow col={F_COL} txt={F_EXPR} />
+                  <ExprRow col={D1_COL} txt={D1_EXPR} />
+                  <ExprRow col={D2_COL} txt={D2_EXPR} />
+                </div>
+                <div style={{ display: "grid", gap: 8 }}>
+                  {PUNTOS.map((p) => (
+                    <div key={p.id} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "9px 11px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${p.color}44` }}>
+                      <i className={`fa-solid ${p.icono}`} style={{ color: p.color, marginTop: 4 }} aria-hidden />
+                      <div>
+                        <div style={{ fontWeight: 900, color: "#fff" }}>{p.tipo} ({fmt2(p.x)}, {fmt2(p.y)})</div>
+                        <div style={{ color: T.text2, lineHeight: 1.4 }}>{p.criterio}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Análisis completo — paso a paso" icono="fa-list-ol">
+                <div style={{ display: "grid", gap: 9 }}>
+                  {PASOS.map((p) => (
+                    <div key={p.etiqueta} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+                      <div style={{ minWidth: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{p.etiqueta}</div>
+                      <div style={{ minWidth: 0 }}>{p.texto}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Intervalos de la función" icono="fa-arrows-left-right-to-line">
+                <div style={{ display: "grid", gap: 9 }}>
+                  <Intervalo col="#34D399" icono="fa-arrow-trend-up" titulo="Creciente (f' > 0)" texto={INTERVALOS.crece} />
+                  <Intervalo col="#F87171" icono="fa-arrow-trend-down" titulo="Decreciente (f' < 0)" texto={INTERVALOS.decrece} />
+                  <Intervalo col="#C084FC" icono="fa-arrow-down-wide-short" titulo="Cóncava abajo (f'' < 0, ∩)" texto={INTERVALOS.concavaAbajo} />
+                  <Intervalo col="#7dd3fc" icono="fa-arrow-up-wide-short" titulo="Cóncava arriba (f'' > 0, ∪)" texto={INTERVALOS.concavaArriba} />
+                </div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos" icono="fa-gauge-high">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ANALISIS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                Cálculo <strong>exacto</strong>: la función <strong>f(x) = x³ − 3x² − 9x + 5</strong> y sus derivadas son verbatim del enunciado A2, y todos los valores (críticos x = −1 y x = 3, inflexión x = 1, máximo (−1, 10), mínimo (3, −22), inflexión (1, −6) e intervalos) son <strong>simbólicos cerrados</strong> resueltos a mano. La curva de f&apos; localiza los críticos donde toca el eje y la de f&apos;&apos; da la concavidad; el plano usa una escala vertical comprimida para que las tres curvas quepan, así que en los bordes f&apos; y f&apos;&apos; salen del recuadro visible.
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
-/* ── Mini valor ───────────────────────────────────────────────────────────── */
-function MiniVal({ label, value, col }: { label: string; value: string; col: string }) {
+/* ── Inclinómetro y concavidad: la flecha gira con f' y la copa sigue a f'' ─── */
+function MedidorPendiente({ d1, d2 }: { d1: number; d2: number }) {
+  const ang = (Math.atan(d1) * 180) / Math.PI;
+  const plano = Math.abs(d1) < 0.5;
   return (
-    <div style={{ padding: "8px 10px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${col}33` }}>
-      <div style={{ fontSize: 10, color: T.text3, fontWeight: 800, marginBottom: 2 }}>{label}</div>
-      <div style={{ fontSize: 13.5, fontWeight: 900, color: col, fontFamily: "ui-monospace, monospace" }}>{value}</div>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, fontWeight: 800, color: "#dce6f5", marginTop: 4 }}>
+      <span style={{ width: 34, height: 34, borderRadius: "50%", border: `2px solid ${plano ? OK : TAN_COL}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <i className="fa-solid fa-arrow-right" aria-hidden style={{ color: plano ? OK : TAN_COL, transform: `rotate(${-ang}deg)`, transition: "transform 120ms linear" }} />
+      </span>
+      <span>{plano ? "horizontal" : d1 > 0 ? "sube" : "baja"} · {Math.abs(d2) < 0.8 ? "inflexión" : d2 > 0 ? "∪" : "∩"} {fmt1(ang)}°</span>
     </div>
   );
 }
@@ -523,7 +361,7 @@ function MiniVal({ label, value, col }: { label: string; value: string; col: str
 function ExprRow({ col, txt }: { col: string; txt: string }) {
   return (
     <div style={{ padding: "9px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${col}33` }}>
-      <div style={{ fontSize: 12.5, fontWeight: 900, color: col, fontFamily: "ui-monospace, monospace" }}>{txt}</div>
+      <div style={{ fontSize: 15, fontWeight: 900, color: col, fontFamily: "ui-monospace, monospace" }}>{txt}</div>
     </div>
   );
 }
@@ -531,7 +369,7 @@ function ExprRow({ col, txt }: { col: string; txt: string }) {
 /* ── Item de leyenda (visor) ──────────────────────────────────────────────── */
 function LegItem({ col, txt, dashed }: { col: string; txt: string; dashed?: boolean }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 10.5, fontWeight: 800, color: "#dce6f5" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
       <span style={{ width: 18, height: 0, borderTop: `${dashed ? "2px dashed" : "3px solid"} ${col}`, flexShrink: 0 }} />
       {txt}
     </div>
@@ -542,42 +380,18 @@ function LegItem({ col, txt, dashed }: { col: string; txt: string; dashed?: bool
 function Intervalo({ col, icono, titulo, texto }: { col: string; icono: string; titulo: string; texto: string }) {
   return (
     <div style={{ display: "flex", gap: 11, alignItems: "center", padding: "10px 12px", borderRadius: 11, background: T.glass, border: `1px solid ${col}33` }}>
-      <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: col, background: `${col}1e`, flexShrink: 0 }}>
+      <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: col, background: `${col}1e`, flexShrink: 0 }}>
         <i className={`fa-solid ${icono}`} />
       </div>
       <div>
-        <div style={{ fontSize: 12, fontWeight: 900, color: "#fff" }}>{titulo}</div>
-        <div style={{ fontSize: 12.5, color: col, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{texto}</div>
+        <div style={{ fontWeight: 900, color: "#fff" }}>{titulo}</div>
+        <div style={{ color: col, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{texto}</div>
       </div>
     </div>
   );
 }
 
-/* ── Deslizador reutilizable ─────────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  const fill = `${((Math.min(max, Math.max(min, value)) - min) / (max - min)) * 100}%`;
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-      </div>
-      <input type="range" className="ex-range" min={min} max={max} step={step} value={Math.min(max, Math.max(min, value))}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--exc" as string]: colr, ["--exfill" as string]: fill }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
-    </div>
-  );
-}
+const BTN_VER = {
+  cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 14px", borderRadius: 10,
+  border: "1px solid", background: "rgba(4,10,22,0.5)", color: "#fff", fontSize: 14, fontWeight: 800,
+} as const;

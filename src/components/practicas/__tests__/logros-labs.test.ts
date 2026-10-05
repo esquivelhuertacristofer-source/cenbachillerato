@@ -50,6 +50,8 @@ describe("objetivos de los laboratorios", () => {
       if (!transitorio) return;
       // Con un `done` que depende del modo, el render TIENE que leer del
       // enganche que recuerda lo cumplido, no del valor en vivo.
+      // `LabShell` engancha los objetivos con `useLogros` (y su pestaña de misiones también).
+      if (src.includes("<LabShell")) return;
       const render = renderObjetivos(src);
       expect(src).toContain("useLogros");
       if (render) expect(render).not.toMatch(/\bo\.done\b/);

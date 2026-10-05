@@ -1,0 +1,12 @@
+{
+  "escena": "Un objeto frente a una lente convergente; los rayos forman su imagen del otro lado",
+  "pregunta": "Si acercas el objeto hasta quedar dentro del foco, ¿cómo es la imagen?",
+  "opciones": [
+    { "id": "a", "texto": "Real e invertida", "icono": "fa-arrows-up-down" },
+    { "id": "b", "texto": "Virtual, derecha y mayor", "icono": "fa-magnifying-glass" },
+    { "id": "c", "texto": "No se forma ninguna imagen", "icono": "fa-ban" }
+  ],
+  "correcta": "b",
+  "porque": "Dentro del foco los rayos salen de la lente todavía separándose y nunca se cruzan. Tu ojo los prolonga hacia atrás y ve una imagen virtual, derecha y más grande: es una lupa.",
+  "comoComprobarlo": "Baja el deslizador de distancia del objeto hasta que la marca del medidor pase la f, y observa la imagen punteada."
+}

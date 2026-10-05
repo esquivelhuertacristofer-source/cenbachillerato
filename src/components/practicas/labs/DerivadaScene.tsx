@@ -19,8 +19,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -57,18 +57,21 @@ function hacerMapa(v: Vista) {
   return { sx, sy, S };
 }
 
-/* ── Etiqueta flotante ────────────────────────────────────────────────────── */
+/* ── Etiqueta flotante: tamaño fijo en píxeles (≥ 14), desplazamiento fijo ────
+ * Las anchas (`ancha`) se ocultan en pantallas angostas: su info va al panel. */
 function Etiqueta({
-  pos, color, children, size = 11.5, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, ancha = false,
 }: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
+  pos: Pt; color: string; children: React.ReactNode; ancha?: boolean;
 }) {
+  const angosta = useThree((st) => st.size.width < 640);
+  if (ancha && angosta) return null;
   return (
-    <Html position={pos} center distanceFactor={15} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
-        whiteSpace: "nowrap", padding: "4px 9px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: `1.5px solid ${color}`, color: "#fff", fontWeight: 800, fontSize: 14,
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       }}>
         {children}
       </div>
@@ -94,8 +97,6 @@ function Plano({ v }: { v: Vista }) {
   const ejeX: Pt[] = [S(v.xmin, ax0), S(v.xmax, ax0)];
   const ejeY: Pt[] = [S(ay0, v.ymin), S(ay0, v.ymax)];
 
-  const fmtTick = (n: number) => n.toLocaleString("es-MX", { maximumFractionDigits: 1 }).replace("-", "−");
-
   return (
     <group>
       <lineSegments geometry={geo}>
@@ -104,15 +105,6 @@ function Plano({ v }: { v: Vista }) {
 
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={[BX + 0.5, sy(ax0), 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.xlabel}</Etiqueta>
-      <Etiqueta pos={[sx(ay0), BY + 0.5, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.ylabel}</Etiqueta>
-
-      {v.xticks.filter((t) => t !== ay0).map((t) => (
-        <Etiqueta key={`tx${t}`} pos={[sx(t), sy(ax0) - 0.34, 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
-      {v.yticks.filter((t) => t !== ax0).map((t) => (
-        <Etiqueta key={`ty${t}`} pos={[sx(ay0) - 0.42, sy(t), 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
     </group>
   );
 }
@@ -187,7 +179,7 @@ function Rectas({ funcId, v, aPos, hSep }: { funcId: FuncId; v: Vista; aPos: num
             points={[[sx(aPos), sy(ax0), 0], [sx(xq), sy(ax0), 0]]}
             color={SEC_COL} lineWidth={2} transparent opacity={0.7}
           />
-          <Etiqueta pos={[(sx(aPos) + sx(xq)) / 2, sy(ax0) - 0.36, 0]} color={SEC_COL} size={10} bg="rgba(6,16,31,0.82)">
+          <Etiqueta pos={[(sx(aPos) + sx(xq)) / 2, sy(ax0) - 0.36, 0]} color={SEC_COL}>
             h = {fmt2(hSep)}
           </Etiqueta>
           <Line points={[[sx(xq), sy(ax0), 0], Q]} color={Q_COL} lineWidth={1.4} dashed dashSize={0.13} gapSize={0.1} transparent opacity={0.5} />
@@ -199,9 +191,9 @@ function Rectas({ funcId, v, aPos, hSep }: { funcId: FuncId; v: Vista; aPos: num
         <>
           <mesh position={Q}>
             <sphereGeometry args={[0.13, 20, 20]} />
-            <meshStandardMaterial color="#fff" emissive={Q_COL} emissiveIntensity={1.4} toneMapped={false} />
+            <meshStandardMaterial color="#fff" emissive={Q_COL} emissiveIntensity={1.4} />
           </mesh>
-          <Etiqueta pos={[Q[0] + 0.2, Q[1] + 0.45, 0.05]} color={Q_COL} size={10.5} bg="rgba(6,16,31,0.92)">
+          <Etiqueta pos={[Q[0] + 1.3, Q[1] + 0.55, 0.05]} color={Q_COL} ancha>
             Q = ({fmt2(xq)}, {fmt2(fq)})
           </Etiqueta>
         </>
@@ -215,13 +207,13 @@ function Rectas({ funcId, v, aPos, hSep }: { funcId: FuncId; v: Vista; aPos: num
           <group ref={pulso} position={P}>
             <mesh>
               <sphereGeometry args={[0.16, 22, 22]} />
-              <meshStandardMaterial color="#fff" emissive={f.color} emissiveIntensity={1.9} toneMapped={false} />
+              <meshStandardMaterial color="#fff" emissive={f.color} emissiveIntensity={1.9} />
             </mesh>
           </group>
-          <Etiqueta pos={[P[0] - 0.2, P[1] + 0.55, 0.05]} color={f.color} size={12} bg="rgba(6,16,31,0.95)">
+          <Etiqueta pos={[P[0] - 1.3, P[1] + 0.55, 0.05]} color={f.color} ancha>
             P = ({fmt2(aPos)}, {fmt2(fa)})
           </Etiqueta>
-          <Etiqueta pos={[P[0] + 1.7, P[1] - 0.5, 0.05]} color={TAN_COL} size={11} bg="rgba(6,16,31,0.92)">
+          <Etiqueta pos={[P[0] + 0.9, P[1] - 0.8, 0.05]} color={TAN_COL}>
             f&apos;({fmt2(aPos)}) = {fmt2(m)}
           </Etiqueta>
         </>
@@ -234,6 +226,18 @@ function Rectas({ funcId, v, aPos, hSep }: { funcId: FuncId; v: Vista; aPos: num
 function Contenido({ funcId, aPos, hSep, accent, resetNonce }: DerivadaSceneProps) {
   const f = func(funcId);
   const v = f.vista;
+
+  // Encuadre: el plano llena ~60 % del alto, entre la barra y la misión; en
+  // pantallas angostas se aleja hasta que quepa todo el ancho.
+  const camera = useThree((st) => st.camera);
+  const ancho = useThree((st) => st.size.width);
+  const alto = useThree((st) => st.size.height);
+  useEffect(() => {
+    const aspecto = ancho / Math.max(alto, 1);
+    const dist = Math.max(15.5, (BX * 2 + 1.2) / (2 * Math.tan((44 * Math.PI) / 360) * aspecto));
+    camera.position.set(dist * 0.16, 1.5 + dist * 0.04, dist);
+    camera.lookAt(0, -0.5, 0);
+  }, [camera, ancho, alto]);
 
   return (
     <>
@@ -255,10 +259,10 @@ function Contenido({ funcId, aPos, hSep, accent, resetNonce }: DerivadaSceneProp
         makeDefault
         enablePan={false}
         minDistance={7}
-        maxDistance={26}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[0, 0, 0]}
+        target={[0, -0.5, 0]}
+        maxDistance={40}
       />
 
       <EffectComposer enableNormalPass={false}>

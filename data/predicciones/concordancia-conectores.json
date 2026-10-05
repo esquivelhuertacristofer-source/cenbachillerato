@@ -1,0 +1,12 @@
+{
+  "escena": "Un aviso del 1.º B para la tutora, con una oración que dice «Los niños fue al parque»",
+  "pregunta": "Si el verbo queda en singular y el sujeto en plural, ¿qué entiende la tutora?",
+  "opciones": [
+    { "id": "a", "texto": "Fue uno, no sabe quién", "icono": "fa-user" },
+    { "id": "b", "texto": "Que fue todo el grupo ahí", "icono": "fa-users" },
+    { "id": "c", "texto": "Lo entiende igual que si estuviera bien escrito", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "El verbo singular señala a una sola persona, aunque el sujeto sea plural. El lector queda con una duda: no sabe cuántos niños fueron ni cuáles.",
+  "comoComprobarlo": "En «Escribe el aviso», cambia la forma de la primera oración entre fue, fueron y fuimos, y mira cuántos niños dibuja la tutora y si aparece el signo «?»."
+}

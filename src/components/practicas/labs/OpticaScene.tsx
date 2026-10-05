@@ -24,8 +24,8 @@
  */
 
 import * as THREE from "three";
-import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -33,7 +33,7 @@ import { CurvaTubo } from "./_tablero";
 import {
   type Modo, type TipoLente, type TipoEspejo,
   resolverGauss, resolverSnell, medioPorId,
-  H_OBJ, fmtAng, fmtDist, fmtAumento, fmt2,
+  H_OBJ, fmtAng, fmtDist, fmt2,
 } from "./optica-data";
 
 export interface OpticaSceneProps {
@@ -106,26 +106,43 @@ function Photon({ path, color, playing, speed = 3.2 }: { path: Pt[]; color: stri
 
   return (
     <mesh ref={ref}>
-      <sphereGeometry args={[0.12, 16, 16]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.1} toneMapped={false} />
+      <sphereGeometry args={[0.16, 20, 20]} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} roughness={0.3} />
     </mesh>
   );
 }
 
-/* ── Título flotante ──────────────────────────────────────────────────────── */
-function Titulo({ texto, sub, color }: { texto: string; sub?: string; color: string }) {
+/* ── Etiqueta: tamaño fijo en píxeles (≥ 14 px). `ancha` se oculta en el celular ── */
+function Etiqueta({ pos, color, children, ancha = false, borde = true }: {
+  pos: Pt; color: string; children: React.ReactNode; ancha?: boolean; borde?: boolean;
+}) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancha && ancho < 640) return null; // el dato ya está en el panel
   return (
-    <Html position={[0, Y + 1.0, 0]} center distanceFactor={20} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
-        whiteSpace: "nowrap", textAlign: "center", padding: "4px 12px", borderRadius: 10,
-        background: "rgba(4,12,26,0.9)", border: `1px solid ${color}aa`, color: "#fff",
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.5)",
+        whiteSpace: "nowrap", textAlign: "center", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.9)",
+        border: borde ? `1.5px solid ${color}` : "1.5px solid transparent", color, fontWeight: 900, fontSize: 14,
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       }}>
-        <div style={{ fontWeight: 900, fontSize: 12 }}>{texto}</div>
-        {sub && <div style={{ fontWeight: 800, fontSize: 10.5, color }}>{sub}</div>}
+        {children}
       </div>
     </Html>
   );
+}
+
+/* ── Encuadre: el dominio horizontal siempre cabe, aun en pantallas angostas ── */
+function Encuadre() {
+  const camera = useThree((st) => st.camera) as THREE.PerspectiveCamera;
+  const { width, height } = useThree((st) => st.size);
+  useEffect(() => {
+    const aspecto = width / Math.max(1, height);
+    const mitad = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const d = Math.min(30, Math.max(16, (X + 1.4) / (mitad * aspecto)));
+    camera.position.set(0, 0.4 * (d / 16), d);
+    camera.updateProjectionMatrix();
+  }, [camera, width, height]);
+  return null;
 }
 
 /* ── Eje óptico ───────────────────────────────────────────────────────────── */
@@ -136,7 +153,7 @@ function EjeOptico() {
 }
 
 /* ── Flecha vertical (objeto / imagen) ────────────────────────────────────── */
-function Flecha({ x, h, color, label, sub, dashed = false }: { x: number; h: number; color: string; label: string; sub?: string; dashed?: boolean }) {
+function Flecha({ x, h, color, label, dashed = false }: { x: number; h: number; color: string; label: string; dashed?: boolean }) {
   const tip: Pt = [x, h, 0];
   const base: Pt = [x, 0, 0];
   const up = h >= 0;
@@ -145,11 +162,7 @@ function Flecha({ x, h, color, label, sub, dashed = false }: { x: number; h: num
     <group>
       <Line points={[base, tip] as Pt[]} color={color} lineWidth={dashed ? 2 : 3} transparent opacity={dashed ? 0.7 : 1} dashed={dashed} dashSize={0.16} gapSize={0.12} />
       <Line points={[[x - 0.16, h - hd, 0], tip, [x + 0.16, h - hd, 0]] as Pt[]} color={color} lineWidth={dashed ? 2 : 3} transparent opacity={dashed ? 0.7 : 1} dashed={dashed} dashSize={0.1} gapSize={0.08} />
-      <Html position={[x, h + (up ? 0.5 : -0.5), 0]} center distanceFactor={17} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", textAlign: "center", padding: "2px 8px", borderRadius: 8, background: "rgba(5,13,26,0.85)", border: `1px solid ${color}88`, color, fontWeight: 900, fontSize: 10, fontFamily: "system-ui, sans-serif" }}>
-          {label}{sub && <div style={{ fontSize: 8.5, fontWeight: 800, color: "rgba(220,232,255,0.75)" }}>{sub}</div>}
-        </div>
-      </Html>
+      <Etiqueta pos={[x, h + (up ? 0.6 : -0.6), 0]} color={color}>{label}</Etiqueta>
     </group>
   );
 }
@@ -159,12 +172,10 @@ function Foco({ x, etq, color = "#fbbf24" }: { x: number; etq: string; color?: s
   return (
     <group>
       <mesh position={[x, 0, 0]}>
-        <sphereGeometry args={[0.08, 12, 12]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.7} toneMapped={false} />
+        <sphereGeometry args={[0.12, 16, 16]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} roughness={0.4} />
       </mesh>
-      <Html position={[x, -0.42, 0]} center distanceFactor={16} pointerEvents="none">
-        <div style={{ fontSize: 9, fontWeight: 900, color, fontFamily: "ui-monospace, monospace" }}>{etq}</div>
-      </Html>
+      <Etiqueta pos={[x, -0.62, 0]} color={color} borde={false}>{etq}</Etiqueta>
     </group>
   );
 }
@@ -273,20 +284,16 @@ function EscenaImagen({
       )}
 
       {/* objeto */}
-      <Flecha x={-do_ * SX} h={ho * SY} color="#86efac" label="objeto" sub={fmtDist(do_)} />
+      <Flecha x={-do_ * SX} h={ho * SY} color="#86efac" label={`objeto · ${fmtDist(do_)}`} />
 
       {/* imagen */}
       {!enInf && Math.abs(xImgU) <= (X / SX) + 0.6 && isFinite(hiU) && (
-        <Flecha x={xImgU * SX} h={hiU * SY} color={virtual ? "#fca5a5" : "#fde047"} label={virtual ? "imagen virtual" : "imagen real"} sub={`${r.orientacion} · ${r.tamano}`} dashed={virtual} />
+        <Flecha x={xImgU * SX} h={hiU * SY} color={virtual ? "#fca5a5" : "#fde047"} label={virtual ? `imagen virtual · ${fmtDist(r.di)}` : `imagen real · ${fmtDist(r.di)}`} dashed={virtual} />
       )}
 
       {/* imagen en el infinito */}
       {enInf && (
-        <Html position={[dir * (X - 1.6), Y - 0.4, 0]} center distanceFactor={18} pointerEvents="none">
-          <div style={{ whiteSpace: "nowrap", padding: "3px 10px", borderRadius: 8, background: "rgba(5,13,26,0.85)", border: "1px solid rgba(255,255,255,0.2)", color: "#fde047", fontWeight: 900, fontSize: 10, fontFamily: "system-ui, sans-serif" }}>
-            objeto en el foco → imagen en el infinito (rayos paralelos)
-          </div>
-        </Html>
+        <Etiqueta pos={[dir * (X - 2.4), Y - 0.5, 0]} color="#fde047" ancha>imagen en el infinito</Etiqueta>
       )}
 
       <Photon path={[tipObj, center, ray2End ?? center]} color="#67e8f9" playing={playing} />
@@ -299,7 +306,7 @@ function EscenaRefraccion({ medio1, medio2, thetaInc, playing }: { medio1: strin
   const m1 = medioPorId(medio1);
   const m2 = medioPorId(medio2);
   const s = resolverSnell(m1.n, m2.n, thetaInc);
-  const R = 6;
+  const R = 4.1;
 
   const t1 = thetaInc * RAD;
   const A: Pt = [-Math.sin(t1) * R, Math.cos(t1) * R, 0];   // incidente desde arriba-izquierda
@@ -338,13 +345,9 @@ function EscenaRefraccion({ medio1, medio2, thetaInc, playing }: { medio1: strin
       <Line points={[[-X, 0, 0], [X, 0, 0]] as Pt[]} color="#e2e8f0" lineWidth={2} transparent opacity={0.75} />
       <Line points={[[0, Y, 0], [0, -Y, 0]] as Pt[]} color="#94a3b8" lineWidth={1.5} transparent opacity={0.55} dashed dashSize={0.2} gapSize={0.16} />
 
-      {/* etiquetas de medio */}
-      <Html position={[-X + 1.4, Y - 0.5, 0]} center distanceFactor={18} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", padding: "2px 9px", borderRadius: 8, background: "rgba(5,13,26,0.8)", border: `1px solid ${m1.color}88`, color: m1.color, fontWeight: 900, fontSize: 10.5, fontFamily: "system-ui, sans-serif" }}>{m1.nombre} · n₁ = {fmt2(m1.n)}</div>
-      </Html>
-      <Html position={[-X + 1.4, -(Y - 0.5), 0]} center distanceFactor={18} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", padding: "2px 9px", borderRadius: 8, background: "rgba(5,13,26,0.8)", border: `1px solid ${m2.color}88`, color: m2.color, fontWeight: 900, fontSize: 10.5, fontFamily: "system-ui, sans-serif" }}>{m2.nombre} · n₂ = {fmt2(m2.n)}</div>
-      </Html>
+      {/* etiquetas de medio (el detalle está en el panel) */}
+      <Etiqueta pos={[-X + 2.2, Y - 0.6, 0]} color={m1.color} ancha>{m1.nombre} · n₁ = {fmt2(m1.n)}</Etiqueta>
+      <Etiqueta pos={[-X + 2.2, -(Y - 0.6), 0]} color={m2.color} ancha>{m2.nombre} · n₂ = {fmt2(m2.n)}</Etiqueta>
 
       {/* rayo incidente */}
       <CurvaTubo puntos={[A, O] as Pt[]} color="#fde047" grosor={0.054} />
@@ -357,30 +360,12 @@ function EscenaRefraccion({ medio1, medio2, thetaInc, playing }: { medio1: strin
       <Line points={arc(0, -t1, 1.3)} color="#fde047" lineWidth={1.5} transparent opacity={0.8} />
       {refrE && <Line points={arc(Math.PI, Math.PI - (s.thetaRefDeg * RAD), 1.3)} color={m2.color} lineWidth={1.5} transparent opacity={0.8} />}
 
-      <Html position={[-Math.sin(t1 / 2) * 1.9, Math.cos(t1 / 2) * 1.9, 0]} center distanceFactor={16} pointerEvents="none">
-        <div style={{ fontSize: 10, fontWeight: 900, color: "#fde047", fontFamily: "ui-monospace, monospace" }}>θ₁ = {fmtAng(thetaInc)}</div>
-      </Html>
-      {refrE && (
-        <Html position={[Math.sin((s.thetaRefDeg * RAD) / 2) * 1.9, -Math.cos((s.thetaRefDeg * RAD) / 2) * 1.9, 0]} center distanceFactor={16} pointerEvents="none">
-          <div style={{ fontSize: 10, fontWeight: 900, color: m2.color, fontFamily: "ui-monospace, monospace" }}>θ₂ = {fmtAng(s.thetaRefDeg)}</div>
-        </Html>
+      <Etiqueta pos={[-Math.sin(t1 / 2) * 2.5 - 0.6, Math.cos(t1 / 2) * 2.5, 0]} color="#fde047" borde={false}>θ₁ = {fmtAng(thetaInc)}</Etiqueta>
+      {refrE ? (
+        <Etiqueta pos={[Math.sin((s.thetaRefDeg * RAD) / 2) * 2.5 + 0.6, -Math.cos((s.thetaRefDeg * RAD) / 2) * 2.5, 0]} color={m2.color} borde={false}>θ₂ = {fmtAng(s.thetaRefDeg)}</Etiqueta>
+      ) : (
+        <Etiqueta pos={[1.9, 2.4, 0]} color="#fde047" borde={false}>reflexión total</Etiqueta>
       )}
-
-      {/* aviso de reflexión total interna */}
-      {s.reflexionTotal && (
-        <Html position={[0, -Y + 0.8, 0]} center distanceFactor={18} pointerEvents="none">
-          <div style={{ whiteSpace: "nowrap", textAlign: "center", padding: "4px 12px", borderRadius: 9, background: "rgba(40,10,8,0.9)", border: "1px solid #fbbf24", color: "#fde047", fontWeight: 900, fontSize: 11, fontFamily: "system-ui, sans-serif" }}>
-            <i className="fa-solid fa-rotate-left" style={{ marginRight: 6 }} />
-            REFLEXIÓN TOTAL INTERNA · θ₁ &gt; θ_c = {s.thetaCriticoDeg != null ? fmtAng(s.thetaCriticoDeg) : "—"}
-          </div>
-        </Html>
-      )}
-
-      <Titulo
-        texto={s.reflexionTotal ? "Reflexión total interna" : "Refracción (ley de Snell)"}
-        sub={`${m1.nombre} → ${m2.nombre} · n₁·sen θ₁ = n₂·sen θ₂`}
-        color={s.reflexionTotal ? "#fde047" : m2.color}
-      />
 
       <Photon path={refrE ? [A, O, refrE] : [A, O, reflE]} color="#fde047" playing={playing} />
     </group>
@@ -390,15 +375,9 @@ function EscenaRefraccion({ medio1, medio2, thetaInc, playing }: { medio1: strin
 /* ── Wrappers de modo con su título ───────────────────────────────────────── */
 function ModoLente({ tipoLente, fLente, doLente, playing }: Pick<OpticaSceneProps, "tipoLente" | "fLente" | "doLente" | "playing" | "accent">) {
   const f = tipoLente === "convergente" ? Math.abs(fLente) : -Math.abs(fLente);
-  const r = resolverGauss(f, doLente, H_OBJ);
   const col = tipoLente === "convergente" ? "#a78bfa" : "#f472b6";
   return (
     <group>
-      <Titulo
-        texto={`Lente ${tipoLente}`}
-        sub={r.enInfinito ? "objeto en el foco → imagen en ∞" : `${r.tipoImagen} · ${r.orientacion} · ${r.tamano} · M = ${fmtAumento(r.M)}`}
-        color={col}
-      />
       <EscenaImagen esLente f={f} do_={doLente} color={col} playing={playing} />
     </group>
   );
@@ -406,15 +385,9 @@ function ModoLente({ tipoLente, fLente, doLente, playing }: Pick<OpticaSceneProp
 
 function ModoEspejo({ tipoEspejo, fEspejo, doEspejo, playing }: Pick<OpticaSceneProps, "tipoEspejo" | "fEspejo" | "doEspejo" | "playing" | "accent">) {
   const f = tipoEspejo === "plano" ? Infinity : tipoEspejo === "concavo" ? Math.abs(fEspejo) : -Math.abs(fEspejo);
-  const r = resolverGauss(f, doEspejo, H_OBJ);
   const col = "#5eead4";
   return (
     <group>
-      <Titulo
-        texto={`Espejo ${tipoEspejo}`}
-        sub={`${r.tipoImagen} · ${r.orientacion} · ${r.tamano} · M = ${fmtAumento(r.M)}`}
-        color={col}
-      />
       <SimboloEspejo tipo={tipoEspejo} color={col} />
       <EscenaImagen esLente={false} f={f} do_={doEspejo} color="#a78bfa" playing={playing} />
     </group>
@@ -431,6 +404,7 @@ function Contenido(props: OpticaSceneProps) {
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
       <Escenario acento={accent} />
+      <Encuadre />
 
 
       <group key={`${modo}-${resetNonce}`}>
@@ -444,14 +418,15 @@ function Contenido(props: OpticaSceneProps) {
         makeDefault
         enablePan={false}
         minDistance={11}
-        maxDistance={28}
+        maxDistance={32}
+        target={[0, -0.3, 0]}
         minPolarAngle={Math.PI / 3.4}
         maxPolarAngle={Math.PI / 1.7}
       />
 
       <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.5} luminanceThreshold={0.55} luminanceSmoothing={0.3} mipmapBlur />
-        <Vignette eskil={false} offset={0.2} darkness={0.45} />
+        <Bloom intensity={0.4} luminanceThreshold={0.7} luminanceSmoothing={0.3} mipmapBlur />
+        <Vignette eskil={false} offset={0.2} darkness={0.4} />
       </EffectComposer>
     </>
   );

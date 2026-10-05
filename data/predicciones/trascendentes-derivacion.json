@@ -1,0 +1,12 @@
+{
+  "escena": "Una curva con una recta tangente que se desliza sobre ella y, aparte, la curva ámbar de su derivada",
+  "pregunta": "Si la tangente a f sube hacia la derecha, ¿dónde queda el punto ámbar de la derivada?",
+  "opciones": [
+    { "id": "a", "texto": "Por encima del eje horizontal", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Por debajo del eje horizontal", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Justo sobre el eje, siempre", "icono": "fa-minus" }
+  ],
+  "correcta": "a",
+  "porque": "La altura del punto ámbar es la pendiente de la tangente. Si la recta sube, su pendiente es positiva y f' vale más que cero en ese punto.",
+  "comoComprobarlo": "Elige una función y mueve la sonda x = a despacio; observa la flecha de la leyenda y la altura del punto ámbar respecto al eje."
+}

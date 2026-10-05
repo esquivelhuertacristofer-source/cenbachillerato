@@ -1,0 +1,12 @@
+{
+  "escena": "Una lata sin tapa de 1000 cm³ cuyo radio puedes cambiar, junto a la gráfica del material que gasta",
+  "pregunta": "Si ensanchas la lata hasta el radio máximo, ¿cuánto material gasta frente a la lata del óptimo?",
+  "opciones": [
+    { "id": "a", "texto": "Menos, porque queda más baja", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Igual, el volumen no cambia", "icono": "fa-equals" },
+    { "id": "c", "texto": "Más, la base crece demasiado", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "c",
+  "porque": "Con volumen fijo, una lata muy ancha ahorra pared pero gasta mucha base. Pasado el óptimo, la base crece más rápido de lo que baja la pared.",
+  "comoComprobarlo": "Pulsa «Óptimo» y lee el material en la barra de la leyenda; luego pulsa «Ancha» y compara la barra y el valor de A(r)."
+}

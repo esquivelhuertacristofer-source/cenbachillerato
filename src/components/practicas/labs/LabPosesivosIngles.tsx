@@ -1,27 +1,30 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Possession: mine or yours?
  * Práctica experimental para IN-I-P08-A4 (Inglés I).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «Saxon genitive» — arrastra el marcador correcto ('s singular / ' plural)
- *     al hueco tras el poseedor para formar el genitivo sajón.
- *  2. «Complete the sentence» — arrastra el posesivo o genitivo adecuado al
- *     hueco de cada oración según el contexto (¿va antes de un sustantivo o solo?).
- *  3. «Adjective or pronoun?» — clasifica diez posesivos en dos columnas:
- *     adjetivo posesivo (va antes de un sustantivo) vs pronombre posesivo (va solo).
- *  + Cuestionario de comprensión.
+ * SIMULADOR: la oficina de objetos perdidos de una escuela ficticia. La
+ * etiqueta que escribe el alumno decide A QUIÉN le entrega el objeto el
+ * empleado; una forma equivocada lo manda con la persona incorrecta o lo deja
+ * en la caja.
+ *  1. «Saxon genitive» — completa la etiqueta con 's, ' o nada: solo la forma
+ *     correcta devuelve el objeto a su dueño.
+ *  2. «Complete the sentence» — elige el posesivo de cada oración: señala a
+ *     una persona distinta o no se entiende.
+ *  3. «Adjective or pronoun?» — prueba cada palabra en dos etiquetas
+ *     («___ backpack» / «The backpack is ___») y ve cuál se lee bien.
+ *  4. «Complete the text» — escribe los huecos (verbatim de la progresión).
+ *  + Reto y Teoría en el panel.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de IN-I·P08
- * (A1 lectura, A2 fill_blanks, A4 quiz, A5 V/F, A6 glosario).
+ * DOM puro. Contenido VERBATIM de IN-I·P08 (A1 lectura, A2 fill_blanks, A4
+ * quiz, A5 V/F, A6 glosario). Personas y escuela FICTICIAS.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { POSESIVOS_INGLES_HUECOS } from "./posesivos-ingles-huecos";
@@ -36,13 +39,22 @@ import {
   BIN_INFO,
   QUIZ,
   DATO_POSESION,
+  OFICINA,
+  OBJETOS,
+  CASOS_ORACION,
+  OBJETO_GENITIVO,
+  motivoMarcador,
+  PLANTILLA_ADJ,
+  PLANTILLA_PRON,
   type BinPos,
+  type ObjetoPerdido,
+  type Persona,
 } from "./posesivos-ingles-data";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 
 const NO = "#FF5E5E";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-posesivos-ingles-reto";
+const RUTA_FOTOS = "/media/labs-sim/posesivos-ingles";
 
 type Modo = "genitivo" | "oraciones" | "clasifica" | "texto";
 
@@ -53,6 +65,8 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
   { id: "texto", label: "Complete the text", icono: "fa-pen-to-square" },
 ];
 
+type MarcaGen = "'s" | "'" | "";
+
 export function LabPosesivosIngles({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
   const [modo, setModo] = useState<Modo>("genitivo");
@@ -60,9 +74,6 @@ export function LabPosesivosIngles({ color }: PracticaLabProps) {
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
-  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
-  // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
   const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
@@ -77,9 +88,6 @@ export function LabPosesivosIngles({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
-  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
-  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
-  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
   const sfxNo = () => {
     partida.error();
@@ -90,96 +98,68 @@ export function LabPosesivosIngles({ color }: PracticaLabProps) {
     return sonido && audioRef.current?.blip();
   };
 
-  // ── modo Saxon genitive (arrastra el marcador correcto) ───────────────
-  const [marcado, setMarcado] = useState<Record<string, boolean>>({});
-  const [selMarker, setSelMarker] = useState<string | null>(null); // label "'s" | "'"
-  const [shakeGen, setShakeGen] = useState<string | null>(null);
+  const [toco, setToco] = useState(false);
 
-  const intentarGen = (markerLabel: string, rowId: string) => {
-    if (marcado[rowId]) return;
-    const row = GENITIVOS.find((g) => g.id === rowId);
-    if (row && markerLabel === row.marker) {
-      setMarcado((e) => ({ ...e, [rowId]: true }));
-      setSelMarker(null);
-      sfxPlace();
-      if (Object.keys(marcado).length + 1 >= GENITIVOS.length) {
-        sfxOk();
-        persistMejor(true, oracionesDone, clasificaDone);
-      }
-    } else {
-      setShakeGen(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeGen(null), 420);
+  // ── modo 1: genitivo sajón ────────────────────────────────────────────
+  const [genSel, setGenSel] = useState<Record<string, MarcaGen | undefined>>({});
+  const genBien = (id: string) => genSel[id] === GENITIVOS.find((g) => g.id === id)!.marker;
+  const genitivoDone = GENITIVOS.every((g) => genBien(g.id));
+  const elegirGen = (id: string, m: MarcaGen) => {
+    if (genSel[id] === m) return;
+    const sig = { ...genSel, [id]: m };
+    setGenSel(sig);
+    setToco(true);
+    if (m === GENITIVOS.find((g) => g.id === id)!.marker) sfxPlace();
+    else sfxNo();
+    if (GENITIVOS.every((g) => sig[g.id] === g.marker) && !genitivoDone) {
+      sfxOk();
+      persistMejor(true, oracionesDone, clasificaDone);
     }
   };
-  const resetGenitivo = () => {
-    setMarcado({});
-    setSelMarker(null);
-  };
+  const resetGenitivo = () => setGenSel({});
 
-  // ── modo Complete the sentence (arrastra la palabra al hueco) ──────────
-  const [completado, setCompletado] = useState<Record<string, boolean>>({});
-  const [selOra, setSelOra] = useState<string | null>(null);
-  const [shakeOra, setShakeOra] = useState<string | null>(null);
-  const oraLibres = ORACIONES.filter((o) => !completado[o.id]).slice().sort((a, b) => a.resp.localeCompare(b.resp, "en"));
-
-  const intentarOra = (chipId: string, rowId: string) => {
-    if (completado[rowId]) return;
-    if (chipId === rowId) {
-      setCompletado((e) => ({ ...e, [rowId]: true }));
-      setSelOra(null);
-      sfxPlace();
-      if (Object.keys(completado).length + 1 >= ORACIONES.length) {
-        sfxOk();
-        persistMejor(genitivoDone, true, clasificaDone);
-      }
-    } else {
-      setShakeOra(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeOra(null), 420);
+  // ── modo 2: oraciones ─────────────────────────────────────────────────
+  const [oraSel, setOraSel] = useState<Record<string, string | undefined>>({});
+  const oraBien = (id: string) => oraSel[id] === ORACIONES.find((o) => o.id === id)!.resp;
+  const oracionesDone = ORACIONES.every((o) => oraBien(o.id));
+  const elegirOra = (id: string, w: string) => {
+    if (oraSel[id] === w) return;
+    const sig = { ...oraSel, [id]: w };
+    setOraSel(sig);
+    setToco(true);
+    if (w === ORACIONES.find((o) => o.id === id)!.resp) sfxPlace();
+    else sfxNo();
+    if (ORACIONES.every((o) => sig[o.id] === o.resp) && !oracionesDone) {
+      sfxOk();
+      persistMejor(genitivoDone, true, clasificaDone);
     }
   };
-  const resetOraciones = () => {
-    setCompletado({});
-    setSelOra(null);
-  };
+  const resetOraciones = () => setOraSel({});
 
-  // ── modo Adjective or pronoun (clasifica en dos columnas) ──────────────
-  const [ubicado, setUbicado] = useState<Record<string, BinPos>>({});
-  const [selPos, setSelPos] = useState<string | null>(null);
-  const [shakeBin, setShakeBin] = useState<BinPos | null>(null);
-  const posLibres = POSESIVOS.filter((p) => !ubicado[p.id]).slice().sort((a, b) => a.palabra.localeCompare(b.palabra, "en"));
-
-  const intentarPos = (posId: string, bin: BinPos) => {
-    if (ubicado[posId]) return;
-    const p = POSESIVOS.find((x) => x.id === posId);
-    if (p && p.bin === bin) {
-      setUbicado((e) => ({ ...e, [posId]: bin }));
-      setSelPos(null);
-      sfxPlace();
-      if (Object.keys(ubicado).length + 1 >= POSESIVOS.length) {
-        sfxOk();
-        persistMejor(genitivoDone, oracionesDone, true);
-      }
-    } else {
-      setShakeBin(bin);
-      sfxNo();
-      window.setTimeout(() => setShakeBin(null), 420);
+  // ── modo 3: adjetivo o pronombre (la etiqueta se prueba en dos lugares) ─
+  const [clasSel, setClasSel] = useState<Record<string, BinPos | undefined>>({});
+  const clasBien = (id: string) => clasSel[id] === POSESIVOS.find((p) => p.id === id)!.bin;
+  const nClas = POSESIVOS.filter((p) => clasBien(p.id)).length;
+  const clasificaDone = nClas >= POSESIVOS.length;
+  const probar = (id: string, bin: BinPos) => {
+    if (clasSel[id] === bin) return;
+    const sig = { ...clasSel, [id]: bin };
+    setClasSel(sig);
+    if (bin === POSESIVOS.find((p) => p.id === id)!.bin) sfxPlace();
+    else sfxNo();
+    if (POSESIVOS.every((p) => sig[p.id] === p.bin) && !clasificaDone) {
+      sfxOk();
+      persistMejor(genitivoDone, oracionesDone, true);
     }
   };
-  const resetClasifica = () => {
-    setUbicado({});
-    setSelPos(null);
-  };
+  const resetClasifica = () => setClasSel({});
 
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── progreso / estrellas ──────────────────────────────────────────────
-  const genitivoDone = Object.keys(marcado).length >= GENITIVOS.length;
-  const oracionesDone = Object.keys(completado).length >= ORACIONES.length;
-  const clasificaDone = Object.keys(ubicado).length >= POSESIVOS.length;
+  const nGen = GENITIVOS.filter((g) => genBien(g.id)).length;
+  const nOra = ORACIONES.filter((o) => oraBien(o.id)).length;
   const modosHechos = (genitivoDone ? 1 : 0) + (oracionesDone ? 1 : 0) + (clasificaDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
   const estrellas = partida.estrellasCon(modosHechos, 4);
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
@@ -191,6 +171,7 @@ export function LabPosesivosIngles({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Elige una forma y mira a quién le da el objeto el empleado", done: toco },
     { txt: "Forma los 4 genitivos sajones con el marcador correcto", done: genitivoDone },
     { txt: "Completa las 8 oraciones con el posesivo adecuado", done: oracionesDone },
     { txt: "Clasifica los 10 posesivos (adjetivo / pronombre)", done: clasificaDone },
@@ -198,187 +179,46 @@ export function LabPosesivosIngles({ color }: PracticaLabProps) {
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
 
-  // arrastre nativo
-  const dragProps = (id: string) => ({
-    draggable: true,
-    onDragStart: (e: React.DragEvent) => {
-      e.dataTransfer.setData("text/plain", id);
-      e.dataTransfer.effectAllowed = "move";
-      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
-      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
-      e.currentTarget.setAttribute("data-arrastrando", "true");
-    },
-    onDragEnd: (e: React.DragEvent) => {
-      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
-      // queda medio borrada para siempre.
-      e.currentTarget.removeAttribute("data-arrastrando");
-      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
-    },
-  });
-  const dropProps = (onDrop: (id: string) => void) => ({
-    onDragOver: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-    },
-    onDragEnter: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.setAttribute("data-sobre", "true");
-    },
-    onDragLeave: (e: React.DragEvent) => {
-      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
-      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
-      const r = e.currentTarget.getBoundingClientRect();
-      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-      if (fuera) e.currentTarget.removeAttribute("data-sobre");
-    },
-    onDrop: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.removeAttribute("data-sobre");
-      const id = e.dataTransfer.getData("text/plain");
-      if (id) onDrop(id);
-    },
-    "data-zona": "true" as const,
-    role: "button" as const,
-    tabIndex: 0,
-    onKeyDown: (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        (e.currentTarget as HTMLElement).click();
-      }
-    },
-  });
-
   const resetTexto = () => {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
   const resetActual = modo === "texto" ? resetTexto : modo === "genitivo" ? resetGenitivo : modo === "oraciones" ? resetOraciones : resetClasifica;
 
+  const lectura =
+    modo === "genitivo" ? (
+      <>Objetos devueltos: {nGen}/{GENITIVOS.length}</>
+    ) : modo === "oraciones" ? (
+      <>Objetos con su dueño: {nOra}/{ORACIONES.length}</>
+    ) : modo === "clasifica" ? (
+      <>Etiquetas bien leídas: {nClas}/{POSESIVOS.length}</>
+    ) : (
+      <>Repaso de la teoría de la práctica</>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes posShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes posPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .pos-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .pos-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .pos-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .pos-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .pos-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .pos-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .pos-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
-        .pos-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .pos-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .pos-chip:active { cursor:grabbing; }
-        .pos-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .pos-row[data-shake="true"] { animation:posShake .4s; border-color:${NO}; }
-        .pos-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .pos-slot { flex-shrink:0; min-width:64px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .pos-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .pos-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:190px; }
-        .pos-bin[data-shake="true"] { animation:posShake .4s; border-color:${NO}; }
-        .pos-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .pos-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .pos-q:disabled{ cursor:default; }
-        .pos-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .pos-btn:hover { border-color:${T.lineStrong}; }
-        .pos-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .pos-row[data-shake="true"], .pos-bin[data-shake="true"] { animation:none; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
 
-        /* Cajón de teoría */
-        .pos-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .pos-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .pos-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .pos-drawer[data-open="true"] { transform:translateX(0); }
-        .pos-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .pos-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .pos-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .pos-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .pos-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .pos-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .pos-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .pos-bin, .pos-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .pos-bin:nth-of-type(6n+1), .pos-row:nth-of-type(6n+1) { --tono:188; }
-        .pos-bin:nth-of-type(6n+2), .pos-row:nth-of-type(6n+2) { --tono:262; }
-        .pos-bin:nth-of-type(6n+3), .pos-row:nth-of-type(6n+3) { --tono:44; }
-        .pos-bin:nth-of-type(6n+4), .pos-row:nth-of-type(6n+4) { --tono:152; }
-        .pos-bin:nth-of-type(6n+5), .pos-row:nth-of-type(6n+5) { --tono:330; }
-        .pos-bin:nth-of-type(6n+6), .pos-row:nth-of-type(6n+6) { --tono:18; }
-        .pos-bin::before, .pos-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .pos-bin[data-done="true"], .pos-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .pos-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .pos-chip:hover { transform:translateY(-2px); }
-        .pos-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .pos-chip, .pos-chip:hover, .pos-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="pos-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="pos-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="pos-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="pos-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="pos-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="pos-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="pos-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="pos-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="pos-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="pos-drawer-body">
-          <FichaTeorica data={POSESIVOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — Saxon genitive */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
               key={textoIntento}
@@ -397,319 +237,339 @@ export function LabPosesivosIngles({ color }: PracticaLabProps) {
 
           {modo === "genitivo" && (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra el marcador correcto tras el poseedor</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: genitivoDone ? OK : T.text3 }}>
-                    {Object.keys(marcado).length}/{GENITIVOS.length}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
-                  Usa <strong style={{ color: T.text2 }}>&apos;s</strong> con un poseedor singular y solo <strong style={{ color: T.text2 }}>&apos;</strong> con un plural que ya termina en s.
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                  {MARCADORES.map((m) => (
-                    <button key={m.id} className="pos-chip" data-sel={selMarker === m.label} onClick={() => setSelMarker((s) => (s === m.label ? null : m.label))} {...dragProps(m.label)} style={{ minWidth: 120 }}>
-                      <span style={{ fontFamily: "monospace", fontSize: 16 }}>{m.label}</span>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: T.text3 }}>{m.desc}</span>
-                    </button>
-                  ))}
-                </div>
+              <Oficina titulo={`${OFICINA.nombre}. Cierra cada etiqueta con la marca correcta.`} />
+              <div className="pos-lista">
+                {GENITIVOS.map((g) => {
+                  const sel = genSel[g.id];
+                  const ok = sel === g.marker;
+                  const obj = OBJETOS[OBJETO_GENITIVO[g.id] ?? "libro"]!;
+                  const dueno: Persona = { id: "dueno", nombre: g.dueno, icono: g.plural ? "fa-users" : "fa-user" };
+                  const etiqueta = `${g.dueno}${sel ?? "…"} ${g.noun}`;
+                  return (
+                    <CasoObjeto
+                      key={g.id}
+                      objeto={obj}
+                      personas={[dueno]}
+                      duenoId="dueno"
+                      holder={sel === undefined ? undefined : ok ? "dueno" : "caja"}
+                      frase={
+                        <>
+                          <span className="pos-es">{g.es}</span>
+                          <span className="pos-etiqueta">
+                            {g.dueno}
+                            <span className="pos-opts" role="radiogroup" aria-label="Marca de posesión">
+                              {([...MARCADORES.map((m) => m.label), ""] as MarcaGen[]).map((m) => (
+                                <button key={m || "nada"} type="button" role="radio" aria-checked={sel === m} className="pos-opt" data-on={sel === m} onClick={() => elegirGen(g.id, m)}>
+                                  {m === "" ? "—" : m}
+                                </button>
+                              ))}
+                            </span>
+                            {g.noun}
+                          </span>
+                        </>
+                      }
+                      lectura={
+                        sel === undefined
+                          ? "Elige cómo cierra la palabra del dueño y mira qué hace el empleado."
+                          : ok
+                            ? `Lee «${etiqueta}» y entrega el objeto a su dueño. ${g.regla}`
+                            : `«${etiqueta}» no se entiende. ${motivoMarcador(g, sel)} Lo deja en la caja.`
+                      }
+                      ok={ok}
+                      elegido={sel !== undefined}
+                    />
+                  );
+                })}
               </div>
-
-              <RowsGenitivo selMarker={selMarker} shakeGen={shakeGen} marcado={marcado} onMatch={intentarGen} dropProps={dropProps} />
             </>
           )}
 
-          {/* MODO 2 — Complete the sentence */}
           {modo === "oraciones" && (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra el posesivo adecuado a cada hueco</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: oracionesDone ? OK : T.text3 }}>
-                    {Object.keys(completado).length}/{ORACIONES.length}
-                  </span>
-                </div>
-                {oraLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Completaste las 8 oraciones!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {oraLibres.map((o) => (
-                      <button key={o.id} className="pos-chip" data-sel={selOra === o.id} onClick={() => setSelOra((s) => (s === o.id ? null : o.id))} {...dragProps(o.id)}>
-                        {o.resp}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <Oficina titulo={`${OFICINA.nombre}. El posesivo que elijas señala a una persona.`} />
+              <div className="pos-lista">
+                {CASOS_ORACION.map((c) => {
+                  const o = ORACIONES.find((x) => x.id === c.id)!;
+                  const sel = oraSel[c.id];
+                  const op = c.opciones.find((x) => x.w === sel);
+                  const ok = sel === o.resp;
+                  const obj = OBJETOS[c.objeto]!;
+                  const holder = !op ? undefined : op.apunta ?? "caja";
+                  const apunta = op?.apunta ? c.personas.find((p) => p.id === op.apunta) : undefined;
+                  return (
+                    <CasoObjeto
+                      key={c.id}
+                      objeto={obj}
+                      personas={c.personas}
+                      duenoId={c.dueno}
+                      holder={holder}
+                      frase={
+                        <span className="pos-etiqueta">
+                          {o.antes}
+                          <span className="pos-opts" role="radiogroup" aria-label="Palabra del hueco">
+                            {c.opciones.map((x) => (
+                              <button key={x.w} type="button" role="radio" aria-checked={sel === x.w} className="pos-opt" data-on={sel === x.w} onClick={() => elegirOra(c.id, x.w)}>
+                                {x.w}
+                              </button>
+                            ))}
+                          </span>
+                          {o.despues}
+                        </span>
+                      }
+                      lectura={
+                        !op
+                          ? "Elige una palabra y mira a quién se lo entrega el empleado."
+                          : ok
+                            ? `«${op.w}» señala a ${apunta?.nombre}: el empleado entrega el objeto a su dueño. (${o.nota})`
+                            : apunta
+                              ? `«${op.w}» señala a ${apunta.nombre}: el empleado le entrega el objeto a quien no es su dueño.`
+                              : `${op.motivo}: la etiqueta no se entiende y el objeto se queda en la caja.`
+                      }
+                      ok={ok}
+                      elegido={!!op}
+                    />
+                  );
+                })}
               </div>
-
-              <RowsOraciones selOra={selOra} shakeOra={shakeOra} completado={completado} onMatch={intentarOra} dropProps={dropProps} />
             </>
           )}
 
-          {/* MODO 3 — Adjective or pronoun */}
           {modo === "clasifica" && (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada posesivo a su columna</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: clasificaDone ? OK : T.text3 }}>
-                    {Object.keys(ubicado).length}/{POSESIVOS.length}
-                  </span>
-                </div>
-                {posLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los 10 posesivos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {posLibres.map((p) => (
-                      <button key={p.id} className="pos-chip" data-sel={selPos === p.id} onClick={() => setSelPos((s) => (s === p.id ? null : p.id))} {...dragProps(p.id)}>
-                        {p.palabra}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <Oficina titulo={`${OFICINA.nombre}. Prueba cada palabra en las dos etiquetas posibles.`} />
+              <div className="pos-lista">
+                {POSESIVOS.map((p) => {
+                  const sel = clasSel[p.id];
+                  const ok = sel === p.bin;
+                  const frase = sel === "adj" ? PLANTILLA_ADJ(p.palabra) : sel === "pron" ? PLANTILLA_PRON(p.palabra) : undefined;
+                  return (
+                    <div key={p.id} className="pos-caso" data-ok={sel ? ok : undefined} data-mal={!!sel && !ok}>
+                      <div className="pos-clas-cab">
+                        <strong className="pos-palabra">{p.palabra}</strong>
+                        <span className="pos-es">{p.es}</span>
+                      </div>
+                      <div className="pos-opts" role="radiogroup" aria-label={`¿Dónde va «${p.palabra}»?`}>
+                        <button type="button" role="radio" aria-checked={sel === "adj"} className="pos-opt pos-opt-largo" data-on={sel === "adj"} onClick={() => probar(p.id, "adj")}>
+                          «___ backpack»
+                        </button>
+                        <button type="button" role="radio" aria-checked={sel === "pron"} className="pos-opt pos-opt-largo" data-on={sel === "pron"} onClick={() => probar(p.id, "pron")}>
+                          «The backpack is ___»
+                        </button>
+                      </div>
+                      <div className="pos-lector" data-ok={sel ? ok : undefined}>
+                        <span className="pos-etq" data-mal={!!sel && !ok}>
+                          <i className={`fa-solid ${!sel ? "fa-tag" : ok ? "fa-circle-check" : "fa-circle-xmark"}`} aria-hidden />
+                          {frase ?? "Elige dónde la pones"}
+                        </span>
+                        <span className="pos-lee">
+                          {!sel
+                            ? "La etiqueta se imprime con la palabra en el lugar que elijas."
+                            : ok
+                              ? `Se lee bien: ${BIN_INFO[p.bin].titulo.toLowerCase()}, ${BIN_INFO[p.bin].subtitulo.toLowerCase()}.`
+                              : p.bin === "adj"
+                                ? `«${p.palabra}» no puede quedarse solo: es adjetivo y necesita un sustantivo después.`
+                                : `«${p.palabra}» ya sustituye al sustantivo: es pronombre y va solo, no antes de «backpack».`}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
-              <BinsClasifica selPos={selPos} shakeBin={shakeBin} ubicado={ubicado} onMatch={intentarPos} dropProps={dropProps} />
             </>
           )}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Genitivos" value={`${nGen}/${GENITIVOS.length}`} col={genitivoDone ? OK : undefined} />
+                  <Dato label="Oraciones" value={`${nOra}/${ORACIONES.length}`} col={oracionesDone ? OK : undefined} />
+                  <Dato label="Posesivos" value={`${nClas}/${POSESIVOS.length}`} col={clasificaDone ? OK : undefined} />
                 </div>
-              ))}
-            </div>
-
-            <div className="pos-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1, 2, 3].map((s) => (
+                      <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
+                    {bestEstrellas >= 3 ? "¡Dominas los posesivos!" : "Termina los modos para ganar 2★; la tercera pide 2 errores o menos."}
+                  </span>
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "You mastered possession in English!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
+              </Bloque>
+              <Bloque titulo="Pista" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {modo === "genitivo" && "Poseedor singular → 's. Plural terminado en s → solo '. Prueba las tres opciones y mira qué hace el empleado."}
+                  {modo === "oraciones" && "Si la palabra va antes de un sustantivo es adjetivo (my, his, their…); si va sola es pronombre (mine, hers…)."}
+                  {modo === "clasifica" && "Adjetivo: va ANTES de un sustantivo. Pronombre: va SOLO, sin sustantivo."}
+                  {modo === "texto" && "Completa cada hueco escribiendo la palabra que falta."}
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Genitivo sajón" icono="fa-quote-right">
+                {GENITIVOS.map((g) => (
+                  <p key={g.id} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{g.es}.</strong> {g.regla}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Adjetivo o pronombre" icono="fa-table-columns">
+                {(["adj", "pron"] as BinPos[]).map((b) => (
+                  <p key={b} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{BIN_INFO[b].titulo}</strong> ({BIN_INFO[b].subtitulo}). {BIN_INFO[b].ejemplo}.
+                  </p>
+                ))}
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {POSESIVOS.map((p) => `${p.palabra} = ${p.es}`).join(" · ")}
+                </p>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_POSESION}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={POSESIVOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "genitivo" && (
-                <><strong style={{ color: T.text }}>Ana&apos;s book</strong> = el libro de Ana. Si el poseedor es plural y termina en s (<strong style={{ color: T.text }}>the students</strong>), solo añades el apóstrofo: <strong style={{ color: T.text }}>the students&apos; notebooks</strong>.</>
-              )}
-              {modo === "oraciones" && (
-                <>¿Hay un sustantivo después? Usa un <strong style={{ color: T.text }}>adjetivo</strong> (my, his, our…). ¿Va solo? Usa un <strong style={{ color: T.text }}>pronombre</strong> (mine, hers…). <strong style={{ color: T.text }}>Whose…?</strong> pregunta de quién es.</>
-              )}
-              {modo === "clasifica" && (
-                <><strong style={{ color: T.text }}>my book</strong> (adjetivo + sustantivo) vs <strong style={{ color: T.text }}>it&apos;s mine</strong> (pronombre solo). Nota: <strong style={{ color: T.text }}>his</strong> es idéntico en ambas formas.</>
-              )}
+/** Banner de la oficina; si la imagen aún no existe queda el degradado con el ícono. */
+function Oficina({ titulo }: { titulo: string }) {
+  const [hay, setHay] = useState(true);
+  return (
+    <div className="pos-foto">
+      <i className="fa-solid fa-box-open" aria-hidden />
+      {hay && <img src={`${RUTA_FOTOS}/objetos-perdidos.webp`} alt="" loading="lazy" onError={() => setHay(false)} />}
+      <span>{titulo}</span>
+    </div>
+  );
+}
+
+function ObjetoImg({ objeto }: { objeto: ObjetoPerdido }) {
+  const [hay, setHay] = useState(true);
+  return (
+    <span className="pos-obj" title={objeto.nombre}>
+      <i className={`fa-solid ${objeto.icono}`} aria-hidden />
+      {hay && objeto.clave && <img src={`${RUTA_FOTOS}/${objeto.clave}.webp`} alt="" loading="lazy" onError={() => setHay(false)} />}
+    </span>
+  );
+}
+
+/**
+ * Un objeto y quien lo tiene: la caja de perdidos o una de las personas. El
+ * objeto SE MUEVE hacia el avatar que la etiqueta señala.
+ */
+function CasoObjeto({ objeto, personas, duenoId, holder, frase, lectura, ok, elegido }: {
+  objeto: ObjetoPerdido;
+  personas: Persona[];
+  duenoId: string;
+  holder: string | undefined;
+  frase: ReactNode;
+  lectura: string;
+  ok: boolean;
+  elegido: boolean;
+}) {
+  const lugares: Persona[] = [{ id: "caja", nombre: "Caja de perdidos", icono: "fa-box-open" }, ...personas];
+  const donde = holder ?? "caja";
+  return (
+    <div className="pos-caso" data-ok={elegido ? ok : undefined} data-mal={elegido && !ok}>
+      <div className="pos-frase">{frase}</div>
+      <div className="pos-lugares">
+        {lugares.map((l) => {
+          const aqui = donde === l.id;
+          return (
+            <span key={l.id} className="pos-lugar" data-aqui={aqui} data-dueno={l.id === duenoId} data-bien={aqui && l.id === duenoId}>
+              <span className="pos-av"><i className={`fa-solid ${l.icono}`} aria-hidden /></span>
+              <span className="pos-nom">{l.nombre}</span>
+              {aqui && <ObjetoImg objeto={objeto} />}
             </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_POSESION}</span>
-          </div>
-        </div>
+          );
+        })}
       </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
+      <div className="pos-lector" data-ok={elegido ? ok : undefined}>
+        <span className="pos-lee"><em>{OFICINA.empleado}</em>{lectura}</span>
+      </div>
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
- * ═══════════════════════════════════════════════════════════════════════════ */
-type DropFactory = (onDrop: (id: string) => void) => {
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-};
-
-function RowsGenitivo({
-  selMarker,
-  shakeGen,
-  marcado,
-  onMatch,
-  dropProps,
-}: {
-  selMarker: string | null;
-  shakeGen: string | null;
-  marcado: Record<string, boolean>;
-  onMatch: (markerLabel: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {GENITIVOS.map((g) => {
-        const done = marcado[g.id];
-        return (
-          <div
-            key={g.id}
-            className="pos-row"
-            data-shake={shakeGen === g.id}
-            data-done={done}
-            onClick={() => !done && selMarker && onMatch(selMarker, g.id)}
-            {...dropProps((id) => onMatch(id, g.id))}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 5 }}>{g.es}</div>
-              <div style={{ fontSize: 15.5, color: done ? "#fff" : T.text2, lineHeight: 1.4, display: "inline-flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-                <span style={{ fontWeight: 700 }}>{g.dueno}</span>
-                {done ? (
-                  <span style={{ animation: "posPop .25s ease", fontWeight: 900, color: OK, fontFamily: "monospace" }}>{g.marker}</span>
-                ) : (
-                  <span className="pos-slot" data-armed={!!selMarker}>
-                    <i className="fa-solid fa-arrow-down" style={{ fontSize: 11 }} />
-                  </span>
-                )}
-                <span style={{ marginLeft: 4 }}>{g.noun}</span>
-              </div>
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 800, color: g.plural ? "#FFC75A" : T.text3, border: `1px solid ${g.plural ? "#FFC75A55" : T.line}`, borderRadius: 6, padding: "2px 8px", textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
-              {g.plural ? "plural" : "singular"}
-            </span>
-            {done && (
-              <div style={{ flexBasis: "100%", fontSize: 12, color: T.text3, lineHeight: 1.45, display: "flex", gap: 8 }}>
-                <i className="fa-solid fa-circle-check" style={{ color: OK, marginTop: 2 }} />
-                <span>{g.regla}</span>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function RowsOraciones({
-  selOra,
-  shakeOra,
-  completado,
-  onMatch,
-  dropProps,
-}: {
-  selOra: string | null;
-  shakeOra: string | null;
-  completado: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {ORACIONES.map((o) => {
-        const done = completado[o.id];
-        return (
-          <div
-            key={o.id}
-            className="pos-row"
-            data-shake={shakeOra === o.id}
-            data-done={done}
-            onClick={() => !done && selOra && onMatch(selOra, o.id)}
-            {...dropProps((id) => onMatch(id, o.id))}
-          >
-            <div style={{ fontSize: 14.5, color: done ? "#fff" : T.text2, lineHeight: 1.6, display: "inline-flex", alignItems: "center", gap: 7, flexWrap: "wrap", flex: 1, minWidth: 0 }}>
-              {o.antes && <span>{o.antes}</span>}
-              {done ? (
-                <span style={{ animation: "posPop .25s ease", fontWeight: 900, color: OK }}>{o.resp}</span>
-              ) : (
-                <span className="pos-slot" data-armed={!!selOra} style={{ minWidth: 76 }}>
-                  <i className="fa-solid fa-arrow-down" style={{ fontSize: 11 }} />
-                </span>
-              )}
-              <span>{o.despues}</span>
-            </div>
-            {!done && (
-              <span style={{ fontSize: 11, color: T.text3, fontStyle: "italic", flexShrink: 0 }}>{o.nota}</span>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function BinsClasifica({
-  selPos,
-  shakeBin,
-  ubicado,
-  onMatch,
-  dropProps,
-}: {
-  selPos: string | null;
-  shakeBin: BinPos | null;
-  ubicado: Record<string, BinPos>;
-  onMatch: (posId: string, bin: BinPos) => void;
-  dropProps: DropFactory;
-}) {
-  const bins: BinPos[] = ["adj", "pron"];
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-      {bins.map((bin) => {
-        const info = BIN_INFO[bin];
-        const dentro = POSESIVOS.filter((p) => ubicado[p.id] === bin);
-        return (
-          <div
-            key={bin}
-            className="pos-bin"
-            data-shake={shakeBin === bin}
-            onClick={() => selPos && onMatch(selPos, bin)}
-            style={{ position: "relative", isolation: "isolate" }}
-            {...dropProps((id) => onMatch(id, bin))}
-          >
-            {/* La ilustración del concepto llenando la caja vacía. */}
-            <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={31} radio={9} />
-              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 4 }}>{info.subtitulo}</div>
-            <div style={{ fontSize: 11, color: T.text3, fontStyle: "italic", marginBottom: 12 }}>{info.ejemplo}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
-              ) : (
-                dentro.map((p) => (
-                  <span key={p.id} style={{ animation: "posPop .25s ease", display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 13px", borderRadius: 999, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 13.5, fontWeight: 800, color: "#fff" }}>
-                    {p.palabra}
-                    <span style={{ fontSize: 10.5, fontWeight: 600, color: T.text3 }}>{p.es}</span>
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+const css = (accent: string, rgba: string) => `
+  .pos-foto { position:relative; height:clamp(84px, 16vw, 130px); border-radius:14px; overflow:hidden; display:flex; align-items:flex-end;
+    background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.95)); border:1px solid ${T.line}; }
+  .pos-foto > i { position:absolute; right:18px; top:50%; transform:translateY(-50%); font-size:46px; color:rgba(255,255,255,0.18); }
+  .pos-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .pos-foto span { position:relative; padding:8px 12px; font-size:14px; font-weight:800; color:#fff; width:100%;
+    background:linear-gradient(0deg, rgba(3,8,18,0.88), transparent); text-shadow:0 1px 6px rgba(0,0,0,0.8); }
+  .pos-lista { display:grid; gap:12px; }
+  .pos-caso { display:grid; gap:10px; padding:14px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; transition:border-color .2s, background .2s; }
+  .pos-caso[data-ok="true"] { border-color:${OK}66; background:${OK}0d; }
+  .pos-caso[data-mal="true"] { border-color:${NO}66; }
+  .pos-frase { display:grid; gap:6px; font-size:16px; line-height:1.6; color:#fff; font-weight:600; }
+  .pos-es { font-size:14px; color:${T.text3}; font-weight:700; }
+  .pos-etiqueta { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .pos-opts { display:inline-flex; flex-wrap:wrap; gap:6px; }
+  .pos-opt { cursor:pointer; padding:8px 14px; border-radius:999px; border:1.5px solid ${T.lineStrong}; background:${T.glassSoft}; color:#fff;
+    font-size:15px; font-weight:800; min-height:40px; min-width:44px; font-family:ui-monospace, monospace; transition:all .14s; }
+  .pos-opt-largo { font-family:inherit; font-size:14px; }
+  .pos-opt:hover { border-color:${accent}; }
+  .pos-opt[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.28); box-shadow:0 0 14px -5px ${accent}; }
+  .pos-lugares { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap:8px; }
+  .pos-lugar { position:relative; display:flex; align-items:center; gap:8px; padding:8px 10px; min-height:60px; border-radius:12px;
+    border:1.5px dashed ${T.line}; background:${T.inset}; color:${T.text2}; font-size:14px; font-weight:700; transition:all .25s; }
+  .pos-lugar[data-aqui="true"] { border-style:solid; border-color:${NO}88; background:${NO}12; color:#fff; }
+  .pos-lugar[data-bien="true"] { border-color:${OK}; background:${OK}1a; }
+  .pos-lugar[data-dueno="true"] .pos-av { color:${accent}; }
+  .pos-av { font-size:18px; display:flex; }
+  .pos-nom { flex:1; min-width:0; line-height:1.2; }
+  .pos-obj { position:relative; width:44px; height:44px; flex-shrink:0; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.1); font-size:20px; color:#fff; animation:posLlega .35s ease; }
+  .pos-obj img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  @keyframes posLlega { from { transform:translateY(-16px) scale(.7); opacity:0; } to { transform:none; opacity:1; } }
+  .pos-lector { padding:10px 12px; border-radius:12px; background:${T.inset}; border-left:4px solid ${T.lineStrong}; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .pos-lector[data-ok="true"] { border-left-color:${OK}; }
+  .pos-lector[data-ok="false"] { border-left-color:${NO}; }
+  .pos-lee { flex:1 1 200px; min-width:0; display:grid; gap:3px; font-size:14px; color:${T.text2}; line-height:1.45; }
+  .pos-lee em { font-style:normal; font-weight:800; color:${T.text3}; }
+  .pos-clas-cab { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .pos-palabra { font-size:20px; color:#fff; font-family:ui-monospace, monospace; }
+  .pos-etq { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; background:#fff; color:#10202f; font-size:15px; font-weight:800; }
+  .pos-etq[data-mal="true"] { background:${NO}22; color:#fff; text-decoration:line-through; }
+  .pos-etq i { color:${OK}; }
+  .pos-etq[data-mal="true"] i { color:${NO}; }
+  .pos-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .pos-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .pos-q:disabled{ cursor:default; }
+  .pos-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .pos-btn:hover { border-color:${T.lineStrong}; }
+  @media (prefers-reduced-motion: reduce){ .pos-obj { animation:none; } .pos-lugar, .pos-caso { transition:none; } }
+`;
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Cuestionario de comprensión
@@ -751,19 +611,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div style={{ ...card, padding: "16px 16px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco preguntas sobre el genitivo sajón y los pronombres posesivos. Responde y pulsa «Comprobar».
       </div>
 
@@ -772,11 +632,11 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -798,7 +658,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="pos-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 26, height: 26, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -807,7 +667,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -830,7 +690,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

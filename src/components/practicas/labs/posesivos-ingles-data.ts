@@ -152,3 +152,121 @@ export const QUIZ: QuizItem[] = [
 /** Dato verbatim de A1 (los pronombres posesivos que van solos). */
 export const DATO_POSESION =
   "Los pronombres posesivos que van solos (sin sustantivo después) son: mine (mío), yours (tuyo), his (suyo — de él), hers (suyo — de ella), ours (nuestro) y theirs (suyo — de ellos).";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * SIMULADOR (2026-10): la oficina de objetos perdidos de una escuela ficticia.
+ * La etiqueta que escribe el alumno decide a quién le entrega el objeto el
+ * empleado. El contenido curricular de arriba no cambia.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+export const OFICINA = { nombre: "Objetos perdidos · Maple High (escuela ficticia)", empleado: "El empleado" };
+
+/** Objeto ilustrado: /media/labs-sim/posesivos-ingles/<clave>.webp */
+export interface ObjetoPerdido {
+  clave: string;
+  nombre: string;
+  icono: string;
+}
+
+export const OBJETOS: Record<string, ObjetoPerdido> = {
+  libro: { clave: "libro", nombre: "libro", icono: "fa-book" },
+  lapiz: { clave: "lapiz", nombre: "lápiz", icono: "fa-pencil" },
+  mochila: { clave: "mochila", nombre: "mochila", icono: "fa-bag-shopping" },
+  tarea: { clave: "tarea", nombre: "tarea", icono: "fa-file-lines" },
+  cuadernos: { clave: "cuadernos", nombre: "cuadernos", icono: "fa-book-open" },
+  pluma: { clave: "pluma", nombre: "pluma", icono: "fa-pen" },
+  escritorio: { clave: "escritorio", nombre: "escritorio", icono: "fa-chair" },
+  maestro: { clave: "", nombre: "maestro", icono: "fa-chalkboard-user" },
+};
+
+export interface Persona {
+  id: string;
+  nombre: string;
+  icono: string;
+}
+
+/** Una forma posible para el hueco: a quién señala (o `null` si la etiqueta no se entiende). */
+export interface OpcionPos {
+  w: string;
+  apunta: string | null;
+  /** Solo cuando `apunta` es null: por qué la etiqueta no se entiende. */
+  motivo?: string;
+}
+
+export interface CasoOracion {
+  /** id de la `Oracion` a la que pertenece. */
+  id: string;
+  objeto: string;
+  personas: Persona[];
+  dueno: string;
+  opciones: OpcionPos[];
+}
+
+const TU: Persona = { id: "tu", nombre: "Tú", icono: "fa-user" };
+const LEO: Persona = { id: "leo", nombre: "Leo", icono: "fa-user" };
+const ANA: Persona = { id: "ana", nombre: "Ana", icono: "fa-user" };
+const CARLOS: Persona = { id: "carlos", nombre: "Carlos", icono: "fa-user" };
+const MARTA: Persona = { id: "marta", nombre: "Marta", icono: "fa-user" };
+const LUCIA: Persona = { id: "lucia", nombre: "Lucía", icono: "fa-user" };
+
+export const CASOS_ORACION: CasoOracion[] = [
+  { id: "o-my", objeto: "libro", personas: [TU, LEO], dueno: "tu", opciones: [
+    { w: "my", apunta: "tu" },
+    { w: "your", apunta: "leo" },
+    { w: "mine", apunta: null, motivo: "«mine» va solo, no antes de «book»" },
+  ] },
+  { id: "o-ana", objeto: "lapiz", personas: [ANA, LEO], dueno: "ana", opciones: [
+    { w: "'s", apunta: "ana" },
+    { w: "s", apunta: null, motivo: "«Anas» se lee como otro nombre: falta el apóstrofo" },
+    { w: "'", apunta: null, motivo: "«Ana'» no marca posesión: falta la s" },
+  ] },
+  { id: "o-his", objeto: "mochila", personas: [CARLOS, MARTA], dueno: "carlos", opciones: [
+    { w: "his", apunta: "carlos" },
+    { w: "her", apunta: "marta" },
+    { w: "hers", apunta: null, motivo: "«hers» va solo, no antes de «backpack»" },
+  ] },
+  { id: "o-their", objeto: "tarea", personas: [{ id: "estud", nombre: "Los estudiantes", icono: "fa-users" }, CARLOS], dueno: "estud", opciones: [
+    { w: "their", apunta: "estud" },
+    { w: "his", apunta: "carlos" },
+    { w: "theirs", apunta: null, motivo: "«theirs» va solo, no antes de «homework»" },
+  ] },
+  { id: "o-our", objeto: "maestro", personas: [{ id: "nos", nombre: "Tu grupo", icono: "fa-users" }, { id: "otro", nombre: "El otro grupo", icono: "fa-users" }], dueno: "nos", opciones: [
+    { w: "Our", apunta: "nos" },
+    { w: "Your", apunta: "otro" },
+    { w: "Ours", apunta: null, motivo: "«Ours» va solo, no antes de «teacher»" },
+  ] },
+  { id: "o-whose", objeto: "cuadernos", personas: [LUCIA, LEO], dueno: "lucia", opciones: [
+    { w: "Whose", apunta: "lucia" },
+    { w: "Who's", apunta: null, motivo: "«Who's» es «who is»: la pregunta queda «¿Quién es cuaderno?»" },
+    { w: "Who", apunta: null, motivo: "falta la forma posesiva: queda «¿Quién cuaderno?»" },
+  ] },
+  { id: "o-hers", objeto: "pluma", personas: [MARTA, CARLOS], dueno: "marta", opciones: [
+    { w: "hers", apunta: "marta" },
+    { w: "his", apunta: "carlos" },
+    { w: "her", apunta: null, motivo: "«her» necesita un sustantivo después y aquí va solo" },
+  ] },
+  { id: "o-mine", objeto: "pluma", personas: [TU, LEO], dueno: "tu", opciones: [
+    { w: "mine", apunta: "tu" },
+    { w: "yours", apunta: "leo" },
+    { w: "my", apunta: null, motivo: "«my» necesita un sustantivo después y aquí va solo" },
+  ] },
+];
+
+/** Objeto de cada genitivo (para la ilustración). */
+export const OBJETO_GENITIVO: Record<string, string> = {
+  "g-ana": "libro",
+  "g-teacher": "escritorio",
+  "g-students": "cuadernos",
+  "g-maria": "libro",
+};
+
+/** Porqué falla cada marcador equivocado, según el poseedor. */
+export function motivoMarcador(g: Genitivo, elegido: "'s" | "'" | ""): string {
+  if (elegido === "") return `«${g.dueno} ${g.noun}» no dice de quién es: parece una lista de dos palabras.`;
+  if (g.plural && elegido === "'s") return `«${g.dueno}'s» suena mal: el plural ya termina en s, solo lleva apóstrofo.`;
+  return `«${g.dueno}'» se queda corto: el poseedor es singular y pide apóstrofo + s.`;
+}
+
+/** Plantillas de la etiqueta del modo «Adjective or pronoun?». */
+export const PLANTILLA_ADJ = (w: string) => `${w} backpack`;
+export const PLANTILLA_PRON = (w: string) => `The backpack is ${w}.`;

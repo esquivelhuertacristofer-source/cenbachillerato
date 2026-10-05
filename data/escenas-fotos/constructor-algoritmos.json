@@ -1,0 +1,8 @@
+{
+  "slug": "constructor-algoritmos",
+  "items": [
+    { "clave": "robot-secuencia", "formato": "1:1", "estilo": "ilustracion", "escena": "Pequeño robot repartidor azul con ruedas y una antena, sosteniendo un paquete de cartón con las manos, sobre el piso de una bodega con cajas apiladas al fondo" },
+    { "clave": "robot-repeticion", "formato": "1:1", "estilo": "ilustracion", "escena": "Pequeño robot repartidor azul visto desde atrás en un pasillo largo y estrecho de una bodega con luces en el techo que se pierden a lo lejos" },
+    { "clave": "robot-decision", "formato": "1:1", "estilo": "ilustracion", "escena": "Pequeño robot repartidor azul con una luz amarilla en la frente frente a una esquina de pared de ladrillo donde el pasillo gira, bodega iluminada" }
+  ]
+}

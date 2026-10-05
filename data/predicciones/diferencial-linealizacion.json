@@ -1,0 +1,12 @@
+{
+  "escena": "Una curva con su recta tangente y un punto que se mueve; una barra roja mide la brecha entre ambas",
+  "pregunta": "Si alejas x del punto base, ¿qué pasa con el error de la tangente?",
+  "opciones": [
+    { "id": "a", "texto": "Disminuye", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Crece", "icono": "fa-arrow-up" },
+    { "id": "c", "texto": "No cambia", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "La tangente solo coincide con la curva en el punto base. Al alejarte, la curva se dobla y la recta sigue derecha, así que la brecha entre las dos crece.",
+  "comoComprobarlo": "En Controles, mueve el deslizador de x hacia los dos extremos y mira la barra roja del medidor y la brecha en la escena."
+}

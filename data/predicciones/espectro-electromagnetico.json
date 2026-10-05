@@ -1,0 +1,12 @@
+{
+  "escena": "Un marcador recorre una barra del espectro, de ondas de radio a rayos gamma, con un medidor de energía",
+  "pregunta": "Al subir la frecuencia de FM a rayos X, ¿qué pasa con la energía de cada fotón?",
+  "opciones": [
+    { "id": "a", "texto": "Aumenta mucho", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Disminuye", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se queda igual", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "La energía del fotón es proporcional a su frecuencia (E = h·f). Los rayos X vibran muchísimas más veces por segundo que una señal de FM, así que cada fotón lleva mucha más energía.",
+  "comoComprobarlo": "Arrastra el deslizador de frecuencia en Controles de FM a Rayos X y vigila el medidor de energía de la esquina."
+}

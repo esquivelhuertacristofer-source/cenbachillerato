@@ -20,8 +20,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -68,18 +68,21 @@ function anilloPts(P: Pt, rad = 0.16, n = 40): Pt[] {
   return pts;
 }
 
-/* ── Etiqueta flotante ────────────────────────────────────────────────────── */
+/* ── Etiqueta flotante: tamaño fijo en píxeles (≥ 14), desplazamiento fijo ────
+ * Las anchas (`ancha`) se ocultan en pantallas angostas: su info va al panel. */
 function Etiqueta({
-  pos, color, children, size = 11.5, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, ancha = false,
 }: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
+  pos: Pt; color: string; children: React.ReactNode; ancha?: boolean;
 }) {
+  const angosta = useThree((st) => st.size.width < 640);
+  if (ancha && angosta) return null;
   return (
-    <Html position={pos} center distanceFactor={15} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
-        whiteSpace: "nowrap", padding: "4px 9px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: `1.5px solid ${color}`, color: "#fff", fontWeight: 800, fontSize: 14,
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       }}>
         {children}
       </div>
@@ -105,8 +108,6 @@ function Plano({ v }: { v: Vista }) {
   const ejeX: Pt[] = [S(v.xmin, ax0), S(v.xmax, ax0)];
   const ejeY: Pt[] = [S(ay0, v.ymin), S(ay0, v.ymax)];
 
-  const fmtTick = (n: number) => n.toLocaleString("es-MX", { maximumFractionDigits: 1 }).replace("-", "−");
-
   return (
     <group>
       <lineSegments geometry={geo}>
@@ -115,15 +116,6 @@ function Plano({ v }: { v: Vista }) {
 
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={[BX + 0.5, sy(ax0), 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.xlabel}</Etiqueta>
-      <Etiqueta pos={[sx(ay0), BY + 0.5, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.ylabel}</Etiqueta>
-
-      {v.xticks.filter((t) => t !== ay0).map((t) => (
-        <Etiqueta key={`tx${t}`} pos={[sx(t), sy(ax0) - 0.34, 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
-      {v.yticks.filter((t) => t !== ax0).map((t) => (
-        <Etiqueta key={`ty${t}`} pos={[sx(ay0) - 0.42, sy(t), 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
     </group>
   );
 }
@@ -175,7 +167,7 @@ function Marcadores({ funcId, v }: { funcId: FuncId; v: Vista }) {
         />
       )}
       {dentroX && (
-        <Etiqueta pos={[sx(f.a), -BY - 0.42, 0]} color={lineCol} size={11} bg="rgba(6,16,31,0.85)">
+        <Etiqueta pos={[sx(f.a), -BY - 0.42, 0]} color={lineCol}>
           x = {f.a.toLocaleString("es-MX", { maximumFractionDigits: 1 })}
         </Etiqueta>
       )}
@@ -184,8 +176,8 @@ function Marcadores({ funcId, v }: { funcId: FuncId; v: Vista }) {
       {f.tipo === "evitable" && ringLim !== null && (
         <>
           <CurvaTubo puntos={anilloPts(S(f.a, ringLim))} color={HOLE_COL} grosor={0.054} />
-          <Etiqueta pos={[S(f.a, ringLim)[0] + 0.3, S(f.a, ringLim)[1] + 0.55, 0.05]} color={HOLE_COL} size={11} bg="rgba(6,16,31,0.92)">
-            f({fmt1(f.a)}) no existe (0/0) · lím = {fmt2(ringLim)}
+          <Etiqueta pos={[S(f.a, ringLim)[0] + 0.3, S(f.a, ringLim)[1] + 0.55, 0.05]} color={HOLE_COL} ancha>
+            hueco: lím = {fmt2(ringLim)}
           </Etiqueta>
         </>
       )}
@@ -194,23 +186,23 @@ function Marcadores({ funcId, v }: { funcId: FuncId; v: Vista }) {
       {f.tipo === "salto" && ringSaltoIzq !== null && f.fa !== null && (
         <>
           <CurvaTubo puntos={anilloPts(S(f.a, ringSaltoIzq))} color={HOLE_COL} grosor={0.054} />
-          <Etiqueta pos={[S(f.a, ringSaltoIzq)[0] - 1.0, S(f.a, ringSaltoIzq)[1] - 0.1, 0.05]} color={HOLE_COL} size={10.5} bg="rgba(6,16,31,0.92)">
+          <Etiqueta pos={[S(f.a, ringSaltoIzq)[0] - 1.0, S(f.a, ringSaltoIzq)[1] - 0.1, 0.05]} color={HOLE_COL}>
             lím izq = {fmt1(ringSaltoIzq)}
           </Etiqueta>
           <mesh position={S(f.a, f.fa)}>
             <sphereGeometry args={[0.15, 22, 22]} />
-            <meshStandardMaterial color="#fff" emissive={f.color} emissiveIntensity={1.6} toneMapped={false} />
+            <meshStandardMaterial color="#fff" emissive={f.color} emissiveIntensity={1.6} />
           </mesh>
-          <Etiqueta pos={[S(f.a, f.fa)[0] + 0.95, S(f.a, f.fa)[1] + 0.15, 0.05]} color={f.color} size={10.5} bg="rgba(6,16,31,0.92)">
-            f({fmt1(f.a)}) = lím der = {fmt1(f.fa)}
+          <Etiqueta pos={[S(f.a, f.fa)[0] + 0.95, S(f.a, f.fa)[1] + 0.15, 0.05]} color={f.color} ancha>
+            f({fmt1(f.a)}) = {fmt1(f.fa)}
           </Etiqueta>
         </>
       )}
 
       {/* ESENCIAL: etiqueta de asíntota vertical */}
       {f.tipo === "esencial" && dentroX && (
-        <Etiqueta pos={[sx(f.a) + 0.95, BY - 0.4, 0.05]} color={HOLE_COL} size={11} bg="rgba(6,16,31,0.92)">
-          asíntota: x = {fmt1(f.a)} (±∞)
+        <Etiqueta pos={[sx(f.a) + 0.95, BY - 0.4, 0.05]} color={HOLE_COL} ancha>
+          asíntota x = {fmt1(f.a)}
         </Etiqueta>
       )}
 
@@ -219,10 +211,10 @@ function Marcadores({ funcId, v }: { funcId: FuncId; v: Vista }) {
         <>
           <mesh position={S(f.a, f.fa)}>
             <sphereGeometry args={[0.15, 22, 22]} />
-            <meshStandardMaterial color="#fff" emissive={OK_COL} emissiveIntensity={1.7} toneMapped={false} />
+            <meshStandardMaterial color="#fff" emissive={OK_COL} emissiveIntensity={1.7} />
           </mesh>
-          <Etiqueta pos={[S(f.a, f.fa)[0] + 0.95, S(f.a, f.fa)[1] + 0.45, 0.05]} color={OK_COL} size={11} bg="rgba(6,16,31,0.92)">
-            f({fmt1(f.a)}) = lím = {fmt1(f.fa)} ✓
+          <Etiqueta pos={[S(f.a, f.fa)[0] + 0.95, S(f.a, f.fa)[1] + 0.45, 0.05]} color={OK_COL} ancha>
+            f({fmt1(f.a)}) = {fmt1(f.fa)} ✓
           </Etiqueta>
         </>
       )}
@@ -256,18 +248,45 @@ function Movil({ funcId, v, xPos }: { funcId: FuncId; v: Vista; xPos: number }) 
 
       <mesh position={baseX}>
         <sphereGeometry args={[0.1, 16, 16]} />
-        <meshStandardMaterial color={X_COL} emissive={X_COL} emissiveIntensity={0.7} toneMapped={false} />
+        <meshStandardMaterial color={X_COL} emissive={X_COL} emissiveIntensity={0.7} />
       </mesh>
 
       <group ref={pulso} position={P}>
         <mesh>
           <sphereGeometry args={[0.15, 22, 22]} />
-          <meshStandardMaterial color="#fff" emissive={f.color} emissiveIntensity={1.8} toneMapped={false} />
+          <meshStandardMaterial color="#fff" emissive={f.color} emissiveIntensity={1.8} />
         </mesh>
       </group>
-      <Etiqueta pos={[P[0] + 0.15, P[1] + 0.5, 0.05]} color={f.color} size={12} bg="rgba(6,16,31,0.92)">
+      <Etiqueta pos={[P[0] + 0.15, P[1] + 0.5, 0.05]} color={f.color}>
         f({fmt2(xPos)}) = {fmt2(y)}
       </Etiqueta>
+    </group>
+  );
+}
+
+/* ── Sondas laterales: el mismo acercamiento por la izquierda y por la derecha ─
+ * Dos esferas en x = a ∓ δ (δ = |x − a|). Si f es continua en a convergen al
+ * mismo valor; si hay salto o asíntota, se separan. */
+const SONDA_IZQ = "#60a5fa";
+const SONDA_DER = "#f472b6";
+
+function Sondas({ funcId, v, xPos }: { funcId: FuncId; v: Vista; xPos: number }) {
+  const { S } = useMemo(() => hacerMapa(v), [v]);
+  const f = func(funcId);
+  const delta = Math.max(Math.abs(xPos - f.a), 0.02);
+  const lados: [number, string][] = [[f.a - delta, SONDA_IZQ], [f.a + delta, SONDA_DER]];
+  return (
+    <group>
+      {lados.map(([x, col]) => {
+        const y = evalFunc(funcId, x);
+        if (!Number.isFinite(y) || x < v.xmin || x > v.xmax || y < v.ymin || y > v.ymax) return null;
+        return (
+          <mesh key={col} position={S(x, y)}>
+            <sphereGeometry args={[0.13, 20, 20]} />
+            <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.9} />
+          </mesh>
+        );
+      })}
     </group>
   );
 }
@@ -303,41 +322,36 @@ function EscenaTvi({ nObj }: { nObj: number }) {
       {/* límites del intervalo [a,b] */}
       <Line points={vertA} color={X_COL} lineWidth={1.4} dashed dashSize={0.14} gapSize={0.12} transparent opacity={0.5} />
       <Line points={vertB} color={X_COL} lineWidth={1.4} dashed dashSize={0.14} gapSize={0.12} transparent opacity={0.5} />
-      <Etiqueta pos={[sx(TVI.a), -BY - 0.42, 0]} color={X_COL} size={10.5} bg="rgba(6,16,31,0.8)">a = 1</Etiqueta>
-      <Etiqueta pos={[sx(TVI.b), -BY - 0.42, 0]} color={X_COL} size={10.5} bg="rgba(6,16,31,0.8)">b = 2</Etiqueta>
 
       {/* extremos (a, g(a)) y (b, g(b)) */}
       <mesh position={S(TVI.a, TVI.ga)}>
         <sphereGeometry args={[0.13, 20, 20]} />
-        <meshStandardMaterial color="#fff" emissive={HOLE_COL} emissiveIntensity={1.4} toneMapped={false} />
+        <meshStandardMaterial color="#fff" emissive={HOLE_COL} emissiveIntensity={1.4} />
       </mesh>
-      <Etiqueta pos={[S(TVI.a, TVI.ga)[0] - 0.7, S(TVI.a, TVI.ga)[1] - 0.1, 0.05]} color={HOLE_COL} size={11} bg="rgba(6,16,31,0.92)">
+      <Etiqueta pos={[S(TVI.a, TVI.ga)[0] - 0.7, S(TVI.a, TVI.ga)[1] - 0.1, 0.05]} color={HOLE_COL}>
         g(1) = −1
       </Etiqueta>
       <mesh position={S(TVI.b, TVI.gb)}>
         <sphereGeometry args={[0.13, 20, 20]} />
-        <meshStandardMaterial color="#fff" emissive={OK_COL} emissiveIntensity={1.4} toneMapped={false} />
+        <meshStandardMaterial color="#fff" emissive={OK_COL} emissiveIntensity={1.4} />
       </mesh>
-      <Etiqueta pos={[S(TVI.b, TVI.gb)[0] - 0.7, S(TVI.b, TVI.gb)[1] + 0.1, 0.05]} color={OK_COL} size={11} bg="rgba(6,16,31,0.92)">
+      <Etiqueta pos={[S(TVI.b, TVI.gb)[0] - 0.7, S(TVI.b, TVI.gb)[1] + 0.1, 0.05]} color={OK_COL}>
         g(2) = 5
       </Etiqueta>
 
       {/* recta objetivo y = N */}
       <Line points={horizontal} color={esRaiz ? OK_COL : "#fbbf24"} lineWidth={1.8} dashed dashSize={0.18} gapSize={0.12} transparent opacity={0.7} />
-      <Etiqueta pos={[-BX - 0.7, sy(nObj), 0]} color={esRaiz ? OK_COL : "#fbbf24"} size={11} bg="rgba(6,16,31,0.92)">
-        {esRaiz ? "N = 0 (raíz)" : `N = ${fmt2(nObj)}`}
-      </Etiqueta>
 
       {/* punto garantizado (c, N) */}
       <Line points={vertC} color={esRaiz ? OK_COL : "#fbbf24"} lineWidth={1.6} dashed dashSize={0.14} gapSize={0.1} transparent opacity={0.6} />
       <group ref={pulso} position={S(c, nObj)}>
         <mesh>
           <sphereGeometry args={[0.16, 22, 22]} />
-          <meshStandardMaterial color="#fff" emissive={esRaiz ? OK_COL : "#fbbf24"} emissiveIntensity={2} toneMapped={false} />
+          <meshStandardMaterial color="#fff" emissive={esRaiz ? OK_COL : "#fbbf24"} emissiveIntensity={2} />
         </mesh>
       </group>
-      <Etiqueta pos={[S(c, nObj)[0] + 0.2, S(c, nObj)[1] + 0.55, 0.05]} color={esRaiz ? OK_COL : "#fbbf24"} size={12} bg="rgba(6,16,31,0.95)">
-        c ≈ {fmt3Local(c)} · g(c) = {fmt2(nObj)}
+      <Etiqueta pos={[S(c, nObj)[0] + 0.2, S(c, nObj)[1] + 0.55, 0.05]} color={esRaiz ? OK_COL : "#fbbf24"}>
+        c ≈ {fmt3Local(c)}
       </Etiqueta>
     </group>
   );
@@ -351,6 +365,18 @@ function fmt3Local(n: number): string {
 function Contenido({ modo, funcId, xPos, nObj, accent, resetNonce }: ContinuidadSceneProps) {
   const f = func(funcId);
   const v = modo === "tvi" ? TVI.vista : f.vista;
+
+  // Encuadre: el plano llena ~60 % del alto, entre la barra y la misión; en
+  // pantallas angostas se aleja hasta que quepa todo el ancho.
+  const camera = useThree((st) => st.camera);
+  const ancho = useThree((st) => st.size.width);
+  const alto = useThree((st) => st.size.height);
+  useEffect(() => {
+    const aspecto = ancho / Math.max(alto, 1);
+    const dist = Math.max(15.5, (BX * 2 + 1.2) / (2 * Math.tan((44 * Math.PI) / 360) * aspecto));
+    camera.position.set(dist * 0.16, 1.5 + dist * 0.04, dist);
+    camera.lookAt(0, -0.5, 0);
+  }, [camera, ancho, alto, modo]);
 
   return (
     <>
@@ -366,6 +392,7 @@ function Contenido({ modo, funcId, xPos, nObj, accent, resetNonce }: Continuidad
           <>
             <Curva funcId={funcId} v={v} color={f.color} />
             <Marcadores funcId={funcId} v={v} />
+            <Sondas funcId={funcId} v={v} xPos={xPos} />
             <Movil funcId={funcId} v={v} xPos={xPos} />
           </>
         ) : (
@@ -379,10 +406,10 @@ function Contenido({ modo, funcId, xPos, nObj, accent, resetNonce }: Continuidad
         makeDefault
         enablePan={false}
         minDistance={7}
-        maxDistance={26}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[0, 0, 0]}
+        target={[0, -0.5, 0]}
+        maxDistance={40}
       />
 
       <EffectComposer enableNormalPass={false}>

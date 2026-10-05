@@ -1,0 +1,12 @@
+{
+  "escena": "Un auto acelera por una autopista, alcanza su rapidez máxima y frena hasta detenerse",
+  "pregunta": "Si frenas con más fuerza (a₂ mayor), ¿qué pasa con los metros que recorre al frenar?",
+  "opciones": [
+    { "id": "a", "texto": "Aumentan", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se reducen", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Quedan igual", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Frenar con más fuerza quita rapidez más rápido, así que el auto se detiene en menos tiempo. La distancia de frenado es v² entre 2a₂: a mayor a₂, menos metros.",
+  "comoComprobarlo": "En Controles, sube el deslizador de frenado a₂ y mira cuántos metros dice «frena en» y dónde queda el poste de alto total."
+}

@@ -14,10 +14,11 @@
  * acumulado demuestra el ejercicio A2: 2 + 2 + 32 = 36 ATP.
  */
 
-import { useState, useRef, useCallback, useEffect, type ReactNode } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
@@ -27,7 +28,6 @@ import {
   PROBLEMA_ATP, RESPUESTA_ATP, DESGLOSE_ATP, RETO_A2,
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, GLOSARIO, CONTEXTO, FUENTE, DATOS,
 } from "./metabolismo-data";
-import { TableroObjetivos } from "./_objetivos";
 
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-metabolismo-celular-3d-reto";
@@ -52,7 +52,6 @@ export function LabMetabolismo({ color }: PracticaLabProps) {
 
   // reto evaluable, teoría (cajón deslizable) y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -110,18 +109,28 @@ export function LabMetabolismo({ color }: PracticaLabProps) {
     setIdx((i) => Math.min(etapas.length - 1, i + 1));
   };
 
+  // Misiones que no se «des-cumplen» al cambiar de proceso o de etapa.
+  const llegoA36 = useLatch(proceso === "respiracion" && atpAcum === 36);
+  const recorrioResp = useLatch(proceso === "respiracion" && idx > 0);
+  const vioFoto = useLatch(proceso === "fotosintesis");
+  const vioFerm = useLatch(proceso === "fermentacion");
+
+  const lectura = etapa
+    ? <>Etapa {seguro + 1}/{etapas.length}: {etapa.nombre}{muestraAtp ? ` · ${atpAcum} ATP` : ""}</>
+    : <>Elige un proceso</>;
+
   // panel de contador (valor calculado, no componente anidado)
-  const contador: ReactNode = muestraAtp ? (
-    <div style={{ borderRadius: 14, padding: "16px 18px", border: `1px solid ${procCol}55`, background: `${procCol}14` }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: T.text3 }}>ATP ACUMULADO</span>
-        <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3 }}>etapa {seguro + 1} / {etapas.length}</span>
+  const contador = muestraAtp ? (
+    <div style={{ borderRadius: 14, padding: "14px 16px", border: `1px solid ${procCol}55`, background: `${procCol}14` }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
+        <span style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3 }}>ATP ACUMULADO</span>
+        <span style={{ fontSize: 14, fontWeight: 800, color: T.text3 }}>etapa {seguro + 1} / {etapas.length}</span>
       </div>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
         <span style={{ fontSize: 40, fontWeight: 900, color: "#fde047", fontFamily: "ui-monospace, monospace", lineHeight: 1 }}>{atpAcum}</span>
-        <span style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>/ {atpTotal} ATP</span>
+        <span style={{ fontSize: 15, fontWeight: 800, color: T.text2 }}>/ {atpTotal} ATP</span>
         {pasoUltimo && atpAcum === 36 && (
-          <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 900, color: "#86efac", border: "1px solid #86efac55", borderRadius: 7, padding: "4px 9px" }}>
+          <span style={{ marginLeft: "auto", fontSize: 14, fontWeight: 900, color: "#86efac", border: "1px solid #86efac55", borderRadius: 7, padding: "4px 9px" }}>
             <i className="fa-solid fa-check" style={{ marginRight: 6 }} />2 + 2 + 32 = 36
           </span>
         )}
@@ -138,9 +147,9 @@ export function LabMetabolismo({ color }: PracticaLabProps) {
       </div>
     </div>
   ) : (
-    <div style={{ borderRadius: 14, padding: "16px 18px", border: `1px solid ${procCol}55`, background: `${procCol}14` }}>
-      <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: T.text3, marginBottom: 8 }}>BALANCE DE LA FOTOSÍNTESIS</div>
-      <div style={{ fontSize: 12.5, color: "#eaf0fb", lineHeight: 1.5 }}>
+    <div style={{ borderRadius: 14, padding: "14px 16px", border: `1px solid ${procCol}55`, background: `${procCol}14` }}>
+      <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, marginBottom: 8 }}>BALANCE DE LA FOTOSÍNTESIS</div>
+      <div style={{ color: "#eaf0fb", lineHeight: 1.5 }}>
         La fotosíntesis <strong>no rinde ATP neto para la célula</strong>: el ATP que genera la fase lumínica se consume en el ciclo de Calvin para fabricar glucosa. Su producto energético es la <strong>glucosa</strong> (C₆H₁₂O₆), combustible que luego la respiración oxida para liberar ~36 ATP.
       </div>
     </div>
@@ -152,430 +161,227 @@ export function LabMetabolismo({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar el proceso en 3D, pero la información sigue aquí. {def.resumen} {etapa ? `Etapa actual — ${etapa.nombre}: ${etapa.descripcion}` : ""}
       </div>
     </div>
   );
 
+  const lista14: React.CSSProperties = { margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 };
+  const chipMol: React.CSSProperties = { fontSize: 14, fontWeight: 700, fontFamily: "ui-monospace, monospace", padding: "4px 9px", borderRadius: 7 };
+  const ecEtapa = etapa ? `#${etapa.color.replace("#", "")}` : procCol;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes mePulse { 0%,100%{ box-shadow:0 0 0 0 var(--mec); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .me-live-dot { animation: mePulse 1.6s ease-in-out infinite; }
-        .me-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,27vw,400px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .me-grid { grid-template-columns: 1fr; } }
-        .me-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .me-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .me-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .me-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .me-tab { cursor:pointer; border:1px solid var(--mec); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .me-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); }
-        .me-tab:hover { background:rgba(255,255,255,0.06); }
-        .me-step { cursor:pointer; border-radius:9px; padding:8px 6px; text-align:center; transition:all .15s;
-          border:1px solid rgba(255,255,255,0.12); background:rgba(4,10,22,0.4); color:#fff; }
-        .me-nav { cursor:pointer; width:42px; height:42px; border-radius:11px; border:1px solid var(--mec);
-          background:transparent; color:#fff; font-size:16px; transition:all .15s; flex-shrink:0; }
-        .me-nav:disabled { opacity:0.3; cursor:not-allowed; }
-        .me-nav:not(:disabled):hover { background:var(--mecf); }
-        @media (max-width: 1000px){ .me-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .mt-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .mt-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .mt-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .mt-drawer[data-open="true"] { transform:translateX(0); }
-        .mt-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .mt-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .mt-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .mt-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .mt-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .mt-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de proceso */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="me-tabs">
-          {PROCESOS.map((p) => {
-            const d = PROCESOS_DEF[p];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = p === proceso;
-            return (
-              <button key={p} className="me-tab" data-on={on} onClick={() => cambiarProceso(p)}
-                style={{ ["--mec" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}><i className={`fa-solid ${d.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="me-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <MetabolismoScene
+            proceso={proceso}
+            etapaActiva={etapaActiva}
+            onSelect={(id) => {
+              const i = etapas.findIndex((e) => e.id === id);
+              if (i >= 0) setIdx(i);
             }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <MetabolismoScene
-                proceso={proceso}
-                etapaActiva={etapaActiva}
-                onSelect={(id) => {
-                  const i = etapas.findIndex((e) => e.id === id);
-                  if (i >= 0) setIdx(i);
-                }}
-                playing={playing}
-                accent={accent}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${procCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="me-live-dot" style={{ ["--mec" as string]: `${procCol}aa`, width: 9, height: 9, borderRadius: "50%", background: procCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="me-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="me-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="me-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar animación" : "Reanudar animación"}>
-                <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="me-icobtn" onClick={resetProceso} title="Reiniciar la vista">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="mt-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: procCol, marginRight: 7 }} />
-                {def.etq} · {def.organelo} · {etapas.length} etapas{muestraAtp ? ` · ${atpTotal} ATP por glucosa` : ""}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>
-                {etapa
-                  ? `${etapa.nombre} (${etapa.lugar}): ${etapa.reactivos} → ${etapa.productos}${etapa.atp > 0 ? ` · +${etapa.atp} ATP` : ""}`
-                  : "Selecciona un proceso para comenzar."}
-              </div>
-            </div>
-          </div>
-
-          {/* Stepper: navegación por etapas */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-shoe-prints" style={{ marginRight: 8, color: procCol }} />
-                Recorrido paso a paso — {def.etq}
-              </Eyebrow>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "stretch", gap: 12 }}>
-              <button className="me-nav" onClick={prev} disabled={seguro <= 0}
-                style={{ ["--mec" as string]: `${procCol}66`, ["--mecf" as string]: `${procCol}22` }} title="Etapa anterior">
-                <i className="fa-solid fa-chevron-left" />
-              </button>
-
-              <div style={{ flex: 1, display: "grid", gridTemplateColumns: `repeat(${etapas.length}, 1fr)`, gap: 8 }}>
-                {etapas.map((e, i) => {
-                  const on = i === seguro;
-                  const done = i < seguro;
-                  const ec = `#${e.color.replace("#", "")}`;
-                  return (
-                    <button key={e.id} className="me-step" onClick={() => setIdx(i)}
-                      style={{ border: `1px solid ${on ? ec : done ? `${ec}55` : "rgba(255,255,255,0.12)"}`, background: on ? `${ec}22` : done ? `${ec}10` : "rgba(4,10,22,0.4)" }}>
-                      <div style={{ fontSize: 15, marginBottom: 3, color: on || done ? ec : T.text3 }}><i className={`fa-solid ${e.icono}`} /></div>
-                      <div style={{ fontSize: 10.5, fontWeight: 800, color: on ? "#fff" : T.text2, lineHeight: 1.2 }}>{e.nombre}</div>
-                      <div style={{ fontSize: 9.5, fontWeight: 900, marginTop: 3, color: e.atp > 0 ? "#fde047" : T.text3, fontFamily: "ui-monospace, monospace" }}>{e.atp > 0 ? `+${e.atp} ATP` : "0 ATP"}</div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button className="me-nav" onClick={next} disabled={seguro >= etapas.length - 1}
-                style={{ ["--mec" as string]: `${procCol}66`, ["--mecf" as string]: `${procCol}22` }} title="Siguiente etapa">
-                <i className="fa-solid fa-chevron-right" />
-              </button>
-            </div>
-
-            {/* Detalle de la etapa seleccionada */}
-            {etapa && (
-              <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${`#${etapa.color.replace("#", "")}`}44`, background: `${`#${etapa.color.replace("#", "")}`}12` }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 8 }}>
-                  <span style={{ width: 34, height: 34, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: "#04121f", background: `#${etapa.color.replace("#", "")}` }}>
-                    <i className={`fa-solid ${etapa.icono}`} />
-                  </span>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 900, color: "#fff" }}>{etapa.nombre}</div>
-                    <div style={{ fontSize: 10.5, color: T.text3 }}><i className="fa-solid fa-location-dot" style={{ marginRight: 5 }} />{etapa.lugar}</div>
-                  </div>
-                  <span style={{ marginLeft: "auto", fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: etapa.fuente === "A2" ? "#fcd34d" : etapa.fuente === "A5" ? "#86efac" : T.text3, border: `1px solid ${etapa.fuente === "A2" ? "#fcd34d55" : etapa.fuente === "A5" ? "#86efac55" : T.line}`, borderRadius: 6, padding: "3px 7px" }}>
-                    {etapa.fuente === "A2" ? "EJERCICIO A2" : etapa.fuente === "A5" ? "GLOSARIO A5" : "LECTURA A1"}
-                  </span>
+            playing={playing}
+            accent={accent}
+            resetNonce={resetNonce}
+            atpAcum={atpAcum}
+            atpTotal={def.atpTotal}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: PROCESOS.map((p) => ({ id: p, etiqueta: PROCESOS_DEF[p].etq, icono: PROCESOS_DEF[p].icono })),
+        valor: proceso,
+        cambiar: (id) => cambiarProceso(id as Proceso),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono="fa-chevron-left" titulo="Etapa anterior" onClick={prev} />
+          <BotonHerramienta icono="fa-chevron-right" titulo="Siguiente etapa" onClick={next} />
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar animación" : "Reanudar animación"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar la vista" onClick={resetProceso} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Avanza etapa por etapa en la respiración hasta que el ATP llegue a 36", done: llegoA36 },
+        { txt: "Recorre las etapas de la respiración aerobia", done: recorrioResp },
+        { txt: "Pasa a la fotosíntesis y sigue la luz hasta la glucosa", done: vioFoto },
+        { txt: "Compara con la fermentación: sin oxígeno, solo 2 ATP", done: vioFerm },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Etapas",
+          icono: "fa-shoe-prints",
+          contenido: (
+            <>
+              <Bloque titulo={`Recorrido: ${def.etq}`} icono={def.icono}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 130px), 1fr))", gap: 8 }}>
+                  {etapas.map((e, i) => {
+                    const on = i === seguro;
+                    const done = i < seguro;
+                    const ec = `#${e.color.replace("#", "")}`;
+                    return (
+                      <button key={e.id} type="button" onClick={() => setIdx(i)}
+                        style={{ cursor: "pointer", borderRadius: 10, padding: "9px 8px", textAlign: "center", color: "#fff",
+                          border: `1px solid ${on ? ec : done ? `${ec}55` : "rgba(255,255,255,0.12)"}`, background: on ? `${ec}22` : done ? `${ec}10` : "rgba(4,10,22,0.4)" }}>
+                        <div style={{ fontSize: 16, marginBottom: 3, color: on || done ? ec : T.text3 }}><i className={`fa-solid ${e.icono}`} /></div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: on ? "#fff" : T.text2, lineHeight: 1.2 }}>{e.nombre}</div>
+                        <div style={{ fontSize: 14, fontWeight: 900, marginTop: 3, color: e.atp > 0 ? "#fde047" : T.text3, fontFamily: "ui-monospace, monospace" }}>{e.atp > 0 ? `+${e.atp} ATP` : "0 ATP"}</div>
+                      </button>
+                    );
+                  })}
                 </div>
-                {/* reactivos → productos */}
-                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: "#cdd8ec", fontFamily: "ui-monospace, monospace", padding: "4px 9px", borderRadius: 7, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>{etapa.reactivos}</span>
-                  <i className="fa-solid fa-arrow-right" style={{ color: procCol }} />
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: "#fff", fontFamily: "ui-monospace, monospace", padding: "4px 9px", borderRadius: 7, background: `${procCol}1f`, border: `1px solid ${procCol}55` }}>{etapa.productos}</span>
-                  {etapa.atp > 0 && (
-                    <span style={{ fontSize: 11.5, fontWeight: 900, color: "#fde047", fontFamily: "ui-monospace, monospace", padding: "4px 9px", borderRadius: 7, background: "#fde0471f", border: "1px solid #fde04755" }}>
-                      <i className="fa-solid fa-bolt" style={{ marginRight: 5 }} />+{etapa.atp} ATP
-                    </span>
-                  )}
-                </div>
-                <div style={{ fontSize: 12.5, color: "#eaf0fb", lineHeight: 1.55 }}>{etapa.descripcion}</div>
-                {etapa.detalle && (
-                  <div style={{ marginTop: 9, paddingTop: 9, borderTop: `1px solid ${T.line}`, fontSize: 11.5, color: T.text2, lineHeight: 1.5 }}>
-                    <i className="fa-solid fa-lightbulb" style={{ color: "#fbbf24", marginRight: 7 }} />
-                    {etapa.detalle}
-                  </div>
-                )}
-              </div>
-            )}
+                {contador}
+              </Bloque>
 
-            {/* Contador de ATP / balance */}
-            <div style={{ marginTop: 14 }}>{contador}</div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Descripción del laboratorio */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-bolt" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>El visor del metabolismo</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Ecuación global del proceso */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: `1px solid ${procCol}40`, background: `${procCol}10` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-flask-vial" style={{ marginRight: 8, color: procCol }} />
-              Ecuación global — {def.etq}
-            </Eyebrow>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", fontFamily: "ui-monospace, monospace", lineHeight: 1.5, padding: "10px 12px", borderRadius: 10, background: "rgba(4,10,22,0.5)", border: `1px solid ${procCol}33` }}>
-              {def.ecuacion}
-            </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginTop: 11 }}>{def.resumen}</div>
-          </div>
-
-          {/* Reto A2: ATP total */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #fcd34d55", background: "rgba(252,211,77,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-calculator" style={{ marginRight: 8, color: "#fcd34d" }} />
-              Reto A2 — ATP total en respiración aerobia
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 12 }}>{PROBLEMA_ATP}</div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {DESGLOSE_ATP.map((d, i) => {
-                const pct = Math.max(8, (d.atp / 36) * 100);
-                return (
-                  <div key={i}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 800, marginBottom: 4 }}>
-                      <span style={{ color: "#fff" }}>{d.etapa} <span style={{ color: T.text3, fontWeight: 600 }}>· {d.lugar}</span></span>
-                      <span style={{ color: "#fde047", fontFamily: "ui-monospace, monospace" }}>{d.atp} ATP</span>
+              {etapa && (
+                <Bloque titulo={etapa.nombre} icono={etapa.icono}>
+                  <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${ecEtapa}44`, background: `${ecEtapa}12`, display: "grid", gap: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", color: T.text3 }}>
+                      <span><i className="fa-solid fa-location-dot" style={{ marginRight: 5 }} />{etapa.lugar}</span>
+                      <span style={{ marginLeft: "auto", fontSize: 13, fontWeight: 900, letterSpacing: "0.06em", color: etapa.fuente === "A2" ? "#fcd34d" : etapa.fuente === "A5" ? "#86efac" : T.text3, border: `1px solid ${etapa.fuente === "A2" ? "#fcd34d55" : etapa.fuente === "A5" ? "#86efac55" : T.line}`, borderRadius: 6, padding: "3px 7px" }}>
+                        {etapa.fuente === "A2" ? "EJERCICIO A2" : etapa.fuente === "A5" ? "GLOSARIO A5" : "LECTURA A1"}
+                      </span>
                     </div>
-                    <div style={{ height: 9, borderRadius: 999, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
-                      <div style={{ width: `${pct}%`, height: "100%", borderRadius: 999, background: "#fbbf24" }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      <span style={{ ...chipMol, color: "#cdd8ec", background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>{etapa.reactivos}</span>
+                      <i className="fa-solid fa-arrow-right" style={{ color: procCol }} />
+                      <span style={{ ...chipMol, color: "#fff", background: `${procCol}1f`, border: `1px solid ${procCol}55` }}>{etapa.productos}</span>
+                      {etapa.atp > 0 && (
+                        <span style={{ ...chipMol, fontWeight: 900, color: "#fde047", background: "#fde0471f", border: "1px solid #fde04755" }}>
+                          <i className="fa-solid fa-bolt" style={{ marginRight: 5 }} />+{etapa.atp} ATP
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ color: "#eaf0fb", lineHeight: 1.55 }}>{etapa.descripcion}</div>
+                    {etapa.detalle && (
+                      <div style={{ paddingTop: 9, borderTop: `1px solid ${T.line}`, color: T.text2, lineHeight: 1.5 }}>
+                        <i className="fa-solid fa-lightbulb" style={{ color: "#fbbf24", marginRight: 7 }} />
+                        {etapa.detalle}
+                      </div>
+                    )}
+                  </div>
+                </Bloque>
+              )}
+
+              <Bloque titulo="Lecturas" icono="fa-gauge-high">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="etapas" value={`${etapas.length}`} col={procCol} />
+                  <Dato label="organelo" value={def.organelo.split(" ")[0] ?? def.organelo} />
+                  <Dato label="usa O₂" value={def.aerobio ? "Sí" : "No"} col={def.aerobio ? "#86efac" : "#fca5a5"} />
+                  <Dato label="ATP / glucosa" value={muestraAtp ? `${atpTotal}` : "n/a"} col="#fde047" />
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={() => {
+                if (sonido) audioRef.current?.correcto();
+              }}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="El visor del metabolismo" icono="fa-bolt">
+                <div style={{ color: T.text2 }}>{PROBLEMA}</div>
+              </Bloque>
+              <Bloque titulo={`Ecuación global: ${def.etq}`} icono="fa-flask-vial">
+                <div style={{ fontWeight: 800, color: "#fff", fontFamily: "ui-monospace, monospace", lineHeight: 1.5, padding: "10px 12px", borderRadius: 10, background: "rgba(4,10,22,0.5)", border: `1px solid ${procCol}33` }}>
+                  {def.ecuacion}
+                </div>
+                <div style={{ color: T.text2, lineHeight: 1.55 }}>{def.resumen}</div>
+              </Bloque>
+              <Bloque titulo="Reto A2: ATP total en respiración aerobia" icono="fa-calculator">
+                <div style={{ color: T.text2, lineHeight: 1.55 }}>{PROBLEMA_ATP}</div>
+                <div style={{ display: "grid", gap: 8 }}>
+                  {DESGLOSE_ATP.map((d, i) => {
+                    const pct = Math.max(8, (d.atp / 36) * 100);
+                    return (
+                      <div key={i}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontWeight: 800, marginBottom: 4 }}>
+                          <span style={{ color: "#fff" }}>{d.etapa} <span style={{ color: T.text3, fontWeight: 600 }}>· {d.lugar}</span></span>
+                          <span style={{ color: "#fde047", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap" }}>{d.atp} ATP</span>
+                        </div>
+                        <div style={{ height: 9, borderRadius: 999, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", borderRadius: 999, background: "#fbbf24" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 11, background: "rgba(252,211,77,0.12)", border: "1px solid #fcd34d44" }}>
+                  <span style={{ fontWeight: 800, color: "#fff" }}>2 + 2 + 32 =</span>
+                  <span style={{ fontSize: 22, fontWeight: 900, color: "#fde047", fontFamily: "ui-monospace, monospace" }}>{RESPUESTA_ATP} ATP</span>
+                </div>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={lista14}>{INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}</ol>
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-circle-question">
+                <ul style={lista14}>{PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}</ul>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={lista14}>{IDEAS.map((x, i) => <li key={i}>{x}</li>)}</ul>
+              </Bloque>
+              <Bloque titulo="Datos" icono="fa-gauge-high">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-            <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 11, background: "rgba(252,211,77,0.12)", border: "1px solid #fcd34d44" }}>
-              <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>2 + 2 + 32 =</span>
-              <span style={{ fontSize: 22, fontWeight: 900, color: "#fde047", fontFamily: "ui-monospace, monospace" }}>{RESPUESTA_ATP} ATP</span>
-            </div>
-          </div>
-
-          {/* Pasos para explorar */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Preguntas de reflexión */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Para reflexionar
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="me-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className={`fa-solid ${def.icono}`} style={{ marginRight: 8, color: procCol }} />
-            Lecturas — {def.etq}
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-            <Readout label="etapas" value={`${etapas.length}`} col={procCol} size={14} />
-            <Readout label="organelo" value={def.organelo.split(" ")[0] ?? def.organelo} col="#fff" size={13} />
-            <Readout label="usa O₂" value={def.aerobio ? "Sí" : "No"} col={def.aerobio ? "#86efac" : "#fca5a5"} size={14} />
-            <Readout label="ATP / glucosa" value={muestraAtp ? `${atpTotal}` : "n/a"} col="#fde047" size={14} />
-          </div>
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Contexto mexicano: SINAP */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />
-              México: el equilibrio fotosíntesis–respiración
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          {/* Glosario */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{g.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          El problema, los pasos guía y la respuesta (<strong>2 + 2 + 32 = 36 ATP</strong>) son <strong>verbatim</strong> del ejercicio A2 (etiqueta «EJERCICIO A2»). Las definiciones de las etapas de la respiración, la fotosíntesis y la fermentación son verbatim del glosario A5 (etiqueta «GLOSARIO A5»). El modelo 3D es <strong>esquemático</strong>: la mitocondria, el cloroplasto y el citosol, los nodos de cada etapa, las moléculas que recorren la ruta y las fichas de ATP son representaciones visuales (no a escala, ni con el número real de moléculas) para identificar dónde ocurre cada etapa y cuánta energía produce. Las ideas clave, el contexto del SINAP y las preguntas para reflexionar son de la lectura A1. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      {/* ── Objetivos ─────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <TableroObjetivos
-          retoKey={RETO_KEY}
-          accent={accent}
-          objetivos={[
-          { txt: "Recorre las etapas de la respiración aerobia", done: proceso === "respiracion" && idx > 0 },
-          { txt: "Pasa a la fotosíntesis y sigue la luz hasta la glucosa", done: proceso === "fotosintesis" },
-          { txt: "Compara con la fermentación: sin oxígeno, solo 2 ATP", done: proceso === "fermentacion" },
-          { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ]}
-        />
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={() => {
-          if (sonido) audioRef.current?.correcto();
-        }}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="mt-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="mt-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="mt-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="mt-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="mt-drawer-body">
-          <FichaTeorica data={METABOLISMO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="México: el equilibrio fotosíntesis–respiración" icono="fa-location-dot">
+                <div style={{ color: T.text2 }}>{CONTEXTO}</div>
+              </Bloque>
+              <Bloque titulo="Glosario" icono="fa-book">
+                {GLOSARIO.map((g, i) => (
+                  <div key={i}><strong style={{ color: accent }}>{g.termino}. </strong><span style={{ color: T.text2 }}>{g.definicion}</span></div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={METABOLISMO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                El problema, los pasos guía y la respuesta (<strong>2 + 2 + 32 = 36 ATP</strong>) son <strong>verbatim</strong> del ejercicio A2 (etiqueta «EJERCICIO A2»). Las definiciones de las etapas son verbatim del glosario A5 (etiqueta «GLOSARIO A5»). El modelo 3D es <strong>esquemático</strong>: la mitocondria, el cloroplasto y el citosol, los nodos de cada etapa, las moléculas que recorren la ruta, las fichas y el medidor de ATP son representaciones visuales (no a escala, ni con el número real de moléculas). Las ideas clave, el contexto del SINAP y las preguntas para reflexionar son de la lectura A1. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
+}
+
+/** Una vez que la condición se cumple, se queda cumplida (cambiar de modo no la deshace). */
+function useLatch(cond: boolean): boolean {
+  const [l, setL] = useState(false);
+  if (cond && !l) setL(true);
+  return l || cond;
 }

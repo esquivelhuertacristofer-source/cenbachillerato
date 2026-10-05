@@ -1,0 +1,12 @@
+{
+  "escena": "Una onda viaja por el aire a 4 Hz y una regla amarilla marca su longitud de onda",
+  "pregunta": "Si subes la frecuencia de 4 a 8 Hz en el mismo medio, ¿qué pasa con λ?",
+  "opciones": [
+    { "id": "a", "texto": "Se hace el doble", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se reduce a la mitad", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se queda igual", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "La rapidez de la onda depende del medio y no cambia. Como v = λ·f, si f se duplica, λ debe volverse la mitad para que el producto siga valiendo lo mismo.",
+  "comoComprobarlo": "Mueve el deslizador de frecuencia en Controles y mira la regla amarilla de λ y el medidor de la esquina."
+}

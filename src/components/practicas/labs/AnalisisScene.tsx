@@ -20,7 +20,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -61,18 +61,21 @@ function hacerMapa(v: Vista) {
 
 /* ── Etiqueta flotante ────────────────────────────────────────────────────── */
 function Etiqueta({
-  pos, color, children, size = 11.5, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, dx = 0, dy = 0,
 }: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
+  pos: Pt; color: string; children: React.ReactNode; dx?: number; dy?: number;
 }) {
+  // Tamaño fijo en píxeles (sin distanceFactor) y desplazamiento fijo en pantalla.
   return (
-    <Html position={pos} center distanceFactor={15} pointerEvents="none">
-      <div style={{
-        whiteSpace: "nowrap", padding: "4px 9px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
-      }}>
-        {children}
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: `translate(${dx}px,${dy}px)` }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 14,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
       </div>
     </Html>
   );
@@ -96,8 +99,6 @@ function Plano({ v }: { v: Vista }) {
   const ejeX: Pt[] = [S(v.xmin, ax0), S(v.xmax, ax0)];
   const ejeY: Pt[] = [S(ay0, v.ymin), S(ay0, v.ymax)];
 
-  const fmtTick = (n: number) => n.toLocaleString("es-MX", { maximumFractionDigits: 2 }).replace("-", "−");
-
   return (
     <group>
       <lineSegments geometry={geo}>
@@ -106,15 +107,6 @@ function Plano({ v }: { v: Vista }) {
 
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={[BX + 0.5, sy(ax0), 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.xlabel}</Etiqueta>
-      <Etiqueta pos={[sx(ay0), BY + 0.5, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.ylabel}</Etiqueta>
-
-      {v.xticks.filter((t) => t !== ay0).map((t) => (
-        <Etiqueta key={`tx${t}`} pos={[sx(t), sy(ax0) - 0.34, 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
-      {v.yticks.filter((t) => t !== ax0).map((t) => (
-        <Etiqueta key={`ty${t}`} pos={[sx(ay0) - 0.5, sy(t), 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
     </group>
   );
 }
@@ -144,6 +136,7 @@ function CurvaTrazo({ which, v, color, width, dashed }: {
 
 /* ── Marcadores fijos de puntos notables sobre f ──────────────────────────── */
 function Notables({ v }: { v: Vista }) {
+  const abreviatura = { max: "Máx.", min: "Mín.", infl: "Infl." } as const;
   const { S } = useMemo(() => hacerMapa(v), [v]);
   return (
     <group>
@@ -155,8 +148,8 @@ function Notables({ v }: { v: Vista }) {
               <sphereGeometry args={[0.17, 22, 22]} />
               <meshStandardMaterial color="#fff" emissive={p.color} emissiveIntensity={1.7} toneMapped={false} />
             </mesh>
-            <Etiqueta pos={[P[0], P[1] + (p.id === "min" ? -0.6 : 0.6), 0.05]} color={p.color} size={11}>
-              {p.tipo} ({fmt2(p.x)}, {fmt2(p.y)})
+            <Etiqueta pos={P} color={p.color} dy={p.id === "min" ? 30 : -30}>
+              {abreviatura[p.id]} ({fmt2(p.x)}, {fmt2(p.y)})
             </Etiqueta>
           </group>
         );
@@ -166,7 +159,7 @@ function Notables({ v }: { v: Vista }) {
 }
 
 /* ── Sonda en x = a: tangente a f + puntos alineados en f, f', f'' ─────────── */
-function SondaActiva({ v, aPos, show1, show2 }: { v: Vista; aPos: number; show1: boolean; show2: boolean }) {
+function SondaActiva({ v, aPos, show1, show2, mostrarP }: { v: Vista; aPos: number; show1: boolean; show2: boolean; mostrarP: boolean }) {
   const { sx, sy, S } = useMemo(() => hacerMapa(v), [v]);
   const pulso = useRef<THREE.Group>(null);
   useFrame((s) => {
@@ -195,9 +188,6 @@ function SondaActiva({ v, aPos, show1, show2 }: { v: Vista; aPos: number; show1:
         points={[[sx(aPos), -BY, 0], [sx(aPos), BY, 0]]}
         color={A_COL} lineWidth={1.5} dashed dashSize={0.16} gapSize={0.12} transparent opacity={0.5}
       />
-      <Etiqueta pos={[sx(aPos), -BY - 0.4, 0]} color={A_COL} size={10.5} bg="rgba(6,16,31,0.85)">
-        x = {fmt2(aPos)}
-      </Etiqueta>
 
       {/* recta TANGENTE a f en P (pendiente f'(a)) */}
       {tanSeg.length === 2 && (
@@ -212,9 +202,6 @@ function SondaActiva({ v, aPos, show1, show2 }: { v: Vista; aPos: number; show1:
             <sphereGeometry args={[0.12, 18, 18]} />
             <meshStandardMaterial color="#fff" emissive={D2_COL} emissiveIntensity={1.4} toneMapped={false} />
           </mesh>
-          <Etiqueta pos={[D2[0] + 0.2, D2[1] + 0.45, 0.05]} color={D2_COL} size={10.5} bg="rgba(6,16,31,0.92)">
-            f&apos;&apos;({fmt2(aPos)}) = {fmt2(d2)}
-          </Etiqueta>
         </>
       )}
 
@@ -226,9 +213,6 @@ function SondaActiva({ v, aPos, show1, show2 }: { v: Vista; aPos: number; show1:
             <sphereGeometry args={[0.13, 20, 20]} />
             <meshStandardMaterial color="#fff" emissive={D1_COL} emissiveIntensity={1.5} toneMapped={false} />
           </mesh>
-          <Etiqueta pos={[D1[0] + 0.2, D1[1] - 0.5, 0.05]} color={D1_COL} size={10.5} bg="rgba(6,16,31,0.92)">
-            f&apos;({fmt2(aPos)}) = {fmt2(d1)}
-          </Etiqueta>
         </>
       )}
 
@@ -241,9 +225,11 @@ function SondaActiva({ v, aPos, show1, show2 }: { v: Vista; aPos: number; show1:
               <meshStandardMaterial color="#fff" emissive={F_COL} emissiveIntensity={1.9} toneMapped={false} />
             </mesh>
           </group>
-          <Etiqueta pos={[P[0] - 0.2, P[1] + 0.6, 0.05]} color={F_COL} size={12} bg="rgba(6,16,31,0.95)">
-            P = ({fmt2(aPos)}, {fmt2(fa)})
-          </Etiqueta>
+          {mostrarP && (
+            <Etiqueta pos={P} color={F_COL} dx={64} dy={-24}>
+              P = ({fmt2(aPos)}, {fmt2(fa)})
+            </Etiqueta>
+          )}
         </>
       )}
     </group>
@@ -253,6 +239,12 @@ function SondaActiva({ v, aPos, show1, show2 }: { v: Vista; aPos: number; show1:
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
 function Contenido({ aPos, show1, show2, accent, resetNonce }: AnalisisSceneProps) {
   const v = VISTA;
+  // En pantallas angostas el plano se achica y se ocultan los rótulos anchos
+  // (la misma información está en el panel).
+  const ancho = useThree((st) => st.size.width);
+  const angosto = ancho < 640;
+  const esc = angosto ? Math.min(1, ancho / 640) * 0.95 : 1;
+  const cercaDeNotable = PUNTOS.some((p) => Math.abs(p.x - aPos) < 0.45);
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -261,13 +253,13 @@ function Contenido({ aPos, show1, show2, accent, resetNonce }: AnalisisSceneProp
       <Escenario acento={accent} suelo={-BY - 0.5} />
 
 
-      <group key={resetNonce}>
+      <group key={resetNonce} scale={esc}>
         <Plano v={v} />
         {show2 && <CurvaTrazo which="d2" v={v} color={D2_COL} width={2.6} dashed />}
         {show1 && <CurvaTrazo which="d1" v={v} color={D1_COL} width={3} dashed />}
         <CurvaTrazo which="f" v={v} color={F_COL} width={4.5} />
-        <Notables v={v} />
-        <SondaActiva v={v} aPos={aPos} show1={show1} show2={show2} />
+        {!angosto && <Notables v={v} />}
+        <SondaActiva v={v} aPos={aPos} show1={show1} show2={show2} mostrarP={!angosto && !cercaDeNotable} />
       </group>
 
 
@@ -279,7 +271,7 @@ function Contenido({ aPos, show1, show2, accent, resetNonce }: AnalisisSceneProp
         maxDistance={26}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[0, 0, 0]}
+        target={[0, -0.5, 0]}
       />
 
       <EffectComposer enableNormalPass={false}>
@@ -292,7 +284,7 @@ function Contenido({ aPos, show1, show2, accent, resetNonce }: AnalisisSceneProp
 
 export default function AnalisisScene(props: AnalisisSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.2, 2.4, 13], fov: 44 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [2.6, 1.6, 15.5], fov: 44 }}>
       <Contenido {...props} />
     </Canvas>
   );

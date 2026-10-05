@@ -19,8 +19,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -56,18 +56,21 @@ function hacerMapa(v: Vista) {
   return { sx, sy, S };
 }
 
-/* ── Etiqueta flotante ────────────────────────────────────────────────────── */
+/* ── Etiqueta flotante: tamaño fijo en píxeles (≥ 14), desplazamiento fijo ────
+ * Las anchas (`ancha`) se ocultan en pantallas angostas: su info va al panel. */
 function Etiqueta({
-  pos, color, children, size = 11.5, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, ancha = false,
 }: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
+  pos: Pt; color: string; children: React.ReactNode; ancha?: boolean;
 }) {
+  const angosta = useThree((st) => st.size.width < 640);
+  if (ancha && angosta) return null;
   return (
-    <Html position={pos} center distanceFactor={15} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
-        whiteSpace: "nowrap", padding: "4px 9px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: `1.5px solid ${color}`, color: "#fff", fontWeight: 800, fontSize: 14,
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       }}>
         {children}
       </div>
@@ -93,8 +96,6 @@ function Plano({ v }: { v: Vista }) {
   const ejeX: Pt[] = [S(v.xmin, ax0), S(v.xmax, ax0)];
   const ejeY: Pt[] = [S(ay0, v.ymin), S(ay0, v.ymax)];
 
-  const fmtTick = (n: number) => n.toLocaleString("es-MX", { maximumFractionDigits: 2 }).replace("-", "−");
-
   return (
     <group>
       <lineSegments geometry={geo}>
@@ -103,22 +104,13 @@ function Plano({ v }: { v: Vista }) {
 
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={[BX + 0.5, sy(ax0), 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.xlabel}</Etiqueta>
-      <Etiqueta pos={[sx(ay0), BY + 0.5, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.ylabel}</Etiqueta>
-
-      {v.xticks.filter((t) => t !== ay0).map((t) => (
-        <Etiqueta key={`tx${t}`} pos={[sx(t), sy(ax0) - 0.34, 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
-      {v.yticks.filter((t) => t !== ax0).map((t) => (
-        <Etiqueta key={`ty${t}`} pos={[sx(ay0) - 0.42, sy(t), 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
     </group>
   );
 }
 
 /* ── Curva (f o f') ───────────────────────────────────────────────────────── */
-function CurvaTrazo({ funcId, which, v, color, width, dashed }: {
-  funcId: FuncId; which: Curva; v: Vista; color: string; width: number; dashed?: boolean;
+function CurvaTrazo({ funcId, which, v, color, grosor }: {
+  funcId: FuncId; which: Curva; v: Vista; color: string; grosor: number;
 }) {
   const { S } = useMemo(() => hacerMapa(v), [v]);
   const polis = useMemo(() => {
@@ -131,9 +123,7 @@ function CurvaTrazo({ funcId, which, v, color, width, dashed }: {
   return (
     <>
       {polis.map((pts, i) =>
-        pts.length > 1
-          ? <Line key={i} points={pts} color={color} lineWidth={width} dashed={dashed} dashSize={0.22} gapSize={0.14} transparent opacity={dashed ? 0.95 : 1} />
-          : null,
+        pts.length > 1 ? <CurvaTubo key={i} puntos={pts} color={color} grosor={grosor} /> : null,
       )}
     </>
   );
@@ -173,7 +163,7 @@ function SondaActiva({ funcId, v, aPos }: { funcId: FuncId; v: Vista; aPos: numb
         points={[[sx(aPos), -BY, 0], [sx(aPos), BY, 0]]}
         color={A_COL} lineWidth={1.5} dashed dashSize={0.16} gapSize={0.12} transparent opacity={0.5}
       />
-      <Etiqueta pos={[sx(aPos), -BY - 0.4, 0]} color={A_COL} size={10.5} bg="rgba(6,16,31,0.85)">
+      <Etiqueta pos={[sx(aPos), -BY - 0.4, 0]} color={A_COL}>
         x = {fmt2(aPos)}
       </Etiqueta>
 
@@ -194,10 +184,10 @@ function SondaActiva({ funcId, v, aPos }: { funcId: FuncId; v: Vista; aPos: numb
           <group ref={pulsoD} position={D}>
             <mesh>
               <sphereGeometry args={[0.13, 20, 20]} />
-              <meshStandardMaterial color="#fff" emissive={DER_COL} emissiveIntensity={1.5} toneMapped={false} />
+              <meshStandardMaterial color="#fff" emissive={DER_COL} emissiveIntensity={1.5} />
             </mesh>
           </group>
-          <Etiqueta pos={[D[0] + 0.2, D[1] - 0.5, 0.05]} color={DER_COL} size={11} bg="rgba(6,16,31,0.92)">
+          <Etiqueta pos={[D[0] + 1.2, D[1] - 0.55, 0.05]} color={DER_COL} ancha>
             f&apos;({fmt2(aPos)}) = {fmt2(da)}
           </Etiqueta>
         </>
@@ -209,10 +199,10 @@ function SondaActiva({ funcId, v, aPos }: { funcId: FuncId; v: Vista; aPos: numb
           <group ref={pulso} position={P}>
             <mesh>
               <sphereGeometry args={[0.16, 22, 22]} />
-              <meshStandardMaterial color="#fff" emissive={f.color} emissiveIntensity={1.9} toneMapped={false} />
+              <meshStandardMaterial color="#fff" emissive={f.color} emissiveIntensity={1.9} />
             </mesh>
           </group>
-          <Etiqueta pos={[P[0] - 0.2, P[1] + 0.55, 0.05]} color={f.color} size={12} bg="rgba(6,16,31,0.95)">
+          <Etiqueta pos={[P[0] - 1.3, P[1] + 0.55, 0.05]} color={f.color} ancha>
             P = ({fmt2(aPos)}, {fmt2(fa)})
           </Etiqueta>
         </>
@@ -226,6 +216,18 @@ function Contenido({ funcId, aPos, accent, resetNonce }: ReglasSceneProps) {
   const f = func(funcId);
   const v = f.vista;
 
+  // Encuadre: el plano llena ~60 % del alto, entre la barra y la misión; en
+  // pantallas angostas se aleja hasta que quepa todo el ancho.
+  const camera = useThree((st) => st.camera);
+  const ancho = useThree((st) => st.size.width);
+  const alto = useThree((st) => st.size.height);
+  useEffect(() => {
+    const aspecto = ancho / Math.max(alto, 1);
+    const dist = Math.max(15.5, (BX * 2 + 1.2) / (2 * Math.tan((44 * Math.PI) / 360) * aspecto));
+    camera.position.set(dist * 0.16, 1.5 + dist * 0.04, dist);
+    camera.lookAt(0, -0.5, 0);
+  }, [camera, ancho, alto]);
+
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -236,8 +238,8 @@ function Contenido({ funcId, aPos, accent, resetNonce }: ReglasSceneProps) {
 
       <group key={`${funcId}-${resetNonce}`}>
         <Plano v={v} />
-        <CurvaTrazo funcId={funcId} which="d" v={v} color={DER_COL} width={3} dashed />
-        <CurvaTrazo funcId={funcId} which="f" v={v} color={f.color} width={4.5} />
+        <CurvaTrazo funcId={funcId} which="d" v={v} color={DER_COL} grosor={0.06} />
+        <CurvaTrazo funcId={funcId} which="f" v={v} color={f.color} grosor={0.085} />
         <SondaActiva funcId={funcId} v={v} aPos={aPos} />
       </group>
 
@@ -247,10 +249,10 @@ function Contenido({ funcId, aPos, accent, resetNonce }: ReglasSceneProps) {
         makeDefault
         enablePan={false}
         minDistance={7}
-        maxDistance={26}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[0, 0, 0]}
+        target={[0, -0.5, 0]}
+        maxDistance={40}
       />
 
       <EffectComposer enableNormalPass={false}>

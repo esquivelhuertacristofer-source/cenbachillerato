@@ -16,8 +16,8 @@
 
 import * as THREE from "three";
 import { useRef, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Html, Stars } from "@react-three/drei";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { T } from "./_kit";
 import { type Proceso, etapaPorId, PROCESOS_DEF } from "./metabolismo-data";
@@ -32,20 +32,23 @@ export interface MetabolismoSceneProps {
   playing: boolean;
   accent: string;
   resetNonce: number;
+  /** ATP acumulado hasta la etapa activa y total del proceso (-1 = no aplica). */
+  atpAcum: number;
+  atpTotal: number;
 }
 
 /* ── Etiqueta flotante (Html) ─────────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 11, fuerte = false, col }: { pos: Pt; children: ReactNode; df?: number; fuerte?: boolean; col?: string }) {
+function Etiqueta({ pos, children, fuerte = false, col }: { pos: Pt; children: ReactNode; fuerte?: boolean; col?: string }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
-          padding: fuerte ? "6px 12px" : "2px 8px",
+          padding: "5px 11px",
           borderRadius: 8,
           background: fuerte ? "rgba(5,14,30,0.85)" : "rgba(5,14,30,0.55)",
           border: `1px solid ${col ?? T.lineStrong}`,
           color: col ?? T.text,
-          fontSize: fuerte ? 16 : 12.5,
+          fontSize: 14,
           fontWeight: fuerte ? 800 : 700,
           whiteSpace: "nowrap",
           letterSpacing: "0.01em",
@@ -148,7 +151,6 @@ function AtpTokens({ n, playing }: { n: number; playing: boolean }) {
           </mesh>
         );
       })}
-      <Etiqueta pos={[0, -0.95, 0]} df={13} col="#fde047">+{n} ATP</Etiqueta>
     </group>
   );
 }
@@ -158,6 +160,7 @@ function EtapaNodo({ id, pos, selected, playing, onSelect }: {
   id: string; pos: Pt; selected: boolean; playing: boolean; onSelect: (id: string) => void;
 }) {
   const g = useRef<THREE.Group>(null);
+  const angosto = useThree((st) => st.size.width) < 640;
   useFrame((state) => {
     if (!g.current) return;
     const t = state.clock.elapsedTime;
@@ -185,9 +188,11 @@ function EtapaNodo({ id, pos, selected, playing, onSelect }: {
           <meshBasicMaterial color={def.color} wireframe transparent opacity={selected ? 0.55 : 0.22} />
         </mesh>
       </group>
-      <Etiqueta pos={[0, 1.05, 0]} df={selected ? 11 : 13} fuerte={selected} col={selected ? def.color : T.text2}>
-        {def.nombre}
-      </Etiqueta>
+      {(selected || !angosto) && (
+        <Etiqueta pos={[0, 1.05, 0]} fuerte={selected} col={selected ? def.color : T.text2}>
+          {def.nombre}
+        </Etiqueta>
+      )}
       {selected && def.atp > 0 && <AtpTokens n={def.atp} playing={playing} />}
     </group>
   );
@@ -223,6 +228,35 @@ function Flujo({ puntos, color, playing }: { puntos: Pt[]; color: string; playin
           <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.4} />
         </mesh>
       ))}
+    </group>
+  );
+}
+
+/* ── Medidor de ATP: el nivel sube al avanzar de etapa ────────────────────── */
+const MED_ALTO = 3.6;
+function MedidorAtp({ acum, total, pos }: { acum: number; total: number; pos: Pt }) {
+  const relleno = useRef<THREE.Mesh>(null);
+  const actual = useRef(0);
+  useFrame((_, dt) => {
+    const meta = total > 0 ? Math.min(1, acum / total) : 0;
+    actual.current += (meta - actual.current) * Math.min(1, dt * 5);
+    const h = Math.max(0.001, actual.current * MED_ALTO);
+    if (relleno.current) {
+      relleno.current.scale.y = h;
+      relleno.current.position.y = -MED_ALTO / 2 + h / 2;
+    }
+  });
+  return (
+    <group position={pos}>
+      <mesh>
+        <boxGeometry args={[0.95, MED_ALTO, 0.95]} />
+        <meshStandardMaterial color="#e2e8f0" transparent opacity={0.12} roughness={0.2} depthWrite={false} />
+      </mesh>
+      <mesh ref={relleno}>
+        <boxGeometry args={[0.7, 1, 0.7]} />
+        <meshStandardMaterial color="#fde047" emissive="#facc15" emissiveIntensity={0.5} roughness={0.35} />
+      </mesh>
+      <Etiqueta pos={[0, MED_ALTO / 2 + 0.55, 0]} col="#fde047">ATP {acum} / {total}</Etiqueta>
     </group>
   );
 }
@@ -276,6 +310,8 @@ function Mundo({ proceso, etapaActiva, playing, onSelect }: {
   );
 }
 
+const DESPLAZA: Record<Proceso, Pt> = { respiracion: [-0.6, 0.9, 0], fotosintesis: [0, 0.9, 0], fermentacion: [-0.9, 0.9, 0] };
+
 /* ── Contenido de la escena ───────────────────────────────────────────────── */
 function Contenido(props: MetabolismoSceneProps) {
   const { proceso, etapaActiva, playing, accent, resetNonce, onSelect } = props;
@@ -287,18 +323,19 @@ function Contenido(props: MetabolismoSceneProps) {
           vez de que alguien la adivine. */}
       <Escenario acento={accent} mesa={false} niebla={false} />
       <directionalLight position={[-8, -4, 4]} intensity={0.35} color={accent} />
-      <Stars radius={80} depth={40} count={1300} factor={3} saturation={0} fade speed={0.6} />
 
-      <group key={`${proceso}-${resetNonce}`}>
+      {/* Se desplaza la escena para que quede entre la barra de arriba y la misión de abajo. */}
+      <group key={`${proceso}-${resetNonce}`} position={DESPLAZA[proceso]}>
         <Mundo proceso={proceso} etapaActiva={etapaActiva} playing={playing} onSelect={onSelect} />
+        {props.atpTotal > 0 && <MedidorAtp acum={props.atpAcum} total={props.atpTotal} pos={proceso === "respiracion" ? [5.1, 0, 0] : [4.2, 0, 0]} />}
       </group>
 
 
       <OrbitControls
         makeDefault
         enablePan={false}
-        minDistance={6}
-        maxDistance={20}
+        minDistance={8}
+        maxDistance={22}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={(Math.PI * 4) / 5}
       />
@@ -315,10 +352,10 @@ function Contenido(props: MetabolismoSceneProps) {
 export default function MetabolismoScene(props: MetabolismoSceneProps) {
   const cam: { position: Pt; fov: number } =
     props.proceso === "respiracion"
-      ? { position: [0, 2.2, 11], fov: 46 }
+      ? { position: [0, 2.2, 14], fov: 46 }
       : props.proceso === "fotosintesis"
-        ? { position: [0, 1.6, 9.5], fov: 46 }
-        : { position: [0, 1.4, 8.5], fov: 48 };
+        ? { position: [0, 1.6, 11.5], fov: 46 }
+        : { position: [0, 1.4, 11.5], fov: 48 };
   return (
     <Canvas key={props.proceso} dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={cam}>
       <Contenido {...props} />

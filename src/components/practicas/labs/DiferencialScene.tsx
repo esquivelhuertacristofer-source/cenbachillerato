@@ -24,15 +24,15 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 import { CurvaTubo } from "./_tablero";
 import {
   linCaso, lineal, muestrear, clipRecta, tangenteBase,
-  volEsfera, dVol, fmt1, fmt2, fmt3,
+  dVol, fmt1, fmt2, fmt3,
   type LinId, type Vista,
 } from "./diferencial-data";
 
@@ -71,20 +71,31 @@ function hacerMapa(v: Vista) {
   return { sx, sy, S };
 }
 
-/* ── Etiqueta flotante ────────────────────────────────────────────────────── */
+/* ── Etiqueta: tamaño fijo en píxeles (≥14), desplazada según el lado para que
+ *    nunca se encimen entre sí ni tapen el punto que nombran ──────────────────── */
+type Lado = "up" | "down" | "left" | "right";
+const DESPLAZA: Record<Lado, string> = {
+  up: "translate(0,-70%)",
+  down: "translate(0,70%)",
+  left: "translate(-62%,0)",
+  right: "translate(62%,0)",
+};
+
 function Etiqueta({
-  pos, color, children, size = 11.5, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, lado = "up",
 }: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
+  pos: Pt; color: string; children: React.ReactNode; lado?: Lado;
 }) {
   return (
-    <Html position={pos} center distanceFactor={16} pointerEvents="none">
-      <div style={{
-        whiteSpace: "nowrap", padding: "4px 9px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
-      }}>
-        {children}
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: DESPLAZA[lado] }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
       </div>
     </Html>
   );
@@ -105,7 +116,6 @@ function Plano({ v }: { v: Vista }) {
 
   const ejeX: Pt[] = [S(v.xmin, Math.max(v.ymin, 0)), S(v.xmax, Math.max(v.ymin, 0))];
   const ejeY: Pt[] = [S(Math.max(v.xmin, 0), v.ymin), S(Math.max(v.xmin, 0), v.ymax)];
-  const fmtTick = (n: number) => n.toLocaleString("es-MX", { maximumFractionDigits: 1 }).replace("-", "−");
 
   return (
     <group>
@@ -115,15 +125,6 @@ function Plano({ v }: { v: Vista }) {
 
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={[BX + 0.5, sy(Math.max(v.ymin, 0)), 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.xlabel}</Etiqueta>
-      <Etiqueta pos={[sx(Math.max(v.xmin, 0)) - 0.1, BY + 0.5, 0]} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">{v.ylabel}</Etiqueta>
-
-      {v.xticks.map((t) => (
-        <Etiqueta key={`tx${t}`} pos={[sx(t), -BY - 0.34, 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
-      {v.yticks.filter((t) => t !== 0).map((t) => (
-        <Etiqueta key={`ty${t}`} pos={[-BX - 0.6, sy(t), 0]} color={AXIS_COL} size={9.5} bg="rgba(6,16,31,0.55)">{fmtTick(t)}</Etiqueta>
-      ))}
     </group>
   );
 }
@@ -194,19 +195,16 @@ function SondaValor({ casoId, xPos }: { casoId: LinId; xPos: number }) {
       {/* punto base a */}
       <mesh position={B}>
         <sphereGeometry args={[0.15, 22, 22]} />
-        <meshStandardMaterial color="#fff" emissive={BASE_COL} emissiveIntensity={1.7} toneMapped={false} />
+        <meshStandardMaterial color="#fff" emissive={BASE_COL} emissiveIntensity={1.7} />
       </mesh>
-      <Etiqueta pos={[B[0], B[1] - 0.55, 0]} color={BASE_COL} size={10.5}>base a = {fmt1(a)}</Etiqueta>
+      <Etiqueta pos={B} color={BASE_COL} lado="left">a = {fmt1(a)}</Etiqueta>
 
       {/* triángulo del diferencial (dx, dy) */}
       <Line points={[B, C]} color={DX_COL} lineWidth={2.2} />
       <Line points={[C, Ttop]} color={DY_COL} lineWidth={2.2} />
-      <Etiqueta pos={[(B[0] + C[0]) / 2, B[1] - 0.34, 0]} color={DX_COL} size={9.5} bg="rgba(6,16,31,0.7)">dx = {fmt2(dxv)}</Etiqueta>
-      <Etiqueta pos={[C[0] + 0.7, (C[1] + Ttop[1]) / 2, 0]} color={DY_COL} size={9.5} bg="rgba(6,16,31,0.7)">dy = {fmt3(dyv)}</Etiqueta>
 
       {/* sonda vertical en x */}
-      <Line points={[[sx(xPos), -BY, 0], [sx(xPos), BY, 0]]} color="#7dd3fc" lineWidth={1.3} dashed dashSize={0.16} gapSize={0.12} transparent opacity={0.4} />
-      <Etiqueta pos={[sx(xPos), -BY - 0.4, 0]} color="#7dd3fc" size={10} bg="rgba(6,16,31,0.85)">x = {fmt2(xPos)}</Etiqueta>
+      <Line points={[[sx(xPos), -BY, 0], [sx(xPos), BY, 0]]} color="#7dd3fc" lineWidth={2} dashed dashSize={0.16} gapSize={0.12} transparent opacity={0.4} />
 
       {/* brecha = error, entre el punto estimado y el real */}
       {dentro(fx) && dentro(Lx) && Math.abs(fx - Lx) > 1e-4 && (
@@ -218,9 +216,9 @@ function SondaValor({ casoId, xPos }: { casoId: LinId; xPos: number }) {
         <>
           <mesh position={Pest}>
             <sphereGeometry args={[0.13, 20, 20]} />
-            <meshStandardMaterial color="#fff" emissive={EST_COL} emissiveIntensity={1.8} toneMapped={false} />
+            <meshStandardMaterial color="#fff" emissive={EST_COL} emissiveIntensity={1.8} />
           </mesh>
-          <Etiqueta pos={[Pest[0] + 1.0, Pest[1] - 0.2, 0]} color={EST_COL} size={11} bg="rgba(6,16,31,0.95)">
+          <Etiqueta pos={Pest} color={EST_COL} lado={Lx >= fx ? "up" : "down"}>
             L(x) ≈ {fmt3(Lx)}
           </Etiqueta>
         </>
@@ -232,10 +230,10 @@ function SondaValor({ casoId, xPos }: { casoId: LinId; xPos: number }) {
           <group ref={pulso} position={Preal}>
             <mesh>
               <sphereGeometry args={[0.14, 22, 22]} />
-              <meshStandardMaterial color="#fff" emissive={REAL_COL} emissiveIntensity={1.9} toneMapped={false} />
+              <meshStandardMaterial color="#fff" emissive={REAL_COL} emissiveIntensity={1.9} />
             </mesh>
           </group>
-          <Etiqueta pos={[Preal[0] + 1.0, Preal[1] + 0.42, 0.05]} color={REAL_COL} size={11} bg="rgba(6,16,31,0.95)">
+          <Etiqueta pos={Preal} color={REAL_COL} lado={Lx >= fx ? "down" : "up"}>
             f(x) = {fmt3(fx)}
           </Etiqueta>
         </>
@@ -251,6 +249,7 @@ function EsferaError({ r, dr, accent }: { r: number; dr: number; accent: string 
     if (giro.current) giro.current.rotation.y += dt * 0.3;
   });
 
+  const ancho = useThree((st) => st.size.width) >= 640;
   const rW = r * W_S;
   const shellW = rW + dr * W_S * SHELL_EXAG; // grosor exagerado para que se vea
 
@@ -269,29 +268,20 @@ function EsferaError({ r, dr, accent }: { r: number; dr: number; accent: string 
         <mesh>
           <sphereGeometry args={[shellW, 48, 48]} />
           <meshStandardMaterial
-            color={ERR_COL} transparent opacity={0.18} side={THREE.DoubleSide}
+            color={ERR_COL} transparent opacity={0.3} side={THREE.DoubleSide}
             emissive={ERR_COL} emissiveIntensity={0.4} depthWrite={false}
           />
         </mesh>
-        {/* malla de la superficie exterior, para marcar el grosor */}
-        <mesh>
-          <sphereGeometry args={[shellW, 24, 16]} />
-          <meshBasicMaterial color={ERR_COL} wireframe transparent opacity={0.35} />
-        </mesh>
         {/* línea ecuatorial que marca r y r+dr */}
-        <Line points={radio(rW)} color={AXIS_COL} lineWidth={2} />
+        <Line points={radio(rW)} color={AXIS_COL} lineWidth={2.6} />
       </group>
 
-      <Etiqueta pos={[0, shellW + 0.7, 0]} color={ERR_COL} size={11.5}>
-        cáscara = dV = 4π r²·dr
-      </Etiqueta>
-      <Etiqueta pos={[rW * 0.5, -0.25, rW * 0.5]} color={AXIS_COL} size={11}>r = {fmt1(r)} cm</Etiqueta>
-      <Etiqueta pos={[0, -shellW - 0.7, 0]} color="#cdd8ec" size={10} bg="rgba(6,16,31,0.85)">
-        dr = {fmt2(dr)} cm (grosor exagerado ×{SHELL_EXAG})
-      </Etiqueta>
-      <Etiqueta pos={[0, -shellW - 1.25, 0]} color={REAL_COL} size={10.5} bg="rgba(6,16,31,0.9)">
-        V = {fmt1(volEsfera(r))} cm³ · dV = {fmt2(dVol(r, dr))} cm³
-      </Etiqueta>
+      {ancho && (
+        <Etiqueta pos={[0, shellW, 0]} color={ERR_COL} lado="up">
+          cáscara dV = {fmt2(dVol(r, dr))} cm³
+        </Etiqueta>
+      )}
+      <Etiqueta pos={[rW, 0, 0]} color={AXIS_COL} lado="right">r = {fmt1(r)} cm</Etiqueta>
     </group>
   );
 }
@@ -333,6 +323,8 @@ function Contenido({ modo, casoId, xPos, r, dr, accent, resetNonce }: Diferencia
 
 
 
+      <Encuadre modo={modo} />
+
       <OrbitControls
         makeDefault
         enablePan={false}
@@ -340,7 +332,7 @@ function Contenido({ modo, casoId, xPos, r, dr, accent, resetNonce }: Diferencia
         maxDistance={32}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.5}
-        target={[0, 0, 0]}
+        target={modo === "esfera" ? [0, -0.1, 0] : [0, -0.6, 0]}
       />
 
       <EffectComposer enableNormalPass={false}>
@@ -349,6 +341,21 @@ function Contenido({ modo, casoId, xPos, r, dr, accent, resetNonce }: Diferencia
       </EffectComposer>
     </>
   );
+}
+
+/** Encuadre: el contenido ocupa ~60 % del alto, entre la barra y la misión; en
+ *  pantallas angostas la cámara se aleja para que quepa el plano completo. */
+function Encuadre({ modo }: { modo: "valor" | "esfera" }) {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const base = modo === "esfera" ? 13.5 : 14.5;
+  const z = Math.min(30, Math.max(base, (modo === "esfera" ? 5.2 : BX + 0.9) / (Math.tan((44 / 2) * (Math.PI / 180)) * Math.min(1.4, aspect))));
+  useEffect(() => {
+    camera.position.set(modo === "esfera" ? 2.4 : 0.4, modo === "esfera" ? 2.4 : 0.8, z);
+    camera.updateProjectionMatrix();
+  }, [camera, modo, z]);
+  return null;
 }
 
 export default function DiferencialScene(props: DiferencialSceneProps) {

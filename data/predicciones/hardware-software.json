@@ -1,0 +1,12 @@
+{
+  "escena": "Una PC para Valeria, que edita video: procesador de 4 núcleos, SSD de 512 GB, tarjeta media, Windows y 8 GB de RAM.",
+  "pregunta": "Instalas su editor de video con solo 8 GB de RAM. ¿Qué pasa?",
+  "opciones": [
+    { "id": "a", "texto": "Abre, pero va un poco lento", "icono": "fa-hourglass-half" },
+    { "id": "b", "texto": "No abre: pide más memoria", "icono": "fa-circle-xmark" },
+    { "id": "c", "texto": "Abre sin imagen", "icono": "fa-eye-slash" }
+  ],
+  "correcta": "b",
+  "porque": "Cada programa pide una memoria RAM mínima para trabajar. Si el equipo no la tiene, el software no arranca: no importa qué tan buenas sean las demás piezas.",
+  "comoComprobarlo": "Elige la RAM de 8 GB, instala la app de Valeria y mira el monitor; luego cambia a 16 GB."
+}

@@ -20,14 +20,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { GRAVITACION_FICHA } from "./gravitacion-universal-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./gravitacion-universal-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import {
   type Modo, resolverFuerza, resolverPeso, resolverOrbita, cuerpoPorId, CUERPOS,
   R_MIN, R_MAX, R_DEF, F_DEF,
@@ -71,9 +70,8 @@ export function LabGravitacion({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -145,21 +143,13 @@ export function LabGravitacion({ color }: PracticaLabProps) {
   const modoCol = modoActual.col;
 
   const objetivos = [
+    { txt: "Duplica la distancia Tierra–Luna y comprueba que la fuerza baja a la cuarta parte", done: modo === "fuerza" && Math.abs(ratioF - 0.25) < 0.03 },
     { txt: "Explora la fuerza gravitacional Tierra–Luna (modo Fuerza)", done: modo === "fuerza" || modo === "peso" || modo === "orbita" },
     { txt: "Compara el peso en distintos cuerpos celestes (modo Peso)", done: modo === "peso" || modo === "orbita" },
     { txt: "Descubre la órbita geoestacionaria Mexsat (modo Órbita)", done: modo === "orbita" },
+    { txt: "Lleva el satélite a 35 786 km de altura: su período es de 24 h y parece fijo", done: modo === "orbita" && orb.geo },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -167,7 +157,7 @@ export function LabGravitacion({ color }: PracticaLabProps) {
         <i className="fa-solid fa-earth-americas" />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>F = G·M·m / r²</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 420, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 420, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero los números siguen aquí.
         {modo === "fuerza" && ` Fuerza Tierra–Luna a r = ${sci(r)} m: F = ${sci(fz.F)} N.`}
         {modo === "peso" && ` En ${cuerpo.nombre}, ${fmt0(m)} kg pesan ${fmt1(pz.W)} N.`}
@@ -176,374 +166,245 @@ export function LabGravitacion({ color }: PracticaLabProps) {
     </div>
   );
 
+  const lectura =
+    modo === "fuerza" ? <>F = {sci(fz.F)} N · {fmt1(ratioF)}× la del problema</>
+    : modo === "peso" ? <>{cuerpo.nombre}: {fmt0(m)} kg pesan {fmt1(pz.W)} N</>
+    : <>T = {fmt1(orb.Th)} h · v = {fmt2(orb.v / 1000)} km/s{orb.geo ? " · fija" : ""}</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes gvPulse { 0%,100%{ box-shadow:0 0 0 0 var(--gvc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .gv-live-dot { animation: gvPulse 1.6s ease-in-out infinite; }
-        .gv-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .gv-grid { grid-template-columns: 1fr; } }
-        .gv-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .gv-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .gv-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .gv-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--gvc) 0%, var(--gvc) var(--gvfill), rgba(255,255,255,0.12) var(--gvfill), rgba(255,255,255,0.12) 100%); }
-        .gv-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--gvc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .gv-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--gvc); cursor:pointer; }
-        .gv-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .gv-tab { cursor:pointer; border:1px solid var(--gvc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .gv-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); }
-        .gv-tab:hover { background:rgba(255,255,255,0.06); }
-        .gv-bodies { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; }
-        @media (max-width: 1000px){ .gv-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .gv-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .gv-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .gv-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .gv-drawer[data-open="true"] { transform:translateX(0); }
-        .gv-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .gv-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .gv-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .gv-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="gv-tabs">
-          {MODOS.map((mo) => {
-            const on = mo.id === modo;
-            return (
-              <button key={mo.id} className="gv-tab" data-on={on} onClick={() => cambiarModo(mo.id)}
-                style={{ ["--gvc" as string]: mo.col, background: on ? `${mo.col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? mo.col : "inherit" }}><i className={`fa-solid ${mo.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{mo.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{mo.desc}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="gv-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <GravitacionScene modo={modo} r={r} cuerpoId={cuerpoId} m={m} alt={alt} t={t} accent={accent} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="gv-live-dot" style={{ ["--gvc" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{modoActual.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="gv-icobtn" data-on={String(drawer)} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="gv-icobtn" data-on={String(sonido)} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              {modo === "orbita" && (
-                <button className="gv-icobtn" data-on={String(playing)} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reproducir la órbita"}>
-                  <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-                </button>
-              )}
-              <button className="gv-icobtn" onClick={resetModo} title="Reiniciar a los valores del problema">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              {modo === "fuerza" && (
-                <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                  <i className="fa-solid fa-down-left-and-up-right-to-center" style={{ color: C_FUERZA, marginRight: 7 }} />
-                  r = {sci(r)} m · F = {sci(fz.F)} N · {fmt1(ratioF)}× la fuerza del problema
-                </div>
-              )}
-              {modo === "peso" && (
-                <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                  <i className="fa-solid fa-weight-hanging" style={{ color: C_PESO, marginRight: 7 }} />
-                  {cuerpo.nombre}: {fmt0(m)} kg × {fmt2(cuerpo.g)} m/s² = {fmt1(pz.W)} N ≈ {fmt1(pz.kgf)} kg-fuerza
-                </div>
-              )}
-              {modo === "orbita" && (
-                <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                  <i className="fa-solid fa-satellite" style={{ color: orb.geo ? C_ORBITA : "#eaf0fb", marginRight: 7 }} />
-                  altura {fmtKm(alt)} km · T = {fmt1(orb.Th)} h · v = {fmt2(orb.v / 1000)} km/s {orb.geo ? "· GEOESTACIONARIA" : ""}
-                </div>
-              )}
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>
-                {modo === "fuerza" && "Acerca o aleja la Luna: la fuerza cae con el cuadrado de la distancia (ley del inverso del cuadrado)."}
-                {modo === "peso" && "Cambia de cuerpo y de masa: el peso depende de g; la masa es la misma en todos lados."}
-                {modo === "orbita" && "Reproduce la órbita; el punto dorado es una antena en la superficie que gira en 24 h. Si el satélite va a su ritmo, queda fijo sobre ella."}
-              </div>
-            </div>
-          </div>
-
-          {/* Controles del modo */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                {modo === "fuerza" ? "Distancia Tierra–Luna" : modo === "peso" ? "Cuerpo y masa" : "Altura de la órbita"}
-              </Eyebrow>
-              {!verbatim && (
-                <button onClick={resetModo} style={{ cursor: "pointer", fontSize: 11, fontWeight: 800, color: modoCol, background: `${modoCol}22`, border: `1px solid ${modoCol}55`, borderRadius: 8, padding: "5px 10px" }}>
-                  <i className="fa-solid fa-rotate-left" style={{ marginRight: 6 }} />volver al problema
-                </button>
-              )}
-            </div>
-
-            {modo === "fuerza" && (
-              <>
-                <Deslizador label="distancia  r (centro a centro)" icon="fa-arrows-left-right" colr={C_FUERZA}
-                  valor={`${sci(r)} m`} min={R_MIN} max={R_MAX} step={0.01e8} value={r}
-                  onChange={setR} hintL={`${sci(R_MIN)}`} hintR={`${sci(R_MAX)}`} />
-                <div style={{ marginTop: 14, padding: "11px 14px", borderRadius: 12, border: `1px solid ${C_FUERZA}44`, background: `${C_FUERZA}14`, fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
-                  <i className="fa-solid fa-circle-half-stroke" style={{ color: C_FUERZA, marginRight: 8 }} />
-                  Al duplicar la distancia, la fuerza baja a la <strong>cuarta parte</strong>. Aquí F = <strong style={{ color: C_FUERZA }}>{sci(fz.F)} N</strong> ({fmt1(ratioF)}× la del problema, que es {sci(F_DEF)} N a r = {sci(R_DEF)} m).
-                </div>
-              </>
-            )}
-
-            {modo === "peso" && (
-              <>
-                <div className="gv-bodies" style={{ marginBottom: 16 }}>
-                  {CUERPOS.map((c) => {
-                    const on = c.id === cuerpoId;
-                    return (
-                      <button key={c.id} className="gv-tab" data-on={on} onClick={() => setCuerpoId(c.id)}
-                        style={{ ["--gvc" as string]: c.color, background: on ? `${c.color}22` : "transparent" }}>
-                        <div style={{ fontSize: 16, marginBottom: 3, color: on ? c.color : "inherit" }}><i className={`fa-solid ${c.icono}`} /></div>
-                        <div style={{ fontSize: 12, fontWeight: 900 }}>{c.nombre}</div>
-                        <div style={{ fontSize: 9.5, color: T.text3, marginTop: 2 }}>{c.rel}</div>
-                      </button>
-                    );
-                  })}
-                </div>
-                <Deslizador label="masa  m" icon="fa-weight-scale" colr={C_PESO}
-                  valor={`${fmt0(m)} kg`} min={M_MIN} max={M_MAX} step={1} value={m}
-                  onChange={setM} hintL={`${fmt0(M_MIN)}`} hintR={`${fmt0(M_MAX)}`} />
-                <div style={{ marginTop: 14, padding: "11px 14px", borderRadius: 12, border: `1px solid ${C_PESO}44`, background: `${C_PESO}14`, fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
-                  <i className="fa-solid fa-scale-balanced" style={{ color: C_PESO, marginRight: 8 }} />
-                  En <strong>{cuerpo.nombre}</strong> pesas <strong style={{ color: C_PESO }}>{fmt1(pz.W)} N ≈ {fmt1(pz.kgf)} kg-fuerza</strong>; en la Tierra serían <strong>{fmt0(pz.WTierra)} N</strong>. Tu masa, {fmt0(m)} kg, <strong>no cambia</strong>.
-                </div>
-              </>
-            )}
-
-            {modo === "orbita" && (
-              <>
-                <Deslizador label="altura sobre la superficie" icon="fa-arrows-up-to-line" colr={C_ORBITA}
-                  valor={`${fmtKm(alt)} km`} min={ALT_MIN} max={ALT_MAX} step={100e3} value={alt}
-                  onChange={setAlt} hintL={`${fmtKm(ALT_MIN)} km`} hintR={`${fmtKm(ALT_MAX)} km`} />
-                <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-                  <button onClick={() => setAlt(ALT_GEO)} style={{ flex: 1, cursor: "pointer", fontSize: 12, fontWeight: 800, color: orb.geo ? "#04121f" : C_ORBITA, background: orb.geo ? C_ORBITA : `${C_ORBITA}1f`, border: `1px solid ${C_ORBITA}66`, borderRadius: 10, padding: "9px 10px" }}>
-                    <i className="fa-solid fa-satellite-dish" style={{ marginRight: 7 }} />ir a la geoestacionaria (35 786 km)
-                  </button>
-                </div>
-                <div style={{ marginTop: 14, padding: "11px 14px", borderRadius: 12, border: `1px solid ${orb.geo ? C_ORBITA : "rgba(255,255,255,0.18)"}`, background: orb.geo ? `${C_ORBITA}14` : "rgba(4,10,22,0.4)", fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
-                  <i className={`fa-solid ${orb.geo ? "fa-circle-check" : "fa-satellite"}`} style={{ color: orb.geo ? C_ORBITA : "#9fb4cc", marginRight: 8 }} />
-                  Período <strong style={{ color: orb.geo ? C_ORBITA : "#fff" }}>T = {fmt1(orb.Th)} h</strong> (Kepler: T² ∝ r³) · rapidez <strong>{fmt2(orb.v / 1000)} km/s</strong>. {orb.geo ? "Igual a la rotación terrestre: el satélite parece FIJO." : `Distinto a las 24 h de rotación: el satélite ${orb.Th < T_TIERRA_H ? "adelanta" : "retrasa"} a la Tierra y se mueve por el cielo.`}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* El problema verbatim */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-meteor" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>El problema</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Respuestas verbatim */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: `1px solid ${accent}40`, background: `rgba(${color.rgba},0.08)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-square-check" style={{ marginRight: 8, color: accent }} />
-              Respuestas
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              <Respuesta etq="a" col={C_FUERZA} txt={`F ≈ ${sci(F_DEF)} N`} sub="atracción gravitacional Tierra–Luna" />
-              <Respuesta etq="b" col={C_PESO} txt="113.4 N ≈ 11.6 kg-fuerza" sub="peso de 70 kg en la Luna (≈ 1/6 del terrestre)" />
-              <Respuesta etq="c" col={C_ORBITA} txt="T = 24 h" sub="período = rotación terrestre ⇒ geoestacionaria" />
-            </div>
-          </div>
-
-          {/* Procedimiento paso a paso (verbatim A2) */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Procedimiento
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {PASOS.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 24, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{p.etiqueta}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p.texto}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="gv-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className={`fa-solid ${modoActual.icono}`} style={{ marginRight: 8, color: modoCol }} />
-            Lecturas — {modoActual.etq}
-          </Eyebrow>
-          {modo === "fuerza" && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-              <Readout label="distancia r" value={sci(r)} unit="m" col={C_FUERZA} size={14} />
-              <Readout label="fuerza F" value={sci(fz.F)} unit="N" col={C_FUERZA} size={14} />
-              <Readout label="vs problema" value={`${fmt1(ratioF)}×`} col="#fff" size={15} />
-            </div>
-          )}
-          {modo === "peso" && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="masa m" value={fmt0(m)} unit="kg" col="#fff" size={15} />
-              <Readout label="gravedad g" value={fmt2(cuerpo.g)} unit="m/s²" col={cuerpo.color} size={15} />
-              <Readout label="peso W" value={fmt1(pz.W)} unit="N" col={C_PESO} size={15} />
-              <Readout label="kg-fuerza" value={fmt1(pz.kgf)} unit="kgf" col={C_PESO} size={15} />
-            </div>
-          )}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <GravitacionScene modo={modo} r={r} cuerpoId={cuerpoId} m={m} alt={alt} t={t} accent={accent} resetNonce={resetNonce} />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((mo) => ({ id: mo.id, etiqueta: mo.etq, icono: mo.icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
           {modo === "orbita" && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="altura" value={fmtKm(alt)} unit="km" col={C_ORBITA} size={15} />
-              <Readout label="período T" value={fmt1(orb.Th)} unit="h" col={orb.geo ? C_ORBITA : "#fff"} size={15} />
-              <Readout label="rapidez v" value={fmt2(orb.v / 1000)} unit="km/s" col={C_ORBITA} size={15} />
-              <Readout label="estado" value={orb.geo ? "fija" : "móvil"} col={orb.geo ? C_ORBITA : "#9fb4cc"} size={15} />
-            </div>
+            <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reproducir la órbita"} activo={playing} onClick={() => setPlaying((p) => !p)} />
           )}
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar a los valores del problema" onClick={resetModo} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{`
+                .gv-bodies { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap:8px; }
+                .gv-tab { cursor:pointer; border:1px solid var(--gvc); border-radius:12px; padding:10px 8px; text-align:center;
+                  background:transparent; transition:all .15s; color:#fff; }
+                .gv-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.7); }
+                .gv-tab:hover { background:rgba(255,255,255,0.06); }
+                .gv-btn { cursor:pointer; font-size:14px; font-weight:800; border-radius:10px; padding:10px 12px; text-align:left; }
+              `}</style>
 
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
+              {modo === "fuerza" && (
+                <>
+                  <Bloque titulo="Distancia Tierra–Luna" icono="fa-down-left-and-up-right-to-center">
+                    <Deslizador label="distancia r (centro a centro)" icon="fa-arrows-left-right" colr={C_FUERZA}
+                      valor={`${sci(r)} m`} min={R_MIN} max={R_MAX} step={0.01e8} value={r}
+                      onChange={setR} hintL={`${sci(R_MIN)}`} hintR={`${sci(R_MAX)}`} />
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      <button type="button" className="gv-btn" onClick={() => setR(R_DEF)} style={{ color: C_FUERZA, background: `${C_FUERZA}1f`, border: `1px solid ${C_FUERZA}66` }}>
+                        <i className="fa-solid fa-moon" style={{ marginRight: 7 }} aria-hidden />Distancia del problema
+                      </button>
+                      <button type="button" className="gv-btn" onClick={() => setR(2 * R_DEF)} style={{ color: C_FUERZA, background: `${C_FUERZA}1f`, border: `1px solid ${C_FUERZA}66` }}>
+                        <i className="fa-solid fa-xmark" style={{ marginRight: 7 }} aria-hidden />Duplicar la distancia
+                      </button>
+                    </div>
+                  </Bloque>
+                  <Bloque titulo="Medidor: la fuerza" icono="fa-gauge-high">
+                    <Barra txt="fuerza F" val={ratioF} max={Math.max(ratioF, 1) * 1.25} marca={1 / (Math.max(ratioF, 1) * 1.25) * 1} col={C_FUERZA} fmtv={`${fmt1(ratioF)}× la del problema`} />
+                    <p style={{ margin: 0, color: T.text2 }}>
+                      La marca blanca es la fuerza del problema ({sci(F_DEF)} N). Al duplicar la distancia, la fuerza baja a la <strong style={{ color: "#fff" }}>cuarta parte</strong>: ley del inverso del cuadrado.
+                    </p>
+                  </Bloque>
+                  <Bloque titulo="Lecturas" icono="fa-list">
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                      <Dato label="distancia r" value={`${sci(r)} m`} col={C_FUERZA} />
+                      <Dato label="fuerza F" value={`${sci(fz.F)} N`} col={C_FUERZA} />
+                      <Dato label="vs problema" value={`${fmt1(ratioF)}×`} />
+                    </div>
+                  </Bloque>
+                </>
+              )}
 
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Física <strong>exacta</strong> de cálculo cerrado: Ley de Gravitación Universal (F = G·M·m/r²), peso (W = m·g, con g_Tierra = 9.81 m/s²) y órbita circular con la 3.ª ley de Kepler (T = 2π·√(r³/GM), v = √(GM/r)). Tamaños y distancias del sistema solar <strong>no</strong> están a escala real (la Luna está 30 diámetros terrestres más lejos de lo que cabe en pantalla); las longitudes de las flechas son proporcionales a sus magnitudes (acotadas para verse). El radio de la órbita sí es proporcional al radio terrestre. Valores, datos y procedimiento son verbatim del enunciado A2.
-        </span>
-      </div>
+              {modo === "peso" && (
+                <>
+                  <Bloque titulo="Cuerpo y masa" icono="fa-weight-hanging">
+                    <div className="gv-bodies">
+                      {CUERPOS.map((c) => {
+                        const on = c.id === cuerpoId;
+                        return (
+                          <button key={c.id} type="button" className="gv-tab" data-on={on} onClick={() => setCuerpoId(c.id)}
+                            style={{ ["--gvc" as string]: c.color, background: on ? `${c.color}22` : "transparent" }}>
+                            <div style={{ fontSize: 18, marginBottom: 3, color: on ? c.color : "inherit" }}><i className={`fa-solid ${c.icono}`} aria-hidden /></div>
+                            <div style={{ fontSize: 14, fontWeight: 900 }}>{c.nombre}</div>
+                            <div style={{ fontSize: 14, color: T.text3, marginTop: 2 }}>{c.rel}</div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <Deslizador label="masa m" icon="fa-weight-scale" colr={C_PESO}
+                      valor={`${fmt0(m)} kg`} min={M_MIN} max={M_MAX} step={1} value={m}
+                      onChange={setM} hintL={`${fmt0(M_MIN)}`} hintR={`${fmt0(M_MAX)}`} />
+                  </Bloque>
+                  <Bloque titulo="Medidor: tu peso" icono="fa-gauge-high">
+                    <Barra txt={`peso en ${cuerpo.nombre}`} val={pz.W} max={Math.max(pz.W, pz.WTierra)} col={C_PESO} fmtv={`${fmt1(pz.W)} N`} />
+                    <Barra txt="peso en la Tierra" val={pz.WTierra} max={Math.max(pz.W, pz.WTierra)} col="#94a3b8" fmtv={`${fmt0(pz.WTierra)} N`} />
+                    <p style={{ margin: 0, color: T.text2 }}>
+                      En <strong style={{ color: "#fff" }}>{cuerpo.nombre}</strong> pesas ≈ {fmt1(pz.kgf)} kg-fuerza. Tu masa, {fmt0(m)} kg, <strong style={{ color: "#fff" }}>no cambia</strong>.
+                    </p>
+                  </Bloque>
+                  <Bloque titulo="Lecturas" icono="fa-list">
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                      <Dato label="masa m" value={`${fmt0(m)} kg`} />
+                      <Dato label="gravedad g" value={`${fmt2(cuerpo.g)} m/s²`} col={cuerpo.color} />
+                      <Dato label="peso W" value={`${fmt1(pz.W)} N`} col={C_PESO} />
+                      <Dato label="kg-fuerza" value={`${fmt1(pz.kgf)} kgf`} col={C_PESO} />
+                    </div>
+                  </Bloque>
+                </>
+              )}
 
-      {/* ── Objetivos ─────────────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {objetivos.map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-              <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+              {modo === "orbita" && (
+                <>
+                  <Bloque titulo="Altura de la órbita" icono="fa-satellite">
+                    <Deslizador label="altura sobre la superficie" icon="fa-arrows-up-to-line" colr={C_ORBITA}
+                      valor={`${fmtKm(alt)} km`} min={ALT_MIN} max={ALT_MAX} step={100e3} value={alt}
+                      onChange={setAlt} hintL={`${fmtKm(ALT_MIN)} km`} hintR={`${fmtKm(ALT_MAX)} km`} />
+                    <button type="button" className="gv-btn" onClick={() => setAlt(ALT_GEO)} style={{ color: orb.geo ? "#04121f" : C_ORBITA, background: orb.geo ? C_ORBITA : `${C_ORBITA}1f`, border: `1px solid ${C_ORBITA}66` }}>
+                      <i className="fa-solid fa-satellite-dish" style={{ marginRight: 7 }} aria-hidden />Ir a la geoestacionaria (35 786 km)
+                    </button>
+                  </Bloque>
+                  <Bloque titulo="Medidor: el período" icono="fa-gauge-high">
+                    <Barra txt="período T del satélite" val={orb.Th} max={Math.max(orb.Th, T_TIERRA_H) * 1.25} marca={T_TIERRA_H / (Math.max(orb.Th, T_TIERRA_H) * 1.25)} col={orb.geo ? C_ORBITA : "#94a3b8"} fmtv={`${fmt1(orb.Th)} h`} />
+                    <p style={{ margin: 0, color: orb.geo ? C_ORBITA : T.text2, fontWeight: 700 }}>
+                      {orb.geo
+                        ? "T = 24 h, igual a la rotación terrestre: el satélite parece FIJO."
+                        : `La marca blanca son las 24 h de la Tierra. El satélite ${orb.Th < T_TIERRA_H ? "adelanta" : "se retrasa respecto"} a la Tierra y se mueve por el cielo.`}
+                    </p>
+                  </Bloque>
+                  <Bloque titulo="Lecturas" icono="fa-list">
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                      <Dato label="altura" value={`${fmtKm(alt)} km`} col={C_ORBITA} />
+                      <Dato label="período T" value={`${fmt1(orb.Th)} h`} col={orb.geo ? C_ORBITA : "#fff"} />
+                      <Dato label="rapidez v" value={`${fmt2(orb.v / 1000)} km/s`} col={C_ORBITA} />
+                      <Dato label="estado" value={orb.geo ? "fija" : "móvil"} col={orb.geo ? C_ORBITA : "#9fb4cc"} />
+                    </div>
+                  </Bloque>
+                </>
+              )}
 
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+              {!verbatim && (
+                <button type="button" className="gv-btn" onClick={resetModo} style={{ marginTop: 16, color: modoCol, background: `${modoCol}22`, border: `1px solid ${modoCol}55` }}>
+                  <i className="fa-solid fa-rotate-left" style={{ marginRight: 7 }} aria-hidden />Volver al problema
+                </button>
+              )}
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-      />
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="El problema" icono="fa-meteor">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Respuestas" icono="fa-square-check">
+                <Respuesta etq="a" col={C_FUERZA} txt={`F ≈ ${sci(F_DEF)} N`} sub="atracción gravitacional Tierra–Luna" />
+                <Respuesta etq="b" col={C_PESO} txt="113.4 N ≈ 11.6 kg-fuerza" sub="peso de 70 kg en la Luna (≈ 1/6 del terrestre)" />
+                <Respuesta etq="c" col={C_ORBITA} txt="T = 24 h" sub="período = rotación terrestre ⇒ geoestacionaria" />
+              </Bloque>
+              <Bloque titulo="Procedimiento" icono="fa-list-ol">
+                {PASOS.map((p, i) => (
+                  <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+                    <div style={{ minWidth: 24, height: 24, padding: "0 4px", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{p.etiqueta}</div>
+                    <div style={{ color: "#fff", minWidth: 0 }}>{p.texto}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos" icono="fa-gauge-high">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={GRAVITACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                Física exacta de cálculo cerrado: Ley de Gravitación Universal (F = G·M·m/r²), peso (W = m·g, con g_Tierra = 9.81 m/s²) y órbita circular con la 3.ª ley de Kepler (T = 2π·√(r³/GM), v = √(GM/r)). Tamaños y distancias del sistema solar <strong>no</strong> están a escala real (la Luna está 30 diámetros terrestres más lejos de lo que cabe en pantalla); las longitudes de las flechas son proporcionales a sus magnitudes (acotadas para verse). El radio de la órbita sí es proporcional al radio terrestre. Valores, datos y procedimiento son verbatim del enunciado A2.
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-      {/* ── Cajón de teoría ──────────────────────────────────────────────── */}
-      <div className="gv-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="gv-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="gv-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="gv-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="gv-drawer-body">
-          <FichaTeorica data={GRAVITACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
+/* ── Barra del medidor, con marca de referencia opcional (fracción 0–1) ─────── */
+function Barra({ txt, val, max, col, fmtv, marca }: { txt: string; val: number; max: number; col: string; fmtv: string; marca?: number }) {
+  return (
+    <div style={{ display: "grid", gap: 4 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+        <span>{txt}</span><span style={{ fontFamily: "ui-monospace, monospace" }}>{fmtv}</span>
+      </div>
+      <div style={{ position: "relative", height: 12, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+        <div style={{ width: `${Math.min(100, Math.max(0, (val / max) * 100))}%`, height: "100%", background: col, transition: "width 120ms linear" }} />
+        {marca != null && (
+          <div style={{ position: "absolute", top: 0, bottom: 0, left: `${Math.min(99, Math.max(0, marca * 100))}%`, width: 2, background: "#fff" }} />
+        )}
+      </div>
     </div>
   );
 }
@@ -552,40 +413,11 @@ export function LabGravitacion({ color }: PracticaLabProps) {
 function Respuesta({ etq, col, txt, sub }: { etq: string; col: string; txt: string; sub: string }) {
   return (
     <div style={{ display: "flex", gap: 11, alignItems: "center", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${col}44` }}>
-      <div style={{ width: 24, height: 24, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "#04121f", background: col, flexShrink: 0 }}>{etq}</div>
+      <div style={{ width: 26, height: 26, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: col, flexShrink: 0 }}>{etq}</div>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{txt}</div>
-        <div style={{ fontSize: 10.5, color: T.text2, lineHeight: 1.3 }}>{sub}</div>
+        <div style={{ fontSize: 15, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{txt}</div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.3 }}>{sub}</div>
       </div>
-    </div>
-  );
-}
-
-/* ── Deslizador reutilizable ─────────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  const fill = `${((Math.min(max, Math.max(min, value)) - min) / (max - min)) * 100}%`;
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-      </div>
-      <input type="range" className="gv-range" min={min} max={max} step={step} value={Math.min(max, Math.max(min, value))}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--gvc" as string]: colr, ["--gvfill" as string]: fill }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
     </div>
   );
 }

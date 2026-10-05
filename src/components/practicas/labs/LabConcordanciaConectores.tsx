@@ -1,27 +1,28 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Concordancia y conectores: el hilo del texto.
  * Práctica experimental para LC-I-P06-A4 (Lengua y Comunicación I).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «Repara la concordancia» — arrastra la forma correcta para corregir el
- *     error de concordancia de cada oración.
- *  2. «Conectores en su lugar» — arrastra el conector adecuado al hueco de cada
- *     oración según su sentido (causa, adición, comparación, consecuencia).
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión.
+ * SIMULADOR: el alumno EDITA mensajes ficticios y ve, literalmente, qué
+ * entiende el lector.
+ *  1. «Escribe el aviso» — un aviso del grupo a la tutora. Cada forma que el
+ *     alumno elige (fue/fueron/fuimos…) cambia la imagen mental del lector:
+ *     una concordancia rota deja un «¿?» visible y baja la claridad del aviso.
+ *  2. «Mensajes con sentido» — cuatro mensajes con un hueco de conector. Un
+ *     conector equivocado VOLTEA el sentido (porque / aunque / por lo tanto)
+ *     y el lector lo interpreta al pie de la letra.
+ *  3. «Escribe el término» (glosario) y 4. «Completa el texto» (huecos).
+ *  + Reto de comprensión y Teoría en el panel.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de LC-I·P06
- * (A1 lectura, A2 quiz, A4 fill_blanks, A5 V/F, A6 glosario).
+ * DOM puro. Contenido VERBATIM de LC-I·P06 (A1 lectura, A2 quiz, A4
+ * fill_blanks, A5 V/F, A6 glosario). Personas y escuela FICTICIAS.
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -35,20 +36,30 @@ import {
   GLOSARIO,
   QUIZ,
   DATO_CONCORDANCIA,
+  AVISOS,
+  AVISO_LECTOR,
+  AVISO_GRUPO,
+  ESCENAS_CONECTOR,
+  RELACION_INFO,
 } from "./concordancia-conectores-data";
 
 const NO = "#FF5E5E";
+const AVISO_COL = "#FFC75A";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-concordancia-conectores-reto";
+const RUTA_FOTOS = "/media/labs-sim/concordancia-conectores";
 
 type Modo = "reparar" | "conectores" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "reparar", label: "Repara la concordancia", icono: "fa-screwdriver-wrench" },
-  { id: "conectores", label: "Conectores en su lugar", icono: "fa-link" },
+  { id: "reparar", label: "Escribe el aviso", icono: "fa-pen-ruler" },
+  { id: "conectores", label: "Mensajes con sentido", icono: "fa-link" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
+
+/** Estado inicial del aviso: cada oración llega con el error de A1. */
+const AVISO_INICIAL = (): Record<string, string> => Object.fromEntries(REPARACIONES.map((r) => [r.id, r.mal]));
 
 export function LabConcordanciaConectores({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -57,9 +68,6 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
-  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
-  // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
   const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
@@ -74,9 +82,6 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
-  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
-  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
-  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
   const sfxNo = () => {
     partida.error();
@@ -87,63 +92,55 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
     return sonido && audioRef.current?.blip();
   };
 
-  // ── modo Reparar (arrastra la forma correcta) ─────────────────────────
-  const [reparado, setReparado] = useState<Record<string, boolean>>({});
-  const [selRep, setSelRep] = useState<string | null>(null);
-  const [shakeRep, setShakeRep] = useState<string | null>(null);
-  const repLibres = REPARACIONES.filter((r) => !reparado[r.id]).slice().sort((a, b) => a.bien.localeCompare(b.bien, "es"));
+  // ── simulador 1: el aviso ─────────────────────────────────────────────
+  const [aviso, setAviso] = useState<Record<string, string>>(AVISO_INICIAL);
+  const [tocoAviso, setTocoAviso] = useState(false);
+  const bienAviso = (id: string) => aviso[id] === REPARACIONES.find((r) => r.id === id)!.bien;
+  const nBienAviso = REPARACIONES.filter((r) => bienAviso(r.id)).length;
+  const reparadoDone = nBienAviso >= REPARACIONES.length;
 
-  const intentarRep = (chipId: string, rowId: string) => {
-    if (reparado[rowId]) return;
-    if (chipId === rowId) {
-      setReparado((e) => ({ ...e, [rowId]: true }));
-      setSelRep(null);
-      sfxPlace();
-      if (Object.keys(reparado).length + 1 >= REPARACIONES.length) {
-        sfxOk();
-        persistMejor(true, conectoresDone, glosarioDone);
-      }
-    } else {
-      setShakeRep(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeRep(null), 420);
+  const elegirAviso = (id: string, forma: string) => {
+    if (aviso[id] === forma) return;
+    const sig = { ...aviso, [id]: forma };
+    setAviso(sig);
+    setTocoAviso(true);
+    const ok = forma === REPARACIONES.find((r) => r.id === id)!.bien;
+    if (ok) sfxPlace();
+    else sfxNo();
+    const todas = REPARACIONES.every((r) => sig[r.id] === r.bien);
+    if (todas && !reparadoDone) {
+      sfxOk();
+      persistMejor(true, conectoresDone, glosarioDone);
     }
   };
-  const resetReparar = () => {
-    setReparado({});
-    setSelRep(null);
-  };
+  const resetReparar = () => setAviso(AVISO_INICIAL());
 
-  // ── modo Conectores (arrastra el conector al hueco) ───────────────────
-  const [colocado, setColocado] = useState<Record<string, boolean>>({});
-  const [selCon, setSelCon] = useState<string | null>(null);
-  const [shakeFrase, setShakeFrase] = useState<string | null>(null);
-  const conLibres = FRASES.filter((f) => !colocado[f.id]).slice().sort((a, b) => a.conector.localeCompare(b.conector, "es"));
+  // ── simulador 2: mensajes con conector ────────────────────────────────
+  const [conSel, setConSel] = useState<Record<string, string | undefined>>({});
+  const [volteoSentido, setVolteoSentido] = useState(false);
+  const conBien = (id: string) => conSel[id] === FRASES.find((f) => f.id === id)!.conector;
+  const nBienCon = FRASES.filter((f) => conBien(f.id)).length;
+  const conectoresDone = nBienCon >= FRASES.length;
 
-  const intentarCon = (chipId: string, rowId: string) => {
-    if (colocado[rowId]) return;
-    if (chipId === rowId) {
-      setColocado((e) => ({ ...e, [rowId]: true }));
-      setSelCon(null);
-      sfxPlace();
-      if (Object.keys(colocado).length + 1 >= FRASES.length) {
-        sfxOk();
-        persistMejor(reparadoDone, true, glosarioDone);
-      }
-    } else {
-      setShakeFrase(rowId);
+  const elegirCon = (id: string, conector: string) => {
+    if (conSel[id] === conector) return;
+    const sig = { ...conSel, [id]: conector };
+    setConSel(sig);
+    const ok = conector === FRASES.find((f) => f.id === id)!.conector;
+    if (ok) sfxPlace();
+    else {
+      setVolteoSentido(true);
       sfxNo();
-      window.setTimeout(() => setShakeFrase(null), 420);
+    }
+    const todas = FRASES.every((f) => sig[f.id] === f.conector);
+    if (todas && !conectoresDone) {
+      sfxOk();
+      persistMejor(reparadoDone, true, glosarioDone);
     }
   };
-  const resetConectores = () => {
-    setColocado({});
-    setSelCon(null);
-  };
+  const resetConectores = () => setConSel({});
 
-  // ── modo Glosario (emparejar término → definición) ────────────────────
-  // El contador hace de `key`: subirlo remonta el componente y deja todas
-  // las tarjetas en blanco.
+  // ── glosario ──────────────────────────────────────────────────────────
   const [glosarioDone, setGlosarioDone] = useState(false);
   const [glosIntento, setGlosIntento] = useState(0);
   const resetGlosario = () => {
@@ -154,10 +151,7 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── progreso / estrellas ──────────────────────────────────────────────
-  const reparadoDone = Object.keys(reparado).length >= REPARACIONES.length;
-  const conectoresDone = Object.keys(colocado).length >= FRASES.length;
   const modosHechos = (reparadoDone ? 1 : 0) + (conectoresDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
   const estrellas = partida.estrellasCon(modosHechos, 4);
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
@@ -169,62 +163,14 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Cambia una forma del aviso y mira cómo lo lee la tutora", done: tocoAviso },
     { txt: "Repara las 4 oraciones con error de concordancia", done: reparadoDone },
+    { txt: "Elige un conector que voltee el sentido y lee la reacción", done: volteoSentido },
     { txt: "Coloca los 4 conectores en su lugar", done: conectoresDone },
     { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
-
-  // arrastre nativo
-  const dragProps = (id: string) => ({
-    draggable: true,
-    onDragStart: (e: React.DragEvent) => {
-      e.dataTransfer.setData("text/plain", id);
-      e.dataTransfer.effectAllowed = "move";
-      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
-      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
-      e.currentTarget.setAttribute("data-arrastrando", "true");
-    },
-    onDragEnd: (e: React.DragEvent) => {
-      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
-      // queda medio borrada para siempre.
-      e.currentTarget.removeAttribute("data-arrastrando");
-      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
-    },
-  });
-  const dropProps = (onDrop: (id: string) => void) => ({
-    onDragOver: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-    },
-    onDragEnter: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.setAttribute("data-sobre", "true");
-    },
-    onDragLeave: (e: React.DragEvent) => {
-      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
-      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
-      const r = e.currentTarget.getBoundingClientRect();
-      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-      if (fuera) e.currentTarget.removeAttribute("data-sobre");
-    },
-    onDrop: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.removeAttribute("data-sobre");
-      const id = e.dataTransfer.getData("text/plain");
-      if (id) onDrop(id);
-    },
-    "data-zona": "true" as const,
-    role: "button" as const,
-    tabIndex: 0,
-    onKeyDown: (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        (e.currentTarget as HTMLElement).click();
-      }
-    },
-  });
 
   const resetTexto = () => {
     setTextoDone(false);
@@ -232,129 +178,39 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
   };
   const resetActual = modo === "texto" ? resetTexto : modo === "reparar" ? resetReparar : modo === "conectores" ? resetConectores : resetGlosario;
 
+  const claridad = Math.round((nBienAviso / REPARACIONES.length) * 100);
+  const lectura =
+    modo === "reparar" ? (
+      <>Claridad del aviso: {claridad}%</>
+    ) : modo === "conectores" ? (
+      <>Mensajes bien entendidos: {nBienCon}/{FRASES.length}</>
+    ) : (
+      <>Repaso de la teoría de la práctica</>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes ccShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes ccPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .cc-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .cc-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .cc-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .cc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .cc-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .cc-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .cc-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
-        .cc-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .cc-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .cc-chip:active { cursor:grabbing; }
-        .cc-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .cc-row[data-shake="true"] { animation:ccShake .4s; border-color:${NO}; }
-        .cc-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .cc-slot { flex-shrink:0; min-width:118px; min-height:44px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 12px; }
-        .cc-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .cc-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .cc-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .cc-q:disabled{ cursor:default; }
-        .cc-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .cc-btn:hover { border-color:${T.lineStrong}; }
-        .cc-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .cc-row[data-shake="true"] { animation:none; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
 
-        /* Cajón de teoría */
-        .cc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .cc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .cc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .cc-drawer[data-open="true"] { transform:translateX(0); }
-        .cc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .cc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .cc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .cc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .cc-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .cc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .cc-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .cc-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .cc-row:nth-of-type(6n+1) { --tono:188; }
-        .cc-row:nth-of-type(6n+2) { --tono:262; }
-        .cc-row:nth-of-type(6n+3) { --tono:44; }
-        .cc-row:nth-of-type(6n+4) { --tono:152; }
-        .cc-row:nth-of-type(6n+5) { --tono:330; }
-        .cc-row:nth-of-type(6n+6) { --tono:18; }
-        .cc-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .cc-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .cc-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .cc-chip:hover { transform:translateY(-2px); }
-        .cc-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .cc-chip, .cc-chip:hover, .cc-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="cc-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="cc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="cc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="cc-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="cc-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="cc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="cc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="cc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="cc-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="cc-drawer-body">
-          <FichaTeorica data={CONCORDANCIA_CONECTORES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — reparar concordancia */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
               key={textoIntento}
@@ -373,64 +229,102 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
 
           {modo === "reparar" && (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra la forma correcta sobre la palabra tachada</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: reparadoDone ? OK : T.text3 }}>
-                    {Object.keys(reparado).length}/{REPARACIONES.length}
+              <Foto clave="aviso-tablero" icono="fa-clipboard" titulo={AVISO_GRUPO} />
+              <div className="cc-medidor" data-bajo={claridad < 100}>
+                <span className="cc-med-cara">
+                  <i className={`fa-solid ${claridad === 100 ? "fa-face-smile-beam" : claridad >= 50 ? "fa-face-meh" : "fa-face-frown-open"}`} aria-hidden />
+                </span>
+                <span className="cc-med-cuerpo">
+                  <span>
+                    <strong>{AVISO_LECTOR.nombre}</strong> · {claridad === 100 ? "«Entendido, gracias por avisar.»" : claridad >= 50 ? "«Entiendo la mitad… ¿me lo puedes aclarar?»" : "«No entiendo nada de este aviso.»"}
                   </span>
-                </div>
-                {repLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Reparaste las 4 oraciones!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {repLibres.map((r) => (
-                      <button key={r.id} className="cc-chip" data-sel={selRep === r.id} onClick={() => setSelRep((s) => (s === r.id ? null : r.id))} {...dragProps(r.id)}>
-                        <i className="fa-solid fa-pen" style={{ fontSize: 12, opacity: 0.7 }} />
-                        {r.bien}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                  <span className="cc-barra"><span style={{ width: `${claridad}%` }} /></span>
+                </span>
+                <strong className="cc-med-pct">{claridad}%</strong>
               </div>
-
-              <RowsReparar selRep={selRep} shakeRep={shakeRep} reparado={reparado} onMatch={intentarRep} dropProps={dropProps} />
+              <div className="cc-lista">
+                {REPARACIONES.map((r) => {
+                  const esc = AVISOS.find((a) => a.id === r.id)!;
+                  const actual = esc.opciones.find((o) => o.forma === aviso[r.id])!;
+                  const ok = aviso[r.id] === r.bien;
+                  return (
+                    <div key={r.id} className="cc-caso" data-ok={ok}>
+                      <div className="cc-frase">
+                        <span>{r.antes}</span>
+                        <span className="cc-opts" role="radiogroup" aria-label="Forma de la palabra">
+                          {esc.opciones.map((o) => (
+                            <button key={o.forma} type="button" role="radio" aria-checked={aviso[r.id] === o.forma} className="cc-opt" data-on={aviso[r.id] === o.forma} onClick={() => elegirAviso(r.id, o.forma)}>
+                              {o.forma}
+                            </button>
+                          ))}
+                        </span>
+                        <span>{r.despues}</span>
+                      </div>
+                      <div className="cc-lector" data-ok={ok}>
+                        <span className="cc-imagen" aria-hidden>
+                          {Array.from({ length: actual.vis.n }).map((_, i) => (
+                            <i key={i} className={`fa-solid ${actual.vis.icono}`} />
+                          ))}
+                          {actual.vis.duda && <b>?</b>}
+                        </span>
+                        <span className="cc-lee">
+                          <em>Lo que imagina {AVISO_LECTOR.nombre}</em>
+                          {actual.lectura}
+                          {ok && <small>{r.regla}</small>}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </>
           )}
 
-          {/* MODO 2 — conectores en su lugar */}
           {modo === "conectores" && (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada conector al hueco según el sentido</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: conectoresDone ? OK : T.text3 }}>
-                    {Object.keys(colocado).length}/{FRASES.length}
-                  </span>
-                </div>
-                {conLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Colocaste los 4 conectores!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {conLibres.map((f) => (
-                      <button key={f.id} className="cc-chip" data-sel={selCon === f.id} onClick={() => setSelCon((s) => (s === f.id ? null : f.id))} {...dragProps(f.id)}>
-                        <i className="fa-solid fa-link" style={{ fontSize: 12, opacity: 0.7 }} />
-                        {f.conector}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <Foto clave="autobus-descompuesto" icono="fa-bus" titulo="Mensajes del grupo: cada conector cambia lo que entiende quien los lee" />
+              <div className="cc-lista">
+                {ESCENAS_CONECTOR.map((e) => {
+                  const f = FRASES.find((x) => x.id === e.id)!;
+                  const sel = conSel[e.id];
+                  const op = e.opciones.find((o) => o.conector === sel);
+                  const ok = sel === f.conector;
+                  const rel = op ? RELACION_INFO[op.relacion] : undefined;
+                  return (
+                    <div key={e.id} className="cc-caso" data-ok={ok} data-mal={!!op && !ok}>
+                      <div className="cc-frase">
+                        <span>{f.antes}</span>
+                        <span className="cc-opts" role="radiogroup" aria-label="Conector">
+                          {e.opciones.map((o) => (
+                            <button key={o.conector} type="button" role="radio" aria-checked={sel === o.conector} className="cc-opt" data-on={sel === o.conector} onClick={() => elegirCon(e.id, o.conector)}>
+                              {o.conector}
+                            </button>
+                          ))}
+                        </span>
+                        <span>{f.despues}</span>
+                      </div>
+                      <div className="cc-flujo" data-ok={ok}>
+                        <span className="cc-idea">{e.ideaA}</span>
+                        <span className="cc-rel" data-vacio={!op}>
+                          <i className={`fa-solid ${rel ? rel.icono : "fa-question"}`} aria-hidden />
+                          {rel ? rel.etiqueta : "¿cómo se relacionan?"}
+                        </span>
+                        <span className="cc-idea">{e.ideaB}</span>
+                      </div>
+                      <div className="cc-lector" data-ok={ok}>
+                        <span className="cc-lee">
+                          <em>{op ? `Así lo lee ${e.quien}` : e.quien}</em>
+                          {op ? op.lectura : "Sin conector, las dos ideas quedan sueltas: no sabe cómo se relacionan."}
+                          {ok && <small>Tipo de relación: {f.tipo}.</small>}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
-              <RowsConectores selCon={selCon} shakeFrase={shakeFrase} colocado={colocado} onMatch={intentarCon} dropProps={dropProps} accent={accent} />
             </>
           )}
 
-          {/* MODO 3 — glosario (emparejar) */}
           {modo === "glosario" && (
             <EscribeTermino
               key={glosIntento}
@@ -449,187 +343,144 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
             />
           )}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Aviso claro" value={`${nBienAviso}/${REPARACIONES.length}`} col={reparadoDone ? OK : undefined} />
+                  <Dato label="Sentido bien" value={`${nBienCon}/${FRASES.length}`} col={conectoresDone ? OK : undefined} />
                 </div>
-              ))}
-            </div>
-
-            <div className="cc-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
-                </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Dominas la concordancia y los conectores!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "reparar" && (
-                <>El sustantivo y el adjetivo concuerdan en <strong style={{ color: T.text }}>género y número</strong>; el sujeto y el verbo, en <strong style={{ color: T.text }}>número y persona</strong>.</>
-              )}
-              {modo === "conectores" && (
-                <><strong style={{ color: T.text }}>porque</strong> = causa · <strong style={{ color: T.text }}>además</strong> = adición · <strong style={{ color: T.text }}>como</strong> = comparación. Lee la frase completa para captar el sentido.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_CONCORDANCIA}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
- * ═══════════════════════════════════════════════════════════════════════════ */
-type DropFactory = (onDrop: (id: string) => void) => {
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-};
-
-function RowsReparar({
-  selRep,
-  shakeRep,
-  reparado,
-  onMatch,
-  dropProps,
-}: {
-  selRep: string | null;
-  shakeRep: string | null;
-  reparado: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {REPARACIONES.map((r) => {
-        const done = reparado[r.id];
-        return (
-          <div
-            key={r.id}
-            className="cc-row"
-            data-shake={shakeRep === r.id}
-            data-done={done}
-            onClick={() => !done && selRep && onMatch(selRep, r.id)}
-            {...dropProps((id) => onMatch(id, r.id))}
-          >
-            <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.5, display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <span>{r.antes}</span>
-              {done ? (
-                <span style={{ animation: "ccPop .25s ease", fontWeight: 900, color: OK }}>{r.bien}</span>
-              ) : (
-                <>
-                  <span style={{ textDecoration: "line-through", color: NO, fontWeight: 700, opacity: 0.85 }}>{r.mal}</span>
-                  <span className="cc-slot" data-armed={!!selRep} style={{ minWidth: 80 }}>
-                    <i className="fa-solid fa-arrow-down" style={{ fontSize: 11 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1, 2, 3].map((s) => (
+                      <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
+                    {bestEstrellas >= 3 ? "¡Dominas la concordancia y los conectores!" : "Termina los modos para ganar 2★; la tercera pide 2 errores o menos."}
                   </span>
-                </>
-              )}
-              <span>{r.despues}</span>
-            </div>
-            {done && (
-              <div style={{ flexBasis: "100%", fontSize: 12, color: T.text3, lineHeight: 1.45, display: "flex", gap: 8 }}>
-                <i className="fa-solid fa-circle-check" style={{ color: OK, marginTop: 2 }} />
-                <span>{r.regla}</span>
-              </div>
-            )}
-          </div>
-        );
-      })}
+                </div>
+              </Bloque>
+              <Bloque titulo="Pista" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {modo === "reparar" && "Sustantivo y adjetivo concuerdan en género y número; sujeto y verbo, en número y persona. Prueba cada forma y mira el «?» del lector."}
+                  {modo === "conectores" && "porque = causa · además = adición · como = comparación. Cambia el conector y mira cómo se voltea la relación entre las dos ideas."}
+                  {modo === "glosario" && "Lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial."}
+                  {modo === "texto" && "Completa cada hueco escribiendo la palabra que falta."}
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Las cuatro reglas del aviso" icono="fa-screwdriver-wrench">
+                {REPARACIONES.map((r) => (
+                  <p key={r.id} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{r.antes} {r.bien} {r.despues}</strong> {r.regla}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Conectores del ejercicio" icono="fa-link">
+                {FRASES.map((f) => (
+                  <p key={f.id} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{f.conector}</strong> ({f.tipo}): {f.antes} {f.conector} {f.despues}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_CONCORDANCIA}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={CONCORDANCIA_CONECTORES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+/** Imagen de escena con respaldo: si el archivo aún no existe, queda el degradado y el ícono. */
+function Foto({ clave, icono, titulo }: { clave: string; icono: string; titulo: string }) {
+  const [hay, setHay] = useState(true);
+  return (
+    <div className="cc-foto">
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {hay && <img src={`${RUTA_FOTOS}/${clave}.webp`} alt="" loading="lazy" onError={() => setHay(false)} />}
+      <span>{titulo}</span>
     </div>
   );
 }
 
-function RowsConectores({
-  selCon,
-  shakeFrase,
-  colocado,
-  onMatch,
-  dropProps,
-  accent,
-}: {
-  selCon: string | null;
-  shakeFrase: string | null;
-  colocado: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-  accent: string;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {FRASES.map((f) => {
-        const done = colocado[f.id];
-        return (
-          <div
-            key={f.id}
-            className="cc-row"
-            data-shake={shakeFrase === f.id}
-            data-done={done}
-            onClick={() => !done && selCon && onMatch(selCon, f.id)}
-            {...dropProps((id) => onMatch(id, f.id))}
-          >
-            <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.6, display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <span>{f.antes}</span>
-              {done ? (
-                <span style={{ animation: "ccPop .25s ease", fontWeight: 900, color: OK }}>{f.conector}</span>
-              ) : (
-                <span className="cc-slot" data-armed={!!selCon}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <i className="fa-solid fa-link" style={{ fontSize: 11 }} /> conector
-                  </span>
-                </span>
-              )}
-              <span>{f.despues}</span>
-              <span style={{ fontSize: 10.5, fontWeight: 800, color: done ? OK : T.text3, border: `1px solid ${done ? `${OK}55` : T.line}`, borderRadius: 6, padding: "1px 7px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                {f.tipo}
-              </span>
-            </div>
-          </div>
-        );
-      })}
-      <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45, display: "flex", gap: 8, marginTop: 2 }}>
-        <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
-        <span>La etiqueta de la derecha indica el tipo de relación que debe expresar el conector.</span>
-      </div>
-    </div>
-  );
-}
+const css = (accent: string, rgba: string) => `
+  .cc-foto { position:relative; height:clamp(84px, 16vw, 130px); border-radius:14px; overflow:hidden; display:flex; align-items:flex-end;
+    background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.95)); border:1px solid ${T.line}; }
+  .cc-foto > i { position:absolute; right:18px; top:50%; transform:translateY(-50%); font-size:46px; color:rgba(255,255,255,0.18); }
+  .cc-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .cc-foto span { position:relative; padding:8px 12px; font-size:14px; font-weight:800; color:#fff; width:100%;
+    background:linear-gradient(0deg, rgba(3,8,18,0.88), transparent); text-shadow:0 1px 6px rgba(0,0,0,0.8); }
+  .cc-medidor { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; border:1.5px solid ${OK}66; background:${OK}12; }
+  .cc-medidor[data-bajo="true"] { border-color:${AVISO_COL}66; background:${AVISO_COL}10; }
+  .cc-med-cara { font-size:30px; color:${OK}; display:flex; }
+  .cc-medidor[data-bajo="true"] .cc-med-cara { color:${AVISO_COL}; }
+  .cc-med-cuerpo { flex:1; min-width:0; display:grid; gap:6px; font-size:14px; color:${T.text2}; line-height:1.4; }
+  .cc-med-cuerpo strong { color:#fff; }
+  .cc-barra { display:block; height:8px; border-radius:99px; background:rgba(255,255,255,0.14); overflow:hidden; }
+  .cc-barra > span { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg, ${AVISO_COL}, ${OK}); transition:width .35s ease; }
+  .cc-med-pct { font-size:20px; font-variant-numeric:tabular-nums; color:#fff; }
+  .cc-lista { display:grid; gap:12px; }
+  .cc-caso { display:grid; gap:10px; padding:14px; border-radius:14px; border:1.5px solid ${AVISO_COL}55; background:${T.glass}; transition:border-color .2s, background .2s; }
+  .cc-caso[data-ok="true"] { border-color:${OK}66; background:${OK}0d; }
+  .cc-caso[data-mal="true"] { border-color:${NO}66; }
+  .cc-frase { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:16px; line-height:1.6; color:#fff; font-weight:600; }
+  .cc-opts { display:inline-flex; flex-wrap:wrap; gap:6px; }
+  .cc-opt { cursor:pointer; padding:8px 14px; border-radius:999px; border:1.5px solid ${T.lineStrong}; background:${T.glassSoft}; color:#fff;
+    font-size:15px; font-weight:800; min-height:40px; transition:all .14s; }
+  .cc-opt:hover { border-color:${accent}; }
+  .cc-opt[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.28); box-shadow:0 0 14px -5px ${accent}; }
+  .cc-lector { display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:10px 12px; border-radius:12px; background:${T.inset}; border-left:4px solid ${AVISO_COL}; }
+  .cc-lector[data-ok="true"] { border-left-color:${OK}; }
+  .cc-imagen { display:inline-flex; flex-wrap:wrap; gap:4px; align-items:center; min-width:48px; font-size:20px; color:rgba(255,255,255,0.85); }
+  .cc-imagen b { font-size:22px; color:${AVISO_COL}; margin-left:4px; }
+  .cc-lee { flex:1 1 200px; min-width:0; display:grid; gap:3px; font-size:14px; color:${T.text2}; line-height:1.45; }
+  .cc-lee em { font-style:normal; font-size:14px; font-weight:800; color:${T.text3}; }
+  .cc-lee small { font-size:14px; color:${OK}; font-weight:700; }
+  .cc-flujo { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:8px; align-items:center; }
+  .cc-idea { padding:8px 10px; border-radius:10px; background:${T.glassSoft}; border:1px solid ${T.line}; font-size:14px; font-weight:700; color:#fff; text-align:center; }
+  .cc-rel { display:inline-flex; flex-direction:column; align-items:center; gap:2px; padding:6px 10px; border-radius:10px; font-size:14px; font-weight:800;
+    color:${AVISO_COL}; border:1px dashed ${AVISO_COL}88; text-align:center; max-width:150px; line-height:1.25; }
+  .cc-rel i { font-size:17px; }
+  .cc-flujo[data-ok="true"] .cc-rel { color:${OK}; border-color:${OK}88; border-style:solid; }
+  .cc-rel[data-vacio="true"] { color:${T.text3}; border-color:${T.lineStrong}; }
+  @media (max-width: 560px) { .cc-flujo { grid-template-columns:1fr; } .cc-rel { max-width:none; flex-direction:row; justify-content:center; } }
+  .cc-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .cc-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .cc-q:disabled{ cursor:default; }
+  .cc-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .cc-btn:hover { border-color:${T.lineStrong}; }
+  @media (prefers-reduced-motion: reduce){ .cc-barra > span, .cc-opt, .cc-caso { transition:none; } }
+`;
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Cuestionario de comprensión
@@ -671,19 +522,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div style={{ ...card, padding: "16px 16px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco preguntas sobre concordancia gramatical y uso de conectores. Responde y pulsa «Comprobar».
       </div>
 
@@ -692,11 +543,11 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -718,7 +569,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="cc-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 26, height: 26, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -727,7 +578,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -750,7 +601,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

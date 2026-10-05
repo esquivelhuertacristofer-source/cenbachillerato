@@ -31,7 +31,7 @@ import { CurvaTubo } from "./_tablero";
 import {
   type Modo,
   resolverCircuito, resolverGenerador, resolverMotor,
-  fmtV, fmtA, fmtR, fmtW, fmtKw, fmtHz, fmtPct,
+  fmtV, fmtA, fmtR, fmtW, fmtKw, fmtPct,
 } from "./electromagnetismo-data";
 
 export interface ElectromagnetismoSceneProps {
@@ -82,26 +82,10 @@ function pointAtFraction(path: Pt[], f: number): Pt {
   return path[path.length - 1] ?? [0, 0, 0];
 }
 
-/* ── Título flotante ──────────────────────────────────────────────────────── */
-function Titulo({ texto, sub, color, y = 5.4 }: { texto: string; sub?: string; color: string; y?: number }) {
-  return (
-    <Html position={[0, y, 0]} center distanceFactor={20} pointerEvents="none">
-      <div style={{
-        whiteSpace: "nowrap", textAlign: "center", padding: "4px 12px", borderRadius: 10,
-        background: "rgba(4,12,26,0.9)", border: `1px solid ${color}aa`, color: "#fff",
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.5)",
-      }}>
-        <div style={{ fontWeight: 900, fontSize: 12 }}>{texto}</div>
-        {sub && <div style={{ fontWeight: 800, fontSize: 10.5, color }}>{sub}</div>}
-      </div>
-    </Html>
-  );
-}
-
 function Etiqueta({ pos, texto, color, mono = false }: { pos: Pt; texto: string; color: string; mono?: boolean }) {
   return (
-    <Html position={pos} center distanceFactor={17} pointerEvents="none">
-      <div style={{ whiteSpace: "nowrap", padding: "2px 8px", borderRadius: 8, background: "rgba(5,13,26,0.85)", border: `1px solid ${color}88`, color, fontWeight: 900, fontSize: 10, fontFamily: mono ? "ui-monospace, monospace" : "system-ui, sans-serif" }}>
+    <Html position={pos} center pointerEvents="none">
+      <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(5,13,26,0.85)", border: `1px solid ${color}88`, color, fontWeight: 900, fontSize: 14, fontFamily: mono ? "ui-monospace, monospace" : "system-ui, sans-serif" }}>
         {texto}
       </div>
     </Html>
@@ -184,7 +168,6 @@ function EscenaCircuito({ V, R, playing, accent }: { V: number; R: number; playi
 
   return (
     <group>
-      <Titulo texto="Circuito — ley de Ohm" sub={`V = ${fmtV(V)} · R = ${fmtR(R)} · I = ${fmtA(c.I)} · P = ${fmtW(c.P)}`} color={accent} />
 
       {/* cable */}
       <CurvaTubo puntos={path} color="#94a3b8" grosor={0.054} />
@@ -197,9 +180,6 @@ function EscenaCircuito({ V, R, playing, accent }: { V: number; R: number; playi
         <CurvaTubo puntos={[[0, 0.45, 0.2], [0, 0.65, 0.2]] as Pt[]} color="#f87171" grosor={0.072} />
         <CurvaTubo puntos={[[-0.12, -0.55, 0.2], [0.12, -0.55, 0.2]] as Pt[]} color="#60a5fa" grosor={0.072} />
         <Etiqueta pos={[-1.05, 0, 0]} texto={`${fmtV(V)}`} color="#fbbf24" mono />
-        <Html position={[-1.05, -0.7, 0]} center distanceFactor={17} pointerEvents="none">
-          <div style={{ fontSize: 9, fontWeight: 800, color: "rgba(220,232,255,0.7)", fontFamily: "system-ui, sans-serif" }}>red CFE</div>
-        </Html>
       </group>
 
       {/* resistencia */}
@@ -213,8 +193,8 @@ function EscenaCircuito({ V, R, playing, accent }: { V: number; R: number; playi
       {/* electrones */}
       <Electrones path={path} count={14} color={accent} speed={speed} playing={playing} />
 
-      {/* sentido de la corriente */}
-      <Etiqueta pos={[0, WY + 0.55, 0]} texto={`I = ${fmtA(c.I)} →`} color={accent} mono />
+      {/* la corriente: el rótulo viaja con el lazo y dice cuánto pasa por segundo */}
+      <Etiqueta pos={[0, WY + 0.7, 0]} texto={`I = ${fmtA(c.I)} →`} color={accent} mono />
     </group>
   );
 }
@@ -264,7 +244,7 @@ function TrazoSenoidal({ ampVis, speed, color, playing }: { ampVis: number; spee
   });
 
   return (
-    <group position={[0, -3.6, 0]}>
+    <group position={[0, -3.0, 0]}>
       {/* eje */}
       <Line points={[[x0, 0, 0], [x0 + W, 0, 0]] as Pt[]} color="#46587a" lineWidth={1} transparent opacity={0.6} />
       <Line points={pts} color={color} lineWidth={2.5} transparent opacity={0.9} />
@@ -273,7 +253,6 @@ function TrazoSenoidal({ ampVis, speed, color, playing }: { ampVis: number; spee
         <meshStandardMaterial color="#fde047" emissive="#fde047" emissiveIntensity={1.3} toneMapped={false} />
       </mesh>
       <Etiqueta pos={[x0 - 0.4, 0, 0]} texto="FEM" color={color} mono />
-      <Etiqueta pos={[x0 + W + 0.4, 0, 0]} texto="t" color="#94a3b8" mono />
     </group>
   );
 }
@@ -293,7 +272,6 @@ function EscenaGenerador({ N, B, area, f, playing, accent }: { N: number; B: num
 
   return (
     <group>
-      <Titulo texto="Generador — inducción de Faraday" sub={`FEM = N·B·A·ω·sen(ωt) · FEM_pico = ${fmtV(g.femPico)} · ${fmtHz(f)}`} color={accent} />
 
       {/* polos del imán */}
       <group position={[0, 0.4, 0]}>
@@ -336,7 +314,7 @@ function Rotor({ color, speed, playing }: { color: string; speed: number; playin
       {[0, 1, 2, 3].map((i) => (
         <mesh key={i} rotation={[0, 0, (i * Math.PI) / 2]} position={[0, 0, 0.42]}>
           <boxGeometry args={[2.0, 0.34, 0.1]} />
-          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.45} toneMapped={false} />
+          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.45} />
         </mesh>
       ))}
       {/* eje */}
@@ -358,7 +336,6 @@ function EscenaMotor({ pElec, efic, playing, accent }: { pElec: number; efic: nu
 
   return (
     <group>
-      <Titulo texto="Motor — eficiencia" sub={`P_elec = ${fmtKw(pElec)} · η = ${fmtPct(efic)} · P_mec = ${fmtKw(m.pMec)}`} color={accent} />
 
       {/* entrada eléctrica */}
       <group position={[-4.4, 0.4, 0]}>
@@ -379,7 +356,6 @@ function EscenaMotor({ pElec, efic, playing, accent }: { pElec: number; efic: nu
       {/* salida mecánica */}
       <CurvaTubo puntos={[[2.0, 0.4, 0], [3.8, 0.4, 0]] as Pt[]} color={VERDE} grosor={0.054} />
       <Etiqueta pos={[4.4, 0.9, 0]} texto={`P_mec = ${fmtKw(m.pMec)}`} color={VERDE} mono />
-      <Etiqueta pos={[4.4, 0.2, 0]} texto={`${m.hp.toFixed(0)} hp`} color={VERDE} mono />
 
       {/* calor perdido (sube) */}
       <Line points={[[0.4, 1.5, 0], [0.4, 2.5, 0]] as Pt[]} color={ROJO} lineWidth={2} transparent opacity={0.7} dashed dashSize={0.18} gapSize={0.14} />
@@ -387,16 +363,18 @@ function EscenaMotor({ pElec, efic, playing, accent }: { pElec: number; efic: nu
 
       {/* barra de eficiencia */}
       <group position={[0, -2.9, 0]}>
-        <mesh position={[x0 + wUtil / 2, 0, 0]}><boxGeometry args={[Math.max(0.001, wUtil), BARH, 0.15]} /><meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.4} toneMapped={false} /></mesh>
-        <mesh position={[x0 + wUtil + wCalor / 2, 0, 0]}><boxGeometry args={[Math.max(0.001, wCalor), BARH, 0.15]} /><meshStandardMaterial color={ROJO} emissive={ROJO} emissiveIntensity={0.4} toneMapped={false} /></mesh>
+        <mesh position={[x0 + wUtil / 2, 0, 0]}><boxGeometry args={[Math.max(0.001, wUtil), BARH, 0.15]} /><meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.4} /></mesh>
+        <mesh position={[x0 + wUtil + wCalor / 2, 0, 0]}><boxGeometry args={[Math.max(0.001, wCalor), BARH, 0.15]} /><meshStandardMaterial color={ROJO} emissive={ROJO} emissiveIntensity={0.4} /></mesh>
         <Etiqueta pos={[x0 + wUtil / 2, 0.7, 0]} texto={`útil ${fmtPct(efic)}`} color={VERDE} mono />
-        <Etiqueta pos={[x0 + wUtil + wCalor / 2, -0.7, 0]} texto={`calor ${fmtPct(100 - efic)}`} color={ROJO} mono />
       </group>
     </group>
   );
 }
 
 /* ── Contenido ────────────────────────────────────────────────────────────── */
+/** Sube cada escena para que quede entre la barra de arriba y la misión de abajo. */
+const DESPLAZA: Record<Modo, number> = { circuito: 1.25, generador: 2.2, motor: 1.65 };
+
 function Contenido(props: ElectromagnetismoSceneProps) {
   const { modo, accent, resetNonce, playing } = props;
   return (
@@ -408,7 +386,7 @@ function Contenido(props: ElectromagnetismoSceneProps) {
       <Escenario acento={accent} />
 
 
-      <group key={`${modo}-${resetNonce}`}>
+      <group key={`${modo}-${resetNonce}`} position={[0, DESPLAZA[modo], 0]}>
         {modo === "circuito" && <EscenaCircuito V={props.V} R={props.R} playing={playing} accent={accent} />}
         {modo === "generador" && <EscenaGenerador N={props.N} B={props.B} area={props.area} f={props.f} playing={playing} accent={accent} />}
         {modo === "motor" && <EscenaMotor pElec={props.pElec} efic={props.efic} playing={playing} accent={accent} />}
@@ -433,7 +411,7 @@ function Contenido(props: ElectromagnetismoSceneProps) {
 }
 
 export default function ElectromagnetismoScene(props: ElectromagnetismoSceneProps) {
-  const cam = { position: [0, 0.6, 17] as Pt, fov: 48 };
+  const cam = { position: [0, 0.6, 18] as Pt, fov: 48 };
   return (
     <Canvas key={props.modo} dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={cam}>
       <Contenido {...props} />

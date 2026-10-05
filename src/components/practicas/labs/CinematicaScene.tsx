@@ -23,11 +23,11 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { resolver, estadoEn, tiempoEnX, fmt0, fmt1 } from "./cinematica-data";
+import { resolver, estadoEn, tiempoEnX, fmt1 } from "./cinematica-data";
 import { Escenario } from "./_escenario";
 import { CurvaTubo } from "./_tablero";
 
@@ -74,6 +74,31 @@ const _hit = new THREE.Vector3();
 const _obj = new THREE.Object3D();
 const PART_N = 14;           // motas de polvo levantadas por el auto
 
+/* ── Etiqueta: tamaño fijo en píxeles (≥14), desplazada según el lado ────────── */
+type Lado = "up" | "down" | "left" | "right";
+const DESPLAZA: Record<Lado, string> = {
+  up: "translate(0,-70%)",
+  down: "translate(0,70%)",
+  left: "translate(-62%,0)",
+  right: "translate(62%,0)",
+};
+
+function Etiqueta({ pos, color, children, lado = "up" }: { pos: Pt; color: string; children: React.ReactNode; lado?: Lado }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: DESPLAZA[lado] }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
+}
+
 /* ── Polvo / estela de las ruedas (partículas en tiempo real) ─────────────── */
 function Polvo({ v, frenando }: { v: number; frenando: boolean }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
@@ -103,7 +128,7 @@ function Polvo({ v, frenando }: { v: number; frenando: boolean }) {
         transparent
         opacity={0.45}
         depthWrite={false}
-        toneMapped={false}
+       
       />
     </instancedMesh>
   );
@@ -111,9 +136,9 @@ function Polvo({ v, frenando }: { v: number; frenando: boolean }) {
 
 /* ── Flecha horizontal (asta + punta) a lo largo de ±x ────────────────────── */
 function Flecha({
-  base, hacia, len, color, label, grosor = 0.06,
+  base, hacia, len, color, label, grosor = 0.06, lado = "up",
 }: {
-  base: Pt; hacia: 1 | -1; len: number; color: string; label?: React.ReactNode; grosor?: number;
+  base: Pt; hacia: 1 | -1; len: number; color: string; label?: React.ReactNode; grosor?: number; lado?: Lado;
 }) {
   const quat = useMemo(
     () => new THREE.Quaternion().setFromUnitVectors(
@@ -128,20 +153,14 @@ function Flecha({
     <group position={base} quaternion={quat}>
       <mesh position={[0, shaftLen / 2, 0]}>
         <cylinderGeometry args={[grosor, grosor, shaftLen, 14]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.55} toneMapped={false} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.55} />
       </mesh>
       <mesh position={[0, shaftLen + headLen / 2, 0]}>
         <coneGeometry args={[grosor * 2.4, headLen, 18]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} toneMapped={false} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
       </mesh>
       {label != null && (
-        <Html position={[hacia * (len + 0.1), 0.34, 0]} center distanceFactor={13} pointerEvents="none">
-          <div style={{
-            whiteSpace: "nowrap", padding: "2px 7px", borderRadius: 7, background: "rgba(6,16,31,0.85)",
-            border: `1px solid ${color}77`, color: "#fff", fontWeight: 800, fontSize: 10.5,
-            fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.45)",
-          }}>{label}</div>
-        </Html>
+        <Etiqueta pos={[0, len, 0]} color={color} lado={lado}>{label}</Etiqueta>
       )}
     </group>
   );
@@ -170,20 +189,20 @@ function Auto({ color, frenando }: { color: string; frenando: boolean }) {
       {/* faro delantero */}
       <mesh position={[0.76, 0.34, 0.22]}>
         <boxGeometry args={[0.04, 0.12, 0.14]} />
-        <meshStandardMaterial color="#fff7d6" emissive="#fff7d6" emissiveIntensity={0.9} toneMapped={false} />
+        <meshStandardMaterial color="#fff7d6" emissive="#fff7d6" emissiveIntensity={0.9} />
       </mesh>
       <mesh position={[0.76, 0.34, -0.22]}>
         <boxGeometry args={[0.04, 0.12, 0.14]} />
-        <meshStandardMaterial color="#fff7d6" emissive="#fff7d6" emissiveIntensity={0.9} toneMapped={false} />
+        <meshStandardMaterial color="#fff7d6" emissive="#fff7d6" emissiveIntensity={0.9} />
       </mesh>
       {/* stop trasero (se enciende al frenar) */}
       <mesh position={[-0.76, 0.34, 0.2]}>
         <boxGeometry args={[0.04, 0.12, 0.16]} />
-        <meshStandardMaterial color="#ff3b3b" emissive="#ff3b3b" emissiveIntensity={frenando ? 1.4 : 0.2} toneMapped={false} />
+        <meshStandardMaterial color="#ff3b3b" emissive="#ff3b3b" emissiveIntensity={frenando ? 1.4 : 0.2} />
       </mesh>
       <mesh position={[-0.76, 0.34, -0.2]}>
         <boxGeometry args={[0.04, 0.12, 0.16]} />
-        <meshStandardMaterial color="#ff3b3b" emissive="#ff3b3b" emissiveIntensity={frenando ? 1.4 : 0.2} toneMapped={false} />
+        <meshStandardMaterial color="#ff3b3b" emissive="#ff3b3b" emissiveIntensity={frenando ? 1.4 : 0.2} />
       </mesh>
       {rueda(0.5, 0.36)}
       {rueda(0.5, -0.36)}
@@ -194,7 +213,7 @@ function Auto({ color, frenando }: { color: string; frenando: boolean }) {
 }
 
 /* ── Hito / poste de referencia ───────────────────────────────────────────── */
-function Hito({ x, color, titulo, sub }: { x: number; color: string; titulo: string; sub: string }) {
+function Hito({ x, color, titulo, ver }: { x: number; color: string; titulo: string; ver: boolean }) {
   return (
     <group position={[x, Y_ROAD, -ROAD_W / 2 - 0.45]}>
       <mesh position={[0, 0.65, 0]}>
@@ -203,24 +222,16 @@ function Hito({ x, color, titulo, sub }: { x: number; color: string; titulo: str
       </mesh>
       <mesh position={[0, 1.35, 0]}>
         <boxGeometry args={[0.06, 0.16, 0.06]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} toneMapped={false} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
       </mesh>
-      <Html position={[0, 1.75, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{
-          whiteSpace: "nowrap", textAlign: "center", padding: "3px 9px", borderRadius: 8,
-          background: "rgba(6,16,31,0.88)", border: `1px solid ${color}88`, color: "#fff",
-          fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.45)",
-        }}>
-          <div style={{ fontWeight: 800, fontSize: 11 }}>{titulo}</div>
-          <div style={{ fontWeight: 700, fontSize: 10, color }}>{sub}</div>
-        </div>
-      </Html>
+      {ver && <Etiqueta pos={[0, 1.45, 0]} color={color} lado="up">{titulo}</Etiqueta>}
     </group>
   );
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
 function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, onGrab }: CinematicaSceneProps) {
+  const ancho = useThree((st) => st.size.width) >= 640;
   const mov = resolver(a1, t1, a2);
   const est = estadoEn(mov, t);
 
@@ -310,9 +321,9 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, on
         )}
 
         {/* hitos */}
-        <Hito x={xToWorld(0)} color="#9fb4cc" titulo="Salida" sub="x = 0" />
-        <Hito x={xToWorld(mov.x1)} color={C_ACC} titulo="Fin de aceleración" sub={`${fmt0(mov.x1)} m · ${fmt0(mov.v1)} m/s`} />
-        <Hito x={xToWorld(mov.xTotal)} color={C_BRK} titulo="Alto total" sub={`${fmt0(mov.xTotal)} m`} />
+        <Hito x={xToWorld(0)} color="#9fb4cc" titulo="Salida" ver={false} />
+        <Hito x={xToWorld(mov.x1)} color={C_ACC} titulo="Rapidez máxima" ver={ancho} />
+        <Hito x={xToWorld(mov.xTotal)} color={C_BRK} titulo="Alto total" ver={ancho} />
 
         {/* auto + flechas */}
         <group position={[carX, Y_ROAD, 0]}>
@@ -324,7 +335,7 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, on
                 color={dragging ? accent : hover ? "#ffffff" : accent}
                 transparent
                 opacity={dragging ? 0.85 : hover ? 0.6 : 0.3}
-                toneMapped={false}
+               
                 side={THREE.DoubleSide}
               />
             </mesh>
@@ -345,46 +356,34 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, on
               <meshBasicMaterial transparent opacity={0} depthWrite={false} />
             </mesh>
           )}
-          <Flecha base={[0, 1.15, 0]} hacia={1} len={vLen} color={C_VEL} label={`v = ${fmt1(est.v)} m/s`} />
+          <Flecha base={[0, 1.15, 0]} hacia={1} len={vLen} color={C_VEL} label={`v = ${fmt1(est.v)} m/s`} lado="up" />
           {aLen > 0.06 && (
             <Flecha
+              lado="down"
               base={[0, 0.5, 0.42]}
               hacia={est.a >= 0 ? 1 : -1}
               len={aLen}
               color={est.a >= 0 ? C_ACC : C_BRK}
               grosor={0.05}
-              label={`a = ${fmt1(est.a)} m/s²`}
+              label={ancho ? `a = ${fmt1(est.a)} m/s²` : undefined}
             />
           )}
-          {/* lectura viva sobre el auto */}
-          <Html position={[0, 1.95, 0]} center distanceFactor={15} pointerEvents="none">
-            <div style={{
-              whiteSpace: "nowrap", padding: "4px 10px", borderRadius: 9, background: "rgba(4,10,22,0.92)",
-              border: `1px solid ${(frenando ? C_BRK : est.fase === 1 ? C_ACC : "#9fb4cc")}aa`, color: "#fff",
-              fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.5)", textAlign: "center",
-            }}>
-              <div style={{ fontWeight: 800, fontSize: 12 }}>
-                t = {fmt1(est.t)} s · x = {fmt0(est.x)} m
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 10.5, color: frenando ? C_BRK : est.fase === 1 ? C_ACC : "#9fb4cc" }}>
-                {est.fase === 1 ? "acelerando" : est.fase === 2 ? "frenando" : "detenido"} · {fmt0(est.v * 3.6)} km/h
-              </div>
-            </div>
-          </Html>
         </group>
       </group>
 
 
+
+      <Encuadre />
 
       <OrbitControls
         makeDefault
         enabled={!dragging}
         enablePan={false}
         minDistance={8}
-        maxDistance={28}
+        maxDistance={36}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0, 0.6, 0]}
+        target={[0, 0.1, 0]}
       />
 
       <EffectComposer enableNormalPass={false}>
@@ -393,6 +392,20 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, on
       </EffectComposer>
     </>
   );
+}
+
+/** Encuadre: la autopista completa entre la barra y la misión; en pantallas
+ *  angostas la cámara se aleja para que quepa a lo largo. */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const z = Math.min(34, Math.max(15, (SCENE_LEN / 2 + 2) / (Math.tan((42 / 2) * (Math.PI / 180)) * Math.min(1.6, aspect))));
+  useEffect(() => {
+    camera.position.set(0, z * 0.4, z);
+    camera.updateProjectionMatrix();
+  }, [camera, z]);
+  return null;
 }
 
 export default function CinematicaScene(props: CinematicaSceneProps) {

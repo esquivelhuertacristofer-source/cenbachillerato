@@ -1,0 +1,12 @@
+{
+  "escena": "Una comunidad sin agua lleva su caso por el tablero del Estado: tres niveles de gobierno y tres poderes",
+  "pregunta": "El pozo se secó y hacen falta pipas hoy. Si acudes a la Suprema Corte, ¿qué pasa con el tinaco?",
+  "opciones": [
+    { "id": "a", "texto": "Se llena más rápido por ser la máxima autoridad", "icono": "fa-bolt" },
+    { "id": "b", "texto": "Sigue vacío y suben los días sin agua", "icono": "fa-hourglass-half" },
+    { "id": "c", "texto": "Se llena solo hasta la mitad", "icono": "fa-droplet" }
+  ],
+  "correcta": "b",
+  "porque": "Cada poder tiene su función: la Corte interpreta la Constitución y no presta servicios. Llevar pipas le toca a quien ejecuta y administra en el municipio.",
+  "comoComprobarlo": "En «Caso Las Palmas», en el paso 1 toca la Suprema Corte y mira el tinaco y el contador de días; luego prueba con otra institución."
+}

@@ -1,26 +1,25 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — El Estado mexicano: elementos, poderes y conceptos.
  * Práctica experimental para CS-I-P01-A4 (Ciencias Sociales I · el Estado).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «Arma el Estado»       — arrastra los tres elementos constitutivos
- *     (territorio, población, gobierno) y rechaza los símbolos patrios.
- *  2. «División de poderes»  — clasifica cargos y funciones en los tres poderes
- *     (Ejecutivo / Legislativo / Judicial).
- *  3. «Conceptos clave»      — empareja cada concepto con su definición.
- *  + Cuestionario de comprensión.
+ * SIMULADOR. «El caso de Las Palmas»: una comunidad ficticia se queda sin agua y
+ * el alumno lleva el trámite por el tablero del Estado (3 niveles de gobierno ×
+ * 3 poderes). Elegir la institución equivocada ATORA el expediente: pasan los
+ * días y el tinaco sigue vacío; la secuencia correcta lo llena. Cifras y hechos
+ * del caso: simulación. Las instituciones se nombran como instituciones.
+ *  1. «Caso Las Palmas» — el simulador.
+ *  + los modos de siempre: «Arma el Estado», «División de poderes», «Conceptos
+ *    clave» (arrastre) y «Completa el texto», verbatim de CS-I·P01.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de CS-I·P01
- * (A1 lectura, A4 quiz, A5 V/F, A6 glosario).
+ * DOM + SVG (sin three.js).
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK } from "./_kit";
+import { LabShell, Bloque, Mesa, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { ESTADO_MEXICANO_HUECOS } from "./estado-mexicano-huecos";
@@ -36,19 +35,37 @@ import {
   DATO_ESTADO,
   type Poder,
 } from "./estado-mexicano-data";
+import {
+  CELDAS,
+  DIAS_INICIO,
+  DIAS_POR_ATORO,
+  NIVELES,
+  PASOS,
+  PODERES_COL,
+  celdaPorId,
+  porQueNo,
+  type Celda,
+} from "./estado-mexicano-sim";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 
 const NO = "#FF5E5E";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
+const AMBAR = "#FFC75A";
+const AGUA = "#4FB3FF";
 const RETO_KEY = "cen-estado-mexicano-reto";
+const RUTA_FOTOS = "/media/labs-sim/estado-mexicano";
 
-type Modo = "armar" | "poderes" | "conceptos" | "texto";
+type Modo = "caso" | "armar" | "poderes" | "conceptos" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "caso", label: "Caso Las Palmas", icono: "fa-faucet-drip" },
   { id: "armar", label: "Arma el Estado", icono: "fa-cubes-stacked" },
   { id: "poderes", label: "División de poderes", icono: "fa-scale-balanced" },
   { id: "conceptos", label: "Conceptos clave", icono: "fa-link" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
+
+type DragF = (id: string) => React.ButtonHTMLAttributes<HTMLButtonElement>;
+type DropF = (onDrop: (id: string) => void) => React.HTMLAttributes<HTMLDivElement>;
 
 const porNombre = (a: { nombre: string }, b: { nombre: string }) => a.nombre.localeCompare(b.nombre, "es");
 const porTexto = (a: { texto: string }, b: { texto: string }) => a.texto.localeCompare(b.texto, "es");
@@ -56,14 +73,11 @@ const porTermino = (a: { termino: string }, b: { termino: string }) => a.termino
 
 export function LabEstadoMexicano({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("armar");
+  const [modo, setModo] = useState<Modo>("caso");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
-  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
-  // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
   const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
@@ -78,9 +92,7 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
-  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
-  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
-  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
+  // Único punto por el que pasan aciertos y fallos: la partida se lleva aquí.
   const sfxOk = () => sonido && audioRef.current?.correcto();
   const sfxNo = () => {
     partida.error();
@@ -89,6 +101,38 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
+  };
+
+  // ── simulador: el caso de Las Palmas ──────────────────────────────────
+  const [resueltas, setResueltas] = useState<string[]>([]);
+  const [atoros, setAtoros] = useState(0);
+  const [atoroCelda, setAtoroCelda] = useState<string | null>(null);
+  const [atoroTexto, setAtoroTexto] = useState<string | null>(null);
+  const paso = resueltas.length;
+  const casoDone = paso >= PASOS.length;
+  const dias = DIAS_INICIO + atoros * DIAS_POR_ATORO;
+
+  const elegirCelda = (celdaId: string) => {
+    if (casoDone || resueltas.includes(celdaId)) return;
+    const p = PASOS[paso]!;
+    if (celdaId === p.correcta) {
+      setResueltas((r) => [...r, celdaId]);
+      setAtoroCelda(null);
+      setAtoroTexto(null);
+      if (paso + 1 >= PASOS.length) sfxOk();
+      else sfxPlace();
+    } else {
+      setAtoros((a) => a + 1);
+      setAtoroCelda(celdaId);
+      setAtoroTexto(porQueNo(p, celdaId));
+      sfxNo();
+    }
+  };
+  const resetCaso = () => {
+    setResueltas([]);
+    setAtoros(0);
+    setAtoroCelda(null);
+    setAtoroTexto(null);
   };
 
   // ── modo Armar (elementos constitutivos vs símbolos patrios) ──────────
@@ -108,10 +152,7 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
       setSelEl(null);
       setRechazo(null);
       sfxPlace();
-      if (nuevo.length >= NUM_CONSTITUTIVOS) {
-        sfxOk();
-        persistMejor(true, poderesDone, conceptosDone);
-      }
+      if (nuevo.length >= NUM_CONSTITUTIVOS) sfxOk();
     } else {
       setShakeEstado(true);
       setRechazo(el.detalle);
@@ -138,10 +179,7 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
       setUbicPoder((u) => ({ ...u, [itemId]: poder }));
       setSelItem(null);
       sfxPlace();
-      if (Object.keys(ubicPoder).length + 1 >= ITEMS_PODER.length) {
-        sfxOk();
-        persistMejor(armarDone, true, conceptosDone);
-      }
+      if (Object.keys(ubicPoder).length + 1 >= ITEMS_PODER.length) sfxOk();
     } else {
       setShakePoder(poder);
       sfxNo();
@@ -165,10 +203,7 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
       setEmpConcepto((e) => ({ ...e, [rowId]: true }));
       setSelConcepto(null);
       sfxPlace();
-      if (Object.keys(empConcepto).length + 1 >= CONCEPTOS.length) {
-        sfxOk();
-        persistMejor(armarDone, poderesDone, true);
-      }
+      if (Object.keys(empConcepto).length + 1 >= CONCEPTOS.length) sfxOk();
     } else {
       setShakeConRow(rowId);
       sfxNo();
@@ -186,19 +221,19 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
   const armarDone = dentroEstado.length >= NUM_CONSTITUTIVOS;
   const poderesDone = Object.keys(ubicPoder).length >= ITEMS_PODER.length;
   const conceptosDone = Object.keys(empConcepto).length >= CONCEPTOS.length;
-  const modosHechos = (armarDone ? 1 : 0) + (poderesDone ? 1 : 0) + (conceptosDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
-  const estrellas = partida.estrellasCon(modosHechos, 4);
+  const modosHechos = (casoDone ? 1 : 0) + (armarDone ? 1 : 0) + (poderesDone ? 1 : 0) + (conceptosDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar todos los modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 5);
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
-
-  const persistMejor = (a: boolean, b: boolean, c: boolean) => {
-    const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    registraEstrellas(est);
-  };
+  useEffect(() => {
+    if (estrellas > 0) registraEstrellas(estrellas);
+  }, [estrellas, registraEstrellas]);
 
   const objetivos = [
+    { txt: "Lleva el caso de Las Palmas por las instituciones correctas hasta resolverlo", done: casoDone },
+    { txt: "Resuélvelo sin atorar el trámite ni una vez", done: casoDone && atoros === 0 },
     { txt: "Arma el Estado con sus 3 elementos constitutivos", done: armarDone },
     { txt: "Clasifica los cargos en los 3 poderes", done: poderesDone },
     { txt: "Empareja los 5 conceptos con su definición", done: conceptosDone },
@@ -212,13 +247,9 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
     onDragStart: (e: React.DragEvent) => {
       e.dataTransfer.setData("text/plain", id);
       e.dataTransfer.effectAllowed = "move";
-      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
-      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
       e.currentTarget.setAttribute("data-arrastrando", "true");
     },
     onDragEnd: (e: React.DragEvent) => {
-      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
-      // queda medio borrada para siempre.
       e.currentTarget.removeAttribute("data-arrastrando");
       document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
     },
@@ -233,8 +264,6 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
       e.currentTarget.setAttribute("data-sobre", "true");
     },
     onDragLeave: (e: React.DragEvent) => {
-      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
-      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
       const r = e.currentTarget.getBoundingClientRect();
       const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
       if (fuera) e.currentTarget.removeAttribute("data-sobre");
@@ -260,482 +289,603 @@ export function LabEstadoMexicano({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "armar" ? resetArmar : modo === "poderes" ? resetPoderes : resetConceptos;
+  const resetActual =
+    modo === "texto" ? resetTexto : modo === "armar" ? resetArmar : modo === "poderes" ? resetPoderes : modo === "conceptos" ? resetConceptos : resetCaso;
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes estShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes estPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .est-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .est-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .est-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .est-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .est-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .est-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .est-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
-        .est-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .est-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .est-chip:active { cursor:grabbing; }
-        .est-bin { border-radius:16px; border:2px dashed ${T.lineStrong}; padding:16px; min-height:140px; transition:all .16s; }
-        .est-bin[data-shake="true"] { animation:estShake .4s; }
-        .est-zona { border-radius:18px; border:2.5px dashed ${T.lineStrong}; padding:22px; min-height:180px; transition:all .16s; }
-        .est-zona[data-shake="true"] { animation:estShake .4s; border-color:${NO}; }
-        .est-zona[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.07); }
-        .est-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:13px 15px; transition:all .16s; display:flex; align-items:center; gap:14px; }
-        .est-row[data-shake="true"] { animation:estShake .4s; border-color:${NO}; }
-        .est-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .est-drop { flex-shrink:0; min-width:170px; min-height:46px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; text-align:center; }
-        .est-drop[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .est-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .est-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .est-q:disabled{ cursor:default; }
-        .est-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .est-btn:hover { border-color:${T.lineStrong}; }
-        .est-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .est-bin[data-shake="true"], .est-zona[data-shake="true"], .est-row[data-shake="true"] { animation:none; } }
+  const lectura =
+    modo === "caso"
+      ? casoDone
+        ? `Caso resuelto · ${atoros} atoros`
+        : `Paso ${paso + 1} de ${PASOS.length} · ${dias} días sin agua`
+      : `${modosHechos}/5 · ${bestEstrellas}★`;
 
-        /* Cajón de teoría */
-        .est-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .est-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .est-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .est-drawer[data-open="true"] { transform:translateX(0); }
-        .est-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .est-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .est-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .est-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .est-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .est-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .est-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
 
-        /* Identidad del tablero */
-        .est-bin, .est-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .est-bin:nth-of-type(6n+1), .est-row:nth-of-type(6n+1) { --tono:188; }
-        .est-bin:nth-of-type(6n+2), .est-row:nth-of-type(6n+2) { --tono:262; }
-        .est-bin:nth-of-type(6n+3), .est-row:nth-of-type(6n+3) { --tono:44; }
-        .est-bin:nth-of-type(6n+4), .est-row:nth-of-type(6n+4) { --tono:152; }
-        .est-bin:nth-of-type(6n+5), .est-row:nth-of-type(6n+5) { --tono:330; }
-        .est-bin:nth-of-type(6n+6), .est-row:nth-of-type(6n+6) { --tono:18; }
-        .est-bin::before, .est-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .est-bin[data-done="true"], .est-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .est-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .est-chip:hover { transform:translateY(-2px); }
-        .est-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .est-chip, .est-chip:hover, .est-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
+      {modo === "caso" && (
+        <SimCaso
+          accent={accent}
+          resueltas={resueltas}
+          paso={paso}
+          casoDone={casoDone}
+          atoros={atoros}
+          dias={dias}
+          atoroCelda={atoroCelda}
+          atoroTexto={atoroTexto}
+          onElegir={elegirCelda}
+        />
+      )}
 
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="est-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="est-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="est-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="est-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+      {modo === "armar" && (
+        <PanelArmar elementosLibres={elementosLibres} dentroEstado={dentroEstado} selEl={selEl} setSelEl={setSelEl} intentarEl={intentarEl} shakeEstado={shakeEstado} rechazo={rechazo} accent={accent} numConstitutivos={NUM_CONSTITUTIVOS} dragProps={dragProps} dropProps={dropProps} />
+      )}
 
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="est-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="est-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="est-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="est-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="est-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="est-drawer-body">
-          <FichaTeorica data={ESTADO_MEXICANO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
+      {modo === "poderes" && (
+        <PanelPoderes itemsLibres={itemsLibres} ubicPoder={ubicPoder} selItem={selItem} setSelItem={setSelItem} intentarItem={intentarItem} shakePoder={shakePoder} dragProps={dragProps} dropProps={dropProps} />
+      )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — armar el Estado */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={ESTADO_MEXICANO_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
+      {modo === "conceptos" && (
+        <PanelConceptos conceptosLibres={conceptosLibres} empConcepto={empConcepto} selConcepto={selConcepto} setSelConcepto={setSelConcepto} intentarConcepto={intentarConcepto} shakeConRow={shakeConRow} dragProps={dragProps} dropProps={dropProps} />
+      )}
 
-          {modo === "armar" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra al Estado solo sus elementos constitutivos</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: armarDone ? OK : T.text3 }}>
-                    {dentroEstado.length}/{NUM_CONSTITUTIVOS}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
-                  El Estado clásico se define por tres elementos. Cuidado: hay distractores que <strong style={{ color: T.text2 }}>parecen</strong> parte del Estado pero no lo son.
-                </div>
-                {elementosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Solo quedaron los elementos correctos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {elementosLibres.map((e) => (
-                      <button key={e.id} className="est-chip" data-sel={selEl === e.id} onClick={() => setSelEl((s) => (s === e.id ? null : e.id))} {...dragProps(e.id)}>
-                        <i className={`fa-solid ${e.icono}`} style={{ fontSize: 13, opacity: 0.85 }} />
-                        {e.nombre}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <EstadoZona
-                dentroEstado={dentroEstado}
-                selEl={selEl}
-                shakeEstado={shakeEstado}
-                rechazo={rechazo}
-                onDropEl={intentarEl}
-                dropProps={dropProps}
-                accent={accent}
-              />
-            </>
-          )}
-
-          {/* MODO 2 — división de poderes (clasificar) */}
-          {modo === "poderes" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada cargo o función a su poder</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: poderesDone ? OK : T.text3 }}>
-                    {Object.keys(ubicPoder).length}/{ITEMS_PODER.length}
-                  </span>
-                </div>
-                {itemsLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {ITEMS_PODER.length} elementos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {itemsLibres.map((it) => (
-                      <button key={it.id} className="est-chip" data-sel={selItem === it.id} onClick={() => setSelItem((s) => (s === it.id ? null : it.id))} {...dragProps(it.id)}>
-                        <i className={`fa-solid ${it.esFuncion ? "fa-gears" : "fa-user"}`} style={{ fontSize: 12, opacity: 0.7 }} />
-                        {it.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsPoderes selItem={selItem} shakePoder={shakePoder} ubicPoder={ubicPoder} onBin={intentarItem} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — conceptos clave (emparejar) */}
-          {modo === "conceptos" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada concepto hasta su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: conceptosDone ? OK : T.text3 }}>
-                    {Object.keys(empConcepto).length}/{CONCEPTOS.length}
-                  </span>
-                </div>
-                {conceptosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {CONCEPTOS.length} conceptos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {conceptosLibres.map((c) => (
-                      <button key={c.id} className="est-chip" data-sel={selConcepto === c.id} onClick={() => setSelConcepto((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
-                        <i className="fa-solid fa-tag" style={{ fontSize: 12, opacity: 0.7 }} />
-                        {c.termino}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsConceptos selConcepto={selConcepto} shakeConRow={shakeConRow} empConcepto={empConcepto} onMatch={intentarConcepto} dropProps={dropProps} />
-            </>
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="est-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
-                </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Entiendes cómo se organiza el Estado!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "armar" && (
-                <>El Estado clásico tiene tres elementos: <strong style={{ color: T.text }}>territorio</strong>, <strong style={{ color: T.text }}>población</strong> y <strong style={{ color: T.text }}>gobierno</strong>. La bandera, el himno y el escudo son símbolos patrios, no elementos constitutivos.</>
-              )}
-              {modo === "poderes" && (
-                <>Recuerda: el <strong style={{ color: T.text }}>Ejecutivo</strong> aplica las leyes, el <strong style={{ color: T.text }}>Legislativo</strong> las hace y el <strong style={{ color: T.text }}>Judicial</strong> imparte justicia. Se controlan mutuamente (pesos y contrapesos).</>
-              )}
-              {modo === "conceptos" && (
-                <>Lee la definición y arrastra el concepto correcto. Ojo con <strong style={{ color: T.text }}>captura del Estado</strong> e <strong style={{ color: T.text }}>impunidad</strong>: describen fallas del Estado.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_ESTADO}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
- * ═══════════════════════════════════════════════════════════════════════════ */
-type DropFactory = (onDrop: (id: string) => void) => {
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-};
-
-function EstadoZona({
-  dentroEstado,
-  selEl,
-  shakeEstado,
-  rechazo,
-  onDropEl,
-  dropProps,
-  accent,
-}: {
-  dentroEstado: string[];
-  selEl: string | null;
-  shakeEstado: boolean;
-  rechazo: string | null;
-  onDropEl: (id: string) => void;
-  dropProps: DropFactory;
-  accent: string;
-}) {
-  const dentro = ELEMENTOS.filter((e) => dentroEstado.includes(e.id));
-  return (
-    <div
-      className="est-zona"
-      data-shake={shakeEstado}
-      data-armed={!!selEl}
-      onClick={() => selEl && onDropEl(selEl)}
-      {...dropProps((id) => onDropEl(id))}
-      style={{ cursor: selEl ? "pointer" : "default" }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 14 }}>
-        <span style={{ width: 38, height: 38, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, color: "#fff", background: `${accent}33` }}>
-          <i className="fa-solid fa-building-columns" />
-        </span>
-        <div>
-          <div style={{ fontSize: 16, fontWeight: 900, color: "#fff" }}>El Estado</div>
-          <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.3 }}>Suelta aquí sus elementos constitutivos</div>
-        </div>
-      </div>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-        {dentro.map((d) => (
-          <span key={d.id} style={{ animation: "estPop .25s ease", display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13.5, fontWeight: 800, color: "#fff", padding: "9px 15px", borderRadius: 999, background: `${OK}26`, border: `1px solid ${OK}66` }}>
-            <i className={`fa-solid ${d.icono}`} style={{ fontSize: 13 }} />
-            {d.nombre}
-          </span>
-        ))}
-        {dentro.length === 0 && <span style={{ fontSize: 12, color: T.text3, fontStyle: "italic" }}>Aún no has colocado ningún elemento…</span>}
-      </div>
-
-      {rechazo && (
-        <div style={{ marginTop: 14, fontSize: 12.5, color: "#fff", lineHeight: 1.45, display: "flex", gap: 9, padding: "10px 13px", borderRadius: 10, background: `${NO}1c`, border: `1px solid ${NO}55` }}>
-          <i className="fa-solid fa-triangle-exclamation" style={{ color: NO, marginTop: 2 }} />
-          <span>{rechazo}</span>
-        </div>
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={ESTADO_MEXICANO_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
       )}
     </div>
   );
-}
 
-function BinsPoderes({
-  selItem,
-  shakePoder,
-  ubicPoder,
-  onBin,
-  dropProps,
-}: {
-  selItem: string | null;
-  shakePoder: Poder | null;
-  ubicPoder: Record<string, Poder>;
-  onBin: (itemId: string, poder: Poder) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-      {(["ejecutivo", "legislativo", "judicial"] as Poder[]).map((poder) => {
-        const info = PODER_INFO[poder];
-        const dentro = ITEMS_PODER.filter((i) => ubicPoder[i.id] === poder);
-        return (
-          <div
-            key={poder}
-            className="est-bin"
-            data-shake={shakePoder === poder}
-            onClick={() => selItem && onBin(selItem, poder)}
-            {...dropProps((id) => onBin(id, poder))}
-            style={{ borderColor: `${info.color}66`, background: `${info.color}0d`, cursor: selItem ? "pointer" : "default" }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
-              <span style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#fff", background: `${info.color}33` }}>
-                <i className={`fa-solid ${info.icono}`} />
-              </span>
-              <div>
-                <div style={{ fontSize: 13.5, fontWeight: 900, color: "#fff" }}>{info.label}</div>
-                <div style={{ fontSize: 10, color: T.text3, lineHeight: 1.25 }}>{info.descripcion}</div>
-              </div>
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-              {dentro.map((d) => (
-                <span key={d.id} style={{ animation: "estPop .25s ease", fontSize: 12, fontWeight: 700, color: "#fff", padding: "6px 11px", borderRadius: 999, background: `${info.color}26`, border: `1px solid ${info.color}55` }}>
-                  {d.texto}
-                </span>
-              ))}
-              {dentro.length === 0 && <span style={{ fontSize: 11, color: T.text3, fontStyle: "italic" }}>Suelta aquí…</span>}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+  const pistaDe: Record<Modo, string> = {
+    caso: "Lee qué necesita cada paso: ¿hay que hacer una ley, aplicarla o juzgar? Y luego, ¿en qué nivel: municipio, estado o federación?",
+    armar: "El Estado clásico tiene tres elementos: territorio, población y gobierno. Bandera, himno y escudo son símbolos patrios.",
+    poderes: "El Ejecutivo aplica las leyes, el Legislativo las hace y el Judicial imparte justicia. Se controlan mutuamente.",
+    conceptos: "Lee la definición y elige el concepto. Captura del Estado e impunidad describen fallas del Estado.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
+  };
 
-function RowsConceptos({
-  selConcepto,
-  shakeConRow,
-  empConcepto,
-  onMatch,
-  dropProps,
-}: {
-  selConcepto: string | null;
-  shakeConRow: string | null;
-  empConcepto: Record<string, boolean>;
-  onMatch: (conId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {CONCEPTOS.map((c) => {
-        const done = empConcepto[c.id];
-        return (
-          <div
-            key={c.id}
-            className="est-row"
-            data-shake={shakeConRow === c.id}
-            data-done={done}
-            onClick={() => !done && selConcepto && onMatch(selConcepto, c.id)}
-            {...dropProps((id) => onMatch(id, c.id))}
-          >
-            <div className="est-drop" data-armed={!done && !!selConcepto} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
-              {done ? (
-                <span style={{ animation: "estPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <i className="fa-solid fa-tag" />
-                  {c.termino}
-                </span>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> concepto
-                </span>
-              )}
-            </div>
-            <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{c.definicion}</div>
-          </div>
-        );
-      })}
-    </div>
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
+            <>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
+                  {[1, 2, 3].map((s) => (
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
+                  ))}
+                </div>
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Entiendes cómo se organiza el Estado!" : "Termina todos los modos para ganar 2★; la tercera pide 2 errores o menos."}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={ESTADO_MEXICANO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Elementos del Estado" icono="fa-cubes-stacked">
+                {ELEMENTOS.map((e) => (
+                  <div key={e.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                    <strong style={{ color: T.text }}>{e.nombre}.</strong> {e.detalle}
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Los tres poderes" icono="fa-scale-balanced">
+                {PODERES_COL.map((p) => (
+                  <div key={p} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                    <strong style={{ color: T.text }}>{PODER_INFO[p].label}.</strong> {PODER_INFO[p].descripcion}
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Conceptos clave" icono="fa-link">
+                {CONCEPTOS.map((c) => (
+                  <div key={c.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                    <strong style={{ color: T.text }}>{c.termino}.</strong> {c.definicion}
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_ESTADO}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Cuestionario de comprensión
+ * Estilos
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const ESTILOS = (accent: string, rgba: string) => `
+  @keyframes estShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes estPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .est-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:12px; }
+  .est-panel { border-radius:16px; border:1px solid ${T.line}; background:${T.glass}; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .est-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:999px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:15px; font-weight:800; transition:all .14s; user-select:none; }
+  .est-chip:hover { border-color:${T.lineStrong}; transform:translateY(-2px); }
+  .est-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
+  .est-pill { display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:800; color:#fff; padding:7px 13px; border-radius:999px; border:1px solid ${T.line}; animation:estPop .25s ease; }
+  .est-bin { border-radius:16px; border:2px dashed ${T.lineStrong}; padding:14px; min-height:150px; display:flex; flex-direction:column; gap:10px; transition:all .16s; min-width:0; }
+  .est-zona { border-radius:18px; border:2.5px dashed ${T.lineStrong}; padding:18px; min-height:180px; display:flex; flex-direction:column; gap:14px; transition:all .16s; }
+  .est-zona[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.07); }
+  .est-bin[data-shake="true"], .est-zona[data-shake="true"], .est-row[data-shake="true"] { animation:estShake .4s; border-color:${NO}; }
+  .est-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:12px 14px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; transition:all .16s; }
+  .est-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
+  .est-drop { flex-shrink:0; min-width:140px; min-height:44px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+    display:flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; padding:4px 10px; text-align:center; }
+  .est-drop[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+  .est-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .est-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .est-q:disabled{ cursor:default; }
+  .est-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:12px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .est-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .est-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .est-btn-main { background:${accent}; color:#04121f; border-color:transparent; }
+  .est-foto { position:relative; aspect-ratio:16/9; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, rgba(79,179,255,0.25), rgba(52,211,153,0.2)); color:rgba(255,255,255,0.4); font-size:30px; }
+  .est-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .est-tablero { position:relative; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; }
+  .est-tablero svg.est-ruta { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+  .est-cabeza { font-size:14px; font-weight:900; text-align:center; text-transform:uppercase; letter-spacing:.06em; padding:6px 4px; border-radius:10px; z-index:1; }
+  .est-celda { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; text-align:center;
+    padding:10px 6px; min-height:104px; border-radius:14px; border:2px solid ${T.line}; background:#0b1a2c; color:#fff; font-size:14px; font-weight:700;
+    line-height:1.25; cursor:pointer; transition:transform .14s, border-color .14s, background .14s; min-width:0; }
+  .est-celda:hover:not(:disabled) { border-color:${T.lineStrong}; transform:translateY(-2px); }
+  .est-celda small { font-size:14px; color:${T.text3}; font-weight:700; }
+  .est-celda[data-ok="true"] { border-color:${OK}; background:#0c2a22; }
+  .est-celda[data-mal="true"] { border-color:${NO}; background:#2a0f14; animation:estShake .4s; }
+  .est-celda:disabled { cursor:default; }
+  .est-num { position:absolute; top:-9px; left:-9px; width:26px; height:26px; border-radius:50%; background:${OK}; color:#04121f; font-size:14px; font-weight:900;
+    display:flex; align-items:center; justify-content:center; }
+  .est-aviso { border-radius:16px; padding:14px 16px; display:grid; gap:8px; border:1.5px solid; }
+  @media (prefers-reduced-motion: reduce){
+    .est-bin[data-shake="true"], .est-zona[data-shake="true"], .est-row[data-shake="true"], .est-celda[data-mal="true"], .est-pill { animation:none; }
+    .est-chip, .est-chip:hover, .est-celda, .est-celda:hover:not(:disabled) { transform:none; transition:none; }
+  }
+`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Piezas
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function Etiqueta({ children }: { children: React.ReactNode }) {
+  return <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", color: T.text3 }}>{children}</div>;
+}
+
+function Listo({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+      <i className="fa-solid fa-circle-check" aria-hidden /> {children}
+    </div>
+  );
+}
+
+/** Foto con respaldo: si el archivo aún no existe, queda el degradado y el ícono. */
+function Foto({ clave, icono }: { clave: string; icono: string }) {
+  const [falla, setFalla] = useState(false);
+  return (
+    <div className="est-foto" aria-hidden>
+      <i className={`fa-solid ${icono}`} />
+      {!falla && <img src={`${RUTA_FOTOS}/${clave}.webp`} alt="" loading="lazy" onError={() => setFalla(true)} />}
+    </div>
+  );
+}
+
+/** Tinaco de Las Palmas: se llena con cada paso resuelto. */
+function Tinaco({ nivel, dias }: { nivel: number; dias: number }) {
+  const alto = 110 * nivel;
+  return (
+    <svg viewBox="0 0 140 170" role="img" aria-label={`Tinaco al ${Math.round(nivel * 100)} por ciento, ${dias} días sin agua`} style={{ width: "100%", maxWidth: 150, height: "auto" }}>
+      <rect x="25" y="30" width="90" height="110" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.35)" strokeWidth="3" />
+      <clipPath id="estTinacoClip">
+        <rect x="28" y="33" width="84" height="104" rx="11" />
+      </clipPath>
+      <g clipPath="url(#estTinacoClip)">
+        <rect x="25" y={140 - alto} width="90" height={alto} fill={AGUA} style={{ transition: "all .8s cubic-bezier(.2,.8,.2,1)" }} opacity="0.85" />
+      </g>
+      <rect x="55" y="18" width="30" height="14" rx="5" fill="rgba(255,255,255,0.35)" />
+      <path d="M70 140 L70 160" stroke="rgba(255,255,255,0.35)" strokeWidth="5" strokeLinecap="round" />
+      {nivel === 0 && (
+        <text x="70" y="92" textAnchor="middle" fontSize="16" fontWeight="900" fill={NO}>
+          SIN AGUA
+        </text>
+      )}
+      {nivel >= 1 && (
+        <text x="70" y="92" textAnchor="middle" fontSize="18" fontWeight="900" fill="#04121f">
+          ¡LLENO!
+        </text>
+      )}
+    </svg>
+  );
+}
+
+function SimCaso({
+  accent,
+  resueltas,
+  paso,
+  casoDone,
+  atoros,
+  dias,
+  atoroCelda,
+  atoroTexto,
+  onElegir,
+}: {
+  accent: string;
+  resueltas: string[];
+  paso: number;
+  casoDone: boolean;
+  atoros: number;
+  dias: number;
+  atoroCelda: string | null;
+  atoroTexto: string | null;
+  onElegir: (id: string) => void;
+}) {
+  const actual = casoDone ? null : PASOS[paso]!;
+  const centro = (c: Celda) => {
+    const col = PODERES_COL.indexOf(c.poder);
+    const fila = NIVELES.findIndex((n) => n.id === c.nivel);
+    return { x: ((col + 0.5) / 3) * 300, y: ((fila + 0.5) / 3) * 300 };
+  };
+  const puntos = resueltas
+    .map((id) => celdaPorId(id))
+    .filter((c): c is Celda => !!c)
+    .map((c) => {
+      const p = centro(c);
+      return `${p.x},${p.y}`;
+    })
+    .join(" ");
+  return (
+    <>
+      <div className="est-panel">
+        <Foto clave="las-palmas" icono="fa-faucet-drip" />
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ flex: "1 1 240px", minWidth: 0, display: "grid", gap: 8 }}>
+            <Etiqueta>
+              {casoDone ? "Caso cerrado" : `Paso ${paso + 1} de ${PASOS.length}`}
+            </Etiqueta>
+            <div style={{ fontSize: 15, color: T.text, lineHeight: 1.5, fontWeight: 700 }}>
+              {actual ? actual.situacion : "El agua volvió a Las Palmas. Recorriste los tres poderes y los tres niveles de gobierno en el orden que pedía el problema."}
+            </div>
+            {paso > 0 && (
+              <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                <i className="fa-solid fa-circle-check" aria-hidden style={{ color: OK, marginRight: 8 }} />
+                {PASOS[paso - 1]!.resuelto}
+              </div>
+            )}
+          </div>
+          <div style={{ flex: "0 1 150px", display: "grid", justifyItems: "center", gap: 4 }}>
+            <Tinaco nivel={resueltas.length / PASOS.length} dias={dias} />
+            <div style={{ fontSize: 14, fontWeight: 800, color: casoDone ? OK : atoros > 0 ? NO : T.text2, textAlign: "center" }}>
+              {casoDone ? "Agua restablecida" : `${dias} días sin agua`}
+            </div>
+            <div style={{ fontSize: 14, color: T.text3 }}>simulación</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="est-panel">
+        <Etiqueta>
+          <i className="fa-solid fa-map" aria-hidden style={{ color: accent, marginRight: 8 }} />
+          {casoDone ? "El camino del expediente" : "Toca la institución que debe actuar"}
+        </Etiqueta>
+        <div className="est-tablero">
+          {PODERES_COL.map((p) => (
+            <div key={p} className="est-cabeza" style={{ background: `${PODER_INFO[p].color}22`, color: PODER_INFO[p].color }}>
+              {PODER_INFO[p].label.replace("Poder ", "")}
+            </div>
+          ))}
+        </div>
+        <div className="est-tablero" style={{ gridAutoRows: "minmax(104px, auto)" }}>
+          <svg className="est-ruta" viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden>
+            {resueltas.length > 1 && <polyline points={puntos} fill="none" stroke={OK} strokeWidth="4" strokeDasharray="8 6" vectorEffect="non-scaling-stroke" />}
+          </svg>
+          {NIVELES.flatMap((n) =>
+            PODERES_COL.map((p) => {
+              const c = CELDAS.find((x) => x.nivel === n.id && x.poder === p)!;
+              const idx = resueltas.indexOf(c.id);
+              return (
+                <button
+                  key={c.id}
+                  className="est-celda"
+                  data-ok={idx >= 0}
+                  data-mal={atoroCelda === c.id}
+                  disabled={casoDone || idx >= 0}
+                  onClick={() => onElegir(c.id)}
+                  aria-label={`${c.nombre}, nivel ${n.label}`}
+                >
+                  {idx >= 0 && <span className="est-num">{idx + 1}</span>}
+                  <i className={`fa-solid ${c.icono}`} aria-hidden style={{ fontSize: 20, color: PODER_INFO[p].color }} />
+                  <span>{c.nombre}</span>
+                  <small>{n.label}</small>
+                </button>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {atoroTexto && !casoDone && (
+        <div className="est-aviso" role="alert" style={{ borderColor: NO, background: `${NO}14` }}>
+          <strong style={{ color: NO, fontSize: 15 }}>
+            <i className="fa-solid fa-hourglass-half" aria-hidden style={{ marginRight: 8 }} />
+            Expediente atorado: +{DIAS_POR_ATORO} días sin agua (simulación)
+          </strong>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{atoroTexto}</div>
+        </div>
+      )}
+      {casoDone && (
+        <div className="est-aviso" role="status" style={{ borderColor: OK, background: `${OK}12` }}>
+          <strong style={{ color: OK, fontSize: 15 }}>
+            <i className="fa-solid fa-circle-check" aria-hidden style={{ marginRight: 8 }} />
+            {PASOS[PASOS.length - 1]!.resuelto}
+          </strong>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+            {atoros === 0
+              ? "Sin un solo atoro: cada paso llegó a la institución que le tocaba. Esa es la división de poderes funcionando."
+              : `Se atoró ${atoros} ${atoros === 1 ? "vez" : "veces"} (+${atoros * DIAS_POR_ATORO} días). Reinicia y busca el camino sin atorarlo.`}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function PanelArmar({
+  elementosLibres,
+  dentroEstado,
+  selEl,
+  setSelEl,
+  intentarEl,
+  shakeEstado,
+  rechazo,
+  accent,
+  numConstitutivos,
+  dragProps,
+  dropProps,
+}: {
+  elementosLibres: typeof ELEMENTOS;
+  dentroEstado: string[];
+  selEl: string | null;
+  setSelEl: (f: (s: string | null) => string | null) => void;
+  intentarEl: (id: string) => void;
+  shakeEstado: boolean;
+  rechazo: string | null;
+  accent: string;
+  numConstitutivos: number;
+  dragProps: DragF;
+  dropProps: DropF;
+}) {
+  return (
+    <Mesa>
+      <div className="est-panel">
+        <Etiqueta>Candidatos · {dentroEstado.length}/{numConstitutivos}</Etiqueta>
+        <div style={{ fontSize: 14, color: T.text2 }}>Cuidado: hay distractores que parecen parte del Estado.</div>
+        {elementosLibres.length === 0 ? (
+          <Listo>¡Solo quedaron los elementos correctos!</Listo>
+        ) : (
+          elementosLibres.map((e) => (
+            <button key={e.id} className="est-chip" data-sel={selEl === e.id} onClick={() => setSelEl((s) => (s === e.id ? null : e.id))} {...dragProps(e.id)}>
+              <i className={`fa-solid ${e.icono}`} aria-hidden />
+              {e.nombre}
+            </button>
+          ))
+        )}
+      </div>
+      <div
+        className="est-zona"
+        data-shake={shakeEstado}
+        data-armed={!!selEl}
+        onClick={() => selEl && intentarEl(selEl)}
+        {...dropProps((id) => intentarEl(id))}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+          <i className="fa-solid fa-building-columns" aria-hidden style={{ color: accent, fontSize: 22 }} />
+          <div>
+            <strong style={{ fontSize: 17 }}>El Estado</strong>
+            <div style={{ fontSize: 14, color: T.text3 }}>Suelta aquí sus elementos constitutivos</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          {ELEMENTOS.filter((e) => dentroEstado.includes(e.id)).map((d) => (
+            <span key={d.id} className="est-pill" style={{ background: `${OK}26`, borderColor: `${OK}66` }}>
+              <i className={`fa-solid ${d.icono}`} aria-hidden /> {d.nombre}
+            </span>
+          ))}
+          {dentroEstado.length === 0 && <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>Aún no has colocado ningún elemento…</span>}
+        </div>
+        {rechazo && (
+          <div style={{ fontSize: 14, lineHeight: 1.45, display: "flex", gap: 9, padding: "10px 13px", borderRadius: 10, background: `${NO}1c`, border: `1px solid ${NO}55` }}>
+            <i className="fa-solid fa-triangle-exclamation" aria-hidden style={{ color: NO, marginTop: 3 }} />
+            <span>{rechazo}</span>
+          </div>
+        )}
+      </div>
+    </Mesa>
+  
+  );
+}
+
+function PanelPoderes({
+  itemsLibres,
+  ubicPoder,
+  selItem,
+  setSelItem,
+  intentarItem,
+  shakePoder,
+  dragProps,
+  dropProps,
+}: {
+  itemsLibres: typeof ITEMS_PODER;
+  ubicPoder: Record<string, Poder>;
+  selItem: string | null;
+  setSelItem: (f: (s: string | null) => string | null) => void;
+  intentarItem: (id: string, p: Poder) => void;
+  shakePoder: Poder | null;
+  dragProps: DragF;
+  dropProps: DropF;
+}) {
+  return (
+    <Mesa>
+      <div className="est-panel">
+        <Etiqueta>Cargos y funciones · {Object.keys(ubicPoder).length}/{ITEMS_PODER.length}</Etiqueta>
+        {itemsLibres.length === 0 ? (
+          <Listo>¡Clasificaste los {ITEMS_PODER.length} elementos!</Listo>
+        ) : (
+          itemsLibres.map((it) => (
+            <button key={it.id} className="est-chip" data-sel={selItem === it.id} onClick={() => setSelItem((s) => (s === it.id ? null : it.id))} {...dragProps(it.id)}>
+              <i className={`fa-solid ${it.esFuncion ? "fa-gears" : "fa-user"}`} aria-hidden />
+              {it.texto}
+            </button>
+          ))
+        )}
+      </div>
+      <div className="est-grid">
+        {PODERES_COL.map((poder) => {
+          const info = PODER_INFO[poder];
+          const dentro = ITEMS_PODER.filter((i) => ubicPoder[i.id] === poder);
+          return (
+            <div
+              key={poder}
+              className="est-bin"
+              data-shake={shakePoder === poder}
+              onClick={() => selItem && intentarItem(selItem, poder)}
+              {...dropProps((id) => intentarItem(id, poder))}
+              style={{ borderColor: `${info.color}66`, background: `${info.color}0d` }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                <i className={`fa-solid ${info.icono}`} aria-hidden style={{ color: info.color, fontSize: 18 }} />
+                <strong style={{ fontSize: 15 }}>{info.label}</strong>
+              </div>
+              <div style={{ fontSize: 14, color: T.text2 }}>{info.descripcion}</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                {dentro.map((d) => (
+                  <span key={d.id} className="est-pill" style={{ background: `${info.color}26`, borderColor: `${info.color}55` }}>
+                    {d.texto}
+                  </span>
+                ))}
+                {dentro.length === 0 && <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>Suelta aquí…</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </Mesa>
+  
+  );
+}
+
+function PanelConceptos({
+  conceptosLibres,
+  empConcepto,
+  selConcepto,
+  setSelConcepto,
+  intentarConcepto,
+  shakeConRow,
+  dragProps,
+  dropProps,
+}: {
+  conceptosLibres: typeof CONCEPTOS;
+  empConcepto: Record<string, boolean>;
+  selConcepto: string | null;
+  setSelConcepto: (f: (s: string | null) => string | null) => void;
+  intentarConcepto: (a: string, b: string) => void;
+  shakeConRow: string | null;
+  dragProps: DragF;
+  dropProps: DropF;
+}) {
+  return (
+    <Mesa>
+      <div className="est-panel">
+        <Etiqueta>Conceptos · {Object.keys(empConcepto).length}/{CONCEPTOS.length}</Etiqueta>
+        {conceptosLibres.length === 0 ? (
+          <Listo>¡Emparejaste los {CONCEPTOS.length} conceptos!</Listo>
+        ) : (
+          conceptosLibres.map((c) => (
+            <button key={c.id} className="est-chip" data-sel={selConcepto === c.id} onClick={() => setSelConcepto((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
+              <i className="fa-solid fa-tag" aria-hidden />
+              {c.termino}
+            </button>
+          ))
+        )}
+      </div>
+      <div style={{ display: "grid", gap: 11 }}>
+        {CONCEPTOS.map((c) => {
+          const done = empConcepto[c.id];
+          return (
+            <div
+              key={c.id}
+              className="est-row"
+              data-shake={shakeConRow === c.id}
+              data-done={done}
+              onClick={() => !done && selConcepto && intentarConcepto(selConcepto, c.id)}
+              {...dropProps((id) => intentarConcepto(id, c.id))}
+            >
+              <div className="est-drop" data-armed={!done && !!selConcepto}>
+                {done ? <strong>{c.termino}</strong> : <span>concepto</span>}
+              </div>
+              <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{c.definicion}</div>
+            </div>
+          );
+        })}
+      </div>
+    </Mesa>
+  
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Cuestionario de comprensión (pestaña Reto)
  * ═══════════════════════════════════════════════════════════════════════════ */
 function QuizCard({
   accent,
@@ -774,90 +924,71 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
-        <Eyebrow>
-          <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
-          Comprueba lo aprendido
-        </Eyebrow>
-        {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
-            <i className="fa-solid fa-circle-check" /> Aprobado
-          </span>
-        )}
+    <div style={{ display: "grid", gap: 16 }}>
+      <style>{ESTILOS(accent, rgba)}</style>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+        Cinco preguntas sobre el Estado, los poderes y la ciudadanía.
+        {aprobado && <strong style={{ color: OK }}> Aprobado.</strong>}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
-        Cinco preguntas sobre el Estado, sus elementos, los tres poderes y sus conceptos clave. Responde y pulsa «Comprobar».
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-        {QUIZ.map((q, qi) => {
-          const elegida = resp[qi];
-          return (
-            <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
-                <span style={{ color: accent }}>{qi + 1}.</span>
-                <span>{q.pregunta}</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
-                {q.opciones.map((op, oi) => {
-                  const sel = elegida === oi;
-                  const esCorrecta = oi === q.correcta;
-                  let borde = T.line;
-                  let fondo = T.glass;
-                  let colorTxt = T.text2;
-                  if (comprobado && esCorrecta) {
-                    borde = OK;
-                    fondo = `${OK}1c`;
-                    colorTxt = "#fff";
-                  } else if (comprobado && sel && !esCorrecta) {
-                    borde = NO;
-                    fondo = `${NO}1c`;
-                    colorTxt = "#fff";
-                  } else if (!comprobado && sel) {
-                    borde = accent;
-                    fondo = `rgba(${rgba},0.16)`;
-                    colorTxt = "#fff";
-                  }
-                  return (
-                    <button key={oi} className="est-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
-                        {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
-                      </span>
-                      <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
-                  <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
-                  <span>{q.retro}</span>
-                </div>
-              )}
+      {QUIZ.map((q, qi) => {
+        const elegida = resp[qi];
+        return (
+          <div key={qi}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 10 }}>
+              <span style={{ color: accent }}>{qi + 1}.</span> {q.pregunta}
             </div>
-          );
-        })}
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22, flexWrap: "wrap" }}>
+            <div style={{ display: "grid", gap: 8 }}>
+              {q.opciones.map((op, oi) => {
+                const sel = elegida === oi;
+                const esCorrecta = oi === q.correcta;
+                let borde = T.line;
+                let fondo = T.glass;
+                let colorTxt = T.text2;
+                if (comprobado && esCorrecta) {
+                  borde = OK;
+                  fondo = `${OK}1c`;
+                  colorTxt = "#fff";
+                } else if (comprobado && sel && !esCorrecta) {
+                  borde = NO;
+                  fondo = `${NO}1c`;
+                  colorTxt = "#fff";
+                } else if (!comprobado && sel) {
+                  borde = accent;
+                  fondo = `rgba(${rgba},0.16)`;
+                  colorTxt = "#fff";
+                }
+                return (
+                  <button key={oi} className="est-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
+                    <span style={{ width: 24, height: 24, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: "1.5px solid currentColor" }}>
+                      {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
+                    </span>
+                    <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {comprobado && (
+              <div style={{ marginTop: 8, fontSize: 14, color: T.text2, lineHeight: 1.5, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                {q.retro}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         {!comprobado ? (
-          <button className="est-btn" style={{ background: accent, color: "#04121f", border: "none" }} onClick={comprobar} disabled={!todas}>
-            <i className="fa-solid fa-list-check" />
-            Comprobar
+          <button className="est-btn est-btn-main" onClick={comprobar} disabled={!todas}>
+            <i className="fa-solid fa-list-check" /> Comprobar
           </button>
         ) : (
           <button className="est-btn" onClick={reintentar}>
-            <i className="fa-solid fa-rotate-left" />
-            Reintentar
+            <i className="fa-solid fa-rotate-left" /> Reintentar
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
-            <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
-            {aciertos} / {total} correctas
-            {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}
-          </div>
+          <strong style={{ fontSize: 14, color: aprobadoAhora ? OK : NO }}>
+            {aciertos} / {total} correctas{!aprobadoAhora && " · revisa las marcadas"}
+          </strong>
         )}
       </div>
     </div>

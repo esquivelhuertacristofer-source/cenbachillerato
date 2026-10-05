@@ -1,0 +1,12 @@
+{
+  "escena": "La oficina de objetos perdidos de una escuela ficticia, con un lápiz sin dueño y dos alumnos en la fila",
+  "pregunta": "Si la etiqueta dice «Ana» y «pencil» sin ninguna marca en medio, ¿qué hace el empleado?",
+  "opciones": [
+    { "id": "a", "texto": "Se lo da a Ana", "icono": "fa-hand-holding" },
+    { "id": "b", "texto": "Lo deja en la caja", "icono": "fa-box-open" },
+    { "id": "c", "texto": "Se lo da a otro alumno", "icono": "fa-user-group" }
+  ],
+  "correcta": "b",
+  "porque": "Sin apóstrofo y s, «Ana pencil» no dice que el lápiz sea de Ana: se lee como dos palabras sueltas. Sin posesión clara, el empleado no entrega nada.",
+  "comoComprobarlo": "En «Saxon genitive», busca un caso de dueño singular y elige la opción del guion «—» en lugar de 's; observa dónde queda el objeto."
+}

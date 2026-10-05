@@ -1,0 +1,12 @@
+{
+  "escena": "Una célula animal en 3D que gira; puedes cambiar a vegetal y a procariota",
+  "pregunta": "Al pasar de célula animal a vegetal, ¿qué estructuras nuevas aparecen?",
+  "opciones": [
+    { "id": "a", "texto": "Lisosomas en mayor cantidad y tamaño", "icono": "fa-circle" },
+    { "id": "b", "texto": "Cloroplastos y pared celular", "icono": "fa-leaf" },
+    { "id": "c", "texto": "Un segundo núcleo en el centro", "icono": "fa-circle-dot" }
+  ],
+  "correcta": "b",
+  "porque": "Las células vegetales hacen fotosíntesis en sus cloroplastos y se sostienen con una pared celular rígida. Además tienen una gran vacuola central; los lisosomas son propios de la célula animal.",
+  "comoComprobarlo": "Cambia entre Célula animal y Célula vegetal con los botones de arriba y compara la lista de organelos en la pestaña Organelos."
+}

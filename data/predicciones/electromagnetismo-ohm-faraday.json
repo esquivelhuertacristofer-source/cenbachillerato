@@ -1,0 +1,12 @@
+{
+  "escena": "Un circuito con una fuente y una resistencia; los electrones recorren el cable",
+  "pregunta": "Con el mismo voltaje, si duplicas la resistencia, ¿qué pasa con la corriente?",
+  "opciones": [
+    { "id": "a", "texto": "Se hace el doble de grande", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Baja a la mitad", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se queda exactamente igual", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Según la ley de Ohm, I = V/R. Con V fijo, una resistencia el doble de grande deja pasar la mitad de corriente: los electrones avanzan más despacio.",
+  "comoComprobarlo": "En Controles, deja la tensión como está y mueve el deslizador de resistencia R; mira los electrones y la lectura de corriente I."
+}

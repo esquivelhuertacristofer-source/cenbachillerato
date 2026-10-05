@@ -7,6 +7,10 @@
  * ondulatorio: sonido, mar y terremotos", UAC CNEYT-V "La energía en procesos
  * de vida diaria").
  *
+ * Experimento central: v = λ·f. El alumno sube la frecuencia (o cambia de
+ * medio) y VE cómo la regla de λ se acorta (o se alarga) mientras el producto
+ * λ × f sigue valiendo lo mismo en el medidor.
+ *
  * Tres modos, según la simulación verbatim del A2:
  *  (a) Onda          — generador de una onda mecánica: amplitud, frecuencia y
  *      medio fijan la longitud de onda por v = λ·f (sube f y λ baja).
@@ -20,7 +24,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { ONDAS_FICHA } from "./ondas-amplitud-frecuencia-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
@@ -35,8 +40,6 @@ import {
   fmt0, fmt1, fmt2, fmtLambda,
 } from "./ondas-data";
 
-import { TableroObjetivos } from "./_objetivos";
-
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-ondas-amplitud-frecuencia-reto";
 
@@ -45,7 +48,7 @@ const OndasScene = dynamic(() => import("./OndasScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-wave-square fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Generando el frente de onda…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Generando el frente de onda…</span>
     </div>
   ),
 });
@@ -53,11 +56,12 @@ const OndasScene = dynamic(() => import("./OndasScene"), {
 const C_ONDA = "#7dd3fc";
 const C_INTER = "#34D399";
 const C_DOPP = "#f59e0b";
+const C_ESTAC = "#a78bfa";
 
-const MODOS: { id: Modo; etq: string; icono: string; col: string; desc: string }[] = [
-  { id: "onda",          etq: "Onda",          icono: "fa-wave-square",       col: C_ONDA,  desc: "Generador de onda: v = λ·f" },
-  { id: "interferencia", etq: "Interferencia", icono: "fa-water",             col: C_INTER, desc: "Dos ondas: suma, cancelación y estacionaria" },
-  { id: "doppler",       etq: "Doppler",       icono: "fa-tower-broadcast",   col: C_DOPP,  desc: "Fuente en movimiento: agudo y grave" },
+const MODOS: { id: Modo; etq: string; icono: string }[] = [
+  { id: "onda", etq: "Onda", icono: "fa-wave-square" },
+  { id: "interferencia", etq: "Interferencia", icono: "fa-water" },
+  { id: "doppler", etq: "Doppler", icono: "fa-tower-broadcast" },
 ];
 
 const FASE_PRESETS = [
@@ -66,6 +70,9 @@ const FASE_PRESETS = [
   { etq: "oposición (π)", phi: Math.PI },
   { etq: "3π/2", phi: (3 * Math.PI) / 2 },
 ];
+
+type Marcas = { f: boolean; medio: boolean; inter: boolean; est: boolean; dopp: boolean; vs: boolean };
+const MARCAS_0: Marcas = { f: false, medio: false, inter: false, est: false, dopp: false, vs: false };
 
 export function LabOndas({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -81,9 +88,9 @@ export function LabOndas({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  // teoría (cajón deslizable) y sonido
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
+  // Misiones «enganchadas»: una vez cumplidas no se des-cumplen al cambiar de modo.
+  const [marcas, setMarcas] = useState<Marcas>(MARCAS_0);
   const audioRef = useRef<LabSfx | null>(null);
 
   const toggleSonido = useCallback(async () => {
@@ -124,10 +131,23 @@ export function LabOndas({ color }: PracticaLabProps) {
   const inter = resolverInterferencia(A, phi);
   const dopp = resolverDoppler(fd, vs);
 
-  const modoActual = MODOS.find((x) => x.id === modo)!;
-  const modoCol = modoActual.col;
+  const tipoCol = estacionaria ? C_ESTAC : inter.tipo === "constructiva" ? C_INTER : inter.tipo === "destructiva" ? "#f87171" : "#fbbf24";
 
-  const tipoCol = estacionaria ? "#a78bfa" : inter.tipo === "constructiva" ? C_INTER : inter.tipo === "destructiva" ? "#f87171" : "#fbbf24";
+  // Ajuste durante el render (patrón de React): engancha cada misión al cumplirse.
+  const ahora: Marcas = {
+    f: f !== F_DEF,
+    medio: medioId !== MEDIO_DEF,
+    inter: modo === "interferencia",
+    est: estacionaria,
+    dopp: modo === "doppler",
+    vs: modo === "doppler" && vs >= 60,
+  };
+  if ((Object.keys(ahora) as (keyof Marcas)[]).some((k) => ahora[k] && !marcas[k])) {
+    setMarcas({
+      f: marcas.f || ahora.f, medio: marcas.medio || ahora.medio, inter: marcas.inter || ahora.inter,
+      est: marcas.est || ahora.est, dopp: marcas.dopp || ahora.dopp, vs: marcas.vs || ahora.vs,
+    });
+  }
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -135,7 +155,7 @@ export function LabOndas({ color }: PracticaLabProps) {
         <i className="fa-solid fa-wave-square" />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>v = λ · f</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 420, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 420, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero los números siguen aquí.
         {modo === "onda" && ` En ${medio.nombre.toLowerCase()} (v = ${fmt0(medio.v)} m/s) a f = ${fmt0(f)} Hz: λ = ${fmtLambda(onda.lambda)}.`}
         {modo === "interferencia" && ` Con φ = ${fmt2(phi)} rad la resultante es ${inter.tipo} (A_res = ${fmt2(inter.Ares)}).`}
@@ -144,463 +164,277 @@ export function LabOndas({ color }: PracticaLabProps) {
     </div>
   );
 
+  // Lo corto va sobre la escena (≤ 10 palabras).
+  const lectura =
+    modo === "onda" ? <>f = {fmt0(f)} Hz → λ = {fmtLambda(onda.lambda)}</>
+    : modo === "interferencia" ? (estacionaria ? <>Nodos quietos, antinodos al máximo</> : <>{inter.tipo}: A_res = {fmt2(inter.Ares)}</>)
+    : <>Adelante {fmt0(dopp.fAcerca)} Hz · atrás {fmt0(dopp.fAleja)} Hz</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes onPulse { 0%,100%{ box-shadow:0 0 0 0 var(--onc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .on-live-dot { animation: onPulse 1.6s ease-in-out infinite; }
-        .on-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .on-grid { grid-template-columns: 1fr; } }
-        .on-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .on-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .on-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .on-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--onc) 0%, var(--onc) var(--onfill), rgba(255,255,255,0.12) var(--onfill), rgba(255,255,255,0.12) 100%); }
-        .on-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--onc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .on-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--onc); cursor:pointer; }
-        .on-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .on-tab { cursor:pointer; border:1px solid var(--onc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .on-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); }
-        .on-tab:hover { background:rgba(255,255,255,0.06); }
-        .on-media { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        @media (max-width: 1000px){ .on-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="on-tabs">
-          {MODOS.map((mo) => {
-            const on = mo.id === modo;
-            return (
-              <button key={mo.id} className="on-tab" data-on={on} onClick={() => cambiarModo(mo.id)}
-                style={{ ["--onc" as string]: mo.col, background: on ? `${mo.col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? mo.col : "inherit" }}><i className={`fa-solid ${mo.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{mo.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{mo.desc}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="on-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <OndasScene modo={modo} A={A} f={f} medioId={medioId} phi={phi} estacionaria={estacionaria} fd={fd} vs={vs} playing={playing} accent={accent} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="on-live-dot" style={{ ["--onc" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{modoActual.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="on-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reproducir"}>
-                <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="on-icobtn" onClick={resetModo} title="Reiniciar a los valores de inicio">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <OndasScene modo={modo} A={A} f={f} medioId={medioId} phi={phi} estacionaria={estacionaria} fd={fd} vs={vs} playing={playing} accent={accent} resetNonce={resetNonce} />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.etq, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reproducir"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar a los valores de inicio" onClick={resetModo} />
+        </>
+      }
+      leyenda={
+        modo === "onda" ? <MedidorV f={f} lambda={onda.lambda} v={medio.v} col={medio.color} />
+        : modo === "interferencia" ? (
+          <>
+            <LegItem col="#fbbf24" txt="onda 1" />
+            <LegItem col="#38bdf8" txt="onda 2" />
+            <LegItem col={tipoCol} txt="resultante" />
+          </>
+        ) : (
+          <>
+            <LegItem col="#f87171" txt="adelante: agudo" />
+            <LegItem col="#60a5fa" txt="atrás: grave" />
+          </>
+        )
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Explora el modo Onda: sube la frecuencia y observa cómo baja λ", done: marcas.f },
+        { txt: "Cambia el medio a agua o acero: con la misma f, λ crece (v = λ·f)", done: marcas.medio },
+        { txt: "Experimenta con interferencia constructiva y destructiva", done: marcas.inter },
+        { txt: "Activa la onda estacionaria y localiza los nodos", done: marcas.est },
+        { txt: "Observa el Efecto Doppler con la fuente en movimiento", done: marcas.dopp },
+        { txt: "Sube la rapidez de la fuente a 60 m/s o más y compara los dos tonos", done: marcas.vs },
+        { txt: "Resuelve el reto evaluable de la actividad", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
               {modo === "onda" && (
-                <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                  <i className="fa-solid fa-wave-square" style={{ color: C_ONDA, marginRight: 7 }} />
-                  {medio.nombre}: v = {fmt0(medio.v)} m/s · f = {fmt0(f)} Hz · λ = {fmtLambda(onda.lambda)} · T = {fmt2(onda.T * 1000)} ms
-                </div>
-              )}
-              {modo === "interferencia" && (
-                <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                  <i className="fa-solid fa-water" style={{ color: tipoCol, marginRight: 7 }} />
-                  {estacionaria ? "onda estacionaria — nodos fijos y antinodos cada λ/2" : `desfase φ = ${fmt2(phi)} rad → ${inter.tipo} · A_res = ${fmt2(inter.Ares)} (${fmt0(inter.pct * 100)}%)`}
-                </div>
-              )}
-              {modo === "doppler" && (
-                <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                  <i className="fa-solid fa-tower-broadcast" style={{ color: C_DOPP, marginRight: 7 }} />
-                  f = {fmt0(fd)} Hz · vs = {fmt0(vs)} m/s → adelante {fmt0(dopp.fAcerca)} Hz (agudo) · atrás {fmt0(dopp.fAleja)} Hz (grave)
-                </div>
-              )}
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>
-                {modo === "onda" && "Sube la frecuencia: la longitud de onda baja (v = λf). Cambia de medio: en agua y acero el sonido va más rápido, así que λ crece. La esfera blanca solo sube y baja: el medio no viaja, la perturbación sí."}
-                {modo === "interferencia" && "Mueve el desfase: en fase se suman (constructiva), en oposición se cancelan (destructiva). Activa la onda estacionaria para ver los nodos fijos y los antinodos."}
-                {modo === "doppler" && "Sube la rapidez de la fuente: por delante los frentes se aprietan (más frecuencia, tono agudo) y por detrás se separan (grave). Así suena la sirena de la ambulancia al pasar."}
-              </div>
-            </div>
-          </div>
-
-          {/* Controles del modo */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                {modo === "onda" ? "Amplitud, frecuencia y medio" : modo === "interferencia" ? "Desfase y tipo de superposición" : "Frecuencia y rapidez de la fuente"}
-              </Eyebrow>
-            </div>
-
-            {modo === "onda" && (
-              <>
-                <Deslizador label="frecuencia  f" icon="fa-gauge-high" colr={C_ONDA}
-                  valor={`${fmt0(f)} Hz`} min={F_MIN} max={F_MAX} step={1} value={f}
-                  onChange={setF} hintL={`${fmt0(F_MIN)} Hz`} hintR={`${fmt0(F_MAX)} Hz`} />
-                <div style={{ height: 14 }} />
-                <Deslizador label="amplitud  A" icon="fa-up-down" colr={C_ONDA}
-                  valor={fmt2(A)} min={A_MIN} max={A_MAX} step={0.05} value={A}
-                  onChange={setA} hintL={fmt1(A_MIN)} hintR={fmt1(A_MAX)} />
-                <div style={{ marginTop: 16, marginBottom: 6, fontSize: 11.5, fontWeight: 800, color: T.text3, letterSpacing: "0.04em" }}>MEDIO DE PROPAGACIÓN</div>
-                <div className="on-media">
-                  {MEDIOS.map((me) => {
-                    const on = me.id === medioId;
-                    return (
-                      <button key={me.id} className="on-tab" data-on={on} onClick={() => setMedioId(me.id)}
-                        style={{ ["--onc" as string]: me.color, background: on ? `${me.color}22` : "transparent" }}>
-                        <div style={{ fontSize: 16, marginBottom: 3, color: on ? me.color : "inherit" }}><i className={`fa-solid ${me.icono}`} /></div>
-                        <div style={{ fontSize: 12, fontWeight: 900 }}>{me.nombre}</div>
-                        <div style={{ fontSize: 9.5, color: T.text3, marginTop: 2 }}>{fmt0(me.v)} m/s</div>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div style={{ marginTop: 14, padding: "11px 14px", borderRadius: 12, border: `1px solid ${C_ONDA}44`, background: `${C_ONDA}14`, fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
-                  <i className="fa-solid fa-circle-half-stroke" style={{ color: C_ONDA, marginRight: 8 }} />
-                  Con v = <strong>{fmt0(medio.v)} m/s</strong> y f = <strong>{fmt0(f)} Hz</strong>: λ = v/f = <strong style={{ color: C_ONDA }}>{fmtLambda(onda.lambda)}</strong>. Al <strong>duplicar f</strong>, λ se reduce a la <strong>mitad</strong> (v constante).
-                </div>
-              </>
-            )}
-
-            {modo === "interferencia" && (
-              <>
-                <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-                  <button onClick={() => setEstacionaria(false)} className="on-tab" data-on={!estacionaria} style={{ flex: 1, ["--onc" as string]: C_INTER, background: !estacionaria ? `${C_INTER}22` : "transparent" }}>
-                    <div style={{ fontSize: 12.5, fontWeight: 900 }}><i className="fa-solid fa-plus-minus" style={{ marginRight: 6 }} />Superposición (desfase)</div>
-                    <div style={{ fontSize: 9.5, color: T.text3, marginTop: 2 }}>constructiva ↔ destructiva</div>
-                  </button>
-                  <button onClick={() => setEstacionaria(true)} className="on-tab" data-on={estacionaria} style={{ flex: 1, ["--onc" as string]: "#a78bfa", background: estacionaria ? "#a78bfa22" : "transparent" }}>
-                    <div style={{ fontSize: 12.5, fontWeight: 900 }}><i className="fa-solid fa-grip-lines-vertical" style={{ marginRight: 6 }} />Onda estacionaria</div>
-                    <div style={{ fontSize: 9.5, color: T.text3, marginTop: 2 }}>sentidos opuestos · nodos</div>
-                  </button>
-                </div>
-                {!estacionaria ? (
-                  <>
-                    <Deslizador label="desfase  φ" icon="fa-arrows-left-right-to-line" colr={tipoCol}
-                      valor={`${fmt2(phi)} rad`} min={FASE_MIN} max={FASE_MAX} step={0.01} value={phi}
-                      onChange={setPhi} hintL="0" hintR="2π" />
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6, marginTop: 12 }}>
-                      {FASE_PRESETS.map((p) => (
-                        <button key={p.etq} onClick={() => setPhi(p.phi)} style={{ cursor: "pointer", fontSize: 10.5, fontWeight: 800, color: Math.abs(phi - p.phi) < 0.02 ? "#04121f" : C_INTER, background: Math.abs(phi - p.phi) < 0.02 ? C_INTER : `${C_INTER}1f`, border: `1px solid ${C_INTER}55`, borderRadius: 8, padding: "7px 4px" }}>
-                          {p.etq}
+                <Bloque titulo="Frecuencia, amplitud y medio" icono="fa-sliders">
+                  <Deslizador label="frecuencia f" icon="fa-gauge-high" colr={C_ONDA} valor={`${fmt0(f)} Hz`} min={F_MIN} max={F_MAX} step={1} value={f} onChange={setF} hintL={`${fmt0(F_MIN)} Hz`} hintR={`${fmt0(F_MAX)} Hz`} />
+                  <Deslizador label="amplitud A" icon="fa-up-down" colr={C_ONDA} valor={fmt2(A)} min={A_MIN} max={A_MAX} step={0.05} value={A} onChange={setA} hintL={fmt1(A_MIN)} hintR={fmt1(A_MAX)} />
+                  <div style={{ fontSize: 13, fontWeight: 800, color: T.text3, letterSpacing: "0.04em" }}>MEDIO DE PROPAGACIÓN</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 96px), 1fr))", gap: 8 }}>
+                    {MEDIOS.map((me) => {
+                      const on = me.id === medioId;
+                      return (
+                        <button key={me.id} type="button" onClick={() => setMedioId(me.id)}
+                          style={{ cursor: "pointer", padding: "10px 6px", borderRadius: 12, textAlign: "center", color: "#fff",
+                            border: `1px solid ${on ? me.color : "rgba(255,255,255,0.14)"}`, background: on ? `${me.color}22` : "transparent" }}>
+                          <div style={{ fontSize: 17, color: on ? me.color : "inherit" }}><i className={`fa-solid ${me.icono}`} /></div>
+                          <div style={{ fontSize: 14, fontWeight: 900 }}>{me.nombre}</div>
+                          <div style={{ fontSize: 14, color: T.text2 }}>{fmt0(me.v)} m/s</div>
                         </button>
-                      ))}
-                    </div>
-                    <div style={{ marginTop: 14, padding: "11px 14px", borderRadius: 12, border: `1px solid ${tipoCol}44`, background: `${tipoCol}14`, fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
-                      <i className="fa-solid fa-wave-square" style={{ color: tipoCol, marginRight: 8 }} />
-                      Resultante <strong style={{ color: tipoCol }}>{inter.tipo}</strong>: A_res = |2A·cos(φ/2)| = <strong>{fmt2(inter.Ares)}</strong> ({fmt0(inter.pct * 100)}% del máximo). En fase se <strong>suman</strong>; en oposición se <strong>cancelan</strong>.
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Deslizador label="amplitud de cada onda  A" icon="fa-up-down" colr="#a78bfa"
-                      valor={fmt2(A)} min={A_MIN} max={A_MAX} step={0.05} value={A}
-                      onChange={setA} hintL={fmt1(A_MIN)} hintR={fmt1(A_MAX)} />
-                    <div style={{ marginTop: 14, padding: "11px 14px", borderRadius: 12, border: "1px solid #a78bfa44", background: "#a78bfa14", fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
-                      <i className="fa-solid fa-grip-lines-vertical" style={{ color: "#a78bfa", marginRight: 8 }} />
-                      Dos ondas iguales viajando en <strong>sentidos opuestos</strong> forman una <strong>onda estacionaria</strong>: los <strong>nodos</strong> (grises) nunca se mueven y los <strong>antinodos</strong> (morados) oscilan al máximo, separados <strong>λ/2</strong>.
-                    </div>
-                  </>
-                )}
-              </>
-            )}
+                      );
+                    })}
+                  </div>
+                  <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${C_ONDA}44`, background: `${C_ONDA}14` }}>
+                    Con v = <strong>{fmt0(medio.v)} m/s</strong> y f = <strong>{fmt0(f)} Hz</strong>: λ = v/f = <strong style={{ color: C_ONDA }}>{fmtLambda(onda.lambda)}</strong>. Al <strong>duplicar f</strong>, λ se reduce a la <strong>mitad</strong>.
+                  </p>
+                </Bloque>
+              )}
 
-            {modo === "doppler" && (
-              <>
-                <Deslizador label="frecuencia de la fuente  f" icon="fa-music" colr={C_DOPP}
-                  valor={`${fmt0(fd)} Hz`} min={FD_MIN} max={FD_MAX} step={10} value={fd}
-                  onChange={setFd} hintL={`${fmt0(FD_MIN)} Hz`} hintR={`${fmt0(FD_MAX)} Hz`} />
-                <div style={{ height: 14 }} />
-                <Deslizador label="rapidez de la fuente  vs" icon="fa-gauge-high" colr={C_DOPP}
-                  valor={`${fmt0(vs)} m/s`} min={VS_MIN} max={VS_MAX} step={1} value={vs}
-                  onChange={setVs} hintL="0 (reposo)" hintR={`${fmt0(VS_MAX)} m/s`} />
-                <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                  <div style={{ padding: "11px 14px", borderRadius: 12, border: "1px solid #f8717144", background: "#f8717114", fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
+              {modo === "interferencia" && (
+                <Bloque titulo="Desfase y tipo de superposición" icono="fa-sliders">
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                    {[
+                      { on: !estacionaria, set: () => setEstacionaria(false), col: C_INTER, t: "Superposición", icono: "fa-plus-minus" },
+                      { on: estacionaria, set: () => setEstacionaria(true), col: C_ESTAC, t: "Estacionaria", icono: "fa-grip-lines-vertical" },
+                    ].map((b) => (
+                      <button key={b.t} type="button" onClick={b.set}
+                        style={{ cursor: "pointer", padding: "10px 6px", borderRadius: 12, color: "#fff", fontSize: 14, fontWeight: 900,
+                          border: `1px solid ${b.on ? b.col : "rgba(255,255,255,0.14)"}`, background: b.on ? `${b.col}22` : "transparent" }}>
+                        <i className={`fa-solid ${b.icono}`} style={{ marginRight: 6, color: b.col }} />{b.t}
+                      </button>
+                    ))}
+                  </div>
+                  {!estacionaria ? (
+                    <>
+                      <Deslizador label="desfase φ" icon="fa-arrows-left-right-to-line" colr={tipoCol} valor={`${fmt2(phi)} rad`} min={FASE_MIN} max={FASE_MAX} step={0.01} value={phi} onChange={setPhi} hintL="0" hintR="2π" />
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 110px), 1fr))", gap: 6 }}>
+                        {FASE_PRESETS.map((p) => {
+                          const on = Math.abs(phi - p.phi) < 0.02;
+                          return (
+                            <button key={p.etq} type="button" onClick={() => setPhi(p.phi)}
+                              style={{ cursor: "pointer", fontSize: 14, fontWeight: 800, color: on ? "#04121f" : C_INTER, background: on ? C_INTER : `${C_INTER}1f`, border: `1px solid ${C_INTER}55`, borderRadius: 8, padding: "8px 4px" }}>
+                              {p.etq}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${tipoCol}44`, background: `${tipoCol}14` }}>
+                        Resultante <strong style={{ color: tipoCol }}>{inter.tipo}</strong>: A_res = |2A·cos(φ/2)| = <strong>{fmt2(inter.Ares)}</strong> ({fmt0(inter.pct * 100)}% del máximo). En fase se <strong>suman</strong>; en oposición se <strong>cancelan</strong>.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <Deslizador label="amplitud de cada onda A" icon="fa-up-down" colr={C_ESTAC} valor={fmt2(A)} min={A_MIN} max={A_MAX} step={0.05} value={A} onChange={setA} hintL={fmt1(A_MIN)} hintR={fmt1(A_MAX)} />
+                      <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${C_ESTAC}44`, background: `${C_ESTAC}14` }}>
+                        Dos ondas iguales en <strong>sentidos opuestos</strong> forman una <strong>onda estacionaria</strong>: los <strong>nodos</strong> (grises) nunca se mueven y los <strong>antinodos</strong> (morados) oscilan al máximo, separados <strong>λ/2</strong>.
+                      </p>
+                    </>
+                  )}
+                </Bloque>
+              )}
+
+              {modo === "doppler" && (
+                <Bloque titulo="Frecuencia y rapidez de la fuente" icono="fa-sliders">
+                  <Deslizador label="frecuencia de la fuente f" icon="fa-music" colr={C_DOPP} valor={`${fmt0(fd)} Hz`} min={FD_MIN} max={FD_MAX} step={10} value={fd} onChange={setFd} hintL={`${fmt0(FD_MIN)} Hz`} hintR={`${fmt0(FD_MAX)} Hz`} />
+                  <Deslizador label="rapidez de la fuente vs" icon="fa-gauge-high" colr={C_DOPP} valor={`${fmt0(vs)} m/s`} min={VS_MIN} max={VS_MAX} step={1} value={vs} onChange={setVs} hintL="0 (reposo)" hintR={`${fmt0(VS_MAX)} m/s`} />
+                  <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: "1px solid #f8717144", background: "#f8717114" }}>
                     <i className="fa-solid fa-arrow-right" style={{ color: "#f87171", marginRight: 8 }} />
                     Se acerca: <strong style={{ color: "#f87171" }}>{fmt0(dopp.fAcerca)} Hz</strong> (+{fmt0(dopp.dAcerca)} Hz, más agudo)
-                  </div>
-                  <div style={{ padding: "11px 14px", borderRadius: 12, border: "1px solid #60a5fa44", background: "#60a5fa14", fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>
+                  </p>
+                  <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: "1px solid #60a5fa44", background: "#60a5fa14" }}>
                     <i className="fa-solid fa-arrow-left" style={{ color: "#60a5fa", marginRight: 8 }} />
                     Se aleja: <strong style={{ color: "#60a5fa" }}>{fmt0(dopp.fAleja)} Hz</strong> (−{fmt0(dopp.dAleja)} Hz, más grave)
+                  </p>
+                </Bloque>
+              )}
+
+              <Bloque titulo="Lecturas" icono="fa-gauge-high">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  {modo === "onda" && (
+                    <>
+                      <Dato label="frecuencia f" value={`${fmt0(f)} Hz`} col={C_ONDA} />
+                      <Dato label="velocidad v" value={`${fmt0(medio.v)} m/s`} col={medio.color} />
+                      <Dato label="long. onda λ" value={fmtLambda(onda.lambda)} col={C_ONDA} />
+                      <Dato label="período T" value={`${fmt2(onda.T * 1000)} ms`} />
+                    </>
+                  )}
+                  {modo === "interferencia" && (
+                    <>
+                      <Dato label="amplitud A" value={fmt2(A)} />
+                      <Dato label="desfase φ" value={estacionaria ? "—" : `${fmt2(phi)} rad`} col={tipoCol} />
+                      <Dato label="A resultante" value={estacionaria ? fmt2(2 * A) : fmt2(inter.Ares)} col={tipoCol} />
+                      <Dato label="tipo" value={estacionaria ? "estacionaria" : inter.tipo} col={tipoCol} />
+                    </>
+                  )}
+                  {modo === "doppler" && (
+                    <>
+                      <Dato label="f fuente" value={`${fmt0(fd)} Hz`} col={C_DOPP} />
+                      <Dato label="vs fuente" value={`${fmt0(vs)} m/s`} col={C_DOPP} />
+                      <Dato label="se acerca" value={`${fmt0(dopp.fAcerca)} Hz`} col="#f87171" />
+                      <Dato label="se aleja" value={`${fmt0(dopp.fAleja)} Hz`} col="#60a5fa" />
+                    </>
+                  )}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={sonido ? (ok) => { if (ok) audioRef.current?.correcto(); else audioRef.current?.incorrecto(); } : undefined}
+              playPick={sonido ? () => audioRef.current?.blip() : undefined}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="La simulación" icono="fa-wave-square">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Ejemplo resuelto" icono="fa-square-check">
+                <p style={{ margin: 0, color: T.text2 }}>{EJEMPLO.enunciado}</p>
+                <div style={{ padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${C_ONDA}44` }}>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>λ = {fmt1(EJEMPLO.lambda * 100)} cm (0.5 m)</div>
+                  <div style={{ color: T.text2 }}>{EJEMPLO.solucion}</div>
+                </div>
+              </Bloque>
+              <Bloque titulo="Pasos de la simulación" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos" icono="fa-gauge-high">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ONDAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                Física exacta de cálculo cerrado: v = λ·f, superposición A_res = |2A·cos(φ/2)| y efecto Doppler clásico (f′ = f·v/(v∓vs), v_sonido = 340 m/s). La onda en pantalla es esquemática: su longitud visual está acotada para que quepa (en acero se ve muy larga), pero los valores de λ, T y de las frecuencias Doppler son exactos. Enunciado, instrucciones, ejemplo y preguntas son verbatim de la actividad A2.
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* La simulación verbatim */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-wave-square" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>La simulación</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Ejemplo resuelto verbatim */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: `1px solid ${accent}40`, background: `rgba(${color.rgba},0.08)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-square-check" style={{ marginRight: 8, color: accent }} />
-              Ejemplo resuelto
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginBottom: 10 }}>{EJEMPLO.enunciado}</div>
-            <div style={{ display: "flex", gap: 11, alignItems: "center", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${C_ONDA}44` }}>
-              <div style={{ width: 24, height: 24, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "#04121f", background: C_ONDA, flexShrink: 0 }}>λ</div>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>λ = {fmt1(EJEMPLO.lambda * 100)} cm (0.5 m)</div>
-                <div style={{ fontSize: 10.5, color: T.text2, lineHeight: 1.3 }}>{EJEMPLO.solucion}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Pasos de la simulación (instrucciones verbatim) */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Pasos de la simulación
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Preguntas de reflexión verbatim */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Para reflexionar
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
+/* ── Medidor de v = λ·f: λ cae al subir f, el producto no cambia ───────────── */
+function MedidorV({ f, lambda, v, col }: { f: number; lambda: number; v: number; col: string }) {
+  // λ en escala logarítmica: de 17 m (20 Hz en aire) a 5000 m (1 Hz en acero)
+  const pct = Math.max(4, Math.min(100, ((Math.log10(lambda) - 1.2) / (3.7 - 1.2)) * 100));
+  return (
+    <div style={{ width: 176, display: "grid", gap: 6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 800, color: "#dce6f5" }}>
+        <span>λ</span><span style={{ fontFamily: "ui-monospace, monospace" }}>{fmtLambda(lambda)}</span>
       </div>
-
-      {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="on-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className={`fa-solid ${modoActual.icono}`} style={{ marginRight: 8, color: modoCol }} />
-            Lecturas — {modoActual.etq}
-          </Eyebrow>
-          {modo === "onda" && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="frecuencia f" value={fmt0(f)} unit="Hz" col={C_ONDA} size={15} />
-              <Readout label="velocidad v" value={fmt0(medio.v)} unit="m/s" col={medio.color} size={15} />
-              <Readout label="long. onda λ" value={fmtLambda(onda.lambda)} col={C_ONDA} size={14} />
-              <Readout label="período T" value={fmt2(onda.T * 1000)} unit="ms" col="#fff" size={15} />
-            </div>
-          )}
-          {modo === "interferencia" && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="amplitud A" value={fmt2(A)} col="#fff" size={15} />
-              <Readout label="desfase φ" value={estacionaria ? "—" : `${fmt2(phi)}`} unit={estacionaria ? "" : "rad"} col={tipoCol} size={15} />
-              <Readout label="A resultante" value={estacionaria ? `${fmt2(2 * A)}` : fmt2(inter.Ares)} col={tipoCol} size={15} />
-              <Readout label="tipo" value={estacionaria ? "estac." : inter.tipo === "constructiva" ? "constr." : inter.tipo === "destructiva" ? "destr." : "parcial"} col={tipoCol} size={14} />
-            </div>
-          )}
-          {modo === "doppler" && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-              <Readout label="f fuente" value={fmt0(fd)} unit="Hz" col={C_DOPP} size={15} />
-              <Readout label="vs fuente" value={fmt0(vs)} unit="m/s" col={C_DOPP} size={15} />
-              <Readout label="se acerca" value={fmt0(dopp.fAcerca)} unit="Hz" col="#f87171" size={15} />
-              <Readout label="se aleja" value={fmt0(dopp.fAleja)} unit="Hz" col="#60a5fa" size={15} />
-            </div>
-          )}
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
+      <div style={{ height: 10, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: col, transition: "width 120ms linear" }} />
       </div>
-
-      {/* ── Objetivos ─────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <TableroObjetivos
-          retoKey={RETO_KEY}
-          accent={accent}
-          objetivos={[
-            { txt: "Explora el modo Onda: sube la frecuencia y observa cómo baja λ", done: f !== F_DEF },
-            { txt: "Experimenta con interferencia constructiva y destructiva", done: modo === "interferencia" },
-            { txt: "Activa la onda estacionaria y localiza los nodos", done: estacionaria },
-            { txt: "Observa el Efecto Doppler con la fuente en movimiento", done: modo === "doppler" },
-            { txt: "Resuelve el reto evaluable de la actividad", done: ejercicioAprobado },
-          ]}
-        />
+      <div style={{ fontWeight: 900, color: col, fontFamily: "ui-monospace, monospace" }}>
+        λ × {fmt0(f)} Hz = {fmt0(v)} m/s
       </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Física <strong>exacta</strong> de cálculo cerrado: relación fundamental v = λ·f, superposición A_res = |2A·cos(φ/2)| y efecto Doppler clásico con fuente en movimiento (f′ = f·v/(v∓vs), v_sonido = 340 m/s). La onda que ves en pantalla es <strong>esquemática</strong>: la longitud de onda visual está acotada para que quepa (por eso en acero, con v ≈ 5000 m/s, se ve muy larga), pero los valores de λ, T y de las frecuencias Doppler de los paneles son <strong>exactos</strong>. Enunciado, instrucciones, ejemplo y preguntas son verbatim de la actividad A2.
-        </span>
-      </div>
-
-      {/* ── Reto evaluable: el quiz verbatim del ancla A3 ─────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
-        }
-        playPick={sonido ? () => audioRef.current?.blip() : undefined}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={ONDAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
     </div>
   );
 }
 
-/* ── Deslizador reutilizable ─────────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  const fill = `${((Math.min(max, Math.max(min, value)) - min) / (max - min)) * 100}%`;
+/* ── Item de leyenda (visor) ──────────────────────────────────────────────── */
+function LegItem({ col, txt }: { col: string; txt: string }) {
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-      </div>
-      <input type="range" className="on-range" min={min} max={max} step={step} value={Math.min(max, Math.max(min, value))}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--onc" as string]: colr, ["--onfill" as string]: fill }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
+    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+      <span style={{ width: 18, height: 0, borderTop: `3px solid ${col}`, flexShrink: 0 }} />
+      {txt}
     </div>
   );
 }

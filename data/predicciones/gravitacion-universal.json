@@ -1,0 +1,12 @@
+{
+  "escena": "La Tierra y la Luna con flechas de atracción; una barra mide la fuerza según la distancia",
+  "pregunta": "Si duplicas la distancia entre la Tierra y la Luna, ¿qué pasa con la fuerza?",
+  "opciones": [
+    { "id": "a", "texto": "Baja exactamente a la mitad", "icono": "fa-divide" },
+    { "id": "b", "texto": "Cae a la cuarta parte", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se duplica", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "b",
+  "porque": "La distancia está elevada al cuadrado en F = G·M·m/r². Si r se duplica, r² se multiplica por 4 y la fuerza se divide entre 4: es la ley del inverso del cuadrado.",
+  "comoComprobarlo": "En modo Fuerza, toca «Duplicar la distancia» o mueve el deslizador de r y compara la barra del medidor con la marca blanca del problema."
+}

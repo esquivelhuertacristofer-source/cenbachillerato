@@ -1,0 +1,12 @@
+{
+  "escena": "Una gráfica de la función a trozos f(x) = x si x < 2 y f(x) = x + 3 si x ≥ 2, con dos puntos a la misma distancia de x = 2.",
+  "pregunta": "En la función de salto, al acercar x a 2, ¿qué pasa con los puntos azul y rosa?",
+  "opciones": [
+    { "id": "a", "texto": "Llegan a la misma altura", "icono": "fa-equals" },
+    { "id": "b", "texto": "Quedan en alturas distintas", "icono": "fa-stairs" },
+    { "id": "c", "texto": "Desaparecen de la gráfica", "icono": "fa-eye-slash" }
+  ],
+  "correcta": "b",
+  "porque": "Por la izquierda la función se acerca a 2 y por la derecha a 5. Como los límites laterales son distintos, el límite no existe y la función es discontinua con un salto de 3.",
+  "comoComprobarlo": "Elige «Salto», arrastra x hacia 2 y compara las alturas del punto azul y del rosa, o mira sus lecturas en el panel."
+}

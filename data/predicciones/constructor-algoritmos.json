@@ -1,0 +1,12 @@
+{
+  "escena": "El robot Chispa en un pasillo largo de 7 casillas con el paquete al fondo, y un programa de solo 2 bloques.",
+  "pregunta": "Armas «Repetir 3 veces: avanzar» una sola vez. ¿Dónde termina Chispa?",
+  "opciones": [
+    { "id": "a", "texto": "En el paquete, al fondo", "icono": "fa-box" },
+    { "id": "b", "texto": "A medio camino, sin llegar", "icono": "fa-hourglass-half" },
+    { "id": "c", "texto": "Choca contra la pared", "icono": "fa-burst" }
+  ],
+  "correcta": "b",
+  "porque": "Repetir 3 veces solo mueve tres casillas y el pasillo mide seis. El programa terminó antes de llegar: un algoritmo hace exactamente lo que dicen sus pasos, ni más ni menos.",
+  "comoComprobarlo": "En el nivel 2 pon un solo bloque «Repetir 3 veces», pulsa Ejecutar y mira dónde se detiene Chispa."
+}

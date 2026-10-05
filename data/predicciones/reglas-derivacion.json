@@ -1,0 +1,12 @@
+{
+  "escena": "Las curvas de f(x) = (x² + 1)(3x − 2) y de su derivada, con una sonda x = a que recorre la gráfica y una recta tangente.",
+  "pregunta": "Cuando la tangente a f se inclina más hacia arriba, ¿qué hace la altura de f'?",
+  "opciones": [
+    { "id": "a", "texto": "Baja, porque la curva se aplana", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Sube: es igual a la pendiente", "icono": "fa-arrow-up" },
+    { "id": "c", "texto": "No cambia, es constante", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "La derivada en a es, por definición, la pendiente de la tangente en ese punto. Si la tangente se inclina más, su pendiente aumenta y el punto sobre la curva f' queda más alto.",
+  "comoComprobarlo": "Arrastra la sonda x = a de izquierda a derecha y compara cómo gira la recta verde con la altura del punto ámbar sobre f'."
+}

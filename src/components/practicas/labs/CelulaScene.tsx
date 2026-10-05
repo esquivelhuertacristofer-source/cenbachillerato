@@ -14,9 +14,9 @@
  */
 
 import * as THREE from "three";
-import { useRef, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Html, Stars } from "@react-three/drei";
+import { useRef, useState, type ReactNode } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { T } from "./_kit";
 import { type Modo, type Forma, organeloPorId, CELULAS } from "./celula-data";
@@ -34,17 +34,17 @@ export interface CelulaSceneProps {
 }
 
 /* ── Etiqueta flotante (Html) ─────────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 11, fuerte = false, col }: { pos: Pt; children: ReactNode; df?: number; fuerte?: boolean; col?: string }) {
+function Etiqueta({ pos, children, fuerte = false, col }: { pos: Pt; children: ReactNode; fuerte?: boolean; col?: string }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
-          padding: fuerte ? "6px 12px" : "2px 7px",
+          padding: "5px 11px",
           borderRadius: 8,
           background: fuerte ? "rgba(5,14,30,0.85)" : "rgba(5,14,30,0.55)",
           border: `1px solid ${col ?? T.lineStrong}`,
           color: col ?? T.text,
-          fontSize: fuerte ? 16 : 12.5,
+          fontSize: 14,
           fontWeight: fuerte ? 800 : 700,
           whiteSpace: "nowrap",
           letterSpacing: "0.01em",
@@ -243,6 +243,8 @@ function Organelo({ id, pos, escala, selected, playing, onSelect }: {
   id: string; pos: Pt; escala: number; selected: boolean; playing: boolean; onSelect: (id: string) => void;
 }) {
   const g = useRef<THREE.Group>(null);
+  const [encima, setEncima] = useState(false);
+  const angosto = useThree((st) => st.size.width) < 640;
   useFrame((state) => {
     if (!g.current) return;
     const t = state.clock.elapsedTime;
@@ -257,14 +259,16 @@ function Organelo({ id, pos, escala, selected, playing, onSelect }: {
     <group ref={g} position={pos}>
       <group
         onClick={(e: ThreeEvent<MouseEvent>) => { e.stopPropagation(); onSelect(id); }}
-        onPointerOver={(e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
-        onPointerOut={() => { document.body.style.cursor = "default"; }}
+        onPointerOver={(e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); setEncima(true); document.body.style.cursor = "pointer"; }}
+        onPointerOut={() => { setEncima(false); document.body.style.cursor = "default"; }}
       >
         <FormaMesh forma={def.forma} color={def.color} emis={emis} />
       </group>
-      <Etiqueta pos={posEtiqueta(pos)} df={selected ? 12 : 8.5} fuerte={selected} col={selected ? def.color : T.text2}>
-        {selected ? def.nombre : def.nombre.replace(" (RE)", "").replace(" (nucleoide)", "")}
-      </Etiqueta>
+      {(selected || encima) && (
+        <Etiqueta pos={angosto ? [0, ALTURA[def.forma] * 0.8, 0] : posEtiqueta(pos)} fuerte={selected} col={selected ? def.color : T.text2}>
+          {selected ? def.nombre : def.nombre.replace(" (RE)", "").replace(" (nucleoide)", "")}
+        </Etiqueta>
+      )}
     </group>
   );
 }
@@ -350,8 +354,8 @@ function Envoltura({ modo, selected }: { modo: Modo; selected: string | null }) 
     <group>
       {pared}
       {membrana}
-      {selMemb && <Etiqueta pos={[0, ALTURA.membrana, 0]} df={12} fuerte col={membDef.color}>{membDef.nombre}</Etiqueta>}
-      {selPared && cel.conPared && <Etiqueta pos={[0, ALTURA.pared, 0]} df={12} fuerte col={paredDef.color}>{paredDef.nombre}</Etiqueta>}
+      {selMemb && <Etiqueta pos={[0, ALTURA.membrana, 0]} fuerte col={membDef.color}>{membDef.nombre}</Etiqueta>}
+      {selPared && cel.conPared && <Etiqueta pos={[0, ALTURA.pared, 0]} fuerte col={paredDef.color}>{paredDef.nombre}</Etiqueta>}
     </group>
   );
 }
@@ -423,9 +427,9 @@ function Contenido(props: CelulaSceneProps) {
           vez de que alguien la adivine. */}
       <Escenario acento={accent} mesa={false} niebla={false} />
       <directionalLight position={[-8, -4, 4]} intensity={0.35} color={accent} />
-      <Stars radius={80} depth={40} count={1400} factor={3} saturation={0} fade speed={0.6} />
 
-      <group key={`${modo}-${resetNonce}`}>
+      {/* Se sube la célula para que quede entre la barra de arriba y la misión de abajo. */}
+      <group key={`${modo}-${resetNonce}`} position={[0, 0.8, 0]}>
         <Mundo modo={modo} selected={selected} playing={playing} onSelect={onSelect} />
       </group>
 
@@ -433,8 +437,8 @@ function Contenido(props: CelulaSceneProps) {
       <OrbitControls
         makeDefault
         enablePan={false}
-        minDistance={6}
-        maxDistance={18}
+        minDistance={8}
+        maxDistance={20}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={(Math.PI * 4) / 5}
       />
@@ -451,8 +455,8 @@ function Contenido(props: CelulaSceneProps) {
 export default function CelulaScene(props: CelulaSceneProps) {
   const cam =
     props.modo === "procariota"
-      ? { position: [0, 1.2, 9.8] as Pt, fov: 48 }
-      : { position: [0, 1.4, 9] as Pt, fov: 46 };
+      ? { position: [0, 1.2, 12.5] as Pt, fov: 48 }
+      : { position: [0, 1.4, 13.5] as Pt, fov: 46 };
   return (
     <Canvas key={props.modo} dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={cam}>
       <Contenido {...props} />

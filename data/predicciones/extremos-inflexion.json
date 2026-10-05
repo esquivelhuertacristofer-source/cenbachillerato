@@ -1,0 +1,12 @@
+{
+  "escena": "Una curva con cima y valle, y una sonda deslizable con su recta tangente verde",
+  "pregunta": "Al llevar la sonda a la cima de la curva, ¿cómo queda la recta tangente?",
+  "opciones": [
+    { "id": "a", "texto": "Muy inclinada hacia arriba", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Horizontal, con pendiente cero", "icono": "fa-minus" },
+    { "id": "c", "texto": "Muy inclinada hacia abajo", "icono": "fa-arrow-trend-down" }
+  ],
+  "correcta": "b",
+  "porque": "En una cima la curva deja de subir y empieza a bajar. Justo ahí la pendiente vale cero, así que la derivada toca el eje horizontal.",
+  "comoComprobarlo": "Pulsa «Máximo local» y mira la flecha de la leyenda; luego mueve la sonda un poco a cada lado y observa el signo de f'."
+}

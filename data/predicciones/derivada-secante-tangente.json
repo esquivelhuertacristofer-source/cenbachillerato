@@ -1,0 +1,12 @@
+{
+  "escena": "La parábola f(x) = x² con una secante que pasa por el punto de tangencia en x = 2 y por otro punto a distancia h.",
+  "pregunta": "Si reduces h hacia 0, ¿a qué valor se acerca la pendiente de la secante?",
+  "opciones": [
+    { "id": "a", "texto": "A 0, la secante queda plana", "icono": "fa-minus" },
+    { "id": "b", "texto": "A 4, la pendiente de la tangente", "icono": "fa-bullseye" },
+    { "id": "c", "texto": "Crece sin límite", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "b",
+  "porque": "La pendiente de la secante es 4 + h. Cuando h se acerca a 0, vale cada vez más cerca de 4, que es f'(2) y la pendiente de la recta tangente en ese punto.",
+  "comoComprobarlo": "Arrastra el deslizador de h hacia 0.05 y compara el medidor de la pendiente de la secante con el de la derivada."
+}

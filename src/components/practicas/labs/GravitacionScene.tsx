@@ -20,14 +20,14 @@
  */
 
 import * as THREE from "three";
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useEffect, useMemo } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 import {
   type Modo, resolverFuerza, resolverPeso, resolverOrbita, cuerpoPorId,
-  F_DEF, R_TIERRA, T_TIERRA_H, sci, fmt0, fmt1, fmt2, fmtKm,
+  F_DEF, R_TIERRA, T_TIERRA_H, sci, fmt0, fmt1, fmt2,
 } from "./gravitacion-data";
 
 export interface GravitacionSceneProps {
@@ -52,12 +52,39 @@ const C_GHOST = "#64748b";    // comparación (peso en la Tierra)
 const TIERRA_AZUL = "#2f6fb0";
 const TIERRA_VERDE = "#3f8f5f";
 
+/* ── Etiqueta: tamaño fijo en píxeles (≥14), desplazada según el lado ────────── */
+type Lado = "up" | "down" | "left" | "right";
+const DESPLAZA: Record<Lado, string> = {
+  up: "translate(0,-70%)",
+  down: "translate(0,70%)",
+  left: "translate(-62%,0)",
+  right: "translate(62%,0)",
+};
+
+function Etiqueta({ position, color, children, lado = "up" }: { position: Pt; color: string; children: React.ReactNode; lado?: Lado }) {
+  return (
+    <Html position={position} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: DESPLAZA[lado] }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
+}
+
 /* ── Flecha en una dirección arbitraria (asta + punta) ─────────────────────── */
 function Flecha({
-  base, dx, dy, dz, len, color, label, grosor = 0.06, opacidad = 1,
+  base, dx, dy, dz, len, color, label, grosor = 0.06, opacidad = 1, lado = "up", encima = false,
 }: {
   base: Pt; dx: number; dy: number; dz: number; len: number; color: string;
-  label?: React.ReactNode; grosor?: number; opacidad?: number;
+  label?: React.ReactNode; grosor?: number; opacidad?: number; lado?: Lado;
+  /** Se dibuja por encima de lo demás (la flecha del peso entra en el planeta). */
+  encima?: boolean;
 }) {
   const quat = useMemo(() => {
     const v = new THREE.Vector3(dx, dy, dz).normalize();
@@ -66,24 +93,19 @@ function Flecha({
   if (len < 0.06) return null;
   const headLen = Math.min(0.36, len * 0.4);
   const shaftLen = Math.max(0.001, len - headLen);
+  const trans = opacidad < 1 || encima;
   return (
     <group position={base} quaternion={quat}>
-      <mesh position={[0, shaftLen / 2, 0]}>
+      <mesh position={[0, shaftLen / 2, 0]} renderOrder={encima ? 10 : 0}>
         <cylinderGeometry args={[grosor, grosor, shaftLen, 14]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.55} transparent opacity={opacidad} toneMapped={false} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.55} transparent={trans} opacity={opacidad} depthTest={!encima} />
       </mesh>
-      <mesh position={[0, shaftLen + headLen / 2, 0]}>
+      <mesh position={[0, shaftLen + headLen / 2, 0]} renderOrder={encima ? 10 : 0}>
         <coneGeometry args={[grosor * 2.4, headLen, 18]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} transparent opacity={opacidad} toneMapped={false} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} transparent={trans} opacity={opacidad} depthTest={!encima} />
       </mesh>
       {label != null && (
-        <Html position={[0, shaftLen + headLen + 0.34, 0]} center distanceFactor={13} pointerEvents="none">
-          <div style={{
-            whiteSpace: "nowrap", padding: "2px 7px", borderRadius: 7, background: "rgba(6,16,31,0.85)",
-            border: `1px solid ${color}77`, color: "#fff", fontWeight: 800, fontSize: 10.5,
-            fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.45)",
-          }}>{label}</div>
-        </Html>
+        <Etiqueta position={[0, len, 0]} color={color} lado={lado}>{label}</Etiqueta>
       )}
     </group>
   );
@@ -100,21 +122,6 @@ function Planeta({
       <sphereGeometry args={[radio, 48, 48]} />
       <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={emissiveIntensity} roughness={rough} metalness={metal} />
     </mesh>
-  );
-}
-
-function Etiqueta({ position, titulo, sub, color }: { position: Pt; titulo: string; sub?: string; color: string }) {
-  return (
-    <Html position={position} center distanceFactor={15} pointerEvents="none">
-      <div style={{
-        whiteSpace: "nowrap", textAlign: "center", padding: "3px 9px", borderRadius: 8,
-        background: "rgba(6,16,31,0.88)", border: `1px solid ${color}88`, color: "#fff",
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.45)",
-      }}>
-        <div style={{ fontWeight: 800, fontSize: 11 }}>{titulo}</div>
-        {sub && <div style={{ fontWeight: 700, fontSize: 10, color }}>{sub}</div>}
-      </div>
-    </Html>
   );
 }
 
@@ -146,14 +153,15 @@ function Tierra({ position, radio }: { position: Pt; radio: number }) {
    ════════════════════════════════════════════════════════════════════════════ */
 function EscenaFuerza({ r }: { r: number }) {
   const { F } = resolverFuerza(r);
-  const ratio = F / F_DEF;
+  const ancho = useThree((st) => st.size.width) >= 640;
 
   const tierraX = -3.6;
-  const tierraR = 1.5;
-  const lunaR = 0.55;
+  const tierraR = 2.0;
+  const lunaR = 0.75;
   // la Luna se acerca/aleja con r (acotado para que siempre quepa)
   const lunaX = Math.min(8.6, Math.max(2.8, 2.6 + ratioDist(r) * 1.9));
   // largo de las flechas ∝ √(F/F_def), acotado (el número exacto va en la etiqueta)
+  const ratio = F / F_DEF;
   const L = Math.min(3.2, Math.max(0.45, 1.4 * Math.sqrt(ratio)));
 
   const tierraBorde = tierraX + tierraR;
@@ -162,31 +170,17 @@ function EscenaFuerza({ r }: { r: number }) {
   return (
     <group>
       <Tierra position={[tierraX, 0, 0]} radio={tierraR} />
-      <Etiqueta position={[tierraX, tierraR + 0.7, 0]} titulo="Tierra" sub="M = 5.97×10²⁴ kg" color={C_PESO} />
-
       <Planeta position={[lunaX, 0, 0]} radio={lunaR} color="#c9d2dc" rough={0.95} />
-      <Etiqueta position={[lunaX, lunaR + 0.7, 0]} titulo="Luna" sub="m = 7.34×10²² kg" color="#cbd5e1" />
+      <Etiqueta position={[tierraX, tierraR, 0]} color={C_PESO} lado="up">Tierra</Etiqueta>
+      <Etiqueta position={[lunaX, lunaR, 0]} color="#cbd5e1" lado="up">Luna</Etiqueta>
 
       {/* línea de distancia centro a centro */}
-      <Line points={[[tierraX, 0, 0], [lunaX, 0, 0]]} color="#ffffff" lineWidth={1} dashed dashSize={0.18} gapSize={0.14} transparent opacity={0.4} />
-      <Html position={[(tierraX + lunaX) / 2, -1.05, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(6,16,31,0.85)", border: "1px solid rgba(255,255,255,0.25)", color: "#fff", fontFamily: "system-ui, sans-serif", fontWeight: 800, fontSize: 10.5 }}>
-          r = {sci(r)} m
-        </div>
-      </Html>
+      <Line points={[[tierraX, 0, 0], [lunaX, 0, 0]]} color="#ffffff" lineWidth={2} dashed dashSize={0.18} gapSize={0.14} transparent opacity={0.5} />
+      {ancho && <Etiqueta position={[(tierraX + lunaX) / 2, -0.2, 0]} color="#ffffff" lado="down">r = {sci(r)} m</Etiqueta>}
 
       {/* fuerzas iguales y opuestas (3.ª ley de Newton) */}
-      <Flecha base={[tierraBorde + 0.1, 0, 0]} dx={1} dy={0} dz={0} len={L} color={C_FUERZA} label={`F = ${sci(F)} N`} />
+      <Flecha base={[tierraBorde + 0.1, 0, 0]} dx={1} dy={0} dz={0} len={L} color={C_FUERZA} label={`F = ${sci(F)} N`} lado="up" />
       <Flecha base={[lunaBorde - 0.1, 0, 0]} dx={-1} dy={0} dz={0} len={L} color={C_FUERZA} />
-
-      <Html position={[(tierraX + lunaX) / 2, 1.9, 0]} center distanceFactor={16} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", textAlign: "center", padding: "5px 12px", borderRadius: 10, background: "rgba(4,10,22,0.9)", border: `1px solid ${C_FUERZA}aa`, color: "#fff", fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.5)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12 }}>F = G·M·m / r²</div>
-          <div style={{ fontWeight: 700, fontSize: 10.5, color: C_FUERZA }}>
-            {ratio >= 0.999 && ratio <= 1.001 ? "valor del problema" : `${fmt1(ratio)}× la fuerza del problema`}
-          </div>
-        </div>
-      </Html>
     </group>
   );
 }
@@ -228,7 +222,7 @@ function Astronauta({ y }: { y: number }) {
 
 function EscenaPeso({ cuerpoId, m }: { cuerpoId: string; m: number }) {
   const cuerpo = cuerpoPorId(cuerpoId);
-  const { W, WTierra, kgf } = resolverPeso(m, cuerpo.g);
+  const { W, WTierra } = resolverPeso(m, cuerpo.g);
 
   const bodyR = 2.6;
   const bodyCenterY = -2.4;
@@ -239,26 +233,21 @@ function EscenaPeso({ cuerpoId, m }: { cuerpoId: string; m: number }) {
   const Lw = escala(W);
   const Lghost = escala(WTierra);
 
+  const ancho = useThree((st) => st.size.width) >= 640;
+
   return (
     <group>
       {/* cuerpo celeste como suelo */}
       <Planeta position={[0, bodyCenterY, 0]} radio={bodyR} color={cuerpo.color} rough={0.92} metal={0.05} />
-      <Etiqueta position={[0, surfaceY + 1.7, 2.0]} titulo={cuerpo.nombre} sub={`g = ${fmt2(cuerpo.g)} m/s²`} color={cuerpo.color} />
+      {ancho && <Etiqueta position={[-bodyR * 0.9, bodyCenterY + bodyR * 0.45, 1.6]} color={cuerpo.color} lado="left">{cuerpo.nombre}: g = {fmt2(cuerpo.g)}</Etiqueta>}
 
       <Astronauta y={surfaceY} />
 
-      {/* flecha de peso (hacia abajo, desde el astronauta) */}
-      <Flecha base={[0, surfaceY + 0.2, 0]} dx={0} dy={-1} dz={0} len={Lw} color={C_PESO} label={`W = ${fmt1(W)} N`} grosor={0.07} />
+      {/* flecha de peso (hacia abajo, hacia el centro del cuerpo) */}
+      <Flecha base={[0, surfaceY + 0.2, 0.5]} dx={0} dy={-1} dz={0} len={Lw} color={C_PESO} label={`W = ${fmt1(W)} N`} grosor={0.07} lado="right" encima />
 
       {/* fantasma: peso en la Tierra para comparar */}
-      <Flecha base={[1.0, surfaceY + 0.2, 0]} dx={0} dy={-1} dz={0} len={Lghost} color={C_GHOST} grosor={0.05} opacidad={0.5} label={`en la Tierra: ${fmt0(WTierra)} N`} />
-
-      <Html position={[0, surfaceY + 2.6, 0]} center distanceFactor={16} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", textAlign: "center", padding: "5px 12px", borderRadius: 10, background: "rgba(4,10,22,0.9)", border: `1px solid ${C_PESO}aa`, color: "#fff", fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.5)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12 }}>W = m·g = {fmt0(m)} × {fmt2(cuerpo.g)}</div>
-          <div style={{ fontWeight: 700, fontSize: 10.5, color: C_PESO }}>{fmt1(W)} N ≈ {fmt1(kgf)} kg-fuerza · masa = {fmt0(m)} kg (no cambia)</div>
-        </div>
-      </Html>
+      <Flecha base={[-1.0, surfaceY + 0.2, 0.5]} dx={0} dy={-1} dz={0} len={Lghost} color={C_GHOST} grosor={0.05} opacidad={0.55} label={ancho ? `Tierra: ${fmt0(WTierra)} N` : undefined} lado="left" encima />
     </group>
   );
 }
@@ -293,6 +282,7 @@ function Satelite({ color }: { color: string }) {
 }
 
 function EscenaOrbita({ alt, t, accent }: { alt: number; t: number; accent: string }) {
+  const ancho = useThree((st) => st.size.width) >= 640;
   const orb = resolverOrbita(alt);
   const tierraR = 1.5;
 
@@ -329,32 +319,27 @@ function EscenaOrbita({ alt, t, accent }: { alt: number; t: number; accent: stri
       <group position={marcaPos}>
         <mesh>
           <sphereGeometry args={[0.12, 18, 18]} />
-          <meshStandardMaterial color="#ffd166" emissive="#ffd166" emissiveIntensity={0.9} toneMapped={false} />
+          <meshStandardMaterial color="#ffd166" emissive="#ffd166" emissiveIntensity={0.9} />
         </mesh>
       </group>
       {/* radio del punto terrestre, extendido hacia afuera para comparar dirección */}
-      <Line points={[[0, 0, 0], marcaOut]} color="#ffd166" lineWidth={1.5} transparent opacity={0.6} />
+      <Line points={[[0, 0, 0], marcaOut]} color="#ffd166" lineWidth={2} transparent opacity={0.6} />
 
       {/* órbita */}
-      <Line points={orbitaEsc} color={lineaCol} lineWidth={orb.geo ? 2.6 : 1.6} transparent opacity={orb.geo ? 0.85 : 0.45} />
+      <Line points={orbitaEsc} color={lineaCol} lineWidth={orb.geo ? 3 : 2} transparent opacity={orb.geo ? 0.85 : 0.45} />
 
       {/* radio satélite (muestra alineación con el punto terrestre cuando es geo) */}
-      <Line points={[[0, 0, 0], satPos]} color={lineaCol} lineWidth={1.5} dashed={!orb.geo} dashSize={0.3} gapSize={0.2} transparent opacity={0.7} />
+      <Line points={[[0, 0, 0], satPos]} color={lineaCol} lineWidth={2} dashed={!orb.geo} dashSize={0.3} gapSize={0.2} transparent opacity={0.7} />
 
       {/* satélite */}
       <group position={satPos}>
         <Satelite color={accent} />
-        <Etiqueta position={[0, 0.7, 0]} titulo="satélite" sub={`v = ${fmt2(orb.v / 1000)} km/s`} color={accent} />
+        <Etiqueta position={[0, 0.3, 0]} color={accent} lado="up">{ancho ? `satélite · v = ${fmt2(orb.v / 1000)} km/s` : "satélite"}</Etiqueta>
       </group>
 
-      <Html position={[0, ringR + 1.0, 0]} center distanceFactor={20} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", textAlign: "center", padding: "5px 12px", borderRadius: 10, background: "rgba(4,10,22,0.9)", border: `1px solid ${lineaCol}cc`, color: "#fff", fontFamily: "system-ui, sans-serif", boxShadow: "0 6px 22px rgba(0,0,0,0.5)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12 }}>altura {fmtKm(alt)} km · T = {fmt1(orb.Th)} h</div>
-          <div style={{ fontWeight: 800, fontSize: 10.5, color: lineaCol }}>
-            {orb.geo ? "GEOESTACIONARIA — el satélite parece fijo (T = rotación terrestre)" : `T ${orb.Th < T_TIERRA_H ? "<" : ">"} 24 h — se desplaza por el cielo`}
-          </div>
-        </div>
-      </Html>
+      <Etiqueta position={[0, -tierraR, 0]} color={lineaCol} lado="down">
+        {orb.geo ? "GEOESTACIONARIA · T = 24 h" : `T = ${fmt1(orb.Th)} h ${orb.Th < T_TIERRA_H ? "<" : ">"} 24 h`}
+      </Etiqueta>
     </group>
   );
 }
@@ -378,14 +363,16 @@ function Contenido({ modo, r, cuerpoId, m, alt, t, accent, resetNonce }: Gravita
 
 
 
+      <Encuadre modo={modo} />
+
       <OrbitControls
         makeDefault
         enablePan={false}
         minDistance={6}
-        maxDistance={40}
+        maxDistance={44}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, modo === "peso" ? 0.4 : 0, 0]}
+        target={OBJETIVO[modo]}
       />
 
       <EffectComposer enableNormalPass={false}>
@@ -396,11 +383,33 @@ function Contenido({ modo, r, cuerpoId, m, alt, t, accent, resetNonce }: Gravita
   );
 }
 
+/* ── Encuadre por modo: el contenido ≈ 60 % del alto, entre la barra y la misión.
+ *    En pantallas angostas la cámara se aleja para que quepa todo el ancho. ───── */
+const OBJETIVO: Record<Modo, Pt> = {
+  fuerza: [1.9, 0.2, 0],
+  peso: [0, -1.0, 0],
+  orbita: [0, -0.4, 0],
+};
+const MEDIO_ANCHO: Record<Modo, number> = { fuerza: 8.6, peso: 3.8, orbita: 12 };
+const Z_MIN: Record<Modo, number> = { fuerza: 13, peso: 10, orbita: 22 };
+
+function Encuadre({ modo }: { modo: Modo }) {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const tanV = Math.tan((42 / 2) * (Math.PI / 180));
+  const z = Math.min(40, Math.max(Z_MIN[modo], MEDIO_ANCHO[modo] / (tanV * Math.min(1.8, aspect))));
+  useEffect(() => {
+    const o = OBJETIVO[modo];
+    const alto = modo === "orbita" ? z * 0.55 : modo === "peso" ? 1.8 : 3.2;
+    camera.position.set(o[0], o[1] + alto, o[2] + z);
+    camera.updateProjectionMatrix();
+  }, [camera, modo, z]);
+  return null;
+}
+
 export default function GravitacionScene(props: GravitacionSceneProps) {
-  const cam =
-    props.modo === "orbita" ? { position: [0, 15, 26] as Pt, fov: 42 }
-    : props.modo === "peso" ? { position: [0, 1.4, 11] as Pt, fov: 42 }
-    : { position: [0, 4, 15] as Pt, fov: 42 };
+  const cam = { position: [OBJETIVO[props.modo][0], 4, 16] as Pt, fov: 42 };
   return (
     <Canvas key={props.modo} shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={cam}>
       <Contenido {...props} />

@@ -1,0 +1,12 @@
+{
+  "escena": "Una mitocondria con tres etapas y un medidor de ATP que se llena al avanzar",
+  "pregunta": "Sin oxígeno, ¿cuánto ATP obtiene la célula de una glucosa, comparado con los 36 de la respiración?",
+  "opciones": [
+    { "id": "a", "texto": "Casi lo mismo, unos 34 ATP", "icono": "fa-equals" },
+    { "id": "b", "texto": "Solo 2 ATP", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Más ATP, porque no gasta oxígeno", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "b",
+  "porque": "Sin oxígeno la cadena de electrones no funciona. Solo queda la glucólisis, que da 2 ATP netos; la fermentación únicamente regenera lo necesario para que siga ocurriendo.",
+  "comoComprobarlo": "Con el medidor de ATP a la vista, cambia entre Respiración aerobia y Fermentación y avanza por todas las etapas de cada una."
+}

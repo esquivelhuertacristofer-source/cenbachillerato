@@ -1,0 +1,13 @@
+{
+  "slug": "posesivos-ingles",
+  "items": [
+    { "clave": "objetos-perdidos", "formato": "16:9", "estilo": "ilustracion", "escena": "Ilustración de un mostrador de objetos perdidos en una escuela con una caja de cartón abierta llena de útiles escolares varios, sin personas, luz cálida, colores suaves" },
+    { "clave": "libro", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de un libro de texto cerrado de pasta azul sobre un banco de madera, fondo liso claro" },
+    { "clave": "lapiz", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de un lápiz amarillo con goma sobre una superficie lisa, fondo claro" },
+    { "clave": "mochila", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de una mochila escolar roja recargada contra una pared, fondo liso claro" },
+    { "clave": "tarea", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de unas hojas de tarea engrapadas con garabatos sin letras legibles sobre un escritorio, fondo claro" },
+    { "clave": "cuadernos", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de una pila de tres cuadernos de colores distintos sobre un escritorio, fondo liso claro" },
+    { "clave": "pluma", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de una pluma de tinta azul con tapa, sobre una superficie lisa, fondo claro" },
+    { "clave": "escritorio", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de un escritorio de maestro de madera con una lámpara y una taza, vacío, en un salón de clases, luz cálida" }
+  ]
+}

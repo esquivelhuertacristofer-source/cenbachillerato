@@ -1,0 +1,8 @@
+{
+  "slug": "hardware-software",
+  "items": [
+    { "clave": "cliente-valeria", "formato": "1:1", "estilo": "ilustracion", "escena": "Mujer joven sentada en un escritorio con dos fotografías de boda impresas y una cámara réflex junto a ella, mirando hacia el frente con gesto de prisa, taller luminoso" },
+    { "clave": "cliente-ernesto", "formato": "1:1", "estilo": "ilustracion", "escena": "Hombre mayor con lentes y camisa de manga corta sentado tras el mostrador de una papelería con hojas de papel, una calculadora y una lámpara de escritorio" },
+    { "clave": "cliente-mariana", "formato": "1:1", "estilo": "ilustracion", "escena": "Estudiante adolescente en su cuarto con audífonos grandes y sudadera, sentada frente a un escritorio con un monitor apagado y luces de colores en la pared" }
+  ]
+}
