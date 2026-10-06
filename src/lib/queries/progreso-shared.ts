@@ -91,7 +91,9 @@ export interface IntentoStatsRow {
   completed_at: string | null;
   actividades: {
     tipo_codigo: string;
-    duracion_estimada_minutos: number | null;
+    // La columna no existe en la BD viva (la crea la migración 23, sin aplicar):
+    // pedirla hacía fallar el select con 400 y las stats salían en cero.
+    duracion_estimada_minutos?: number | null;
     progresiones: {
       uac: { codigo: string; nombre: string } | null;
     } | null;
@@ -256,7 +258,6 @@ export async function statsLegacyEnMemoria(sba: SbAny, alumnoId: string): Promis
       completed_at,
       actividades!actividad_id!inner (
         tipo_codigo,
-        duracion_estimada_minutos,
         progresiones!progresion_id (
           uac!uac_id ( codigo, nombre )
         )
