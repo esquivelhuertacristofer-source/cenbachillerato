@@ -634,6 +634,72 @@ const PENDIENTES: Caratula[] = [
     escena:
       "A clay diorama of a small Mexican house cut open like a dollhouse, with a glowing refrigerator, a TV and warm hanging light bulbs inside and a black water tank on the flat roof, connected by power lines on steel towers to a small coal power plant with a steaming cooling tower, while a big translucent CO2 bubble floats above the house.",
   },
+  // ── Inglés IV y V (campaña 2026-10): DOM puro, la escena es el experimento central ──
+  {
+    slug: "preferencias-elecciones-ingles",
+    semestre: 4,
+    escena:
+      "A clay student council meeting seen slightly from above: five diverse teenagers around a round " +
+      "table choosing the end-of-term school trip, three picture postcards in the middle showing a beach, " +
+      "a pine forest and a pyramid, one girl pointing at a postcard with a friendly smile while the others " +
+      "lean in to listen",
+  },
+  {
+    slug: "habitos-contexto-ingles",
+    semestre: 4,
+    escena:
+      "A small snowy clay village with pine trees and a yellow school bus waiting at a corner stop; in the " +
+      "foreground a Mexican exchange student in a puffy coat sits on a bench rearranging small coloured " +
+      "blocks across a weekly planner board with seven blank columns, a steaming cup beside her",
+  },
+  {
+    slug: "anecdota-ingles",
+    semestre: 4,
+    escena:
+      "A cosy clay café at night with an open mic: a young man on a tiny wooden stage holds a microphone " +
+      "and gestures as he tells a story under warm string lights, while eight listeners at small round " +
+      "tables lean in, some laughing, one glancing down at a phone",
+  },
+  {
+    slug: "campo-estudio-ingles",
+    semestre: 5,
+    escena:
+      "A clay career fair in a school gym seen slightly from above: four plain booths in a row, one table " +
+      "holding a small hospital bed, one a little wheeled robot, one a tray of seedlings beside a toy drone, " +
+      "one a suitcase and a folded map, while diverse students with backpacks walk between them",
+  },
+  {
+    slug: "opiniones-preocupaciones-ingles",
+    semestre: 5,
+    escena:
+      "A clay town hall meeting in a small coastal town: a young woman speaks at a wooden lectern while six " +
+      "neighbours on benches listen, a big brass balance scale stands beside her, and through a wide window " +
+      "a fishing pier and a distant cruise ship sit on a calm blue bay",
+  },
+  {
+    slug: "lectura-campo-ingles",
+    semestre: 5,
+    escena:
+      "A clay student detective in a cap holding a large magnifying glass over four paper sheets covered in " +
+      "soft wavy grey lines pinned to a corkboard; on the desk below rest a small sand hourglass, a potted " +
+      "plant, a rubber lab glove and a toy bus",
+  },
+  {
+    slug: "textos-funcionales-ingles",
+    semestre: 5,
+    escena:
+      "A clay writing desk seen slightly from above: four sealed paper envelopes of different colours fanned " +
+      "out in a wooden desk tray, a student's hand releasing a fifth envelope that flies off like a little " +
+      "paper plane toward the open window, a fountain pen and a cup of tea beside it",
+  },
+  {
+    slug: "entrevista-ingles",
+    semestre: 5,
+    escena:
+      "A clay scholarship interview in a bright office: a nervous teenage student in a blazer sits across a " +
+      "desk from a kind interviewer holding a notebook, a small sand hourglass between them and an old desk " +
+      "phone ringing beside it, a potted plant on the windowsill",
+  },
 ];
 
 interface Grafo { [k: string]: { class_type: string; inputs: Record<string, unknown> } }

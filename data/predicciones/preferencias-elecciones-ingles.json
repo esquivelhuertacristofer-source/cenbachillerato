@@ -1,0 +1,12 @@
+{
+  "escena": "En el comité estudiantil, Sofía pregunta qué prefieres para el viaje y tú contestas en inglés",
+  "pregunta": "Si dices tu preferencia sin «because» ni «since», ¿cuánto sube el convencimiento del grupo?",
+  "opciones": [
+    { "id": "a", "texto": "Casi nada: suena a capricho", "icono": "fa-face-rolling-eyes" },
+    { "id": "b", "texto": "Igual que con una razón", "icono": "fa-equals" },
+    { "id": "c", "texto": "Más, porque la frase es corta", "icono": "fa-arrow-trend-up" }
+  ],
+  "correcta": "a",
+  "porque": "Una preferencia sin razón es sólo un gusto: el grupo no sabe por qué debería cambiar de idea. Con «because» o «since» y un dato verdadero, la misma preferencia se vuelve un argumento.",
+  "comoComprobarlo": "En «Student council», responde a Sofía dos veces: una con «(sin tu razón)» y otra con una razón. Compara cuánto se mueve la barra de Convencimiento."
+}

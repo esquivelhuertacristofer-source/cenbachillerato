@@ -1,0 +1,12 @@
+{
+  "escena": "Una entrevista de beca en inglés: el entrevistador usa una palabra que no queda clara",
+  "pregunta": "Si pides que aclare esa palabra antes de responder, ¿qué le pasa a tu impresión?",
+  "opciones": [
+    { "id": "a", "texto": "Baja: parece que no sabes suficiente inglés", "icono": "fa-arrow-trend-down" },
+    { "id": "b", "texto": "Sube: demuestra que escuchas", "icono": "fa-arrow-trend-up" },
+    { "id": "c", "texto": "No cambia: solo cuenta la respuesta final", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Pedir aclaración («Could you clarify what you mean by...?») muestra escucha activa y evita responder otra cosa. Adivinar el significado suele terminar fuera de tema, y el entrevistador anota que respondiste sin entender.",
+  "comoComprobarlo": "En «Interview», llega a la pregunta 3 y pulsa «Pedir aclaración» antes de armar tu respuesta; luego repite la entrevista respondiendo sin aclarar y compara el medidor de Escucha y la impresión."
+}

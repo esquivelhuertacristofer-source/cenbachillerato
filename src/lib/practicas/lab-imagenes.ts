@@ -340,6 +340,9 @@ const LABS_CON_IMAGEN_ESPECIFICA_SEM3 = new Set<string>([
 ]);
 
 const LABS_CON_IMAGEN_ESPECIFICA_SEM4 = new Set<string>([
+  "preferencias-elecciones-ingles",
+  "habitos-contexto-ingles",
+  "anecdota-ingles",
   "pasado-viaje-ingles",
   "contaminantes-plasticos-3d",
   "quimica-organica-industria-3d",
@@ -372,6 +375,11 @@ const LABS_CON_IMAGEN_ESPECIFICA_SEM4 = new Set<string>([
 ]);
 
 const LABS_CON_IMAGEN_ESPECIFICA_SEM5 = new Set<string>([
+  "campo-estudio-ingles",
+  "opiniones-preocupaciones-ingles",
+  "lectura-campo-ingles",
+  "textos-funcionales-ingles",
+  "entrevista-ingles",
   "fision-nuclear-etica-3d",
   "continuidad-tres-condiciones",
   "dcl-leyes-newton",

@@ -1,0 +1,12 @@
+{
+  "escena": "Lucía, de Puebla, llega de intercambio a Maple Falls, un pueblo frío donde el autobús escolar pasa a las 7:00. Su agenda de la semana sigue siendo la misma que tenía en casa.",
+  "pregunta": "Con exactamente los mismos hábitos, ¿qué le pasa a su energía en Maple Falls?",
+  "opciones": [
+    { "id": "a", "texto": "Baja: el contexto cambia el costo de cada hábito", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Queda igual, porque los hábitos no cambiaron", "icono": "fa-equals" },
+    { "id": "c", "texto": "Sube, porque en un pueblo pequeño se descansa más", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "a",
+  "porque": "En Maple Falls el autobús pasa a las 7:00 y el pueblo va una hora adelante de Puebla: dormirse tarde y chatear de noche cuestan más energía allá. El mismo hábito tiene otra consecuencia en otro contexto.",
+  "comoComprobarlo": "En «My week», sin mover ningún día de la agenda, cambia el contexto entre Puebla y Maple Falls y mira el medidor de energía."
+}

@@ -39,6 +39,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     titulo: "Laboratorio Interactivo — Anatomía de una exposición oral",
     descripcion: "Monta el guion pieza por pieza y comprueba qué se rompe cuando falta cada una, reparte los segundos contra el reloj hasta ver cómo el desarrollo se come el cierre, decide el apoyo visual de cada momento y diagnostica cuatro exposiciones ajenas. Contenido verbatim de Lengua y Comunicación I.",
   },
+  "anecdota-ingles": {
+    slug: "anecdota-ingles",
+    titulo: "Laboratorio Interactivo — Open mic: cuenta una anécdota en inglés",
+    descripcion: "Edita la anécdota de un narrador en un micrófono abierto: orden de los hechos, conectores y pasado simple o continuo deciden si el público se engancha o saca el celular, con curva de atención y línea de tiempo en vivo. Contenido verbatim de Inglés IV.",
+  },
   "archivo-fuentes-historicas-3d": {
     slug: "archivo-fuentes-historicas-3d",
     titulo: "Laboratorio 3D — Archivo de fuentes históricas",
@@ -83,6 +88,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     slug: "busqueda-confiable",
     titulo: "Laboratorio Interactivo — Búsqueda Confiable",
     descripcion: "Distingue fuentes confiables de señales de alerta, empareja estrategias de búsqueda con su pregunta clave y domina el glosario. Contenido verbatim de Cultura Digital II.",
+  },
+  "campo-estudio-ingles": {
+    slug: "campo-estudio-ingles",
+    titulo: "Laboratorio Interactivo — Career fair: describe un campo de estudio",
+    descripcion: "Recorre una feria de carreras, observa las herramientas de cada estación, deduce el campo y descríbelo en inglés ante tres visitantes que se interesan o se confunden según la precisión de tu vocabulario. Contenido verbatim de Inglés V.",
   },
   "carreras-digitales": {
     slug: "carreras-digitales",
@@ -344,6 +354,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     titulo: "Laboratorio 3D — Enlaces Químicos",
     descripcion: "Forma moléculas y cristales manipulando átomos; observa cómo los electrones de valencia determinan el tipo de enlace (iónico, covalente, metálico).",
   },
+  "entrevista-ingles": {
+    slug: "entrevista-ingles",
+    titulo: "Laboratorio Interactivo — The interview: entrevista y panel en inglés",
+    descripcion: "Enfrenta una entrevista de beca con preguntas ambiguas, ruido y reloj de silencio: pide aclaración, gana tiempo y desarrolla respuestas; la libreta del entrevistador explica la decisión final. Incluye un panel estudiantil por turnos. Contenido verbatim de Inglés V.",
+  },
   "entropia-segunda-ley": {
     slug: "entropia-segunda-ley",
     titulo: "Laboratorio 3D — Entropía y Segunda Ley",
@@ -514,6 +529,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     titulo: "Laboratorio Interactivo — Habits and comparisons: comparar lo que hacen, eligen o prefieren",
     descripcion: "Nombra la regla que le toca a cada adjetivo y construye su comparativo y su superlativo esquivando «more easier» y «gooder», lee tablas de datos y elige la única comparación en inglés que esos datos sostienen, arma la igualdad «as … as» y su negación con el comparativo al que equivale, y completa prefer … to, would rather … than y like … better than con la forma de verbo que cada una exige. Contenido verbatim de Inglés III.",
   },
+  "habitos-contexto-ingles": {
+    slug: "habitos-contexto-ingles",
+    titulo: "Laboratorio Interactivo — A week in Maple Falls: hábitos con razones",
+    descripcion: "Ajusta la agenda semanal de una estudiante de intercambio y observa cómo cambian su energía, su tiempo libre y su adaptación según el lugar; luego explica cada hábito en inglés con frecuencia y razón (always… because…). Contenido verbatim de Inglés IV.",
+  },
   "hardware-software": {
     slug: "hardware-software",
     titulo: "Laboratorio Interactivo — Hardware y Software",
@@ -578,6 +598,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     slug: "kit-herramientas-digitales",
     titulo: "Laboratorio Interactivo — Kit de herramientas digitales para estudiar",
     descripcion: "Elige la categoría de herramienta que resuelve cada encargo escolar y descarta las que no sirven, desempata entre dos herramientas según la necesidad declarada, renombra y archiva un escritorio hecho un desastre y ordena los ocho pasos de un trabajo con la herramienta de cada paso. Contenido verbatim de Cultura Digital I.",
+  },
+  "lectura-campo-ingles": {
+    slug: "lectura-campo-ingles",
+    titulo: "Laboratorio Interactivo — Read & decide: lectura estratégica en inglés",
+    descripcion: "Resuelve tareas reales leyendo textos breves con reloj: skimming, scanning, lectura detallada y pistas de contexto (incluidos falsos cognados); una mala lectura tiene consecuencia visible y se muestra la oración que decidía. Contenido verbatim de Inglés V.",
   },
   "lectura-critica-postura": {
     slug: "lectura-critica-postura",
@@ -724,6 +749,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     titulo: "Laboratorio 3D — Operaciones con Monomios y Binomios",
     descripcion: "Suma, resta y multiplica monomios y binomios con mosaicos de álgebra; visualiza la propiedad distributiva como el área de un rectángulo.",
   },
+  "opiniones-preocupaciones-ingles": {
+    slug: "opiniones-preocupaciones-ingles",
+    titulo: "Laboratorio Interactivo — Town hall: opiniones y preocupaciones",
+    descripcion: "Interviene en una asamblea ciudadana con preocupación, fuerza (might, could, will), evidencia y propuesta: la balanza entre lo que afirmas y lo que pruebas mueve la credibilidad y el voto del consejo. Contenido verbatim de Inglés V.",
+  },
   "optica-lentes-espejos": {
     slug: "optica-lentes-espejos",
     titulo: "Laboratorio 3D — Óptica: Lentes y Espejos",
@@ -803,6 +833,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     slug: "potencias-raices",
     titulo: "Laboratorio 3D — Potencias y Raíces",
     descripcion: "Construye cubos y cuadrados para relacionar área y volumen con potencias; usa la raíz cuadrada y cúbica para encontrar la longitud del lado.",
+  },
+  "preferencias-elecciones-ingles": {
+    slug: "preferencias-elecciones-ingles",
+    titulo: "Laboratorio Interactivo — Student Council: elige y justifica en inglés",
+    descripcion: "Defiende una opción ante el comité estudiantil armando frases con apertura, preferencia y razón (I'd rather, I prefer X to Y, because…): la claridad, el respeto y el convencimiento mueven el voto del grupo, y una frase grosera lo cierra. Contenido verbatim de Inglés IV.",
   },
   "preguntas-pasado-discursos-3d": {
     slug: "preguntas-pasado-discursos-3d",
@@ -993,6 +1028,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     slug: "terminal-horarios-ingles-3d",
     titulo: "Laboratorio 3D — Where and when? La terminal de autobuses",
     descripcion: "Pide información en una terminal de autobuses 3D con la palabra interrogativa correcta, responde a viajeros leyendo un tablero de salidas que cambia en vivo y atiende el módulo de información con respuestas cortas y completas.",
+  },
+  "textos-funcionales-ingles": {
+    slug: "textos-funcionales-ingles",
+    titulo: "Laboratorio Interactivo — Outbox: correos que funcionan",
+    descripcion: "Arregla y envía correos formales e informales pieza por pieza (asunto, saludo, petición, cierre): el destinatario concede, pide aclaraciones, se molesta o ni lo abre según claridad, cortesía y registro. Contenido verbatim de Inglés V.",
   },
   "tiempo-historico": {
     slug: "tiempo-historico",

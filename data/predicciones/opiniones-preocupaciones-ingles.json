@@ -1,0 +1,12 @@
+{
+  "escena": "En un foro ciudadano ficticio opinas en inglés sobre un plan de cruceros. Seis integrantes votan según la credibilidad, el respeto y la claridad de tu intervención.",
+  "pregunta": "Respondes con cortesía y dices «this plan will pollute the water» apoyándote sólo en un ejemplo personal. ¿Qué pasa?",
+  "opciones": [
+    { "id": "a", "texto": "Convences a más integrantes porque suenas seguro", "icono": "fa-bullhorn" },
+    { "id": "b", "texto": "Cae tu credibilidad y el plan no cambia", "icono": "fa-scale-unbalanced" },
+    { "id": "c", "texto": "Sólo baja el respeto del foro", "icono": "fa-handshake-slash" }
+  ],
+  "correcta": "b",
+  "porque": "«Will» es certeza alta, pero un ejemplo personal es evidencia débil: afirmas más de lo que pruebas. Los dos integrantes que miran la credibilidad votan en contra y no se juntan los cinco votos; el respeto no cambia.",
+  "comoComprobarlo": "En «Town hall», Puerto Calma, elige «I see your point, but», la preocupación por el agua, el ejemplo del aceite en la arena, la propuesta de un barco por semana, sube la fuerza a «will» y habla en el foro."
+}

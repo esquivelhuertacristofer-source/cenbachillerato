@@ -1,0 +1,17 @@
+{
+  "slug": "entrevista-ingles",
+  "items": [
+    { "texto": "Today I am going to talk about... / My presentation focuses on...", "escena": "A clay student standing at the front of a classroom beside a large blank board, opening her arms toward the audience as she begins to speak" },
+    { "texto": "Moving on to... / Now let's look at... / Turning to...", "escena": "A clay presenter stepping from one display stand of pictures to the next in an exhibition hall, waving the audience to follow her" },
+    { "texto": "Could you repeat that, please? / Could you clarify what you mean by...?", "escena": "A clay student at an interview table cupping a hand behind her ear and leaning forward politely, while the interviewer across the table pauses mid-sentence" },
+    { "texto": "That's a great question. / Let me think about that for a moment.", "escena": "A clay young man at an interview table looking up thoughtfully with a finger on his chin and a calm smile, while the interviewer waits patiently with folded hands" },
+    { "texto": "In conclusion, / To wrap up, / To summarize...", "escena": "A clay presenter on a small stage tying a ribbon around a gift box on a table, as the audience in front begins to applaud" },
+    { "texto": "From my experience... / Based on what I have learned...", "escena": "A clay young woman at an interview table opening a photo album to show the interviewer pictures of herself volunteering at a community kitchen" },
+    { "texto": "proposition", "escena": "A clay school debate stage with two team tables; the team on the left stands up together nodding, their speaker giving a confident thumbs-up" },
+    { "texto": "opposition", "escena": "A clay school debate stage with two team tables; the team on the right sits with arms crossed, their speaker shaking her head and raising an open hand to object" },
+    { "texto": "rebuttals", "escena": "Two clay debaters at facing lecterns: one speaks while the other listens closely and quickly scribbles notes, ready to answer back" },
+    { "texto": "moderator", "escena": "A clay moderator seated between two debate tables, holding up a small hourglass in one hand and gesturing to one speaker with the other" },
+    { "texto": "backchanneling", "escena": "A clay girl on a park bench listening to her friend's story, nodding with a warm smile and leaning in without interrupting" },
+    { "texto": "circumlocution", "escena": "A clay student at a hardware store counter miming the shape and twisting motion of a screwdriver with her hands, while the friendly clerk reaches toward a shelf of tools to guess" }
+  ]
+}

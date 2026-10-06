@@ -1,0 +1,13 @@
+{
+  "slug": "habitos-contexto-ingles",
+  "items": [
+    { "clave": "maple-falls-invierno", "formato": "16:9", "estilo": "foto", "escena": "Calle de un pueblo pequeño de Norteamérica al amanecer en invierno, casas de madera con porche cubiertas de nieve, un autobús escolar amarillo liso detenido junto a la banqueta, una adolescente con abrigo grueso y mochila esperando, luz azulada y faroles encendidos; el autobús sin letreros, sin letras ni rótulos" },
+    { "clave": "puebla-calle", "formato": "16:9", "estilo": "foto", "escena": "Calle colonial de una ciudad del centro de México por la mañana, fachadas de colores con azulejos y balcones de herrería, banqueta soleada con estudiantes de preparatoria caminando con mochilas, cielo despejado; sin letreros, sin letras ni anuncios" },
+    { "clave": "dormir-temprano", "formato": "1:1", "estilo": "ilustracion", "escena": "Recámara juvenil de noche con la cama recién tendida y una adolescente acostándose, lámpara de buró con luz cálida, ventana con nieve cayendo afuera, mochila lista junto a la puerta" },
+    { "clave": "autobus-nieve", "formato": "1:1", "estilo": "foto", "escena": "Interior de un autobús escolar por la mañana con asientos de vinil verde, adolescentes sentados con abrigos y gorros, ventanas empañadas que dejan ver un camino nevado; sin letreros ni letras" },
+    { "clave": "cena-familia", "formato": "1:1", "estilo": "ilustracion", "escena": "Mesa de comedor de una casa a la hora de la cena, una pareja adulta, un niño y una adolescente invitada conversando y sonriendo, platos de pasta y ensalada, ventana oscura detrás y luz cálida de lámpara colgante" },
+    { "clave": "chat-noche", "formato": "1:1", "estilo": "ilustracion", "escena": "Adolescente sentada en la cama a oscuras de noche, el rostro iluminado por la luz azul de un teléfono, reloj de pared analógico sin números marcando una hora tardía, ventana con luna; la pantalla del teléfono vista de canto, sin texto visible" },
+    { "clave": "biblioteca", "formato": "1:1", "estilo": "foto", "escena": "Mesa larga de una biblioteca escolar por la tarde, una adolescente estudiando con libros abiertos, cuaderno y lápiz, estantes llenos de libros de lomos lisos al fondo, luz de ventana entrando de lado; sin letras visibles" },
+    { "clave": "futbol-centro", "formato": "1:1", "estilo": "foto", "escena": "Cancha techada de un centro comunitario con piso de madera, adolescentes de distintos orígenes jugando fútbol rápido con un balón, porterías pequeñas, gradas al fondo; sin letreros, números ni letras" }
+  ]
+}

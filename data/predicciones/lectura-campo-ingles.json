@@ -1,0 +1,12 @@
+{
+  "escena": "Un folleto turístico en inglés dice a qué hora sale el autobús del tour. Es domingo y tienes 45 segundos de lectura.",
+  "pregunta": "Con scanning encuentras «8:40 a.m.» y «8:10 a.m.». ¿A qué hora llegas a la terminal?",
+  "opciones": [
+    { "id": "a", "texto": "A las 8:25 a.m.", "icono": "fa-clock" },
+    { "id": "b", "texto": "A las 7:55 a.m.", "icono": "fa-person-walking-luggage" },
+    { "id": "c", "texto": "A las 8:40 a.m.", "icono": "fa-bus" }
+  ],
+  "correcta": "b",
+  "porque": "8:40 es el horario de lunes a sábado. La oración siguiente empieza con «However»: los domingos sale a las 8:10, y el folleto pide llegar 15 minutos antes. El scanning encuentra las horas; la lectura detallada dice cuál aplica.",
+  "comoComprobarlo": "En «Read & decide», abre el caso 4, usa la lupa «Numbers», lee con detalle las oraciones donde brillan las horas y elige tu hora de llegada."
+}

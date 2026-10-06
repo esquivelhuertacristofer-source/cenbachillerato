@@ -1,0 +1,10 @@
+{
+  "slug": "textos-funcionales-ingles",
+  "items": [
+    { "clave": "rivera", "formato": "1:1", "estilo": "foto", "escena": "Mujer de unos cincuenta años con lentes y saco azul marino sentada en el escritorio de una oficina universitaria luminosa, hojeando una carpeta de papel, con plantas y estantes de carpetas lisas sin rótulos al fondo" },
+    { "clave": "verdemar", "formato": "1:1", "estilo": "foto", "escena": "Escritorio ordenado con carpetas de papel lisas y una taza junto a un ventanal; del otro lado del vidrio, dos técnicos con bata blanca revisan frascos con agua de río sobre una mesa de laboratorio" },
+    { "clave": "comite", "formato": "1:1", "estilo": "foto", "escena": "Sala de juntas de una escuela con mesa larga de madera: un profesor de mediana edad con camisa clara preside la reunión y cuatro estudiantes de bachillerato sentados lo escuchan, luz de mañana por las ventanas" },
+    { "clave": "tomas", "formato": "1:1", "estilo": "foto", "escena": "Joven estudiante sonriente con sudadera gris y mochila sentado en las gradas del patio de su escuela por la tarde, mirando hacia la cámara de forma relajada, sol cálido" },
+    { "clave": "escritorio", "formato": "16:9", "estilo": "foto", "escena": "Mesa de madera junto a una ventana con una hoja de papel en blanco, una pluma, un sobre cerrado sin escritura y una taza de café, luz natural suave de mañana" }
+  ]
+}

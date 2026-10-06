@@ -1,0 +1,13 @@
+{
+  "slug": "preferencias-elecciones-ingles",
+  "items": [
+    { "clave": "sala-comite", "formato": "16:9", "estilo": "ilustracion", "escena": "Salón escolar de preparatoria con mesas juntas formando una mesa larga de reunión, sillas alrededor, carpetas y vasos de agua sobre la mesa, ventanas con luz de tarde nublada" },
+    { "clave": "museo", "formato": "16:9", "estilo": "ilustracion", "escena": "Sala interior de un museo de ciencias con un gran péndulo colgando del techo, maquetas de planetas y vitrinas con piedras y fósiles, piso pulido y luz cálida" },
+    { "clave": "parque", "formato": "16:9", "estilo": "ilustracion", "escena": "Parque acuático al aire libre con toboganes de colores que bajan a una alberca azul, palmeras y camastros vacíos, cielo despejado de mediodía" },
+    { "clave": "sofia", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una chica de 17 años con cabello oscuro en cola de caballo, suéter azul marino y una carpeta abrazada al pecho, expresión atenta, fondo liso" },
+    { "clave": "marco", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de un chico de 17 años de cabello rizado corto, playera roja y gorra hacia atrás, sonrisa confiada, fondo liso" },
+    { "clave": "lupita", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una chica de 16 años con lentes redondos y trenza larga, sudadera amarilla, expresión pensativa con la mano en la barbilla, fondo liso" },
+    { "clave": "rios", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de un maestro de unos 45 años con barba corta canosa, camisa de manga larga verde olivo y lentes en el bolsillo, expresión tranquila, fondo liso" },
+    { "clave": "dani", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de un joven de 16 años de cabello lacio con fleco, chamarra de mezclilla y audífonos colgando del cuello, sonrisa amistosa, fondo liso" }
+  ]
+}

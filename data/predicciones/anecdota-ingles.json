@@ -1,0 +1,12 @@
+{
+  "escena": "Leo cuenta en un micrófono abierto lo que le pasó en una terminal de autobuses",
+  "pregunta": "Si Leo cuenta cómo terminó todo antes de contar el problema, ¿qué hace la atención del público?",
+  "opciones": [
+    { "id": "a", "texto": "Sube: el final atrapa desde el principio", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Baja: ya saben cómo termina", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "Nada cambia si la gramática está bien", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Una anécdota va en orden: escena, complicación, clímax, resolución y reacción. Contar la resolución antes es un spoiler: el público ya conoce el final, pierde la tensión y deja de escuchar lo que falta.",
+  "comoComprobarlo": "En «Open mic», sube con las flechas la parte «Resolution» por encima de «Complication» y observa el medidor, las caras y la línea de tiempo."
+}

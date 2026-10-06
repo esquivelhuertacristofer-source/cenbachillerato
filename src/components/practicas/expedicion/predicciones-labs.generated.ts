@@ -122,6 +122,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "porque": "Si el público lee la pantalla deja de oír, y sin contacto visual siente que le leen. La atención cae en cada momento de la exposición.",
     "comoComprobarlo": "En «Da la exposición», deja mirada y apoyo como están y mueve el momento de la exposición a 3:00; luego cambia a mirar al grupo y esquema."
   },
+  "anecdota-ingles": {
+    "escena": "Leo cuenta en un micrófono abierto lo que le pasó en una terminal de autobuses",
+    "pregunta": "Si Leo cuenta cómo terminó todo antes de contar el problema, ¿qué hace la atención del público?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Sube: el final atrapa desde el principio",
+        "icono": "fa-arrow-trend-up"
+      },
+      {
+        "id": "b",
+        "texto": "Baja: ya saben cómo termina",
+        "icono": "fa-arrow-trend-down"
+      },
+      {
+        "id": "c",
+        "texto": "Nada cambia si la gramática está bien",
+        "icono": "fa-equals"
+      }
+    ],
+    "correcta": "b",
+    "porque": "Una anécdota va en orden: escena, complicación, clímax, resolución y reacción. Contar la resolución antes es un spoiler: el público ya conoce el final, pierde la tensión y deja de escuchar lo que falta.",
+    "comoComprobarlo": "En «Open mic», sube con las flechas la parte «Resolution» por encima de «Complication» y observa el medidor, las caras y la línea de tiempo."
+  },
   "archivo-fuentes-historicas-3d": {
     "escena": "Una balanza de brazos largos con un expediente de 1938: telegrama, fotografía, testimonio oral, cartas y diarios. Cada fuente pesa distinto como evidencia.",
     "pregunta": "¿Qué tres fuentes bastan para que la balanza supere el peso mínimo y sostenga la tesis?",
@@ -289,6 +313,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "correcta": "b",
     "porque": "Las comillas piden que aparezcan todas las palabras juntas, así que el buscador descarta lo que solo coincide con una. Menos ruido, pero también menos opciones para comparar.",
     "comoComprobarlo": "Elige «sueño», «adolescentes» y «horas», cuenta los resultados, activa y desactiva las comillas y compara el número."
+  },
+  "campo-estudio-ingles": {
+    "escena": "En una feria de carreras observas una estación, deduces el campo y lo describes en inglés con seis frases. Tres visitantes escuchan: cada uno atiende dos frases y se registra solo si las entiende.",
+    "pregunta": "En la estación A, ¿qué pasa si dices «This area involves testing soil and planning healthy crops»?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Lucía se confunde y no se registra",
+        "icono": "fa-face-frown-open"
+      },
+      {
+        "id": "b",
+        "texto": "Todos se registran: la gramática es correcta",
+        "icono": "fa-users"
+      },
+      {
+        "id": "c",
+        "texto": "Solo duda la coordinadora de prácticas",
+        "icono": "fa-briefcase"
+      }
+    ],
+    "correcta": "a",
+    "porque": "La frase está bien escrita, pero describe agronomía y la estación A es otro campo. A Lucía le importa justo qué hace la gente del campo; los otros dos escuchan otras frases y solo pierden un poco de interés.",
+    "comoComprobarlo": "En «Career fair», estación A, observa tres objetos, elige esa opción en «This area involves…», completa las demás frases y presiona «Present to the visitors»."
   },
   "carreras-digitales": {
     "escena": "Ximena cursa cuatro semestres y en cada uno elige una actividad. Un radar de seis habilidades crece y los perfiles digitales se iluminan.",
@@ -1370,6 +1418,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "porque": "Con una ΔEN de 1.7 o más, el átomo más electronegativo arranca el electrón al otro. Así se forman Na⁺ y Cl⁻, iones de carga opuesta que se atraen: enlace iónico.",
     "comoComprobarlo": "En «Tu enlace», elige Na como átomo A y Cl como átomo B, y mira la escala de ΔEN y el electrón en la escena."
   },
+  "entrevista-ingles": {
+    "escena": "Una entrevista de beca en inglés: el entrevistador usa una palabra que no queda clara",
+    "pregunta": "Si pides que aclare esa palabra antes de responder, ¿qué le pasa a tu impresión?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Baja: parece que no sabes suficiente inglés",
+        "icono": "fa-arrow-trend-down"
+      },
+      {
+        "id": "b",
+        "texto": "Sube: demuestra que escuchas",
+        "icono": "fa-arrow-trend-up"
+      },
+      {
+        "id": "c",
+        "texto": "No cambia: solo cuenta la respuesta final",
+        "icono": "fa-equals"
+      }
+    ],
+    "correcta": "b",
+    "porque": "Pedir aclaración («Could you clarify what you mean by...?») muestra escucha activa y evita responder otra cosa. Adivinar el significado suele terminar fuera de tema, y el entrevistador anota que respondiste sin entender.",
+    "comoComprobarlo": "En «Interview», llega a la pregunta 3 y pulsa «Pedir aclaración» antes de armar tu respuesta; luego repite la entrevista respondiendo sin aclarar y compara el medidor de Escucha y la impresión."
+  },
   "entropia-segunda-ley": {
     "escena": "Una caja de vidrio dividida por una pared: gas azul a la izquierda, gas rojo a la derecha, y una barra de entropía al lado.",
     "pregunta": "Si quitas la pared, ¿qué le pasa a la barra de entropía?",
@@ -2114,6 +2186,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "porque": "«fast» es de una sílaba y su superlativo es the fastest. Una oración mal armada confunde a quien escucha, y con prisa elige lo primero que pasa.",
     "comoComprobarlo": "En «El sábado de Ana», elige esa oración en la primera situación y mira a qué barra señala Ana."
   },
+  "habitos-contexto-ingles": {
+    "escena": "Lucía, de Puebla, llega de intercambio a Maple Falls, un pueblo frío donde el autobús escolar pasa a las 7:00. Su agenda de la semana sigue siendo la misma que tenía en casa.",
+    "pregunta": "Con exactamente los mismos hábitos, ¿qué le pasa a su energía en Maple Falls?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Baja: el contexto cambia el costo de cada hábito",
+        "icono": "fa-arrow-down"
+      },
+      {
+        "id": "b",
+        "texto": "Queda igual, porque los hábitos no cambiaron",
+        "icono": "fa-equals"
+      },
+      {
+        "id": "c",
+        "texto": "Sube, porque en un pueblo pequeño se descansa más",
+        "icono": "fa-arrow-up"
+      }
+    ],
+    "correcta": "a",
+    "porque": "En Maple Falls el autobús pasa a las 7:00 y el pueblo va una hora adelante de Puebla: dormirse tarde y chatear de noche cuestan más energía allá. El mismo hábito tiene otra consecuencia en otro contexto.",
+    "comoComprobarlo": "En «My week», sin mover ningún día de la agenda, cambia el contexto entre Puebla y Maple Falls y mira el medidor de energía."
+  },
   "hardware-software": {
     "escena": "Una PC para Valeria, que edita video: procesador de 4 núcleos, SSD de 512 GB, tarjeta media, Windows y 8 GB de RAM.",
     "pregunta": "Instalas su editor de video con solo 8 GB de RAM. ¿Qué pasa?",
@@ -2425,6 +2521,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "correcta": "b",
     "porque": "Las versiones sueltas se cruzan: nadie sabe cuál es la última y se pisan los cambios. Un documento compartido evita justo eso.",
     "comoComprobarlo": "En «La entrega del viernes» avanza hasta la etapa de redactar y elige archivos por correo; compara los tres medidores antes y después."
+  },
+  "lectura-campo-ingles": {
+    "escena": "Un folleto turístico en inglés dice a qué hora sale el autobús del tour. Es domingo y tienes 45 segundos de lectura.",
+    "pregunta": "Con scanning encuentras «8:40 a.m.» y «8:10 a.m.». ¿A qué hora llegas a la terminal?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "A las 8:25 a.m.",
+        "icono": "fa-clock"
+      },
+      {
+        "id": "b",
+        "texto": "A las 7:55 a.m.",
+        "icono": "fa-person-walking-luggage"
+      },
+      {
+        "id": "c",
+        "texto": "A las 8:40 a.m.",
+        "icono": "fa-bus"
+      }
+    ],
+    "correcta": "b",
+    "porque": "8:40 es el horario de lunes a sábado. La oración siguiente empieza con «However»: los domingos sale a las 8:10, y el folleto pide llegar 15 minutos antes. El scanning encuentra las horas; la lectura detallada dice cuál aplica.",
+    "comoComprobarlo": "En «Read & decide», abre el caso 4, usa la lupa «Numbers», lee con detalle las oraciones donde brillan las horas y elige tu hora de llegada."
   },
   "lectura-critica-postura": {
     "escena": "Una columna de opinión cita a «todos los especialistas» y a un sobrino que reprobó",
@@ -3074,6 +3194,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "porque": "La rapidez de la onda depende del medio y no cambia. Como v = λ·f, si f se duplica, λ debe volverse la mitad para que el producto siga valiendo lo mismo.",
     "comoComprobarlo": "Mueve el deslizador de frecuencia en Controles y mira la regla amarilla de λ y el medidor de la esquina."
   },
+  "opiniones-preocupaciones-ingles": {
+    "escena": "En un foro ciudadano ficticio opinas en inglés sobre un plan de cruceros. Seis integrantes votan según la credibilidad, el respeto y la claridad de tu intervención.",
+    "pregunta": "Respondes con cortesía y dices «this plan will pollute the water» apoyándote sólo en un ejemplo personal. ¿Qué pasa?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Convences a más integrantes porque suenas seguro",
+        "icono": "fa-bullhorn"
+      },
+      {
+        "id": "b",
+        "texto": "Cae tu credibilidad y el plan no cambia",
+        "icono": "fa-scale-unbalanced"
+      },
+      {
+        "id": "c",
+        "texto": "Sólo baja el respeto del foro",
+        "icono": "fa-handshake-slash"
+      }
+    ],
+    "correcta": "b",
+    "porque": "«Will» es certeza alta, pero un ejemplo personal es evidencia débil: afirmas más de lo que pruebas. Los dos integrantes que miran la credibilidad votan en contra y no se juntan los cinco votos; el respeto no cambia.",
+    "comoComprobarlo": "En «Town hall», Puerto Calma, elige «I see your point, but», la preocupación por el agua, el ejemplo del aceite en la arena, la propuesta de un barco por semana, sube la fuerza a «will» y habla en el foro."
+  },
   "optica-lentes-espejos": {
     "escena": "Un objeto frente a una lente convergente; los rayos forman su imagen del otro lado",
     "pregunta": "Si acercas el objeto hasta quedar dentro del foco, ¿cómo es la imagen?",
@@ -3433,6 +3577,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "correcta": "c",
     "porque": "El volumen depende del lado multiplicado tres veces: 4³ = 64 y 2³ = 8, así que 64 ÷ 8 = 8. Duplicar el lado multiplica el volumen por 2³.",
     "comoComprobarlo": "Elige «Al cubo», deja la base en 2 y pulsa «Duplicar el lado»; compara los cubitos antes y después."
+  },
+  "preferencias-elecciones-ingles": {
+    "escena": "En el comité estudiantil, Sofía pregunta qué prefieres para el viaje y tú contestas en inglés",
+    "pregunta": "Si dices tu preferencia sin «because» ni «since», ¿cuánto sube el convencimiento del grupo?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Casi nada: suena a capricho",
+        "icono": "fa-face-rolling-eyes"
+      },
+      {
+        "id": "b",
+        "texto": "Igual que con una razón",
+        "icono": "fa-equals"
+      },
+      {
+        "id": "c",
+        "texto": "Más, porque la frase es corta",
+        "icono": "fa-arrow-trend-up"
+      }
+    ],
+    "correcta": "a",
+    "porque": "Una preferencia sin razón es sólo un gusto: el grupo no sabe por qué debería cambiar de idea. Con «because» o «since» y un dato verdadero, la misma preferencia se vuelve un argumento.",
+    "comoComprobarlo": "En «Student council», responde a Sofía dos veces: una con «(sin tu razón)» y otra con una razón. Compara cuánto se mueve la barra de Convencimiento."
   },
   "preguntas-pasado-discursos-3d": {
     "escena": "Una espiral del tiempo con vueltas de 110 años. Cada evidencia cae sobre ella cuando la ubicas en su siglo correcto.",
@@ -4345,6 +4513,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "correcta": "b",
     "porque": "Where pide un lugar y la pregunta está bien formada, así que Rosa contesta con la ubicación. Lucy recibe el dato, camina hacia allá y el local queda resaltado.",
     "comoComprobarlo": "En «Ask the right question» elige el dato 1, escribe esa pregunta y pulsa Preguntar a Rosa; luego cámbiala a «What time…» y compara."
+  },
+  "textos-funcionales-ingles": {
+    "escena": "Le pides por correo a tu amigo Tomás sus diapositivas del proyecto",
+    "pregunta": "Si a tu amigo le escribes «Dear Mr. Gómez» y «Yours faithfully», ¿cómo responde?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Te manda todo: lo formal siempre suma",
+        "icono": "fa-thumbs-up"
+      },
+      {
+        "id": "b",
+        "texto": "Te pregunta si estás molesto con él",
+        "icono": "fa-face-meh"
+      },
+      {
+        "id": "c",
+        "texto": "Ni lo abre: parece spam",
+        "icono": "fa-envelope"
+      }
+    ],
+    "correcta": "b",
+    "porque": "El registro depende de quién lee. Con un amigo, «Dear Mr.» y «Yours faithfully» suenan fríos, como de oficina: Tomás no se ofende, pero lo nota y pregunta si pasa algo. Entre amigos van «Hi Tomás,» y «See you,».",
+    "comoComprobarlo": "En «Outbox», abre la misión de Tomás, deja todas las piezas informales salvo el saludo «Dear Mr. Gómez,» y la despedida «Yours faithfully,», y pulsa «Send»."
   },
   "tiempo-historico": {
     "escena": "Estás en un taller de línea del tiempo con la Revolución Mexicana (1910) y la Constitución de 1917 ya colocadas por décadas.",

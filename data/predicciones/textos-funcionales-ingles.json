@@ -1,0 +1,12 @@
+{
+  "escena": "Le pides por correo a tu amigo Tomás sus diapositivas del proyecto",
+  "pregunta": "Si a tu amigo le escribes «Dear Mr. Gómez» y «Yours faithfully», ¿cómo responde?",
+  "opciones": [
+    { "id": "a", "texto": "Te manda todo: lo formal siempre suma", "icono": "fa-thumbs-up" },
+    { "id": "b", "texto": "Te pregunta si estás molesto con él", "icono": "fa-face-meh" },
+    { "id": "c", "texto": "Ni lo abre: parece spam", "icono": "fa-envelope" }
+  ],
+  "correcta": "b",
+  "porque": "El registro depende de quién lee. Con un amigo, «Dear Mr.» y «Yours faithfully» suenan fríos, como de oficina: Tomás no se ofende, pero lo nota y pregunta si pasa algo. Entre amigos van «Hi Tomás,» y «See you,».",
+  "comoComprobarlo": "En «Outbox», abre la misión de Tomás, deja todas las piezas informales salvo el saludo «Dear Mr. Gómez,» y la despedida «Yours faithfully,», y pulsa «Send»."
+}

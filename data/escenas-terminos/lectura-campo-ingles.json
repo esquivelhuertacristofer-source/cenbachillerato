@@ -1,0 +1,17 @@
+{
+  "slug": "lectura-campo-ingles",
+  "items": [
+    { "texto": "The main idea of the text is...", "escena": "A clay student holding up a single sheet of paper covered in soft wavy grey lines, a big glowing light bulb floating above it as she explains it to a classmate" },
+    { "texto": "According to the author / According to the text...", "escena": "A clay student resting her fingertip on one exact spot of a paper page covered in soft grey lines while she turns to speak to her class" },
+    { "texto": "However / Nevertheless / On the other hand...", "escena": "A clay girl standing where a garden path forks, one side sunny and full of flowers, the other shaded under a rain cloud, glancing back and forth between them" },
+    { "texto": "In other words, / That is to say...", "escena": "A clay teacher holding up a big tangled knot of rope, and beside her a student holding the same rope straightened into one simple neat line" },
+    { "texto": "I find this text / argument... because...", "escena": "A clay student in a library armchair reading a sheet of paper with an intrigued smile, tapping her chin as if weighing what she reads" },
+    { "texto": "To sum up / In conclusion / To summarize...", "escena": "A clay student on a desk squeezing a big messy pile of colourful paper strips into one small neat bundle tied with a ribbon" },
+    { "texto": "skimming", "escena": "A clay student flipping quickly through a thick stack of papers, eyes darting over them, pages fluttering in the air like a breeze" },
+    { "texto": "scanning", "escena": "A clay student holding a magnifying glass over a large sheet of grey-lined paper, the lens stopping over one single bright yellow dot" },
+    { "texto": "close reading", "escena": "A clay student leaning close over a single page under a desk lamp, slowly following each line with her fingertip, a pencil tucked behind her ear" },
+    { "texto": "topic sentence", "escena": "A clay toy train on a track where a bright red locomotive leads a line of plain cream wagons, and a station worker points at the front engine" },
+    { "texto": "fact", "escena": "A clay student measuring the height of a young tree with a long tape measure while a classmate carefully writes the result on a clipboard" },
+    { "texto": "opinion", "escena": "A clay boy tasting a spoonful of salsa and smiling broadly, while his friend beside him grimaces at a spoonful of the very same salsa" }
+  ]
+}

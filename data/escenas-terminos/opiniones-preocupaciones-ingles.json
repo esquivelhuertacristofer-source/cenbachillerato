@@ -1,0 +1,17 @@
+{
+  "slug": "opiniones-preocupaciones-ingles",
+  "items": [
+    { "texto": "In my opinion, / I believe that...", "escena": "A clay student standing up at a community meeting with one hand on her chest, calmly sharing her view while neighbours in folding chairs listen" },
+    { "texto": "I am worried about / I am concerned about...", "escena": "A clay fisherman on a small wooden pier frowning, hand at his chin, as a huge cruise ship approaches his quiet little bay" },
+    { "texto": "I strongly believe that... / I am not sure, but...", "escena": "Two clay students at a debate table: one leans forward pressing a fist firmly on the table with confidence, the other tilts her head with a small shrug and an open hand" },
+    { "texto": "I see your point, but... / That's a good point, however...", "escena": "Two clay neighbours at a town meeting: one nods respectfully with a hand on the other's shoulder while raising a finger to add a different idea, both smiling" },
+    { "texto": "From my point of view... / As I see it...", "escena": "A clay girl on a hilltop looking at a coastal town through binoculars, while a friend beside her views the same town from a rock at a different angle" },
+    { "texto": "I prefer... to... / I would rather... than...", "escena": "A clay young woman in a coastal town street resting one hand on a bicycle and smiling, while a set of car keys lies ignored on a low wall beside her" },
+    { "texto": "should", "escena": "A clay older neighbour gently pointing a young man toward a row of solar panels on a rooftop, with a kind, advising expression" },
+    { "texto": "could", "escena": "Clay teenagers standing at the edge of a weedy vacant lot, one of them sketching in a notebook a small park with trees and benches that the lot might become" },
+    { "texto": "might", "escena": "A clay man on a beach looking up at a sky that is half sunny and half cloudy, holding a folded umbrella with an uncertain expression" },
+    { "texto": "would", "escena": "A clay neighbourhood street where every house has colourful recycling bins at its door, the air above clear and the river beside it sparkling clean" },
+    { "texto": "however", "escena": "A clay car filling up at a fuel pump while thick grey smoke pours from its exhaust and a girl standing nearby covers her nose" },
+    { "texto": "although", "escena": "A clay family installing solar panels on their roof: the father winces while handing over a big pile of coins, and the mother smiles at a glass savings jar slowly filling up" }
+  ]
+}

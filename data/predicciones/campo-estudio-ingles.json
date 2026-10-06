@@ -1,0 +1,12 @@
+{
+  "escena": "En una feria de carreras observas una estación, deduces el campo y lo describes en inglés con seis frases. Tres visitantes escuchan: cada uno atiende dos frases y se registra solo si las entiende.",
+  "pregunta": "En la estación A, ¿qué pasa si dices «This area involves testing soil and planning healthy crops»?",
+  "opciones": [
+    { "id": "a", "texto": "Lucía se confunde y no se registra", "icono": "fa-face-frown-open" },
+    { "id": "b", "texto": "Todos se registran: la gramática es correcta", "icono": "fa-users" },
+    { "id": "c", "texto": "Solo duda la coordinadora de prácticas", "icono": "fa-briefcase" }
+  ],
+  "correcta": "a",
+  "porque": "La frase está bien escrita, pero describe agronomía y la estación A es otro campo. A Lucía le importa justo qué hace la gente del campo; los otros dos escuchan otras frases y solo pierden un poco de interés.",
+  "comoComprobarlo": "En «Career fair», estación A, observa tres objetos, elige esa opción en «This area involves…», completa las demás frases y presiona «Present to the visitors»."
+}

@@ -1,0 +1,12 @@
+{
+  "slug": "opiniones-preocupaciones-ingles",
+  "items": [
+    { "clave":"caso-bahia", "formato":"16:9", "estilo":"foto", "escena":"Una pequeña bahía tropical al amanecer con lanchas de pescadores de madera pintadas de colores amarradas a un muelle viejo, casas bajas junto a la playa y, muy a lo lejos en el horizonte, la silueta borrosa de un gran barco blanco; agua tranquila y cielo rosado, sin personas, sin texto, letras, nombres de barcos ni logotipos" },
+    { "clave":"caso-valle", "formato":"16:9", "estilo":"foto", "escena":"Una milpa en un valle verde con plantas de maíz altas, guías de calabaza con flores amarillas entre los surcos y un río angosto de agua clara que corre junto al campo, cerros al fondo y luz de media mañana; sin personas, sin drones, sin texto, letras ni logotipos" },
+    { "clave":"caso-clinica", "formato":"16:9", "estilo":"foto", "escena":"La sala de espera de una clínica comunitaria sencilla con sillas de plástico azules en fila, una ventanilla de recepción vacía y una tableta apagada sobre un soporte metálico junto a la puerta del consultorio; paredes verde claro y luz de ventana, sin personas, sin texto, letreros, letras ni logotipos" },
+    { "clave":"orador-bahia", "formato":"1:1", "estilo":"ilustracion", "escena":"Retrato de busto de un hombre de unos 55 años, moreno, bigote canoso, camisa guayabera blanca lisa, sonrisa confiada de comerciante, fondo liso turquesa claro; sin texto, gafete ni logotipos" },
+    { "clave":"orador-valle", "formato":"1:1", "estilo":"ilustracion", "escena":"Retrato de busto de un hombre de unos 45 años con camisa de trabajo caqui lisa y gorra lisa sin marca, gesto seguro y algo impaciente, fondo liso amarillo pálido; sin texto, gafete ni logotipos" },
+    { "clave":"orador-clinica", "formato":"1:1", "estilo":"ilustracion", "escena":"Retrato de busto de una mujer de unos 40 años, cabello negro recogido, blazer azul marino liso sobre blusa clara, sostiene una tableta apagada, expresión entusiasta y profesional, fondo liso lila claro; sin texto, gafete ni logotipos" },
+    { "clave":"columna-salinas", "formato":"16:9", "estilo":"foto", "escena":"Unas salinas costeras abandonadas, planas y blanquecinas, junto al mar al atardecer, con unas pocas lanchas de pesca varadas en la orilla y un sendero de tierra que llega al agua; cielo naranja, sin paneles solares, sin personas, sin texto, letras ni logotipos" }
+  ]
+}

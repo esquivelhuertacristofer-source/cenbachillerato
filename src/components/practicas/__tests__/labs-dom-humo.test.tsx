@@ -1,7 +1,7 @@
 /**
  * BANCO DE HUMO DE LOS LABORATORIOS DOM.
  *
- * Los 70 laboratorios no-STEM son DOM puro, así que se pueden montar y OPERAR
+ * Los 78 laboratorios no-STEM son DOM puro, así que se pueden montar y OPERAR
  * en jsdom. Hasta ahora nadie los había ejecutado nunca en una prueba: el único
  * control era abrirlos a mano. Esto los recorre a todos y, por cada uno:
  *
@@ -90,8 +90,8 @@ function huella(cont: HTMLElement): string {
 }
 
 describe("laboratorios DOM: se montan y responden", () => {
-  it("el banco cubre los 70 laboratorios DOM", () => {
-    expect(DOM.length).toBe(70);
+  it("el banco cubre los 78 laboratorios DOM", () => {
+    expect(DOM.length).toBe(78);
   });
 
   describe.each(DOM.map((l) => [l.slug, l.archivo] as const))("%s", (slug, archivo) => {
@@ -153,8 +153,8 @@ describe("el modo «Completa el texto»", () => {
   // palabras que la propia lectura pregunta. Ninguno se queda fuera.
   const ESPERADOS = DOM;
 
-  it("lo llevan los 70 laboratorios DOM", () => {
-    expect(ESPERADOS.length).toBe(70);
+  it("lo llevan los 78 laboratorios DOM", () => {
+    expect(ESPERADOS.length).toBe(78);
   });
 
   it.each(ESPERADOS.map((l) => [l.slug, l.archivo] as const))(
@@ -204,7 +204,7 @@ describe("el modo «Escribe el término»", () => {
       readFileSync(resolve(LABS_DIR, `${a}.tsx`), "utf8").includes("const glosLibres = ")
     );
     expect(conArrastre.sort()).toEqual(ESTRUCTURAS_EN_INGLES.sort());
-    expect(CONVERTIDOS.length).toBe(42);
+    expect(CONVERTIDOS.length).toBe(48);
   });
 
   it.each(CONVERTIDOS)("%s: el glosario ya no se arrastra", (archivo) => {

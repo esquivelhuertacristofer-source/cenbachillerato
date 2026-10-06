@@ -259,6 +259,14 @@ const LabExperienciasRecientes = dynamic(() => import("./labs/LabExperienciasRec
 const LabHabitosComparaciones = dynamic(() => import("./labs/LabHabitosComparaciones").then((m) => m.LabHabitosComparaciones), { ssr: false, loading: LabCargando });
 const LabInstruccionesIngles = dynamic(() => import("./labs/LabInstruccionesIngles").then((m) => m.LabInstruccionesIngles), { ssr: false, loading: LabCargando });
 const LabPasadoViajeIngles = dynamic(() => import("./labs/LabPasadoViajeIngles").then((m) => m.LabPasadoViajeIngles), { ssr: false, loading: LabCargando });
+const LabPreferenciasEleccionesIngles = dynamic(() => import("./labs/LabPreferenciasEleccionesIngles").then((m) => m.LabPreferenciasEleccionesIngles), { ssr: false, loading: LabCargando });
+const LabHabitosContextoIngles = dynamic(() => import("./labs/LabHabitosContextoIngles").then((m) => m.LabHabitosContextoIngles), { ssr: false, loading: LabCargando });
+const LabAnecdotaIngles = dynamic(() => import("./labs/LabAnecdotaIngles").then((m) => m.LabAnecdotaIngles), { ssr: false, loading: LabCargando });
+const LabCampoEstudioIngles = dynamic(() => import("./labs/LabCampoEstudioIngles").then((m) => m.LabCampoEstudioIngles), { ssr: false, loading: LabCargando });
+const LabOpinionesPreocupacionesIngles = dynamic(() => import("./labs/LabOpinionesPreocupacionesIngles").then((m) => m.LabOpinionesPreocupacionesIngles), { ssr: false, loading: LabCargando });
+const LabLecturaCampoIngles = dynamic(() => import("./labs/LabLecturaCampoIngles").then((m) => m.LabLecturaCampoIngles), { ssr: false, loading: LabCargando });
+const LabTextosFuncionalesIngles = dynamic(() => import("./labs/LabTextosFuncionalesIngles").then((m) => m.LabTextosFuncionalesIngles), { ssr: false, loading: LabCargando });
+const LabEntrevistaIngles = dynamic(() => import("./labs/LabEntrevistaIngles").then((m) => m.LabEntrevistaIngles), { ssr: false, loading: LabCargando });
 
 /** Props que recibe cada componente de laboratorio. */
 export interface PracticaLabProps {
@@ -282,6 +290,14 @@ export interface PracticaDef {
 }
 
 export const PRACTICAS: Record<string, PracticaDef> = {
+  "entrevista-ingles": { ...PRACTICAS_META["entrevista-ingles"]!, Component: LabEntrevistaIngles },
+  "textos-funcionales-ingles": { ...PRACTICAS_META["textos-funcionales-ingles"]!, Component: LabTextosFuncionalesIngles },
+  "lectura-campo-ingles": { ...PRACTICAS_META["lectura-campo-ingles"]!, Component: LabLecturaCampoIngles },
+  "opiniones-preocupaciones-ingles": { ...PRACTICAS_META["opiniones-preocupaciones-ingles"]!, Component: LabOpinionesPreocupacionesIngles },
+  "campo-estudio-ingles": { ...PRACTICAS_META["campo-estudio-ingles"]!, Component: LabCampoEstudioIngles },
+  "anecdota-ingles": { ...PRACTICAS_META["anecdota-ingles"]!, Component: LabAnecdotaIngles },
+  "habitos-contexto-ingles": { ...PRACTICAS_META["habitos-contexto-ingles"]!, Component: LabHabitosContextoIngles },
+  "preferencias-elecciones-ingles": { ...PRACTICAS_META["preferencias-elecciones-ingles"]!, Component: LabPreferenciasEleccionesIngles },
   "pasado-viaje-ingles": { ...PRACTICAS_META["pasado-viaje-ingles"]!, Component: LabPasadoViajeIngles },
   "instrucciones-ingles": { ...PRACTICAS_META["instrucciones-ingles"]!, Component: LabInstruccionesIngles },
   "habitos-comparaciones-ingles": { ...PRACTICAS_META["habitos-comparaciones-ingles"]!, Component: LabHabitosComparaciones },

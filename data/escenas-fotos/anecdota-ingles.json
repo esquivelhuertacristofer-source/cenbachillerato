@@ -1,0 +1,47 @@
+{
+  "slug": "anecdota-ingles",
+  "items": [
+    {
+      "clave": "open-mic",
+      "formato": "16:9",
+      "estilo": "ilustracion",
+      "escena": "Pequeño escenario de un café acogedor de noche con un micrófono de pie y un banco alto de madera vacíos, luces cálidas colgantes, mesas redondas con tazas y personas sentadas de espaldas en primer plano mirando hacia el escenario"
+    },
+    {
+      "clave": "estacion",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Dos jóvenes primos sentados con mochilas en una banca metálica de una terminal de autobuses de pueblo en una tarde calurosa, luz de sol intensa entrando por ventanales altos"
+    },
+    {
+      "clave": "guitarra",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Estuche de guitarra negro olvidado sobre una banca metálica de una terminal de autobuses, al fondo un hombre de sombrero corriendo desenfocado hacia la salida"
+    },
+    {
+      "clave": "autobus",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Autobús de pasajeros entrando al andén de una terminal de pueblo con las puertas abriéndose, polvo levantándose y sol dorado de tarde"
+    },
+    {
+      "clave": "taquilla",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Two teenagers handing a black guitar case to a smiling older man wearing a hat, inside a plain bus station hall with metal benches; blank walls, no signs."
+    },
+    {
+      "clave": "cancion",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Músico callejero mayor de sombrero tocando la guitarra sentado en una banca de una terminal, dos jóvenes escuchando de pie con sonrisas y mochilas al hombro"
+    },
+    {
+      "clave": "cuaderno",
+      "formato": "16:9",
+      "estilo": "ilustracion",
+      "escena": "Cuaderno abierto con renglones vacíos y un lápiz sobre una mesa de madera de café junto a una taza de chocolate caliente, luz cálida de lámpara, sin escritura visible"
+    }
+  ]
+}

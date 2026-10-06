@@ -1,0 +1,10 @@
+{
+  "slug": "lectura-campo-ingles",
+  "items": [
+    { "clave": "caso-lab", "formato": "16:9", "estilo": "foto", "escena": "Una mesa de laboratorio escolar de química con vasos de precipitados de vidrio, un frasco ámbar cerrado, una campana de extracción metálica al fondo y dos cajas de cartón abiertas con guantes desechables, unas azules y otras verdes; luz blanca fría, sin personas, sin texto, letras, etiquetas ni logotipos" },
+    { "clave": "caso-biblioteca", "formato": "16:9", "estilo": "foto", "escena": "Una biblioteca escolar luminosa con estantes de madera llenos de libros de lomos lisos, un carrito metálico con cinco computadoras portátiles cerradas y un mostrador de madera vacío; luz de tarde por la ventana, sin personas, sin texto, letras, carteles ni logotipos" },
+    { "clave": "caso-invernadero", "formato": "16:9", "estilo": "foto", "escena": "El interior de un pequeño invernadero escolar con mesas de madera y hileras de macetas de barro con plántulas de jitomate de diez días, una regadera metálica y una jarra medidora de plástico transparente sin marcas; luz difusa a través del plástico, sin personas, sin texto, letras ni logotipos" },
+    { "clave": "caso-autobus", "formato": "16:9", "estilo": "foto", "escena": "Un autobús turístico amarillo estacionado junto a la amplia puerta de salida de una terminal de autobuses al amanecer, con montañas verdes al fondo y una banca vacía en la acera; cielo rosado, sin personas, sin texto, letras, letreros, relojes ni logotipos" },
+    { "clave": "boletin", "formato": "16:9", "estilo": "foto", "escena": "Un tablero de corcho en el pasillo de una escuela con hojas de papel en blanco sujetas con tachuelas de colores, una fotografía impresa de un jaguar en la selva y otra de un bosque de pinos; luz cálida, sin personas, sin texto, letras ni logotipos" }
+  ]
+}

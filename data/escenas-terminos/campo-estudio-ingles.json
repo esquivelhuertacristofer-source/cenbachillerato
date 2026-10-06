@@ -1,0 +1,17 @@
+{
+  "slug": "campo-estudio-ingles",
+  "items": [
+    { "texto": "My field of study is...", "escena": "A clay university student in a lab coat standing proudly beside a row of aquariums with fish and corals, gesturing toward the tanks as she introduces herself to visitors" },
+    { "texto": "I'm currently studying...", "escena": "A clay young man in the middle of a class, sketching at a desk in a busy architecture studio surrounded by small cardboard model buildings" },
+    { "texto": "This area involves...", "escena": "A clay veterinary student gently examining a puppy on a table, with a gauze roll, a pet bowl, a brush and a small dog collar laid out around her" },
+    { "texto": "Professionals in this field...", "escena": "Three clay civil engineers in hard hats and safety vests on a construction site, one unrolling blueprints, one measuring a wall, one guiding a small crane" },
+    { "texto": "It is related to...", "escena": "A clay student pinning photos of a kitchen, a vegetable garden and a hospital meal tray onto a corkboard, linking each one with red string to a central photo of a nutritionist" },
+    { "texto": "One of the main goals of this field is to...", "escena": "Clay students planting rows of young trees on a bare brown hillside, while in the distance a neighbouring hill is already lush and green, the target they are working toward" },
+    { "texto": "technology", "escena": "A clay teenage girl wearing safety goggles assembling a small wheeled robot on a workbench, coloured wires and a soldering iron beside her" },
+    { "texto": "health", "escena": "A clay physiotherapist helping an older man stretch his arm with a rubber exercise band in a bright rehabilitation room" },
+    { "texto": "environment", "escena": "Clay students in gloves picking up plastic bottles along a riverbank and dropping them into recycling sacks, green trees and clear water behind them" },
+    { "texto": "education", "escena": "A clay teacher kneeling beside a young child at a small classroom table, helping her stack colourful wooden blocks while other children draw nearby" },
+    { "texto": "arts", "escena": "A clay young artist painting a colourful mural of birds and flowers on a village wall while another student plays a guitar nearby" },
+    { "texto": "sports", "escena": "A clay soccer player sitting on a bench with her leg stretched out while a sports medicine student wraps a bandage around her knee, a green field behind them" }
+  ]
+}

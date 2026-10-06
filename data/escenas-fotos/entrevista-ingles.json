@@ -1,0 +1,13 @@
+{
+  "slug": "entrevista-ingles",
+  "items": [
+    { "clave": "sala-espera", "formato": "16:9", "estilo": "ilustracion", "escena": "Sala de espera de una oficina pequeña con tres sillas tapizadas en fila, una mesa baja con un vaso de agua, una planta grande junto a la ventana y una puerta de madera cerrada, luz de mañana" },
+    { "clave": "oficina-entrevista", "formato": "16:9", "estilo": "ilustracion", "escena": "Oficina luminosa vista desde la silla del candidato: escritorio de madera con una libreta abierta, una pluma y una taza, silla vacía del otro lado, librero al fondo y ventana con cortinas claras" },
+    { "clave": "entrevistador", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de un hombre de unos 50 años de piel morena clara, cabello corto canoso y lentes de armazón delgado, saco gris sobre camisa azul clara, sostiene una pluma, expresión serena y neutra, fondo liso" },
+    { "clave": "panel-mesa", "formato": "16:9", "estilo": "ilustracion", "escena": "Pequeño escenario escolar con una mesa larga cubierta con mantel azul, cuatro sillas, cuatro micrófonos de mesa y vasos de agua, filas de sillas del público en primer plano, luz cálida de auditorio" },
+    { "clave": "moderadora", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una mujer de unos 40 años con cabello negro recogido, blazer color vino y tarjetas de cartulina en la mano, expresión amable y atenta, fondo liso" },
+    { "clave": "tom", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de un chico de 17 años de cabello castaño ondulado, camisa de cuadros verde y un gafete sin texto colgado del cuello, gesto de estar explicando con una mano abierta, fondo liso" },
+    { "clave": "aisha", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una chica de 17 años con mascada color mostaza en la cabeza, suéter gris y brazos cruzados, expresión seria y segura, fondo liso" },
+    { "clave": "auditorio", "formato": "16:9", "estilo": "ilustracion", "escena": "Aula pequeña vista desde el frente: un atril de madera vacío en primer plano, una pantalla de proyección en blanco iluminada y filas de pupitres al fondo, luz de tarde" }
+  ]
+}

@@ -1,5 +1,5 @@
 // GENERADO por scripts/generar-registro-fichas.ts — no editar a mano.
-// 211 laboratorios con ficha teórica.
+// 219 laboratorios con ficha teórica.
 
 import type { FichaTeoricaData } from "../labs/_ficha";
 
@@ -9,6 +9,7 @@ export const FICHAS: Record<string, () => Promise<FichaTeoricaData>> = {
   "alcance-publicacion-3d": () => import("../labs/alcance-publicacion-ficha").then((m) => m.ALCANCE_PUBLICACION_FICHA),
   "algoritmos-deciden": () => import("../labs/algoritmos-deciden-ficha").then((m) => m.ALGORITMOS_DECIDEN_FICHA),
   "anatomia-exposicion-oral": () => import("../labs/anatomia-exposicion-ficha").then((m) => m.ANATOMIA_EXPOSICION_FICHA),
+  "anecdota-ingles": () => import("../labs/anecdota-ingles-ficha").then((m) => m.ANECDOTA_INGLES_FICHA),
   "archivo-fuentes-historicas-3d": () => import("../labs/archivo-fuentes-ficha").then((m) => m.ARCHIVO_FUENTES_FICHA),
   "aula-ingles-interacciones": () => import("../labs/aula-ingles-ficha").then((m) => m.AULA_INGLES_FICHA),
   "balanceo-ecuaciones": () => import("../labs/balanceo-ecuaciones-ficha").then((m) => m.BALANCEO_FICHA),
@@ -18,6 +19,7 @@ export const FICHAS: Record<string, () => Promise<FichaTeoricaData>> = {
   "biomoleculas-cuatro-clases": () => import("../labs/biomoleculas-cuatro-clases-ficha").then((m) => m.BIOMOLECULAS_FICHA),
   "biotecnologia-crispr-3d": () => import("../labs/biotecnologia-ficha").then((m) => m.BIOTECNOLOGIA_FICHA),
   "busqueda-confiable": () => import("../labs/busqueda-confiable-ficha").then((m) => m.BUSQUEDA_CONFIABLE_FICHA),
+  "campo-estudio-ingles": () => import("../labs/campo-estudio-ingles-ficha").then((m) => m.CAMPO_ESTUDIO_INGLES_FICHA),
   "carreras-digitales": () => import("../labs/carreras-digitales-ficha").then((m) => m.CARRERAS_DIGITALES_FICHA),
   "casa-escuela-objetos-ingles-3d": () => import("../labs/casa-objetos-ingles-ficha").then((m) => m.CASA_OBJETOS_INGLES_FICHA),
   "causalidad-historica": () => import("../labs/causalidad-historica-ficha").then((m) => m.CAUSALIDAD_HISTORICA_FICHA),
@@ -70,6 +72,7 @@ export const FICHAS: Record<string, () => Promise<FichaTeoricaData>> = {
   "energia-electricidad": () => import("../labs/energia-electricidad-ficha").then((m) => m.ENERGIA_ELECTRICIDAD_FICHA),
   "energias-renovables-mexico-3d": () => import("../labs/renovables-mexico-ficha").then((m) => m.RENOVABLES_MEXICO_FICHA),
   "enlaces-quimicos": () => import("../labs/enlaces-quimicos-ficha").then((m) => m.ENLACES_QUIMICOS_FICHA),
+  "entrevista-ingles": () => import("../labs/entrevista-ingles-ficha").then((m) => m.ENTREVISTA_INGLES_FICHA),
   "entropia-segunda-ley": () => import("../labs/entropia-segunda-ley-ficha").then((m) => m.ENTROPIA_FICHA),
   "equilibrio-quimico": () => import("../labs/equilibrio-quimico-ficha").then((m) => m.EQUILIBRIO_FICHA),
   "espectro-electromagnetico": () => import("../labs/espectro-electromagnetico-ficha").then((m) => m.ESPECTRO_FICHA),
@@ -104,6 +107,7 @@ export const FICHAS: Record<string, () => Promise<FichaTeoricaData>> = {
   "gustos-opiniones-ingles-3d": () => import("../labs/gustos-opiniones-ingles-ficha").then((m) => m.GUSTOS_OPINIONES_INGLES_FICHA),
   "habilidades-permisos-ingles-3d": () => import("../labs/habilidades-permisos-ingles-ficha").then((m) => m.HABILIDADES_PERMISOS_INGLES_FICHA),
   "habitos-comparaciones-ingles": () => import("../labs/habitos-comparaciones-ficha").then((m) => m.HABITOS_COMPARACIONES_FICHA),
+  "habitos-contexto-ingles": () => import("../labs/habitos-contexto-ficha").then((m) => m.HABITOS_CONTEXTO_FICHA),
   "hardware-software": () => import("../labs/hardware-software-ficha").then((m) => m.HARDWARE_SOFTWARE_FICHA),
   "hecho-opinion-texto": () => import("../labs/hecho-opinion-ficha").then((m) => m.HECHO_OPINION_FICHA),
   "herramientas-colaborativas": () => import("../labs/herramientas-colaborativas-ficha").then((m) => m.HERRAMIENTAS_COLABORATIVAS_FICHA),
@@ -117,6 +121,7 @@ export const FICHAS: Record<string, () => Promise<FichaTeoricaData>> = {
   "jerarquia-operaciones-3d": () => import("../labs/jerarquia-operaciones-ficha").then((m) => m.JERARQUIA_OPERACIONES_FICHA),
   "juventudes-politicas": () => import("../labs/juventudes-politicas-ficha").then((m) => m.JUVENTUDES_POLITICAS_FICHA),
   "kit-herramientas-digitales": () => import("../labs/kit-herramientas-ficha").then((m) => m.KIT_HERRAMIENTAS_FICHA),
+  "lectura-campo-ingles": () => import("../labs/lectura-campo-ingles-ficha").then((m) => m.LECTURA_CAMPO_INGLES_FICHA),
   "lectura-critica-postura": () => import("../labs/lectura-critica-ficha").then((m) => m.LECTURA_CRITICA_FICHA),
   "lectura-en-voz-alta": () => import("../labs/lectura-voz-alta-ficha").then((m) => m.LECTURA_VOZ_ALTA_FICHA),
   "lectura-escritura-dialogo": () => import("../labs/lectura-escritura-ficha").then((m) => m.LECTURA_ESCRITURA_FICHA),
@@ -146,6 +151,7 @@ export const FICHAS: Record<string, () => Promise<FichaTeoricaData>> = {
   "notacion-cientifica": () => import("../labs/notacion-cientifica-ficha").then((m) => m.NOTACION_CIENTIFICA_FICHA),
   "ondas-amplitud-frecuencia": () => import("../labs/ondas-amplitud-frecuencia-ficha").then((m) => m.ONDAS_FICHA),
   "operaciones-binomios-mosaicos": () => import("../labs/algebra-tiles-ficha").then((m) => m.ALGEBRA_TILES_FICHA),
+  "opiniones-preocupaciones-ingles": () => import("../labs/opiniones-preocupaciones-ingles-ficha").then((m) => m.OPINIONES_PREOCUPACIONES_INGLES_FICHA),
   "optica-lentes-espejos": () => import("../labs/optica-lentes-espejos-ficha").then((m) => m.OPTICA_FICHA),
   "optimizacion-cilindro": () => import("../labs/optimizacion-cilindro-ficha").then((m) => m.OPTIMIZACION_FICHA),
   "organica-visor": () => import("../labs/organica-visor-ficha").then((m) => m.ORGANICA_FICHA),
@@ -162,6 +168,7 @@ export const FICHAS: Record<string, () => Promise<FichaTeoricaData>> = {
   "politicas-publicas": () => import("../labs/politicas-publicas-ficha").then((m) => m.POLITICAS_PUBLICAS_FICHA),
   "posesivos-ingles": () => import("../labs/posesivos-ingles-ficha").then((m) => m.POSESIVOS_INGLES_FICHA),
   "potencias-raices": () => import("../labs/potencias-raices-ficha").then((m) => m.POTENCIAS_RAICES_FICHA),
+  "preferencias-elecciones-ingles": () => import("../labs/preferencias-elecciones-ingles-ficha").then((m) => m.PREFERENCIAS_ELECCIONES_INGLES_FICHA),
   "preguntas-pasado-discursos-3d": () => import("../labs/preguntas-pasado-ficha").then((m) => m.PREGUNTAS_PASADO_FICHA),
   "present-perfect-ingles": () => import("../labs/present-perfect-ingles-ficha").then((m) => m.PRESENT_PERFECT_INGLES_FICHA),
   "presentaciones-ingles": () => import("../labs/presentaciones-ingles-ficha").then((m) => m.PRESENTACIONES_INGLES_FICHA),
@@ -200,6 +207,7 @@ export const FICHAS: Record<string, () => Promise<FichaTeoricaData>> = {
   "teorema-fundamental-calculo": () => import("../labs/teorema-fundamental-calculo-ficha").then((m) => m.TFC_FICHA),
   "teorema-pitagoras": () => import("../labs/teorema-pitagoras-ficha").then((m) => m.PITAGORAS_FICHA),
   "terminal-horarios-ingles-3d": () => import("../labs/terminal-horarios-ingles-ficha").then((m) => m.TERMINAL_HORARIOS_FICHA),
+  "textos-funcionales-ingles": () => import("../labs/textos-funcionales-ingles-ficha").then((m) => m.TEXTOS_FUNCIONALES_INGLES_FICHA),
   "tiempo-historico": () => import("../labs/tiempo-historico-ficha").then((m) => m.TIEMPO_HISTORICO_FICHA),
   "tiempo-libre-ingles": () => import("../labs/tiempo-libre-ingles-ficha").then((m) => m.TIEMPO_LIBRE_INGLES_FICHA),
   "tipos-de-preguntas": () => import("../labs/tipos-de-preguntas-ficha").then((m) => m.TIPOS_DE_PREGUNTAS_FICHA),

@@ -5,6 +5,46 @@ export interface PracticaMeta {
 }
 
 export const PRACTICAS_META: Record<string, PracticaMeta> = {
+  "entrevista-ingles": {
+    slug: "entrevista-ingles",
+    titulo: "Laboratorio Interactivo — The interview: entrevista y panel en inglés",
+    descripcion: "Enfrenta una entrevista de beca con preguntas ambiguas, ruido y reloj de silencio: pide aclaración, gana tiempo y desarrolla respuestas; la libreta del entrevistador explica la decisión final. Incluye un panel estudiantil por turnos. Contenido verbatim de Inglés V.",
+  },
+  "textos-funcionales-ingles": {
+    slug: "textos-funcionales-ingles",
+    titulo: "Laboratorio Interactivo — Outbox: correos que funcionan",
+    descripcion: "Arregla y envía correos formales e informales pieza por pieza (asunto, saludo, petición, cierre): el destinatario concede, pide aclaraciones, se molesta o ni lo abre según claridad, cortesía y registro. Contenido verbatim de Inglés V.",
+  },
+  "lectura-campo-ingles": {
+    slug: "lectura-campo-ingles",
+    titulo: "Laboratorio Interactivo — Read & decide: lectura estratégica en inglés",
+    descripcion: "Resuelve tareas reales leyendo textos breves con reloj: skimming, scanning, lectura detallada y pistas de contexto (incluidos falsos cognados); una mala lectura tiene consecuencia visible y se muestra la oración que decidía. Contenido verbatim de Inglés V.",
+  },
+  "opiniones-preocupaciones-ingles": {
+    slug: "opiniones-preocupaciones-ingles",
+    titulo: "Laboratorio Interactivo — Town hall: opiniones y preocupaciones",
+    descripcion: "Interviene en una asamblea ciudadana con preocupación, fuerza (might, could, will), evidencia y propuesta: la balanza entre lo que afirmas y lo que pruebas mueve la credibilidad y el voto del consejo. Contenido verbatim de Inglés V.",
+  },
+  "campo-estudio-ingles": {
+    slug: "campo-estudio-ingles",
+    titulo: "Laboratorio Interactivo — Career fair: describe un campo de estudio",
+    descripcion: "Recorre una feria de carreras, observa las herramientas de cada estación, deduce el campo y descríbelo en inglés ante tres visitantes que se interesan o se confunden según la precisión de tu vocabulario. Contenido verbatim de Inglés V.",
+  },
+  "anecdota-ingles": {
+    slug: "anecdota-ingles",
+    titulo: "Laboratorio Interactivo — Open mic: cuenta una anécdota en inglés",
+    descripcion: "Edita la anécdota de un narrador en un micrófono abierto: orden de los hechos, conectores y pasado simple o continuo deciden si el público se engancha o saca el celular, con curva de atención y línea de tiempo en vivo. Contenido verbatim de Inglés IV.",
+  },
+  "habitos-contexto-ingles": {
+    slug: "habitos-contexto-ingles",
+    titulo: "Laboratorio Interactivo — A week in Maple Falls: hábitos con razones",
+    descripcion: "Ajusta la agenda semanal de una estudiante de intercambio y observa cómo cambian su energía, su tiempo libre y su adaptación según el lugar; luego explica cada hábito en inglés con frecuencia y razón (always… because…). Contenido verbatim de Inglés IV.",
+  },
+  "preferencias-elecciones-ingles": {
+    slug: "preferencias-elecciones-ingles",
+    titulo: "Laboratorio Interactivo — Student Council: elige y justifica en inglés",
+    descripcion: "Defiende una opción ante el comité estudiantil armando frases con apertura, preferencia y razón (I'd rather, I prefer X to Y, because…): la claridad, el respeto y el convencimiento mueven el voto del grupo, y una frase grosera lo cierra. Contenido verbatim de Inglés IV.",
+  },
   "pasado-viaje-ingles": {
     slug: "pasado-viaje-ingles",
     titulo: "Laboratorio Interactivo — A trip to remember: narrar en pasado con detalle",

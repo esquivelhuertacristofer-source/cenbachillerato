@@ -1,4 +1,479 @@
 {
+ "entrevista-ingles": {
+  "componente": "LabEntrevistaIngles",
+  "ficha": "entrevista-ingles-ficha",
+  "export": "ENTREVISTA_INGLES_FICHA",
+  "terminos": [
+   {
+    "clave": "today-i-am-going-to-talk-about-my-presentation-f",
+    "texto": "Today I am going to talk about... / My presentation focuses on...",
+    "definicion": "Standard opening statements for a formal presentation in English. They signal the topic clearly and orient the audience from the beginning."
+   },
+   {
+    "clave": "moving-on-to-now-let-s-look-at-turning-to",
+    "texto": "Moving on to... / Now let's look at... / Turning to...",
+    "definicion": "Transition phrases (signposting language) used to move from one section or point to the next in a presentation. They help the audience follow the structure."
+   },
+   {
+    "clave": "could-you-repeat-that-please-could-you-clarify-w",
+    "texto": "Could you repeat that, please? / Could you clarify what you mean by...?",
+    "definicion": "Clarification requests used when you do not understand a question or comment. Essential communication strategies for professional and academic interactions."
+   },
+   {
+    "clave": "that-s-a-great-question-let-me-think-about-that-",
+    "texto": "That's a great question. / Let me think about that for a moment.",
+    "definicion": "Phrases used to buy time and acknowledge a question before answering. They are polite, professional, and natural in English conversations and interviews."
+   },
+   {
+    "clave": "in-conclusion-to-wrap-up-to-summarize",
+    "texto": "In conclusion, / To wrap up, / To summarize...",
+    "definicion": "Closing phrases that signal the end of a presentation. They introduce the final summary or main takeaway for the audience."
+   },
+   {
+    "clave": "from-my-experience-based-on-what-i-have-learned",
+    "texto": "From my experience... / Based on what I have learned...",
+    "definicion": "Phrases to introduce personal experience or knowledge as support for an argument or response in an interview or discussion."
+   },
+   {
+    "clave": "proposition",
+    "texto": "proposition",
+    "definicion": "The side of a formal debate which argues in favor of a statement."
+   },
+   {
+    "clave": "opposition",
+    "texto": "opposition",
+    "definicion": "The side of a formal debate which argues against it."
+   },
+   {
+    "clave": "rebuttals",
+    "texto": "rebuttals",
+    "definicion": "Responses to the other side's points."
+   },
+   {
+    "clave": "moderator",
+    "texto": "moderator",
+    "definicion": "Manages the time, gives the floor to each speaker, and ensures the debate stays on topic."
+   },
+   {
+    "clave": "backchanneling",
+    "texto": "backchanneling",
+    "definicion": "Las señales que damos para indicar que estamos escuchando sin interrumpir: 'mm-hmm', 'I see', 'right', 'exactly'."
+   },
+   {
+    "clave": "circumlocution",
+    "texto": "circumlocution",
+    "definicion": "Describir la palabra que no recuerdas. Por ejemplo: 'It's a kind of machine that...', 'It's the process of...', 'I don't remember the exact word, but it means...'."
+   },
+   {
+    "clave": "signposting",
+    "texto": "signposting",
+    "definicion": "Signposting language helps the audience follow the structure of a presentation."
+   }
+  ]
+ },
+ "textos-funcionales-ingles": {
+  "componente": "LabTextosFuncionalesIngles",
+  "ficha": "textos-funcionales-ingles-ficha",
+  "export": "TEXTOS_FUNCIONALES_INGLES_FICHA",
+  "terminos": [
+   {
+    "clave": "subject-asunto",
+    "texto": "Subject (Asunto)",
+    "definicion": "breve y claro. Indica el propósito del correo."
+   },
+   {
+    "clave": "salutation-saludo-formal",
+    "texto": "Salutation (Saludo formal)",
+    "definicion": "Dear Mr. [Apellido], — para hombre · Dear Ms. [Apellido], — para mujer (formal, sin especificar estado civil) · Dear Dr. [Apellido], — para doctor(a) · Dear Sir/Madam, — cuando no sabes el nombre"
+   },
+   {
+    "clave": "purpose-proposito-primer-parrafo",
+    "texto": "Purpose (Propósito — primer párrafo)",
+    "definicion": "Explica por qué escribes. Sé directo y claro."
+   },
+   {
+    "clave": "body-desarrollo",
+    "texto": "Body (Desarrollo)",
+    "definicion": "Amplía el propósito con detalles relevantes. Organiza con conectores."
+   },
+   {
+    "clave": "closing-cierre-cortes",
+    "texto": "Closing (Cierre cortés)",
+    "definicion": "Agradece y expresa expectativa de respuesta."
+   },
+   {
+    "clave": "sign-off-despedida-formal",
+    "texto": "Sign-off (Despedida formal)",
+    "definicion": "Sincerely, — formal, para cuando conoces el nombre del destinatario · Best regards, — semi-formal, muy usado en contextos académicos y profesionales · Yours faithfully, — muy formal, para Dear Sir/Madam"
+   },
+   {
+    "clave": "signature-firma",
+    "texto": "Signature (Firma)",
+    "definicion": "Nombre completo + datos de contacto si es necesario."
+   },
+   {
+    "clave": "i-am-writing-to",
+    "texto": "I am writing to...",
+    "definicion": "The standard opening for a formal email or letter in English. It states the purpose directly. 'I am writing to' is always followed by the base form of a verb (the to-infinitive): 'I am writing to inform you…', 'I am writing to request…'."
+   },
+   {
+    "clave": "i-would-like-to-i-would-appreciate-it-if",
+    "texto": "I would like to... / I would appreciate it if...",
+    "definicion": "Polite request structures used in formal writing. 'Would like to' is more direct; 'would appreciate it if + could/would + base verb' is more indirect and very formal."
+   },
+   {
+    "clave": "please-find-attached",
+    "texto": "Please find attached",
+    "definicion": "Phrases used to refer to documents or files attached to an email or letter. 'Please find attached' is common in emails; 'I am enclosing' is used in paper letters."
+   },
+   {
+    "clave": "we-propose-that",
+    "texto": "We propose that...",
+    "definicion": "Structures for making a formal proposal or suggestion. 'We propose that + subject + base verb' is for formal proposals; 'I would like to suggest + gerund or that-clause' is common in emails."
+   },
+   {
+    "clave": "i-look-forward-to-hearing-from-you",
+    "texto": "I look forward to hearing from you.",
+    "definicion": "A standard closing phrase in formal English correspondence. It expresses expectation of a reply. 'Look forward to' is followed by a gerund (-ing form)."
+   },
+   {
+    "clave": "dear-mr-ms-last-name",
+    "texto": "Dear Mr./Ms. [Last Name],",
+    "definicion": "Formal salutations and closings. 'Dear + title + last name' opens formal emails. 'Best regards' or 'Kind regards' are semi-formal closings. 'Yours sincerely' is used when the recipient's name is known."
+   }
+  ]
+ },
+ "lectura-campo-ingles": {
+  "componente": "LabLecturaCampoIngles",
+  "ficha": "lectura-campo-ingles-ficha",
+  "export": "LECTURA_CAMPO_INGLES_FICHA",
+  "terminos": [
+   {
+    "clave": "the-main-idea-of-the-text-is",
+    "texto": "The main idea of the text is...",
+    "definicion": "A phrase used to introduce the central message or topic of a text when summarizing or analyzing it. Equivalent to 'the text is mainly about...'"
+   },
+   {
+    "clave": "according-to-the-author-according-to-the-text",
+    "texto": "According to the author / According to the text...",
+    "definicion": "A citation phrase used to attribute an idea to the source text without copying it verbatim. Essential for academic writing and reading responses."
+   },
+   {
+    "clave": "however-nevertheless-on-the-other-hand",
+    "texto": "However / Nevertheless / On the other hand...",
+    "definicion": "Contrast connectors used in texts to introduce opposing ideas, counterarguments, or contrasting information. Recognizing them helps comprehension of complex texts."
+   },
+   {
+    "clave": "in-other-words-that-is-to-say",
+    "texto": "In other words, / That is to say...",
+    "definicion": "Paraphrasing markers used in texts to restate a complex idea in simpler terms. Useful for both comprehension and for writing summaries."
+   },
+   {
+    "clave": "i-find-this-text-argument-because",
+    "texto": "I find this text / argument... because...",
+    "definicion": "An opinion structure for evaluating a text. 'I find [noun] [adjective] because [reason]' expresses a personal evaluation supported by reasoning."
+   },
+   {
+    "clave": "to-sum-up-in-conclusion-to-summarize",
+    "texto": "To sum up / In conclusion / To summarize...",
+    "definicion": "Summary markers used at the end of a text or paragraph to restate the most important points. They signal that the writer is closing or concluding."
+   },
+   {
+    "clave": "skimming",
+    "texto": "skimming",
+    "definicion": "Leer rápido para captar la idea general."
+   },
+   {
+    "clave": "scanning",
+    "texto": "scanning",
+    "definicion": "Buscar un dato concreto (una fecha, un nombre o una cifra) sin leer todo el texto."
+   },
+   {
+    "clave": "close-reading",
+    "texto": "close reading",
+    "definicion": "Lectura detallada: leer con atención para entender argumentos, matices e ideas complejas."
+   },
+   {
+    "clave": "topic-sentence",
+    "texto": "topic sentence",
+    "definicion": "The topic sentence introduces the main idea of a paragraph and is typically the first sentence."
+   },
+   {
+    "clave": "fact",
+    "texto": "fact",
+    "definicion": "Puede verificarse con datos o evidencia objetiva."
+   },
+   {
+    "clave": "opinion",
+    "texto": "opinion",
+    "definicion": "Refleja el punto de vista de alguien."
+   }
+  ]
+ },
+ "opiniones-preocupaciones-ingles": {
+  "componente": "LabOpinionesPreocupacionesIngles",
+  "ficha": "opiniones-preocupaciones-ingles-ficha",
+  "export": "OPINIONES_PREOCUPACIONES_INGLES_FICHA",
+  "terminos": [
+   {
+    "clave": "in-my-opinion-i-believe-that",
+    "texto": "In my opinion, / I believe that...",
+    "definicion": "Phrases used to introduce a personal opinion. 'In my opinion' is placed at the start of the sentence. 'I believe that' is followed by a full clause."
+   },
+   {
+    "clave": "i-am-worried-about-i-am-concerned-about",
+    "texto": "I am worried about / I am concerned about...",
+    "definicion": "Structures to express concern or anxiety about a situation or problem. Both are followed by a noun or gerund (-ing form)."
+   },
+   {
+    "clave": "i-strongly-believe-that-i-am-not-sure-but",
+    "texto": "I strongly believe that... / I am not sure, but...",
+    "definicion": "Adverbs like 'strongly' intensify an opinion. 'I am not sure, but...' introduces a tentative opinion with less certainty — useful for hedging."
+   },
+   {
+    "clave": "i-see-your-point-but-that-s-a-good-point-however",
+    "texto": "I see your point, but... / That's a good point, however...",
+    "definicion": "Polite disagreement phrases. They acknowledge the other person's idea before introducing a contrasting view. Essential for respectful discussion."
+   },
+   {
+    "clave": "from-my-point-of-view-as-i-see-it",
+    "texto": "From my point of view... / As I see it...",
+    "definicion": "Phrases to introduce a personal perspective or interpretation, slightly more emphatic than 'in my opinion'. Common in discussions and debates."
+   },
+   {
+    "clave": "i-prefer-to-i-would-rather-than",
+    "texto": "I prefer... to... / I would rather... than...",
+    "definicion": "'I prefer [gerund] to [gerund]' and 'I would rather [base verb] than [base verb]' are both used to express preference between two options."
+   },
+   {
+    "clave": "should",
+    "texto": "should",
+    "definicion": "recomendación — \"Governments should invest in renewable energy.\""
+   },
+   {
+    "clave": "could",
+    "texto": "could",
+    "definicion": "posibilidad — \"Young people could make a difference by changing their habits.\""
+   },
+   {
+    "clave": "might",
+    "texto": "might",
+    "definicion": "posibilidad menos segura — \"This might be one of the biggest challenges of our century.\""
+   },
+   {
+    "clave": "would",
+    "texto": "would",
+    "definicion": "condición — \"If everyone recycled, pollution would decrease significantly.\""
+   },
+   {
+    "clave": "however",
+    "texto": "however",
+    "definicion": "sin embargo — \"Fossil fuels are cheap. However, they are extremely polluting.\""
+   },
+   {
+    "clave": "although",
+    "texto": "although",
+    "definicion": "aunque — \"Although renewable energy is expensive at first, it saves money long-term.\""
+   },
+   {
+    "clave": "despite",
+    "texto": "despite",
+    "definicion": "a pesar de — \"Despite the challenges, many young people are taking action.\""
+   },
+   {
+    "clave": "on-the-other-hand",
+    "texto": "on the other hand",
+    "definicion": "por otro lado — \"On the other hand, some people argue that economic growth must come first.\""
+   }
+  ]
+ },
+ "campo-estudio-ingles": {
+  "componente": "LabCampoEstudioIngles",
+  "ficha": "campo-estudio-ingles-ficha",
+  "export": "CAMPO_ESTUDIO_INGLES_FICHA",
+  "terminos": [
+   {
+    "clave": "my-field-of-study-is",
+    "texto": "My field of study is...",
+    "definicion": "A simple and direct phrase to introduce the area or discipline you are studying. 'Field' means a domain of knowledge or professional activity."
+   },
+   {
+    "clave": "i-m-currently-studying",
+    "texto": "I'm currently studying...",
+    "definicion": "A phrase using the present continuous to describe your current field or course of study. It indicates an ongoing activity happening now."
+   },
+   {
+    "clave": "this-area-involves",
+    "texto": "This area involves...",
+    "definicion": "Used to explain what activities, skills, or tasks are part of a particular field. 'Involve' is followed by a gerund (verb + -ing)."
+   },
+   {
+    "clave": "professionals-in-this-field",
+    "texto": "Professionals in this field...",
+    "definicion": "A phrase to describe what experts or workers in your area of study typically do. It introduces typical tasks, roles, or responsibilities."
+   },
+   {
+    "clave": "it-is-related-to",
+    "texto": "It is related to...",
+    "definicion": "A phrase to show connections between your field and other topics, subjects, or real-world applications. Preposition 'to' is always used after 'related'."
+   },
+   {
+    "clave": "one-of-the-main-goals-of-this-field-is-to",
+    "texto": "One of the main goals of this field is to...",
+    "definicion": "A structure to describe the purpose or objective of a field of study. 'Goal' = objective or aim. Use 'to + infinitive' after 'goal is'."
+   },
+   {
+    "clave": "technology",
+    "texto": "technology",
+    "definicion": "tecnología — \"I'm interested in technology because it solves real-world problems.\""
+   },
+   {
+    "clave": "health",
+    "texto": "health",
+    "definicion": "salud — \"My field is health science. We study how the body functions.\""
+   },
+   {
+    "clave": "environment",
+    "texto": "environment",
+    "definicion": "medio ambiente — \"In environmental science, we investigate how human activities affect ecosystems.\""
+   },
+   {
+    "clave": "education",
+    "texto": "education",
+    "definicion": "educación — \"I'm passionate about education because every child deserves to learn.\""
+   },
+   {
+    "clave": "arts",
+    "texto": "arts",
+    "definicion": "artes — \"In the arts, we explore creativity and cultural expression.\""
+   },
+   {
+    "clave": "sports",
+    "texto": "sports",
+    "definicion": "deporte — \"I'm interested in sports medicine because I want to help athletes recover.\""
+   },
+   {
+    "clave": "business",
+    "texto": "business",
+    "definicion": "negocios — \"My field is business administration. We develop strategies for organizations.\""
+   },
+   {
+    "clave": "major",
+    "texto": "major",
+    "definicion": "'Major' refers specifically to the main subject or area of study at a university level."
+   },
+   {
+    "clave": "career",
+    "texto": "career",
+    "definicion": "'Career' refers to a person's professional life or occupation over time."
+   }
+  ]
+ },
+ "anecdota-ingles": {
+  "componente": "LabAnecdotaIngles",
+  "ficha": "anecdota-ingles-ficha",
+  "export": "ANECDOTA_INGLES_FICHA",
+  "terminos": [
+   {
+    "clave": "past-continuous",
+    "texto": "Past continuous",
+    "definicion": "was/were + verb-ing. Use this to describe an action IN PROGRESS at a past moment (una acción en progreso en el pasado)."
+   },
+   {
+    "clave": "past-simple",
+    "texto": "Past simple",
+    "definicion": "past simple = completed actions and events."
+   },
+   {
+    "clave": "i-was-when",
+    "texto": "I WAS … WHEN …",
+    "definicion": "\"I WAS [doing something] WHEN [something happened]\" — I was eating tacos when I saw my favorite singer."
+   },
+   {
+    "clave": "while-i-was",
+    "texto": "WHILE I WAS …",
+    "definicion": "\"WHILE I WAS [doing something], [something happened]\" — While we were watching the Chivas game, the lights went out."
+   },
+   {
+    "clave": "setting",
+    "texto": "Setting",
+    "definicion": "setting (when/where/who)"
+   },
+   {
+    "clave": "complication",
+    "texto": "Complication",
+    "definicion": "complication (what happened)"
+   },
+   {
+    "clave": "resolution-reaction",
+    "texto": "Resolution / reaction",
+    "definicion": "resolution/reaction (how it ended or how you felt)"
+   },
+   {
+    "clave": "anecdote-opener",
+    "texto": "anecdote opener",
+    "definicion": "Expresión para captar la atención al iniciar una historia."
+   },
+   {
+    "clave": "setting-the-scene",
+    "texto": "setting the scene",
+    "definicion": "Presentar el contexto: cuándo, dónde y quién estaba."
+   },
+   {
+    "clave": "narrative-connectors",
+    "texto": "narrative connectors",
+    "definicion": "Conectores narrativos: then, after that, suddenly, all of a sudden, eventually."
+   },
+   {
+    "clave": "in-the-end-luckily-unfortunately",
+    "texto": "in the end / luckily / unfortunately",
+    "definicion": "Expresiones para la resolución o reacción final."
+   },
+   {
+    "clave": "reaction-phrases",
+    "texto": "reaction phrases",
+    "definicion": "Expresar cómo te sentiste al final: I couldn't believe it, It was hilarious, I was so relieved."
+   }
+  ]
+ },
+ "habitos-contexto-ingles": {
+  "componente": "LabHabitosContextoIngles",
+  "ficha": "habitos-contexto-ficha",
+  "export": "HABITOS_CONTEXTO_FICHA",
+  "terminos": []
+ },
+ "preferencias-elecciones-ingles": {
+  "componente": "LabPreferenciasEleccionesIngles",
+  "ficha": "preferencias-elecciones-ingles-ficha",
+  "export": "PREFERENCIAS_ELECCIONES_INGLES_FICHA",
+  "terminos": [
+   {
+    "clave": "comparative",
+    "texto": "Comparative",
+    "definicion": "Comparative adjectives are used to compare two things."
+   },
+   {
+    "clave": "superlative",
+    "texto": "Superlative",
+    "definicion": "Superlative adjectives are used to compare one thing with all others in a group."
+   },
+   {
+    "clave": "irregular-adjectives",
+    "texto": "Irregular adjectives",
+    "definicion": "Some adjectives are irregular and must be memorized. 'Good' becomes 'better' in the comparative and 'the best' in the superlative."
+   },
+   {
+    "clave": "double-comparative",
+    "texto": "Double comparative",
+    "definicion": "Saying 'more faster' or 'more bigger'. Since 'faster' already is the comparative of 'fast', adding 'more' creates a redundant double comparison."
+   },
+   {
+    "clave": "double-superlative",
+    "texto": "Double superlative",
+    "definicion": "Saying 'the most best'. Since 'best' is already the superlative of 'good', 'the most' is unnecessary."
+   }
+  ]
+ },
  "pasado-viaje-ingles": {
   "componente": "LabPasadoViajeIngles",
   "ficha": "pasado-viaje-ficha",
@@ -665,7 +1140,7 @@
    {
     "clave": "plagio",
     "texto": "Plagio",
-    "definicion": "Usar el trabajo o ideas de otros sin dar crédito, presentándolo como propio."
+    "definicion": "Presentar como propio el trabajo de otros."
    }
   ]
  },
@@ -2482,7 +2957,7 @@
    {
     "clave": "propiedad-simetrica",
     "texto": "Propiedad simétrica",
-    "definicion": "Si a es igual a b, entonces b es igual a, a."
+    "definicion": "Si a es igual a b, entonces b es igual a a."
    },
    {
     "clave": "propiedad-transitiva",
@@ -3832,7 +4307,7 @@
    {
     "clave": "fijacion-de-nitrogeno",
     "texto": "Fijación de nitrógeno",
-    "definicion": "Conversión del N₂ atmosférico en amonio (NH₄⁺) o nitratos por bacterias fijadoras, haciéndolo asimilable para las plantas."
+    "definicion": "Conversión del N₂ atmosférico en amoníaco o amonio (NH₃/NH₄⁺) por bacterias fijadoras, haciéndolo asimilable para las plantas."
    },
    {
     "clave": "denitrificacion",
@@ -4139,12 +4614,12 @@
    {
     "clave": "raiz-doble",
     "texto": "Raíz doble",
-    "definicion": "Cuando Δ=0, la única raíz es x=−b/(2a). La parábola correspondiente es tangente al eje x."
+    "definicion": "Gráficamente: la parábola toca el eje x en un solo punto, que es su vértice."
    },
    {
     "clave": "uso-practico-del-discriminante",
     "texto": "Uso práctico del discriminante",
-    "definicion": "Permite clasificar las raíces antes de resolver y anticipar la cantidad de intersecciones de la parábola con el eje x."
+    "definicion": "Indica hacia dónde abre la parábola: hacia arriba si Δ > 0 y hacia abajo si Δ < 0."
    }
   ]
  },
@@ -5071,7 +5546,7 @@
    {
     "clave": "carbohidrato-glucido",
     "texto": "Carbohidrato (glúcido)",
-    "definicion": "Biomolécula compuesta por C, H y O con fórmula general Cₙ(H₂O)ₙ; función principal: fuente de energía rápida y almacenamiento."
+    "definicion": "Biomolécula compuesta por C, H y O con fórmula general Cₘ(H₂O)ₙ; función principal: fuente de energía rápida y almacenamiento."
    },
    {
     "clave": "lipido",
@@ -5111,7 +5586,7 @@
    {
     "clave": "nixtamalizacion",
     "texto": "Nixtamalización",
-    "definicion": "Proceso mesoamericano prehispánico que consiste en cocer el maíz con agua y cal (Ca(OH)₂). Libera niacina unida a proteínas, aumenta el contenido de calcio y mejora la digestibilidad del maíz."
+    "definicion": "Proceso mesoamericano prehispánico que consiste en cocer el maíz con agua y cal (Ca(OH)₂). Libera la niacina ligada del grano (niacitina), aumenta el contenido de calcio y mejora la digestibilidad del maíz."
    },
    {
     "clave": "fosfolipido",
@@ -5237,7 +5712,7 @@
    {
     "clave": "discontinuidad-de-salto",
     "texto": "Discontinuidad de salto",
-    "definicion": "Tipo de discontinuidad donde los límites laterales existen pero son distintos (lím_{x→a⁻} f(x) ≠ lím_{x→a⁺} f(x)). La función salta abruptamente de un valor a otro. Las tarifas por bloques de la CFE son un ejemplo de función con discontinuidades de salto."
+    "definicion": "Tipo de discontinuidad donde los límites laterales existen pero son distintos (lím_{x→a⁻} f(x) ≠ lím_{x→a⁺} f(x)). La función salta abruptamente de un valor a otro. El precio por kWh de las tarifas por bloques de la CFE es un ejemplo de función con discontinuidades de salto (el costo total del recibo, en cambio, es continuo)."
    },
    {
     "clave": "teorema-del-valor-intermedio-tvi",
@@ -5829,7 +6304,7 @@
    {
     "clave": "espectro-radioelectrico",
     "texto": "Espectro radioeléctrico",
-    "definicion": "Porción del espectro EM (9 kHz – 300 GHz) usada para comunicaciones. En México lo administra el IFT mediante concesiones; en 2023 se subastó el espectro 5G en la banda 3.5 GHz."
+    "definicion": "Porción del espectro EM (9 kHz – 300 GHz) usada para comunicaciones. En México lo administra la Comisión Reguladora de Telecomunicaciones (antes el IFT) mediante concesiones; las primeras redes 5G arrancaron en 2022 en la banda de 3.5 GHz."
    },
    {
     "clave": "gtm-inaoe",
@@ -5844,7 +6319,7 @@
    {
     "clave": "ondas-de-radio-y-microondas",
     "texto": "Ondas de radio y microondas",
-    "definicion": "Ondas de radio (f < 300 MHz, λ > 1 m): telecomunicaciones, radiodifusión AM/FM, WiFi. Microondas (300 MHz - 300 GHz): hornos, radar, telefonía móvil, satélites GPS."
+    "definicion": "Ondas de radio (f < 300 MHz, λ > 1 m): telecomunicaciones, radiodifusión AM/FM. Microondas (300 MHz - 300 GHz): WiFi, hornos, radar, telefonía móvil, satélites GPS."
    },
    {
     "clave": "infrarrojo-ir",
@@ -6124,7 +6599,7 @@
    {
     "clave": "glucolisis",
     "texto": "Glucólisis",
-    "definicion": "Primera etapa de la respiración celular. Ocurre en el citosol. Convierte 1 glucosa (6C) en 2 piruvatos (3C) con ganancia neta de 2 ATP y 2 NADH. No requiere oxígeno; es la única vía energética en anaerobios estrictos."
+    "definicion": "Primera etapa de la respiración celular. Ocurre en el citosol. Convierte 1 glucosa (6C) en 2 piruvatos (3C) con ganancia neta de 2 ATP y 2 NADH. No requiere oxígeno; es la vía energética principal de muchos organismos anaerobios."
    },
    {
     "clave": "ciclo-de-krebs-ciclo-del-acido-citrico",
@@ -6258,7 +6733,7 @@
    {
     "clave": "replicacion-del-adn-semiconservativa",
     "texto": "Replicación del ADN (semiconservativa)",
-    "definicion": "Proceso por el cual el ADN se duplica antes de la división celular. La ADN helicasa separa las cadenas; la ADN polimerasa III sintetiza la nueva cadena en dirección 5'→3' usando cada cadena como molde. Resultado: dos moléculas hijas idénticas, cada una con una cadena parental."
+    "definicion": "Proceso por el cual el ADN se duplica antes de la división celular. La ADN helicasa separa las cadenas; la ADN polimerasa (la III en bacterias; δ y ε en eucariotas) sintetiza la nueva cadena en dirección 5'→3' usando cada cadena como molde. Resultado: dos moléculas hijas idénticas, cada una con una cadena parental."
    },
    {
     "clave": "codigo-genetico-y-codones",
@@ -6268,7 +6743,7 @@
    {
     "clave": "dogma-central-de-la-biologia-molecular",
     "texto": "Dogma central de la biología molecular",
-    "definicion": "Flujo de información genética propuesto por Francis Crick (1958): ADN → ARN → Proteína. La replicación reproduce el ADN; la transcripción produce ARN; la traducción produce proteínas. Las retrovirus (VIH) añaden transcripción inversa: ARN → ADN."
+    "definicion": "Flujo de información genética propuesto por Francis Crick (1958): ADN → ARN → Proteína. La replicación reproduce el ADN; la transcripción produce ARN; la traducción produce proteínas. Los retrovirus (como el VIH) añaden transcripción inversa: ARN → ADN."
    }
   ]
  },
@@ -6290,7 +6765,7 @@
    {
     "clave": "experimento-de-miller-urey-1953",
     "texto": "Experimento de Miller-Urey (1953)",
-    "definicion": "Stanley Miller y Harold Urey simularon estas condiciones en laboratorio y obtuvieron aminoácidos, validando experimentalmente que los bloques de la vida pueden formarse abioticamente."
+    "definicion": "Stanley Miller y Harold Urey simularon estas condiciones en laboratorio y obtuvieron aminoácidos, validando experimentalmente que los bloques de la vida pueden formarse abióticamente."
    },
    {
     "clave": "ventiladeros-hidrotermales",
@@ -6387,7 +6862,7 @@
    {
     "clave": "mutaciones-germinales-vs-somaticas",
     "texto": "Mutaciones germinales vs somáticas",
-    "definicion": "Germinales: ocurren en células de la línea germinal (gametos); son heredables y afectan a toda la descendencia. Somáticas: ocurren en células del cuerpo del individuo; no son heredables, pero pueden causar cáncer si afectan genes reguladores del ciclo celular (proto-oncogenes, genes supresores de tumor)."
+    "definicion": "Germinales: ocurren en células de la línea germinal (gametos); son heredables y pueden transmitirse a la descendencia. Somáticas: ocurren en células del cuerpo del individuo; no son heredables, pero pueden causar cáncer si afectan genes reguladores del ciclo celular (proto-oncogenes, genes supresores de tumor)."
    },
    {
     "clave": "variabilidad-genetica-y-evolucion",
@@ -6444,7 +6919,7 @@
    {
     "clave": "edicion-de-linea-germinal-vs-somatica",
     "texto": "Edición de línea germinal vs somática",
-    "definicion": "Edición somática: modifica células del cuerpo del individuo; los cambios no son heredables; ejemplos en ensayos clínicos para cáncer y enfermedades genéticas. Edición germinal: modifica embriones, óvulos o espermatozoides; los cambios se heredan indefinidamente. Caso He Jiankui (2018): primer bebé CRISPR, generó condena científica y ética internacional."
+    "definicion": "Edición somática: modifica células del cuerpo del individuo; los cambios no son heredables; ejemplos en ensayos clínicos para cáncer y enfermedades genéticas. Edición germinal: modifica embriones, óvulos o espermatozoides; los cambios se heredan indefinidamente. Caso He Jiankui (2018): nacimiento de las primeras bebés editadas con CRISPR (gemelas), generó condena científica y ética internacional."
    },
    {
     "clave": "bioprospeccion-y-propiedad-intelectual-en-biotec",
@@ -7206,7 +7681,7 @@
    {
     "clave": "more-adjective-than",
     "texto": "more + adjective + than",
-    "definicion": "Comparativo de adjetivos largos (2+ sílabas)."
+    "definicion": "Comparativo de adjetivos largos (2+ sílabas; los de 2 sílabas en -y usan -ier: happier)."
    },
    {
     "clave": "than",
@@ -7347,7 +7822,7 @@
    {
     "clave": "causa-coyuntural",
     "texto": "Causa coyuntural",
-    "definicion": "Evento o circunstancia inmediata que actúa como detonante o catalizador de un proceso histórico ya condicionado por causas estructurales."
+    "definicion": "Circunstancia de mediano plazo (una crisis económica, una guerra, un cambio político) que agrava las tensiones estructurales y vuelve probable el estallido; el detonante inmediato es la causa contingente."
    },
    {
     "clave": "consecuencia-historica",
@@ -7599,8 +8074,8 @@
     "definicion": "Análisis, interpretación o síntesis elaborada por investigadores o historiadores con base en fuentes primarias. Ofrece perspectivas analíticas sobre los hechos del pasado."
    },
    {
-    "clave": "critica-de-fuentes-heuristica",
-    "texto": "Crítica de fuentes (heurística)",
+    "clave": "critica-de-fuentes-critica-historica",
+    "texto": "Crítica de fuentes (crítica histórica)",
     "definicion": "Proceso metodológico para evaluar la autenticidad, confiabilidad y perspectiva de una fuente histórica. Incluye crítica externa (¿es auténtica?) e interna (¿qué dice realmente y con qué sesgo?)."
    },
    {
@@ -7665,7 +8140,7 @@
    {
     "clave": "coeficiente-de-gini",
     "texto": "Coeficiente de Gini",
-    "definicion": "Medida estadística de desigualdad económica que va de 0 (igualdad perfecta) a 1 (máxima desigualdad). México tiene un Gini de 0.427 (2022), entre los más altos de los países de la OCDE."
+    "definicion": "Medida estadística de desigualdad económica que va de 0 (igualdad perfecta) a 1 (máxima desigualdad). México tiene un Gini de alrededor de 0.40 (ENIGH 2022), entre los más altos de los países de la OCDE."
    },
    {
     "clave": "sociedad-civil",
@@ -7675,7 +8150,7 @@
    {
     "clave": "corporativismo",
     "texto": "Corporativismo",
-    "definicion": "Sistema político en el que el Estado organiza a los grupos sociales (trabajadores, campesinos, empresarios) en organizaciones controladas desde arriba, integradas como intermediarios entre la sociedad y el gobierno. El PRI construyó un sistema corporativista que duró 70 años."
+    "definicion": "Sistema político en el que el Estado organiza a los grupos sociales (trabajadores, campesinos, empresarios) en organizaciones controladas desde arriba, integradas como intermediarios entre la sociedad y el gobierno. El partido oficial (PNR-PRM-PRI) construyó desde los años treinta un sistema corporativista que se mantuvo hasta la alternancia de 2000."
    },
    {
     "clave": "movimiento-social",
@@ -7754,7 +8229,7 @@
    {
     "clave": "presupuesto-de-egresos",
     "texto": "Presupuesto de Egresos",
-    "definicion": "Documento que aprueba la Cámara de Diputados cada diciembre, que establece el monto y destino de todos los gastos del gobierno federal durante el año siguiente. Es el instrumento financiero central de las políticas públicas en México."
+    "definicion": "Documento que aprueba en exclusiva la Cámara de Diputados cada año, por regla general a más tardar el 15 de noviembre (art. 74 constitucional; el plazo se amplía el año en que cambia el Ejecutivo), que establece el monto y destino de todos los gastos del gobierno federal durante el año siguiente. Es el instrumento financiero central de las políticas públicas en México."
    },
    {
     "clave": "pobreza-multidimensional",
@@ -7764,7 +8239,7 @@
    {
     "clave": "federalismo",
     "texto": "Federalismo",
-    "definicion": "Sistema de gobierno en el que el poder se distribuye entre un gobierno central (federal) y gobiernos subnacionales (estados y municipios). En México implica que muchas políticas se diseñan federalmente pero se implementan en 2,469 municipios con capacidades técnicas y presupuestarias muy distintas."
+    "definicion": "Sistema de gobierno en el que el poder se distribuye entre un gobierno central (federal) y gobiernos subnacionales (estados y municipios). En México implica que muchas políticas se diseñan federalmente pero se implementan en cerca de 2,500 municipios y alcaldías con capacidades técnicas y presupuestarias muy distintas."
    },
    {
     "clave": "politica-publica",
@@ -7900,7 +8375,7 @@
    {
     "clave": "volunteer-work",
     "texto": "volunteer work",
-    "definicion": "Servicio social / trabajo voluntario: actividades realizadas sin recibir pago, generalmente para ayudar a una comunidad u organización. En México, el servicio social universitario es un requisito."
+    "definicion": "Trabajo voluntario: actividades realizadas sin recibir pago, generalmente para ayudar a una comunidad u organización. ¡Ojo! No es lo mismo que el servicio social de México, que es obligatorio (en inglés se le suele llamar 'community service' o 'social service')."
    },
    {
     "clave": "internship",
@@ -7940,7 +8415,7 @@
    {
     "clave": "that-is-why-i-decided-to",
     "texto": "That is why I decided to...",
-    "definicion": "A cause-and-effect connector in the past tense, used to explain the reason for a decision. Links an experience to a conclusion or action."
+    "definicion": "A cause-and-effect connector ('That is why') followed by the past simple ('I decided'), used to explain the reason for a decision. Links an experience to a conclusion or action."
    },
    {
     "clave": "it-was-a-challenging-rewarding-eye-opening-exper",
@@ -8516,7 +8991,7 @@
    {
     "clave": "deduccion",
     "texto": "Deducción",
-    "definicion": "Razonamiento que parte de principios o premisas generales para obtener una conclusión particular necesaria."
+    "definicion": "Razonamiento en el que la conclusión se sigue necesariamente de las premisas: si estas son verdaderas, la conclusión no puede ser falsa."
    },
    {
     "clave": "induccion",
@@ -8639,7 +9114,7 @@
    {
     "clave": "cosmogonia",
     "texto": "Cosmogonía",
-    "definicion": "Relato o sistema explicativo sobre el origen del universo, el tiempo y los seres humanos. Cada cultura tiene su propia cosmogonía; la nahuatl organiza la historia en cinco eras o 'Soles'."
+    "definicion": "Relato o sistema explicativo sobre el origen del universo, el tiempo y los seres humanos. Cada cultura tiene su propia cosmogonía; la náhuatl organiza la historia en cinco eras o 'Soles'."
    },
    {
     "clave": "memoria-colectiva",
