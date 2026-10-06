@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
   Menu,
   X,
@@ -15,6 +15,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { getSupabaseBrowser } from '@/lib/supabase-browser';
+import type { GrupoDelDocente } from './Sidebar';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Panel Principal',     href: '/dashboard/docente' },
@@ -25,9 +26,23 @@ const navItems = [
   { icon: Library,         label: 'Biblioteca',          href: '/dashboard/docente/biblioteca' },
 ];
 
-export default function MobileNav({ teacherName }: { teacherName?: string }) {
+/*
+ * En el celular no había forma de cambiar de grupo: el selector solo vivía en el
+ * lateral de escritorio. Ahora el cajón lo trae, con el mismo `?grupo=<id>` que
+ * valida la página contra los grupos del docente. Con un solo grupo se muestra
+ * el dato, no un control.
+ */
+export default function MobileNav({
+  teacherName,
+  grupos = [],
+}: {
+  teacherName?: string;
+  grupos?: GrupoDelDocente[];
+}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const grupoPedido = useSearchParams().get('grupo');
+  const grupoActivo = grupos.find((g) => g.id === grupoPedido) ?? grupos[0];
 
   // Cerrar el drawer con Escape cuando está abierto.
   useEffect(() => {
@@ -103,6 +118,41 @@ export default function MobileNav({ teacherName }: { teacherName?: string }) {
               <div className="mx-4 mb-4 px-4 py-3 bg-white/5 rounded-2xl border border-white/5">
                 <p className="text-white/30 text-[9px] font-black uppercase tracking-widest leading-none mb-1">Docente</p>
                 <p className="text-white font-black text-sm truncate">{teacherName}</p>
+              </div>
+            )}
+
+            {/* Grupo activo */}
+            {grupoActivo && (
+              <div className="mx-4 mb-4">
+                <p className="text-white/30 text-[9px] font-black uppercase tracking-widest leading-none mb-2 px-1">Grupo activo</p>
+                {grupos.length > 1 ? (
+                  <div className="flex flex-col gap-1 max-h-44 overflow-y-auto">
+                    {grupos.map((g) => {
+                      const activo = g.id === grupoActivo.id;
+                      return (
+                        <Link
+                          key={g.id}
+                          href={`/dashboard/docente?grupo=${g.id}`}
+                          onClick={() => setOpen(false)}
+                          aria-current={activo ? "true" : undefined}
+                          className={`flex items-center justify-between gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all ${
+                            activo
+                              ? "bg-[#D4A574]/15 text-[#E5C295] border border-[#D4A574]/30"
+                              : "text-white/60 bg-white/5 border border-transparent hover:text-white"
+                          }`}
+                        >
+                          <span className="truncate">{g.nombre}</span>
+                          <span className="shrink-0 text-[11px] text-white/40">{g.semestre}° sem.</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="px-4 py-2.5 rounded-xl bg-white/5 text-sm font-bold text-white flex justify-between gap-2">
+                    <span className="truncate">{grupoActivo.nombre}</span>
+                    <span className="shrink-0 text-[11px] text-white/40">{grupoActivo.semestre}° sem.</span>
+                  </div>
+                )}
               </div>
             )}
 

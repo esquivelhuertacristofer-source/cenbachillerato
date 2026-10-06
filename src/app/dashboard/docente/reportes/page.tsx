@@ -18,6 +18,13 @@ import {
   FileDown,
   Loader2,
 } from 'lucide-react';
+import {
+  avancePorUac,
+  cohorteDeSemestre,
+  semestresDelDocente,
+  type GrupoSemestre,
+  type Membresia,
+} from '@/lib/docente/avance-por-uac';
 
 interface StudentRow {
   id: string;
@@ -34,7 +41,11 @@ export default function ReportesPage() {
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [grupoNombres, setGrupoNombres] = useState<string[]>([]);
   const [weekly, setWeekly] = useState<{ bars: WeeklyBar[]; trend: number | null }>({ bars: [], trend: null });
-  const [uacBars, setUacBars] = useState<HBarItem[]>([]);
+  const [avance, setAvance] = useState<Omit<Parameters<typeof avancePorUac>[0], 'semestre' | 'cohorte'> & {
+    grupos: GrupoSemestre[];
+    membresias: Membresia[];
+  } | null>(null);
+  const [semestreSel, setSemestreSel] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const router = useRouter();
@@ -147,75 +158,50 @@ export default function ReportesPage() {
 
       setStudents(enriched);
 
-      // ── Avance por asignatura (cohorte, semestre del primer grupo) ───────────
-      // Replica la semántica de getUACsConCompletionGrupo: pct = completadas /
-      // (actividades publicadas × nº de alumnos) por UAC.
-      const semestre = grupos[0]?.semestre;
-      if (semestre != null) {
-        const { data: uacs } = await sb
-          .from('uac')
-          .select('id, codigo, nombre, semestre')
-          .eq('semestre', semestre)
-          .order('orden', { ascending: true });
-
-        if (uacs && uacs.length > 0) {
-          const uacIds = uacs.map((u) => u.id);
-          const { data: progs } = await sb
-            .from('progresiones')
-            .select('id, uac_id')
-            .in('uac_id', uacIds);
-
-          const progIds = (progs ?? []).map((p) => p.id);
-          const { data: acts } = progIds.length > 0
-            ? await sb.from('actividades').select('id, progresion_id')
-                .in('progresion_id', progIds).eq('estado', 'publicada')
-            : { data: [] as { id: string; progresion_id: string }[] };
-
-          // actividad → uac
-          const progToUac = new Map<string, string>();
-          for (const p of (progs ?? []) as { id: string; uac_id: string }[]) {
-            progToUac.set(p.id, p.uac_id);
-          }
-          const actToUac = new Map<string, string>();
-          const totalActsByUac = new Map<string, number>();
-          for (const a of (acts ?? []) as { id: string; progresion_id: string }[]) {
-            const uacId = progToUac.get(a.progresion_id);
-            if (!uacId) continue;
-            actToUac.set(a.id, uacId);
-            totalActsByUac.set(uacId, (totalActsByUac.get(uacId) ?? 0) + 1);
-          }
-
-          // intentos completados de la cohorte por UAC
-          const completadasByUac = new Map<string, number>();
-          for (const it of intentos as { actividad_id: string | null }[]) {
-            if (!it.actividad_id) continue;
-            const uacId = actToUac.get(it.actividad_id);
-            if (!uacId) continue;
-            completadasByUac.set(uacId, (completadasByUac.get(uacId) ?? 0) + 1);
-          }
-
-          const totalAlumnos = studentIds.length;
-          const palette = ['#7DD3FC', '#D4A574', '#34d399', '#a78bfa', '#fb7185', '#f59e0b', '#22d3ee'];
-          const bars: HBarItem[] = uacs.map((uac, i) => {
-            const totalActs = totalActsByUac.get(uac.id) ?? 0;
-            const completadas = completadasByUac.get(uac.id) ?? 0;
-            const maxPosible = totalActs * totalAlumnos;
-            const pct = maxPosible > 0 ? Math.round((completadas / maxPosible) * 100) : 0;
-            return {
-              label: uac.codigo,
-              sublabel: uac.nombre,
-              pct,
-              color: palette[i % palette.length]!,
-            };
-          });
-          setUacBars(bars);
-        }
-      }
+      // ── Avance por asignatura ─────────────────────────────────────────────
+      // Se cargan las UAC de TODOS los semestres que da el docente; la gráfica
+      // muestra el que elija, con la cohorte de sus grupos de ese semestre
+      // (ver src/lib/docente/avance-por-uac.ts).
+      const semestres = semestresDelDocente(grupos);
+      const { data: uacs } = await sb
+        .from('uac')
+        .select('id, codigo, nombre, semestre')
+        .in('semestre', semestres)
+        .order('orden', { ascending: true });
+      const uacIds = (uacs ?? []).map((u) => u.id);
+      const { data: progs } = uacIds.length > 0
+        ? await sb.from('progresiones').select('id, uac_id').in('uac_id', uacIds)
+        : { data: [] as { id: string; uac_id: string }[] };
+      const progIds = (progs ?? []).map((p) => p.id);
+      const { data: acts } = progIds.length > 0
+        ? await sb.from('actividades').select('id, progresion_id')
+            .in('progresion_id', progIds).eq('estado', 'publicada')
+        : { data: [] as { id: string; progresion_id: string }[] };
+      setAvance({
+        grupos,
+        membresias: memberships ?? [],
+        uacs: uacs ?? [],
+        progresiones: progs ?? [],
+        actividades: acts ?? [],
+        intentos: intentos as { user_id: string; actividad_id: string | null }[],
+      });
+      setSemestreSel(semestres[0] ?? null);
 
       setLoading(false);
     };
     void init();
   }, [router]);
+
+  const semestresDisponibles = useMemo(() => (avance ? semestresDelDocente(avance.grupos) : []), [avance]);
+  const uacBars: HBarItem[] = useMemo(() => {
+    if (!avance || semestreSel == null) return [];
+    const palette = ['#7DD3FC', '#D4A574', '#34d399', '#a78bfa', '#fb7185', '#f59e0b', '#22d3ee'];
+    return avancePorUac({
+      ...avance,
+      semestre: semestreSel,
+      cohorte: cohorteDeSemestre(avance.grupos, avance.membresias, semestreSel),
+    }).map((u, i) => ({ label: u.codigo, sublabel: u.nombre, pct: u.pct, color: palette[i % palette.length]! }));
+  }, [avance, semestreSel]);
 
   // ── Métricas reales del grupo ──────────────────────────────────────────────
   const stats = useMemo(() => {
@@ -503,16 +489,35 @@ export default function ReportesPage() {
 
           {/* Avance por asignatura (cohorte) */}
           <div className="rounded-[3rem] p-10 border shadow-xl bg-white/5 border-white/5">
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex flex-wrap items-center gap-4 mb-8">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#7DD3FC]/10 text-[#7DD3FC]">
                 <Activity className="w-6 h-6" />
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Avance por Asignatura</p>
                 <p className="text-[11px] font-medium text-white/40 mt-1">
-                  % de actividades completadas por el grupo en cada UAC del semestre.
+                  % de actividades completadas por tus grupos de {semestreSel ?? '—'}° semestre en cada UAC.
                 </p>
               </div>
+              {semestresDisponibles.length > 1 && (
+                <div className="ml-auto flex flex-wrap gap-1.5" role="group" aria-label="Semestre del avance por asignatura">
+                  {semestresDisponibles.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setSemestreSel(s)}
+                      aria-pressed={semestreSel === s}
+                      className={`px-3.5 py-2 rounded-xl text-[12px] font-extrabold transition-all ${
+                        semestreSel === s
+                          ? 'bg-gradient-to-br from-[#E5C295] to-[#D4A574] text-[#3a2410]'
+                          : 'bg-white/5 text-white/50 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      {s}° semestre
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <HBarChart
               items={uacBars}

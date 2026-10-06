@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { getUser, getProfile } from "@/lib/supabase-helpers";
+import { Suspense } from "react";
+import { getUser, getProfile, getSupabaseServer } from "@/lib/supabase-helpers";
 import MobileNav from "@/components/dashboard/MobileNav";
 
 export default async function DocenteLayout({
@@ -17,9 +18,19 @@ export default async function DocenteLayout({
   if (profile.role === "student") redirect("/hub");
   if (profile.role === "admin" || profile.role === "super_admin") redirect("/admin/escuelas");
 
+  // El menú móvil también cambia de grupo (en escritorio lo hace el lateral).
+  // Solo id, nombre y semestre: es la consulta más ligera posible.
+  const sb = await getSupabaseServer();
+  const { data: grupos } = await sb
+    .from("grupos")
+    .select("id, nombre, semestre")
+    .eq("id_docente", user.id);
+
   return (
     <div className="pt-14 md:pt-0">
-      <MobileNav teacherName={profile.full_name ?? undefined} />
+      <Suspense fallback={null}>
+        <MobileNav teacherName={profile.full_name ?? undefined} grupos={grupos ?? []} />
+      </Suspense>
       {children}
     </div>
   );

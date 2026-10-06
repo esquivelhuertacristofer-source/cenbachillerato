@@ -103,7 +103,10 @@ export default function Sidebar({
         </Link>
       </div>
 
-      {/* Semestre: botones SOLO si el docente da mas de un semestre */}
+      {/* Semestre: botones SOLO si el docente da mas de un semestre. Sin grupos
+          (páginas que no los pasan) no se pinta: antes decía «1° semestre» a
+          docentes de 4.º, un dato falso. */}
+      {grupos.length > 0 && (
       <div className="relative z-10 px-[18px] pt-4 mb-5">
         <p className="text-white/28 text-[9.5px] font-extrabold uppercase tracking-[0.16em] mb-2 px-0.5">Semestre activo</p>
         {semestresQueDa.length > 1 ? (
@@ -129,6 +132,7 @@ export default function Sidebar({
           </div>
         )}
       </div>
+      )}
 
       {/* Grupo activo: desplegable de verdad si hay mas de uno; si no, el dato y ya */}
       {grupoNombre && (

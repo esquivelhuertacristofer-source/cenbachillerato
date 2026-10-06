@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
@@ -64,19 +65,26 @@ export default async function GruposAdminPage() {
             </span>
           </h1>
         </div>
-        <button style={{
-          borderRadius: 999,
-          background: '#0B2545',
-          padding: '10px 22px',
-          fontSize: 13,
-          fontWeight: 700,
-          color: '#fff',
-          border: 'none',
-          cursor: 'pointer',
-        }}>
+        {/* Era un <button> sin onClick: se veía y no hacía nada. Los grupos se
+            crean en la carga masiva (alta-masiva.ts crea los que falten). */}
+        <Link
+          href="/admin/alta-masiva"
+          title="Los grupos se crean al cargar el archivo de alumnos y docentes"
+          style={{
+            borderRadius: 999,
+            background: '#0B2545',
+            padding: '10px 22px',
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#fff',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}
+        >
           <i className="fa-solid fa-plus" style={{ marginRight: 8 }} />
           Agregar grupo
-        </button>
+        </Link>
       </div>
 
       {!grupos || grupos.length === 0 ? (
