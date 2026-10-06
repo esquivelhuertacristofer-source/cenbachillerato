@@ -5,6 +5,9 @@ compatibility_flags = ["nodejs_compat"]
 
 [assets]
 directory = ".open-next/assets"
+# El Worker lee de aquí las páginas prerenderizadas (caché incremental de solo
+# lectura en cdn-cgi/_next_cache, ver open-next.config.ts) y las imágenes.
+binding = "ASSETS"
 
 [[kv_namespaces]]
 binding = "NEXT_INC_CACHE_KV"
