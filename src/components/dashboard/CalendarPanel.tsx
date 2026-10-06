@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, PlusCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 
 export default function CalendarPanel() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -26,9 +26,9 @@ export default function CalendarPanel() {
             </div>
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0B2545]">Agenda Docente</h3>
           </div>
-          <button aria-label="Agregar evento" className="h-8 w-8 rounded-xl bg-[#D4A574]/10 text-[#D4A574] hover:bg-[#D4A574] hover:text-white transition-all flex items-center justify-center shadow-sm">
-            <PlusCircle className="w-4 h-4" aria-hidden="true" />
-          </button>
+          {/* Aquí había un <button> «Agregar evento» sin onClick: la agenda no
+              tiene dónde guardar eventos (no hay tabla ni acción), así que se
+              quita en vez de dejar un botón que no responde. */}
         </div>
 
         <div className="flex items-center justify-between mb-4 px-2">
@@ -72,11 +72,13 @@ export default function CalendarPanel() {
             const hasActivity = d === 12 || d === 18 || d === 25;
             const hasPlan = d === 15 || d === 22;
 
+            // Cada día era un <button> sin onClick (no hay vista de día a la
+            // que ir): ahora es un dato, sin hover que prometa un clic.
             return (
-              <button
+              <div
                 key={d}
-                className={`relative h-9 w-full rounded-xl flex items-center justify-center text-xs font-black transition-all ${
-                  isToday ? 'bg-[#0B2545] text-white shadow-lg' : 'text-[#0B2545] hover:bg-white hover:shadow-sm'
+                className={`relative h-9 w-full rounded-xl flex items-center justify-center text-xs font-black ${
+                  isToday ? 'bg-[#0B2545] text-white shadow-lg' : 'text-[#0B2545]'
                 }`}
               >
                 {d}
@@ -84,7 +86,7 @@ export default function CalendarPanel() {
                   {hasActivity && <div className="w-1 h-1 rounded-full bg-[#1E40AF]" />}
                   {hasPlan && <div className="w-1 h-1 rounded-full bg-[#D4A574]" />}
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>

@@ -109,7 +109,9 @@ export default function WelcomeBanner({
           <div className={`absolute inset-0 rounded-full blur-[100px] animate-pulse ${isDark ? 'bg-[#7DD3FC]/5' : 'bg-[#7DD3FC]/10'}`} />
           <div className={`absolute inset-0 border-[2px] rounded-full animate-[spin_30s_linear_infinite] ${isDark ? 'border-white/10' : 'border-[#011C40]/5'}`} />
 
-          <div className={`relative w-48 h-48 md:w-72 md:h-72 border backdrop-blur-3xl rounded-[4rem] flex items-center justify-center shadow-2xl transform hover:scale-110 transition-transform duration-1000 overflow-hidden cursor-pointer ${
+          {/* Es decoración: llevaba cursor-pointer y la manita prometía un clic
+              que no hace nada. Se queda el hover, sin la manita. */}
+          <div className={`relative w-48 h-48 md:w-72 md:h-72 border backdrop-blur-3xl rounded-[4rem] flex items-center justify-center shadow-2xl transform hover:scale-110 transition-transform duration-1000 overflow-hidden ${
             isDark ? 'bg-white/5 border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.5)]' : 'bg-white border-slate-100 shadow-[0_40px_80px_rgba(1,28,64,0.1)]'
           }`}>
             <div className={`absolute inset-0 opacity-60 ${isDark ? 'bg-gradient-to-tr from-[#7DD3FC]/20 to-[#D4A574]/20' : 'bg-gradient-to-tr from-[#7DD3FC]/5 to-[#D4A574]/5'}`} />

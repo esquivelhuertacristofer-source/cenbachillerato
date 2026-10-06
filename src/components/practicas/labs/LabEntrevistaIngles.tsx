@@ -29,6 +29,7 @@
  * DOM puro (sin three.js). Personas, organizaciones y lugares ficticios.
  */
 
+import { hablarLab, callarLab } from "./lab-voz";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, Eyebrow } from "./_kit";
@@ -135,38 +136,21 @@ function selInicial(t: Turno, entendida: boolean): (string | null)[] {
   return filasDe(t, entendida).map((f) => (f.opciones[0]?.en === "" ? f.opciones[0]!.id : null));
 }
 
-/* ── Voz del navegador (speechSynthesis), con degradación si no existe ── */
+/* ── Voz: la de la plataforma (clip grabado con en-US-AvaNeural si existe; si
+ *    no, la síntesis del navegador). Antes armaba su propio speechSynthesis y
+ *    sonaba con la voz que tuviera la máquina (en Windows, la SAPI vieja). ── */
 function useVoz() {
   const [soportada] = useState(
-    () => typeof window !== "undefined" && "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function"
+    () => typeof window !== "undefined" && (typeof Audio === "function" || "speechSynthesis" in window)
   );
   const hablar = useCallback(
     (texto: string, rate = 0.95) => {
       if (!soportada) return;
-      try {
-        const s = window.speechSynthesis;
-        s.cancel();
-        const u = new window.SpeechSynthesisUtterance(texto.replace(/▒+/g, " ").replace(/\s+/g, " "));
-        u.lang = "en-US";
-        u.rate = rate;
-        const voces = s.getVoices();
-        const v = voces.find((x) => x.lang === "en-US") ?? voces.find((x) => x.lang.startsWith("en"));
-        if (v) u.voice = v;
-        s.speak(u);
-      } catch {
-        /* sin voz: el texto sigue en pantalla */
-      }
+      hablarLab(texto.replace(/▒+/g, " ").replace(/\s+/g, " ").trim(), { idioma: "en", rate });
     },
     [soportada]
   );
-  const callar = useCallback(() => {
-    if (!soportada) return;
-    try {
-      window.speechSynthesis.cancel();
-    } catch {
-      /* noop */
-    }
-  }, [soportada]);
+  const callar = useCallback(() => callarLab(), []);
   useEffect(() => callar, [callar]);
   return { soportada, hablar, callar };
 }
@@ -652,7 +636,7 @@ export function LabEntrevistaIngles({ color }: PracticaLabProps) {
       herramientas={
         <>
           <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar efectos" : "Activar efectos de sonido"} activo={sonido} onClick={toggleSonido} />
-          <BotonHerramienta icono="fa-comment-dots" titulo={voz ? "Apagar la voz de los personajes" : "Que los personajes hablen (voz del navegador)"} activo={voz} onClick={toggleVoz} />
+          <BotonHerramienta icono="fa-comment-dots" titulo={voz ? "Apagar la voz de los personajes" : "Que los personajes hablen"} activo={voz} onClick={toggleVoz} />
           <BotonHerramienta icono="fa-stopwatch" titulo={relojOn ? "Quitar el reloj de silencio" : "Poner el reloj de silencio"} activo={relojOn} onClick={() => setRelojOn((v) => !v)} />
           <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
         </>
@@ -772,6 +756,7 @@ export function LabEntrevistaIngles({ color }: PracticaLabProps) {
                             <button
                               type="button"
                               className="ei-mini"
+                              aria-label="Escuchar la pregunta"
                               onClick={() => {
                                 const h = preguntaHablada(turno, entendida);
                                 hablar(h.txt, h.rate);
@@ -963,7 +948,7 @@ export function LabEntrevistaIngles({ color }: PracticaLabProps) {
                         {PANELISTAS[momento.habla].nombre} ({PANELISTAS[momento.habla].rol}):
                       </strong>
                       {vozSoportada && (
-                        <button type="button" className="ei-mini" onClick={() => hablar(momento.linea)}>
+                        <button type="button" className="ei-mini" aria-label="Escuchar esta intervención" onClick={() => hablar(momento.linea)}>
                           <i className="fa-solid fa-volume-high" aria-hidden /> Escuchar
                         </button>
                       )}

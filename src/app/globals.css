@@ -597,7 +597,7 @@ body {
   pointer-events: none;
   mix-blend-mode: overlay;
   z-index: 1;
-  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+  background-image: url('/textures/noise.svg');
 }
 
 .dashboard-scrollbar-thin::-webkit-scrollbar { width: 6px; }

@@ -69,6 +69,7 @@ export const LABS_CON_VOZ: { slug: string; archivo: string }[] = [
   { slug: "rutina-diaria-ingles-3d", archivo: "LabRutinaDiariaIngles" },
   { slug: "terminal-horarios-ingles-3d", archivo: "LabTerminalHorariosIngles" },
   { slug: "tiempo-libre-ingles", archivo: "LabTiempoLibreIngles" },
+  { slug: "entrevista-ingles", archivo: "LabEntrevistaIngles" },
 ];
 
 /** Lo que deja un barrido de un laboratorio. */
