@@ -184,7 +184,7 @@ import type { RetoNumericoData } from "./_reto-numerico";
 export const RETO_A2: RetoNumericoData = {
   titulo: "Modelo la trayectoria de un balón con una función cuadrática",
   contexto:
-    "Desde la azotea de un edificio en Guadalajara, se lanza verticalmente hacia arriba una pelota. La altura (en metros sobre el suelo) en función del tiempo (en segundos) está dada por: h(t) = -5t² + 20t + 1, donde t es el tiempo en segundos y 1 metro es la altura inicial de lanzamiento sobre la azotea.",
+    "En un parque de Guadalajara, desde 1 m sobre el suelo, se lanza verticalmente hacia arriba una pelota. La altura (en metros sobre el suelo) en función del tiempo (en segundos) está dada por: h(t) = -5t² + 20t + 1, donde t es el tiempo en segundos y 1 metro es la altura inicial de lanzamiento sobre el suelo.",
   problema:
     "(a) ¿A qué tiempo alcanza la pelota su altura máxima?\n" +
     "(b) ¿Cuál es la altura máxima?\n" +

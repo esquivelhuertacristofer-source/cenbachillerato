@@ -156,7 +156,7 @@ export const QUIZ: QuizItem[] = [
   {
     pregunta: "¿Qué es un algoritmo?",
     opciones: [
-      "Un conjunto de instrucciones ordenadas para resolver un problema",
+      "Una serie ordenada de pasos para resolver algo",
       "Un tipo de computadora",
       "Una red social",
       "Un componente físico del celular",

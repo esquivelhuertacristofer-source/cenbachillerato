@@ -59,7 +59,7 @@ export const SUBSISTEMAS_FICHA: FichaTeoricaData = {
   ],
 
   aplicaciones: [
-    "El CONAHCYT (ex CONACYT) coordina la investigación científica sobre cambio climático en México; el SNII agrupa a más de 35,000 investigadores activos en todo el país.",
+    "La Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI), que en 2025 sustituyó al CONAHCYT, coordina la investigación científica del país, incluida la del cambio climático; el SNII agrupa a más de 35,000 investigadores activos en todo el país.",
     "Comprender las interacciones entre subsistemas es la base del modelado climático que usan el IPCC y los meteorólogos para proyectar el futuro del planeta.",
     "La reforestación y la restauración de ecosistemas son estrategias concretas que usan el conocimiento de la biosfera para reducir el CO₂ atmosférico.",
   ],

@@ -20,7 +20,7 @@ export const MEXICO_EN_EL_MUNDO_HUECOS: TextoHuecosData = {
   ],
   huecos: [
     { respuesta: "multicausalidad", alternativas: [], pista: "El principio que reconoce múltiples causas en los procesos históricos se llama ___." },
-    { respuesta: "Atlánticas", alternativas: ["atlánticas"], pista: "Las revoluciones del Atlántico (Francia, EE.UU., Haití, latinoamerica) se conocen como Revoluciones ___." },
+    { respuesta: "Atlánticas", alternativas: ["atlánticas"], pista: "Las revoluciones del Atlántico (Francia, EE.UU., Haití, Latinoamérica) se conocen como Revoluciones ___." },
     { respuesta: "ferrocarriles", alternativas: ["ferrocarril"], pista: "Durante el Porfiriato, el capital extranjero dominaba los ___ como medio de transporte e inversión." },
     { respuesta: "Fría", alternativas: ["fría"], pista: "El período de tensión entre EE.UU. y la URSS sin confrontación militar directa se llama Guerra ___." },
   ],

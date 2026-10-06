@@ -51,7 +51,7 @@ export const QUIZ_A2: QuizEvaluable = {
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "El grupo carboxilo (–COOH) define a los ácidos carboxílicos. El ácido acético al 5-8% es el vinagre; el ácido cítrico (con 3 grupos –COOH) es el responsable del sabor ácido del limón. México es el principal productor mundial de limón persa.",
+        "El grupo carboxilo (–COOH) define a los ácidos carboxílicos. El ácido acético al 5-8% es el vinagre; el ácido cítrico (con 3 grupos –COOH) es el responsable del sabor ácido del limón. México es el principal exportador mundial de limón persa.",
     },
     {
       enunciado: "¿Cuál de estas propiedades distingue a los alquenos de los alcanos?",
@@ -69,10 +69,10 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado:
         "¿Por qué el etanol (C₂H₅OH) y el metanol (CH₃OH) tienen efectos biológicos tan distintos si ambos son alcoholes?",
       opciones: [
-        "Son exactamente iguales en sus efectos; el nombre cambia pero la molécula es la misma",
-        "Difieren solo en una longitud de cadena: el metanol se metaboliza en formaldehído y ácido fórmico, que son altamente tóxicos; el etanol se metaboliza en acetaldehído y ácido acético, mucho menos tóxicos en dosis moderadas",
-        "El metanol es más dulce, por eso se prefiere en bebidas alcohólicas fraudulentas",
-        "No hay diferencia en toxicidad; la dosis es lo único que importa",
+        "Son exactamente iguales en sus efectos: el nombre cambia, pero en el cuerpo se transforman en la misma molécula",
+        "El metanol se metaboliza en formaldehído y ácido fórmico, muy tóxicos; el etanol, en acetaldehído y ácido acético, menos dañinos",
+        "El metanol es más dulce y menos volátil, por eso se usa en bebidas fraudulentas, pero su efecto es el mismo",
+        "No difieren en toxicidad: ambos se metabolizan igual y la dosis ingerida es lo único que importa",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:

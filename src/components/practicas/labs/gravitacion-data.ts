@@ -124,9 +124,9 @@ export interface PasoReto { etiqueta: string; texto: string; }
 
 export const PASOS: PasoReto[] = [
   { etiqueta: "a", texto: "Inciso (a): F = G·M_T·m_L/r². Sustituir: F = (6.674×10⁻¹¹)(5.97×10²⁴)(7.34×10²²) / (3.84×10⁸)². Numerador: 6.674×10⁻¹¹ × 5.97×10²⁴ = 3.982×10¹⁴; luego × 7.34×10²² = 2.922×10³⁷. Denominador: (3.84×10⁸)² = 14.75×10¹⁶ = 1.475×10¹⁷. F = 2.922×10³⁷ / 1.475×10¹⁷ ≈ 1.98×10²⁰ N." },
-  { etiqueta: "a", texto: "Interpretación: F ≈ 1.98×10²⁰ N es una fuerza enorme (casi 200 quintillones de newtons) que mantiene a la Luna en órbita alrededor de la Tierra y produce las mareas oceánicas en México (Golfo de México y Pacífico)." },
+  { etiqueta: "a", texto: "Interpretación: F ≈ 1.98×10²⁰ N es una fuerza enorme (casi 200 trillones de newtons) que mantiene a la Luna en órbita alrededor de la Tierra y produce las mareas oceánicas en México (Golfo de México y Pacífico)." },
   { etiqueta: "b", texto: "Inciso (b): Peso en Luna = m × g_Luna = 70 × 1.62 = 113.4 N. En kg-fuerza: 113.4 / 9.8 ≈ 11.6 kg-fuerza. La persona 'pesa' apenas el 16.5% de su peso en la Tierra (70 kg × 9.8 = 686 N en la Tierra). La masa sigue siendo 70 kg." },
-  { etiqueta: "c", texto: "Inciso (c): La órbita geoestacionaria a 35,786 km tiene el período orbital T = 24 h (exactamente igual al período de rotación de la Tierra sobre su propio eje). Como el satélite da exactamente la misma vuelta angular que la Tierra en el mismo tiempo, desde cualquier punto de la superficie parece inmóvil. Las antenas parabólicas (Dish, SKY México) pueden apuntar siempre al mismo punto del cielo sin mecanismo de seguimiento." },
+  { etiqueta: "c", texto: "Inciso (c): La órbita geoestacionaria a 35,786 km tiene el período orbital T ≈ 24 h (en rigor 23 h 56 min, igual al período de rotación de la Tierra sobre su propio eje). Como el satélite da exactamente la misma vuelta angular que la Tierra en el mismo tiempo, desde cualquier punto de la superficie parece inmóvil. Las antenas parabólicas (Dish, SKY México) pueden apuntar siempre al mismo punto del cielo sin mecanismo de seguimiento." },
   { etiqueta: "✓", texto: "Verificación conceptual: si el período fuera diferente al de rotación terrestre (como en una órbita baja LEO a 400 km, T ≈ 92 minutos), el satélite se movería rápidamente por el cielo y solo sería visible durante minutos desde cada punto de la Tierra." },
 ];
 

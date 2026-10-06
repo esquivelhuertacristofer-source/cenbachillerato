@@ -28,13 +28,13 @@ export const QUIZ_A2: QuizEvaluable = {
         "Biosfera",
       ],
       respuestaCorrecta: 3,
-      retroalimentacion: "La biosfera comprende todos los organismos vivos y los ecosistemas que habitan, desde las profundidades oceánicas hasta la alta atmósfera. Es el único subsistema formado exclusivamente por seres vivos y sus interacciones.",
+      retroalimentacion: "La biosfera comprende todos los organismos vivos y los ecosistemas que habitan, desde las profundidades oceánicas hasta la alta atmósfera. Es el único subsistema definido por la presencia de vida, y se superpone con partes de la atmósfera, la hidrosfera y la litosfera.",
     },
     {
       enunciado: "¿Cuál es la composición aproximada de la atmósfera terrestre actual?",
       opciones: [
         "78% O₂, 21% N₂, 1% CO₂",
-        "78% N₂, 21% O₂, ~1% otros gases (Ar, CO₂, vapor de agua)",
+        "78% N₂, 21% O₂, ~1% otros gases",
         "50% N₂, 50% O₂",
         "100% N₂ con trazas de O₂",
       ],
@@ -56,7 +56,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Cómo conecta la biosfera con el ciclo del carbono de la atmósfera?",
       opciones: [
         "La biosfera solo produce CO₂ mediante la respiración",
-        "Las plantas fijan CO₂ atmosférico mediante fotosíntesis; los organismos lo liberan por respiración y descomposición, creando un intercambio continuo entre biosfera y atmósfera",
+        "La fotosíntesis fija CO₂ y la respiración lo devuelve al aire",
         "La biosfera no tiene efecto sobre el CO₂ atmosférico",
         "Solo los océanos intercambian carbono con la atmósfera",
       ],

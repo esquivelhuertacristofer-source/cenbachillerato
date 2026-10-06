@@ -247,7 +247,7 @@ export default function ProgresoPage() {
             <>
               <p className="prog-hero-big">Tu semestre empieza aquí</p>
               <p className="prog-hero-sub">
-                Completá tu primera actividad para arrancar tu avance y
+                Completa tu primera actividad para arrancar tu avance y
                 encender tu racha. <strong>{totalProgresiones} propósitos formativos</strong> te esperan.
               </p>
             </>
@@ -312,7 +312,7 @@ export default function ProgresoPage() {
           </div>
           <p className="prog-racha-sub">
             {diasConsecutivos === 0
-              ? "Empezá hoy y construí tu racha 💪"
+              ? "Empieza hoy y construye tu racha 💪"
               : `¡${diasConsecutivos} día${diasConsecutivos !== 1 ? "s" : ""} seguido${diasConsecutivos !== 1 ? "s" : ""}!`}
           </p>
 

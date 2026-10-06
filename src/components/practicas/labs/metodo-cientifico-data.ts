@@ -422,7 +422,7 @@ export const QUIZ_A2: QuizEvaluable = {
 export const RETO_A6: RetoNumericoData = {
   titulo: "Medición: conversión de unidades",
   contexto: "1 m = 100 cm = 1000 mm. Las conversiones dentro del SI se hacen multiplicando o dividiendo por potencias de 10.",
-  problema: "En un experimento mediste la longitud de una mesa: 1.75 m. Exprésala en centímetros (cm) y en milímetros (mm).",
+  problema: "En un experimento mediste la longitud de una mesa: 1.75 m. Exprésala en centímetros (cm) y en milímetros (mm). En la casilla escribe el resultado en centímetros.",
   campos: [
     { etiqueta: "Longitud en centímetros", objetivo: 175, tolerancia: 0, unidad: "cm" },
     { etiqueta: "Longitud en milímetros", objetivo: 1750, tolerancia: 0, unidad: "mm" },

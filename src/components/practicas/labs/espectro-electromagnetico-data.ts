@@ -44,19 +44,19 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado:
         "Las ondas electromagnéticas se diferencian de las ondas mecánicas (como el sonido) en que:",
       opciones: [
-        "Viajan más lento que el sonido",
-        "No pueden transportar energía",
-        "Pueden propagarse en el vacío sin necesidad de un medio material",
-        "Solo se propagan en sólidos",
+        "Viajan más lento que el sonido en el aire",
+        "No pueden transportar energía de un lugar a otro",
+        "Se propagan en el vacío, sin medio material",
+        "Solo se propagan dentro de materiales sólidos",
       ],
       respuestaCorrecta: 2,
       retroalimentacion:
-        "Las ondas electromagnéticas no necesitan medio material para propagarse; viajan en el vacío a c = 3×10⁸ m/s. Por eso la luz del Sol llega hasta la Tierra a través del vacío del espacio interestelar. El sonido, en cambio, necesita un medio (aire, agua, sólido) y no se propaga en el vacío.",
+        "Las ondas electromagnéticas no necesitan medio material para propagarse; viajan en el vacío a c = 3×10⁸ m/s. Por eso la luz del Sol llega hasta la Tierra a través del vacío del espacio interplanetario. El sonido, en cambio, necesita un medio (aire, agua, sólido) y no se propaga en el vacío.",
     },
     {
       // respuesta_correcta=1 (0-based) → "Las frecuencias de radio y televisión…"
       enunciado:
-        "El IFT (Instituto Federal de Telecomunicaciones) de México regula el uso de:",
+        "La Comisión Reguladora de Telecomunicaciones (CRT), que en 2025 sustituyó al IFT, regula en México el uso de:",
       opciones: [
         "Los rayos X en hospitales",
         "Las frecuencias de radio y televisión del espectro radioeléctrico",
@@ -65,7 +65,7 @@ export const QUIZ_A2: QuizEvaluable = {
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "El IFT es el órgano regulador autónomo que administra y vigila el espectro radioeléctrico en México: concesiones de radio AM/FM, televisión abierta, telefonía celular (4G/5G), WiFi y otros servicios inalámbricos. Los rayos X son regulados por la COFEPRIS; los rayos gamma en medicina por la CNSNS (Comisión Nacional de Seguridad Nuclear y Salvaguardias).",
+        "La CRT (que sustituyó en 2025 al IFT, antes órgano autónomo) administra y vigila el espectro radioeléctrico en México: concesiones de radio AM/FM, televisión abierta, telefonía celular (4G/5G), WiFi y otros servicios inalámbricos. Los rayos X son regulados por la COFEPRIS; los rayos gamma en medicina por la CNSNS (Comisión Nacional de Seguridad Nuclear y Salvaguardias).",
     },
     {
       // respuesta_correcta=1 (0-based) → "3×10⁸ m/s"
@@ -92,7 +92,7 @@ export const QUIZ_A2: QuizEvaluable = {
       ],
       respuestaCorrecta: 2,
       retroalimentacion:
-        "La radiación ionizante (rayos X, rayos gamma, y algunas UV de onda corta) tiene suficiente energía para arrancar electrones de los átomos, dañando el ADN y los tejidos. Las ondas de radio, microondas, infrarrojo y luz visible son no ionizantes: no tienen energía suficiente para ionizar átomos. El IMSS y el INER regulan la exposición a radiación ionizante con dosímetros personales y blindajes de plomo.",
+        "La radiación ionizante (rayos X, rayos gamma, y algunas UV de onda corta) tiene suficiente energía para arrancar electrones de los átomos, dañando el ADN y los tejidos. Las ondas de radio, microondas, infrarrojo y luz visible son no ionizantes: no tienen energía suficiente para ionizar átomos. En México, la CNSNS y la COFEPRIS regulan la exposición a radiación ionizante; en hospitales como los del IMSS el personal usa dosímetros personales y blindajes de plomo.",
     },
   ],
 };

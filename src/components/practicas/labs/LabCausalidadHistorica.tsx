@@ -292,8 +292,8 @@ export function LabCausalidadHistorica({ color }: PracticaLabProps) {
   };
 
   const pistaDe: Record<Modo, string> = {
-    caso: "Una causa siempre ocurre ANTES del evento y se liga a ÉL. Combina condiciones profundas (estructurales) con un detonante (coyuntural).",
-    causas: "La causa estructural es profunda y de larga duración; la coyuntural es el detonante inmediato; la consecuencia es el efecto posterior.",
+    caso: "Una causa siempre ocurre ANTES del evento y se liga a ÉL. Combina condiciones profundas (estructurales) con un detonante (causa contingente).",
+    causas: "La causa estructural es profunda y de larga duración; la coyuntural agrava las tensiones a mediano plazo y el detonante (contingente) las hace estallar; la consecuencia es el efecto posterior.",
     explicacion: "Una explicación monocausal usa palabras como «solo», «únicamente» o «exclusivamente». La multicausal combina varios factores.",
     glosario: "Lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.",
     texto: "Escribe la palabra que falta en cada hueco del texto.",

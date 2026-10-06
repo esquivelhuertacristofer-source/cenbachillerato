@@ -839,7 +839,7 @@ export const PREGUNTAS: string[] = [
 
 /** Hechos: quiz A4 (verdadero/falso), cada enunciado con su retroalimentación verbatim. */
 export const HECHOS: string[] = [
-  "Verdadero: «Los polímeros sintéticos como el nylon y el PET están formados por cadenas largas de monómeros orgánicos repetidos». Correcto: los polímeros sintéticos se obtienen por reacciones de polimerización de monómeros orgánicos como éteres, ésteres o amidas.",
+  "Verdadero: «Los polímeros sintéticos como el nylon y el PET están formados por cadenas largas de monómeros orgánicos repetidos». Correcto: los polímeros sintéticos se obtienen por polimerización de monómeros orgánicos (p. ej., etilenglicol y ácido tereftálico en el PET; diaminas y diácidos en el nylon), que quedan unidos por enlaces éster o amida.",
   "Verdadero: «La fermentación alcohólica es un proceso industrial en que las levaduras transforman azúcares en etanol y CO₂». Correcto: la fermentación alcohólica (C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂) se usa en la producción de bebidas, pan y biocombustibles.",
   "Falso: «Los fármacos son siempre sustancias inorgánicas; la química orgánica no participa en su síntesis». La mayoría de los fármacos modernos son compuestos orgánicos. Ejemplo: la aspirina (ácido acetilsalicílico) y la penicilina son moléculas orgánicas de síntesis o semisíntesis.",
   "Verdadero: «La petroquímica utiliza el petróleo como materia prima para producir plásticos, combustibles y solventes orgánicos». Correcto: el refinado del petróleo y el craqueo catalítico producen compuestos orgánicos base para múltiples industrias.",
@@ -931,10 +931,10 @@ export const QUIZ_A2: QuizEvaluable = {
     {
       enunciado: "¿Qué es un polímero sintético y cuál es un ejemplo de aplicación industrial en México?",
       opciones: [
-        "Una molécula natural de origen vegetal usada en perfumería",
-        "Una macromolécula fabricada por la unión repetida de monómeros orgánicos, como el PET de las botellas de refresco recicladas por el programa ECOCE",
-        "Un compuesto mineral extraído de rocas para la construcción",
-        "Una proteína producida por ingeniería genética en laboratorio",
+        "Una molécula pequeña de origen vegetal, como los aceites esenciales usados en perfumería",
+        "Una macromolécula hecha de monómeros orgánicos repetidos, como el PET de las botellas de refresco",
+        "Un compuesto mineral extraído de rocas, como el yeso o la cal usados en la construcción",
+        "Una proteína obtenida por ingeniería genética en un laboratorio de biotecnología",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
@@ -944,7 +944,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "El ácido benzoico y el benzoato de sodio se usan en la industria alimentaria principalmente como:",
       opciones: [
         "Colorantes artificiales para dar apariencia atractiva",
-        "Conservadores antimicrobianos que inhiben el crecimiento de bacterias y hongos en bebidas y alimentos ácidos",
+        "Conservadores que inhiben bacterias y hongos en alimentos ácidos",
         "Edulcorantes no calóricos para reducir el azúcar",
         "Emulsificantes para mezclar agua y aceite en salsas",
       ],
@@ -954,7 +954,7 @@ export const QUIZ_A2: QuizEvaluable = {
     },
     {
       enunciado: "La industria farmacéutica diseña medicamentos como 'moléculas que encajan en receptores del cuerpo'. Este concepto se conoce como:",
-      opciones: ["Síntesis orgánica total", "El modelo llave-cerradura (o interacción fármaco-receptor)", "Polimeración en cadena", "Esterificación controlada"],
+      opciones: ["Síntesis orgánica total", "El modelo llave-cerradura", "Polimerización en cadena", "Esterificación controlada"],
       respuestaCorrecta: 1,
       retroalimentacion:
         "El modelo llave-cerradura (propuesto por Emil Fischer en 1894) describe que un fármaco (llave) tiene una forma molecular complementaria al receptor biológico (cerradura). La interacción es altamente específica, lo que permite que medicamentos actúen sobre tejidos concretos con efectos selectivos.",
@@ -962,14 +962,14 @@ export const QUIZ_A2: QuizEvaluable = {
     {
       enunciado: "¿Por qué la producción de plástico a partir del petróleo genera dependencia de un recurso no renovable?",
       opciones: [
-        "Porque el petróleo es el único solvente que puede polimerizar plásticos",
-        "Porque los monómeros de la mayoría de los plásticos sintéticos (etileno, propileno, estireno) se obtienen por refinación del petróleo crudo, un recurso fósil que tarda millones de años en formarse",
-        "Porque el plástico es en realidad petróleo solidificado directamente",
-        "Porque sin petróleo no hay energía para los hornos de polimerización",
+        "Porque el petróleo es el único solvente capaz de disolver los monómeros para polimerizarlos",
+        "Porque sus monómeros (etileno, propileno, estireno) se obtienen del petróleo, que tarda millones de años en formarse",
+        "Porque el plástico es en realidad petróleo crudo que solo se enfría y se solidifica en moldes",
+        "Porque sin petróleo no habría energía para encender los hornos donde se polimeriza el plástico",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "Los plásticos más comunes (polietileno, PET, PVC, poliestireno) se fabrican a partir de monómeros orgánicos como el etileno y el propileno, obtenidos por craqueo (fraccionamiento) del petróleo. Al ser el petróleo no renovable, la dependencia del plástico convencional es un problema de sostenibilidad a largo plazo.",
+        "Los plásticos más comunes (polietileno, PET, PVC, poliestireno) se fabrican a partir de monómeros orgánicos como el etileno y el propileno, obtenidos por craqueo (ruptura de moléculas grandes) de fracciones del petróleo. Al ser el petróleo no renovable, la dependencia del plástico convencional es un problema de sostenibilidad a largo plazo.",
     },
   ],
 };

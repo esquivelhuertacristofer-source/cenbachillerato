@@ -740,7 +740,7 @@ export const QUIZ: QuizEvaluable = {
     },
     {
       enunciado: "La entonación en la lectura en voz alta sirve para:",
-      opciones: ["Leer más rápido", "Expresar preguntas, exclamaciones y afirmaciones con variación de tono", "Pronunciar sílabas claramente", "Hacer pausas en los puntos"],
+      opciones: ["Leer más rápido", "Marcar preguntas, exclamaciones y afirmaciones", "Pronunciar sílabas claramente", "Hacer pausas en los puntos"],
       respuestaCorrecta: 1,
       retroalimentacion: "La entonación varía el tono según el tipo de oración, dando expresividad a la lectura.",
     },

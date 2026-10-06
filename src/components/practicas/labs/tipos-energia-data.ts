@@ -874,7 +874,7 @@ export const HUECOS_A6: TextoHuecosData = {
   ],
   huecos: [
     { respuesta: "explicar", alternativas: ["entender", "comprender"], pista: "Dar razón de algo." },
-    { respuesta: "máquina", alternativas: ["maquina"], pista: "Máquina ___ (térmica)." },
+    { respuesta: "máquina", alternativas: ["maquina"], pista: "Dispositivo que convierte calor en trabajo." },
     { respuesta: "mecánica", alternativas: ["mecanica"], pista: "Energía del movimiento." },
     { respuesta: "transformaciones", alternativas: ["transformacion", "transformación"], pista: "Cambios de forma de la energía." },
   ],

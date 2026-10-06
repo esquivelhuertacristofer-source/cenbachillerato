@@ -1789,7 +1789,7 @@ export const HUECOS_A2: TextoHuecosData = {
     { respuesta: "Where", alternativas: ["where"], pista: "Pregunta de lugar" },
     { respuesta: "is", alternativas: [], pista: "It ___ next to..." },
     { respuesta: "What", alternativas: ["what"], pista: "___ time is the exam?" },
-    { respuesta: "at", alternativas: [], pista: "It is ___ 2:30 (hora específica)" },
+    { respuesta: "at", alternativas: [], pista: "The meeting is ___ 2:30 (hora específica)" },
     { respuesta: "When", alternativas: ["when"], pista: "Pregunta de tiempo/día" },
     { respuesta: "on", alternativas: [], pista: "___ Monday (día de la semana)" },
     { respuesta: "at", alternativas: [], pista: "___ 8 am (hora)" },

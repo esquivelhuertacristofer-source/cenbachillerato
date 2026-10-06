@@ -749,7 +749,7 @@ export const LECTURA_A1: string[] = [
 
 /** Recuadro «info» de la lectura A1 — verbatim. */
 export const RECUADRO_A1 =
-  "El CONEVAL mide la pobreza en México con un enfoque multidimensional que incluye ingreso, rezago educativo, acceso a servicios de salud, vivienda y alimentación. En 2022, el 36.3% de la población mexicana vivía en pobreza — datos que ilustran la complejidad de los fenómenos sociales.";
+  "La medición oficial de la pobreza en México —a cargo del CONEVAL hasta 2025 y hoy del INEGI— usa un enfoque multidimensional que incluye ingreso, rezago educativo, acceso a servicios de salud, vivienda y alimentación. En 2022, el 36.3% de la población mexicana vivía en pobreza (en 2024, el 29.6%, según la primera medición del INEGI) (en 2024, el 29.6%, según la primera medición del INEGI) — datos que ilustran la complejidad de los fenómenos sociales.";
 
 /** Precisiones del laboratorio (no verbatim). */
 export const NOTA_RECUADRO =
@@ -817,10 +817,10 @@ export const QUIZ_A4: QuizEvaluable = {
   titulo: "Ciudadanía — Quiz",
   puntajeMinimo: 70,
   reactivos: [
-    { enunciado: "¿A qué edad se adquiere la ciudadanía formal en México?", opciones: ["A los 15 años", "A los 16 años", "A los 18 años", "A los 21 años"], respuestaCorrecta: 2, retroalimentacion: "A los 18 años, con la credencial del INE." },
+    { enunciado: "¿A qué edad se adquiere la ciudadanía formal en México?", opciones: ["A los 15 años", "A los 16 años", "A los 18 años", "A los 21 años"], respuestaCorrecta: 2, retroalimentacion: "A los 18 años cumplidos y con un modo honesto de vivir (art. 34 constitucional); la credencial del INE la acredita, pero no la otorga." },
     { enunciado: "La ciudadanía 'sustantiva' o real se refiere a:", opciones: ["tener la credencial de elector", "la capacidad real de ejercer los derechos", "haber nacido en el país", "pagar impuestos"], respuestaCorrecta: 1, retroalimentacion: "Es la capacidad efectiva de ejercer derechos, más allá del estatus jurídico." },
     { enunciado: "¿En qué año obtuvieron las mujeres mexicanas el derecho al voto?", opciones: ["1917", "1929", "1953", "1968"], respuestaCorrecta: 2, retroalimentacion: "En 1953 se reconoció el sufragio femenino a nivel federal." },
-    { enunciado: "Que la ciudadanía sea una 'conquista' significa que:", opciones: ["es un dato natural", "se ha ampliado gracias a luchas y movimientos sociales", "se compra con dinero", "la otorga un solo gobernante"], respuestaCorrecta: 1, retroalimentacion: "Históricamente fue negada a muchos grupos y se amplió por la lucha social." },
+    { enunciado: "Que la ciudadanía sea una 'conquista' significa que:", opciones: ["es un dato natural", "se amplió por luchas sociales", "se compra con dinero", "la otorga un solo gobernante"], respuestaCorrecta: 1, retroalimentacion: "Históricamente fue negada a muchos grupos y se amplió por la lucha social." },
     { enunciado: "¿Cuál es un ejemplo de ciudadanía ampliada hoy?", opciones: ["ciudadanía digital", "ciudadanía hereditaria", "ciudadanía militar", "ciudadanía vitalicia"], respuestaCorrecta: 0, retroalimentacion: "Ciudadanía digital, ambiental y global son expansiones contemporáneas del concepto." },
   ],
 };

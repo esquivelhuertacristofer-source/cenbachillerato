@@ -549,13 +549,13 @@ export const GLOSARIO: { termino: string; definicion: string; ejemplo: string }[
   },
   {
     termino: "Fusión nuclear",
-    definicion: "Proceso en el que dos núcleos ligeros (como deuterio y tritio, isótopos del hidrógeno) se fusionan formando un núcleo más pesado y liberando enorme cantidad de energía. Es la fuente de energía del Sol.",
-    ejemplo: "El Sol fusiona ~620 millones de toneladas de hidrógeno cada segundo, liberando energía equivalente a 3.8 × 10²⁶ W.",
+    definicion: "Proceso en el que dos núcleos ligeros (como los del hidrógeno y sus isótopos deuterio y tritio) se fusionan formando un núcleo más pesado y liberando enorme cantidad de energía. Es la fuente de energía del Sol.",
+    ejemplo: "El Sol fusiona ~620 millones de toneladas de hidrógeno cada segundo, liberando una potencia de 3.8 × 10²⁶ W.",
   },
   {
     termino: "Radiactividad y residuos nucleares",
     definicion: "Los materiales radiactivos emiten partículas o radiación al desintegrarse. Los residuos nucleares de alta actividad pueden permanecer peligrosos durante miles de años, representando un desafío ético de almacenamiento seguro para generaciones futuras.",
-    ejemplo: "El plutonio-239, producto de los reactores, tiene una vida media de 24 100 años, lo que plantea el dilema ético de legar estos residuos a futuras generaciones.",
+    ejemplo: "El plutonio-239, producto de los reactores, tiene una semivida (periodo de semidesintegración) de 24 100 años, lo que plantea el dilema ético de legar estos residuos a futuras generaciones.",
   },
   {
     termino: "Brecha digital",
@@ -608,10 +608,10 @@ export const QUIZ_A2: QuizEvaluable = {
     {
       enunciado: "La planta nucleoeléctrica de Laguna Verde, en Veracruz, opera con reactores de tipo BWR (Boiling Water Reactor). ¿Cuál es el proceso físico que genera la energía en un reactor nuclear?",
       opciones: [
-        "Fusión nuclear controlada de hidrógeno (como en el Sol)",
-        "Fisión nuclear del uranio-235: el núcleo se divide liberando energía, calentando agua para mover turbinas",
-        "Combustión del uranio metálico con oxígeno",
-        "Reacción química exotérmica entre plutonio y agua",
+        "Fusión nuclear controlada de núcleos de hidrógeno, como en el Sol",
+        "Fisión nuclear del uranio-235: el núcleo se divide y libera calor",
+        "Combustión del uranio metálico con oxígeno, como un carbón muy potente",
+        "Reacción química exotérmica entre plutonio y el agua del reactor",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
@@ -639,10 +639,10 @@ export const QUIZ_A2: QuizEvaluable = {
     {
       enunciado: "¿Qué es la 'basura electrónica' (e-waste) y cuál es el principal riesgo ambiental asociado a su manejo inadecuado?",
       opciones: [
-        "Son archivos digitales corruptos que contaminan los servidores",
-        "Son dispositivos eléctricos y electrónicos desechados que contienen metales pesados tóxicos (plomo, mercurio, cadmio) que contaminan suelo y agua",
-        "Son emisiones de CO₂ de los centros de datos de internet",
-        "Son los residuos radiactivos de los teléfonos celulares viejos",
+        "Archivos digitales corruptos que se acumulan y contaminan los servidores de la nube",
+        "Aparatos electrónicos desechados cuyos metales pesados (plomo, mercurio) contaminan suelo y agua",
+        "Emisiones de CO₂ de los centros de datos de internet, que calientan el planeta",
+        "Residuos radiactivos de celulares viejos, cuya radiación se filtra a los acuíferos",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
@@ -676,7 +676,7 @@ export const HUECOS_A6: TextoHuecosData = {
   ],
   huecos: [
     // «mc2» no está en la actividad: se acepta porque el «²» no se puede teclear en muchos teclados.
-    { respuesta: "mc²", alternativas: ["m·c²", "mc^2", "mc2"], pista: "La famosa ecuación de Einstein: E = ___ (masa por velocidad de la luz al cuadrado)." },
+    { respuesta: "mc²", alternativas: ["m·c²", "mc^2", "mc2"], pista: "La famosa ecuación de Einstein relaciona la energía con la masa y con una constante muy grande; escríbela con símbolos." },
     { respuesta: "dividir", alternativas: ["separar", "fragmentar"], pista: "La fisión nuclear consiste en ___ (partir) núcleos pesados en núcleos más pequeños." },
     { respuesta: "Sol", alternativas: ["sol", "el Sol"], pista: "La fusión nuclear es el proceso que proporciona energía al ___, nuestra estrella." },
     { respuesta: "brecha", alternativas: [], pista: "La ___ digital describe la desigualdad de acceso a internet y tecnologías entre distintos grupos sociales." },

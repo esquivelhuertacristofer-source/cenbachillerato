@@ -68,7 +68,7 @@ export const VARIABLES_ESTADISTICA_FICHA: FichaTeoricaData = {
   aplicaciones: [
     "El INEGI mide a toda la población con el Censo de Población y Vivienda cada diez años.",
     "La ENIGH usa muestras de miles de hogares para estimar las condiciones de vida de millones.",
-    "El CONEVAL mide la pobreza multidimensional con datos del INEGI.",
+    "El INEGI mide desde 2025 la pobreza multidimensional (antes lo hacía el CONEVAL) con datos de la ENIGH.",
     "Un hospital decide qué tratamiento adoptar con base en ensayos clínicos; una tienda identifica sus productos más vendidos con sus propios datos.",
   ],
 

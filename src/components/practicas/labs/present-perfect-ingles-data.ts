@@ -175,7 +175,7 @@ export const PARES: ParGlosario[] = [
   {
     id: "gl-thatiswhy",
     termino: "That is why I decided to...",
-    definicion: "A cause-and-effect connector in the past tense, used to explain the reason for a decision. Links an experience to a conclusion or action.",
+    definicion: "A cause-and-effect connector ('That is why') followed by the past simple ('I decided'), used to explain the reason for a decision. Links an experience to a conclusion or action.",
     ejemplo: "I saw how engineers helped my community. That is why I decided to study civil engineering.",
   },
   {

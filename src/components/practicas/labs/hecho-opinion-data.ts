@@ -461,9 +461,9 @@ export const QUIZ = {
     {
       enunciado: "Un lector crítico ante una noticia debe preguntarse:",
       opciones: [
-        "Si el texto está bien redactado",
+        "Si el texto está bien redactado y sin faltas",
         "Solo si le gusta el tema",
-        "Quién lo escribió, con qué propósito y qué evidencia presenta",
+        "Quién lo escribió, para qué y con qué pruebas",
         "Si la letra es legible",
       ],
       respuestaCorrecta: 2,

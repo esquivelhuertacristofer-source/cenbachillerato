@@ -448,7 +448,7 @@ export const QUIZ = {
       enunciado: "Al investigar hábitos lectores de la comunidad, ¿qué habilidades se desarrollan?",
       opciones: [
         "Solo ortografía",
-        "Formular preguntas, escuchar y sistematizar información",
+        "Indagar, escuchar y organizar datos",
         "Memorización de textos",
         "Escritura creativa únicamente",
       ],

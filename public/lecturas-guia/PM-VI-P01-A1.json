@@ -41,7 +41,7 @@
     {
       "parrafos": [3, 4],
       "titulo": "Fuentes de datos: población y muestra",
-      "idea": "INEGI, CONEVAL, CONAPO y el sector salud generan datos; el Censo mide a toda la población y las encuestas usan muestras.",
+      "idea": "INEGI (que desde 2025 también mide la pobreza), CONAPO y el sector salud generan datos; el Censo mide a toda la población y las encuestas usan muestras.",
       "visual": { "tipo": "comparar", "columnas": [
         { "titulo": "Población", "puntos": ["El conjunto completo de interés", "El Censo del INEGI intenta medirla cada diez años"] },
         { "titulo": "Muestra", "puntos": ["Un subconjunto representativo", "La ENIGH usa miles de hogares para estimar millones"] }

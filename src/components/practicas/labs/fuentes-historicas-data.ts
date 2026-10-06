@@ -38,9 +38,9 @@ export const TIPO_FUENTE_INFO: Record<
 
 export const FUENTES: { id: string; texto: string; tipo: TipoFuente }[] = [
   { id: "fu-p1", texto: "Una fotografía de la Revolución Mexicana del archivo Casasola (1910-1920)", tipo: "primaria" },
-  { id: "fu-p2", texto: "El Diario de Cristóbal Colón (1492)", tipo: "primaria" },
+  { id: "fu-p2", texto: "El Diario de a bordo de Cristóbal Colón (1492, conservado en el resumen de fray Bartolomé de las Casas)", tipo: "primaria" },
   { id: "fu-p3", texto: "Una carta escrita por un soldado durante la Revolución Mexicana", tipo: "primaria" },
-  { id: "fu-s1", texto: "El libro «México a través de los siglos» de Vicente Riva Palacio", tipo: "secundaria" },
+  { id: "fu-s1", texto: "El libro «México a través de los siglos» dirigido por Vicente Riva Palacio", tipo: "secundaria" },
   { id: "fu-s2", texto: "Un artículo académico sobre la Revolución Francesa publicado en 2010", tipo: "secundaria" },
   { id: "fu-s3", texto: "Un libro publicado en 2020 que analiza documentos coloniales", tipo: "secundaria" },
   { id: "fu-t1", texto: "Una bibliografía que recopila libros sobre la Independencia", tipo: "terciaria" },
@@ -91,13 +91,13 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     id: "gl-primaria",
     termino: "Fuente primaria",
     definicion: "Documento, objeto o testimonio producido durante el período histórico estudiado o por participantes directos de los hechos. Proporciona evidencia de primera mano.",
-    ejemplo: "El Diario de Cristóbal Colón (1492), fotografías de la Revolución Mexicana (1910-1920), documentos del Archivo General de la Nación.",
+    ejemplo: "El Diario de a bordo de Cristóbal Colón (1492, conservado en el resumen de fray Bartolomé de las Casas), fotografías de la Revolución Mexicana (1910-1920), documentos del Archivo General de la Nación.",
   },
   {
     id: "gl-secundaria",
     termino: "Fuente secundaria",
     definicion: "Análisis, interpretación o síntesis elaborada por historiadores u otros autores sobre el pasado, generalmente con base en fuentes primarias. Incluye libros de historia, artículos académicos y enciclopedias.",
-    ejemplo: "El libro 'México a través de los siglos' de Vicente Riva Palacio, un artículo académico sobre la Revolución Francesa publicado en 2010.",
+    ejemplo: "El libro 'México a través de los siglos' dirigido por Vicente Riva Palacio, un artículo académico sobre la Revolución Francesa publicado en 2010.",
   },
   {
     id: "gl-sesgo",

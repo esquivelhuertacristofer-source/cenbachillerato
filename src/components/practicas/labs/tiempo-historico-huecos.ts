@@ -22,6 +22,6 @@ export const TIEMPO_HISTORICO_HUECOS: TextoHuecosData = {
     { respuesta: "cronológico", alternativas: [], pista: "Tipo de tiempo que se mide con relojes y calendarios; es lineal y mensurable." },
     { respuesta: "cíclico", alternativas: ["cíclico"], pista: "Concepción del tiempo basada en la repetición de ciclos; propia de muchas culturas antiguas." },
     { respuesta: "subjetivo", alternativas: [], pista: "Forma de vivir el tiempo según la experiencia personal: a veces parece largo, a veces corto." },
-    { respuesta: "duración", alternativas: ["la duración"], pista: "Concepto de Braudel que distingue larga duración, mediana duración y tiempo corto: ___ histórica." },
+    { respuesta: "duración", alternativas: ["la duración"], pista: "Concepto de Braudel que distingue el tiempo de las estructuras, el de las coyunturas y el de los acontecimientos: ___ histórica." },
   ],
 };

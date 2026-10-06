@@ -379,18 +379,18 @@ export const SITUACIONES: Situacion[] = [
  * ══════════════════════════════════════════════════════════════════════ */
 
 export const PROBLEMA =
-  "En muchas situaciones practicas es imposible o demasiado costoso estudiar a toda la poblacion. El muestreo estadistico es la tecnica que permite obtener informacion valida sobre una poblacion a partir de una muestra representativa.";
+  "En muchas situaciones prácticas es imposible o demasiado costoso estudiar a toda la población. El muestreo estadístico es la técnica que permite obtener información válida sobre una población a partir de una muestra representativa.";
 
 export const DEFINICION =
-  "El error muestral disminuye al aumentar el tamaño de la muestra y al mejorar el metodo de seleccion; el sesgo de seleccion no se corrige encuestando a más personas.";
+  "El error muestral disminuye al aumentar el tamaño de la muestra y al mejorar el método de selección; el sesgo de selección no se corrige encuestando a más personas.";
 
 /** Lectura A1 — los cinco párrafos, verbatim (la fila de la plataforma viene sin tildes). */
 export const LECTURA_A1: string[] = [
-  "En muchas situaciones practicas es imposible o demasiado costoso estudiar a toda la poblacion. El Censo de Poblacion del INEGI, que intenta contar a todos los mexicanos, se realiza solo cada diez años por el enorme costo que representa. En cambio, la Encuesta Nacional de Ingresos y Gastos de los Hogares (ENIGH) levanta datos de decenas de miles de hogares para estimar condiciones de vida de millones. El muestreo estadistico es la tecnica que permite obtener informacion valida sobre una poblacion a partir de una muestra representativa.",
-  "El error muestral es la diferencia entre el resultado obtenido en la muestra y el verdadero valor poblacional (que generalmente no conocemos). El error muestral es inevitable, pero se puede controlar: disminuye al aumentar el tamaño de la muestra y al mejorar el metodo de seleccion. El margen de error que reportan las encuestas electorales ('con un margen de error de +/- 3 puntos porcentuales') refleja precisamente este error muestral controlado.",
-  "Existen varios tipos de muestreo probabilistico (donde cada elemento de la poblacion tiene una probabilidad conocida y mayor a cero de ser seleccionado). El muestreo aleatorio simple selecciona los elementos al azar, como extraer boletos de una urna. Hoy se usan tablas de numeros aleatorios o funciones de computadora. El muestreo sistematico selecciona cada k-esimo elemento de una lista ordenada: k = N/n, donde N es el tamaño de la poblacion y n es el tamaño de la muestra deseada. Si N=800 y n=80, k=10: se selecciona un elemento de partida al azar entre el 1 y el 10, y luego cada decimo elemento. El muestreo estratificado divide la poblacion en grupos homogeneos llamados estratos (por edad, genero, region, nivel educativo) y selecciona una muestra proporcionalmente de cada estrato. Garantiza que todos los grupos importantes esten representados en la muestra. El muestreo por conglomerados selecciona grupos naturales completos (manzanas de una ciudad, escuelas de un municipio) y encuesta a todos sus miembros; es mas economico cuando la poblacion esta geograficamente dispersa.",
-  "Los muestreos no probabilisticos (como el de conveniencia, donde se encuesta a quien sea accesible) tienen sesgo de seleccion y sus resultados no pueden generalizarse a la poblacion. Las encuestas en linea con autoselecion, donde solo responden quienes estan interesados o tienen acceso a internet, son ejemplos de muestras sesgadas que no son representativas de la poblacion general mexicana.",
-  "El INEGI usa disenos muestrales complejos en sus encuestas: la ENIGH usa muestreo estratificado y por conglomerados en multiple etapas para garantizar representatividad nacional, estatal y rural/urbana. La Encuesta Nacional de Ocupacion y Empleo (ENOE) se levanta trimestralmente con metodologia similar. Entender como se construyen estas muestras es fundamental para interpretar correctamente los resultados y sus margenes de error.",
+  "En muchas situaciones prácticas es imposible o demasiado costoso estudiar a toda la población. El Censo de Población del INEGI, que intenta contar a todos los mexicanos, se realiza solo cada diez años por el enorme costo que representa. En cambio, la Encuesta Nacional de Ingresos y Gastos de los Hogares (ENIGH) levanta datos de decenas de miles de hogares para estimar condiciones de vida de millones. El muestreo estadístico es la técnica que permite obtener información válida sobre una población a partir de una muestra representativa.",
+  "El error muestral es la diferencia entre el resultado obtenido en la muestra y el verdadero valor poblacional (que generalmente no conocemos). El error muestral es inevitable, pero se puede controlar: disminuye al aumentar el tamaño de la muestra y al mejorar el método de selección. El margen de error que reportan las encuestas electorales ('con un margen de error de +/- 3 puntos porcentuales') refleja precisamente este error muestral controlado.",
+  "Existen varios tipos de muestreo probabilístico (donde cada elemento de la población tiene una probabilidad conocida y mayor a cero de ser seleccionado). El muestreo aleatorio simple selecciona los elementos al azar, como extraer boletos de una urna. Hoy se usan tablas de números aleatorios o funciones de computadora. El muestreo sistemático selecciona cada k-ésimo elemento de una lista ordenada: k = N/n, donde N es el tamaño de la población y n es el tamaño de la muestra deseada. Si N=800 y n=80, k=10: se selecciona un elemento de partida al azar entre el 1 y el 10, y luego cada décimo elemento. El muestreo estratificado divide la población en grupos homogéneos llamados estratos (por edad, género, región, nivel educativo) y selecciona una muestra proporcionalmente de cada estrato. Garantiza que todos los grupos importantes estén representados en la muestra. El muestreo por conglomerados selecciona grupos naturales completos (manzanas de una ciudad, escuelas de un municipio) y encuesta a todos sus miembros; es más económico cuando la población está geográficamente dispersa.",
+  "Los muestreos no probabilísticos (como el de conveniencia, donde se encuesta a quien sea accesible) tienen sesgo de selección y sus resultados no pueden generalizarse a la población. Las encuestas en línea con autoselección, donde solo responden quienes están interesados o tienen acceso a internet, son ejemplos de muestras sesgadas que no son representativas de la población general mexicana.",
+  "El INEGI usa diseños muestrales complejos en sus encuestas: la ENIGH usa muestreo estratificado y por conglomerados en múltiple etapas para garantizar representatividad nacional, estatal y rural/urbana. La Encuesta Nacional de Ocupación y Empleo (ENOE) se levanta trimestralmente con metodología similar. Entender cómo se construyen estas muestras es fundamental para interpretar correctamente los resultados y sus márgenes de error.",
 ];
 
 /** Preguntas de comprensión de la lectura A1 — verbatim. */
@@ -446,7 +446,7 @@ export const DATOS: DatoClave[] = [
 export const CONTEXTO =
   "El INEGI no encuesta a millones de hogares cada trimestre: la ENIGH y la ENOE combinan estratos y conglomerados en varias etapas para que decenas de miles de hogares representen a todo el país, a cada entidad y a las zonas rurales y urbanas. Así se miden el ingreso, el gasto y el empleo con márgenes de error conocidos.";
 
-export const FUENTE = "Material CEN Bachillerato — PM-VI. Ref.: INEGI-ENIGH, ENOE. Metodologia de muestreo.";
+export const FUENTE = "Material CEN Bachillerato — PM-VI. Ref.: INEGI-ENIGH, ENOE. Metodología de muestreo.";
 
 /** Glosario A5 — los 6 términos verbatim. */
 export interface GlosarioItem {
@@ -494,7 +494,7 @@ export const RETO_A2: RetoNumericoData = {
   titulo: "Calcular tamaño de muestra y diseñar un muestreo estratificado",
   contexto: "El ejercicio aplica el muestreo estratificado proporcional: la fracción de muestreo f = n/N se aplica igual a cada estrato.",
   problema:
-    "Quieres encuestar a estudiantes de tu escuela sobre el uso de redes sociales. Tu escuela tiene 800 estudiantes distribuidos en 4 grados: 1o (250), 2o (210), 3o (190) y 4o (150). Decides usar muestreo estratificado con una muestra de n = 80 estudiantes. Calcula cuantos estudiantes debes encuestar de cada grado.",
+    "Quieres encuestar a estudiantes de tu escuela sobre el uso de redes sociales. Tu escuela tiene 800 estudiantes distribuidos en 4 grados: 1o (250), 2o (210), 3o (190) y 4o (150). Decides usar muestreo estratificado con una muestra de n = 80 estudiantes (como respuesta final, escribe cuántos corresponden a 2.º grado). Calcula cuántos estudiantes debes encuestar de cada grado.",
   campos: [
     { etiqueta: "Grado 1", objetivo: 25, tolerancia: 0, unidad: "estudiantes" },
     { etiqueta: "Grado 2", objetivo: 21, tolerancia: 0, unidad: "estudiantes" },
@@ -503,12 +503,12 @@ export const RETO_A2: RetoNumericoData = {
     { etiqueta: "Total de la muestra", objetivo: 80, tolerancia: 0, unidad: "estudiantes" },
   ],
   pasosGuia: [
-    "Calcula la fraccion de muestreo: f = n/N = 80/800 = 0.10 = 10%.",
+    "Calcula la fracción de muestreo: f = n/N = 80/800 = 0.10 = 10%.",
     "Grado 1: 250 x 0.10 = 25 estudiantes.",
     "Grado 2: 210 x 0.10 = 21 estudiantes.",
     "Grado 3: 190 x 0.10 = 19 estudiantes.",
     "Grado 4: 150 x 0.10 = 15 estudiantes.",
-    "Verificacion: 25 + 21 + 19 + 15 = 80 estudiantes. Correcto.",
+    "Verificación: 25 + 21 + 19 + 15 = 80 estudiantes. Correcto.",
   ],
   respuestaFinal: "25 + 21 + 19 + 15 = 80 estudiantes.",
 };

@@ -21,7 +21,7 @@ export const CAUSALIDAD_HISTORICA_HUECOS: TextoHuecosData = {
   huecos: [
     { respuesta: "multicausalidad", alternativas: [], pista: "Principio que afirma que los eventos históricos tienen múltiples causas simultáneas de distinta naturaleza." },
     { respuesta: "estructurales", alternativas: ["estructural"], pista: "Causas de largo plazo que crean las condiciones para que ocurra un evento: causas ___." },
-    { respuesta: "coyuntural", alternativas: ["coyunturales"], pista: "Causa inmediata que actúa como detonante o catalizador de un proceso ya condicionado: causa ___." },
+    { respuesta: "coyuntural", alternativas: ["coyunturales"], pista: "Circunstancia de mediano plazo (una crisis, una guerra) que agrava un proceso ya condicionado: causa ___." },
     { respuesta: "agencia", alternativas: [], pista: "Capacidad de los actores históricos (personas, grupos) de tomar decisiones e influir en los eventos: ___ histórica." },
   ],
 };

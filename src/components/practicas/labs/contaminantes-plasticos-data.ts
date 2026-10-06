@@ -646,7 +646,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "El PET (polietileno tereftalato) puede reciclarse mecánicamente para fabricar nuevas botellas, fibras textiles o materiales de construcción.",
       opciones: VF,
       respuestaCorrecta: 0,
-      retroalimentacion: "Correcto. El PET es uno de los plásticos más reciclables. El programa ECOCE en México recupera botellas PET para producir rPET (PET reciclado) que se usa en nuevas botellas, ropa polar (fleece), alfombras y tuberías. Sin embargo, Mexico recicla menos del 30% del PET que consume.",
+      retroalimentacion: "Correcto. El PET es uno de los plásticos más reciclables. El programa ECOCE en México recupera botellas PET para producir rPET (PET reciclado) que se usa en nuevas botellas, ropa polar (fleece), alfombras y tuberías. Sin embargo, aunque según ECOCE en México se acopia para reciclaje cerca del 60% de los envases de PET, el resto aún termina en tiraderos o en el ambiente.",
     },
     {
       enunciado: "El DDT es un contaminante orgánico persistente (COP) que se acumula en los tejidos grasos de los organismos a medida que sube en la cadena alimentaria, en un proceso llamado biomagnificación.",
@@ -658,7 +658,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "Todos los plásticos flotan en el océano, por eso es posible recolectarlos completamente con redes en la superficie del agua.",
       opciones: VF,
       respuestaCorrecta: 1,
-      retroalimentacion: "Falso. Algunos plásticos son más densos que el agua de mar (PVC, PS expandido al absorber agua, PET con sedimento) y se hunden. Además, los microplásticos y nanoplásticos se distribuyen en toda la columna de agua, incluyendo los sedimentos del fondo marino, donde las redes superficiales no los capturan.",
+      retroalimentacion: "Falso. Algunos plásticos son más densos que el agua de mar (PVC, PET y poliestireno sólido) y se hunden. Además, los microplásticos y nanoplásticos se distribuyen en toda la columna de agua, incluyendo los sedimentos del fondo marino, donde las redes superficiales no los capturan.",
     },
     {
       enunciado: "En México, el uso de bolsas de plástico de un solo uso ha sido completamente prohibido en todos los estados del país desde 2020.",
@@ -684,6 +684,6 @@ export const HUECOS_A6: TextoHuecosData = {
     { respuesta: "microplásticos", alternativas: ["microplasticos"], pista: "Fragmentos de plástico menores a 5 mm presentes en océanos y suelos." },
     { respuesta: "contaminante", alternativas: ["contaminantes", "compuesto"], pista: "Tipo de sustancia química que persiste en el ambiente sin degradarse y se bioacumula." },
     { respuesta: "biodegradables", alternativas: ["degradables"], pista: "Característica de ser descompuestos por microorganismos; los metales pesados NO la tienen." },
-    { respuesta: "economía", alternativas: ["modelo"], pista: "Término que completa 'economía circular': modelo que elimina residuos manteniendo materiales en uso." },
+    { respuesta: "economía", alternativas: ["modelo"], pista: "Sustantivo que, junto con «circular», nombra al modelo que se opone al esquema lineal «producir, usar, desechar»." },
   ],
 };

@@ -16,7 +16,7 @@ export const DETECCION_FAKE_NEWS_HUECOS: TextoHuecosData = {
     " estudia las prácticas de las personas en entornos digitales. Para recoger opiniones de un grupo pequeño se usa el grupo ",
     ". El proceso de investigación implica buscar, recopilar, extraer, organizar y ",
     " la información. Las licencias ",
-    " permiten usar y compartir el material, como en LibreOffice.",
+    " permiten usar y compartir el material, como la MIT o la Apache.",
   ],
   huecos: [
     { respuesta: "ciberetnografía", alternativas: ["ciberetnografia"], pista: "Etnografía en lo digital." },

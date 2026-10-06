@@ -266,7 +266,7 @@ export const REGLAS_A9: string[] = [
   "Es falsa únicamente cuando p es verdadera y q es falsa.",
   "Es verdadera cuando ambas proposiciones tienen el mismo valor de verdad.",
   "Es verdadera solo si al menos una de las dos proposiciones es falsa.",
-  "Es verdadera siempre que p sea falsa, sin importar el valor de q.",
+  "Es verdadera siempre que q sea falsa, sin importar el valor de p.",
 ];
 /** Orden en que se ofrecen (fijo, revuelto una vez). */
 export const ORDEN_REGLAS = [3, 5, 0, 4, 6, 1, 2];
@@ -580,7 +580,7 @@ export const HECHOS: string[] = [
 /** Reflexión A3 — consigna y pistas verbatim. */
 export const REFLEXION_A3 = {
   prompt:
-    "Encuentra en las noticias, redes sociales o publicidad un argumento que uses para analizarlo lógicamente. Identifica sus proposiciones, su forma lógica (¿qué conectivos usa?) y determina si el argumento es válido o tiene fallas. Explica si te convenció o no, y por qué.",
+    "Encuentra en las noticias, redes sociales o publicidad un argumento y analízalo lógicamente. Identifica sus proposiciones, su forma lógica (¿qué conectivos usa?) y determina si el argumento es válido o tiene fallas. Explica si te convenció o no, y por qué.",
   pistas: ["¿Hay argumentos tipo 'si haces X, entonces Y'?", "¿Hay promesas que usen 'si y solo si'?", "¿Hay afirmaciones que combinen condiciones con Y u O?"],
 };
 

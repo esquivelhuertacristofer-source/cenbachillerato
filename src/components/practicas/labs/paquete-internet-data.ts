@@ -566,7 +566,7 @@ export const QUIZ_A2: QuizEvaluable = {
     },
     {
       enunciado: "El copyleft permite…",
-      opciones: ["prohibir toda copia", "copiar y modificar si se conservan las libertades", "vender sin permiso ajeno", "eliminar la autoría"],
+      opciones: ["prohibir toda copia de la obra original", "copiar y modificar conservando las libertades", "cerrar el código de las versiones derivadas", "eliminar el nombre del autor original"],
       respuestaCorrecta: 1,
       retroalimentacion: "El copyleft mantiene las libertades en las obras derivadas.",
     },

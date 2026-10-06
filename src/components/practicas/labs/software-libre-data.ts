@@ -617,7 +617,7 @@ export const HECHOS: string[] = [
   "Verdadero: «El software libre permite estudiar y modificar el programa». Correcto: es la libertad 1.",
   "Falso: «'Software libre' significa siempre que es gratis y nada más». Libre se refiere a libertad, no necesariamente a precio.",
   "Verdadero: «GNU/Linux es un ejemplo de sistema operativo libre». Correcto.",
-  "Verdadero: «La cultura hacker, en su sentido original, se basa en explorar y compartir conocimiento». Correcto: la filosofía 'Hazlo tú mismx'.",
+  "Verdadero: «La cultura hacker, en su sentido original, se basa en explorar y compartir conocimiento». Correcto: explorar cómo funcionan las cosas y compartir lo aprendido.",
 ];
 
 /** Glosario A5 — verbatim. */

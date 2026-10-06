@@ -67,5 +67,5 @@ export const RETO_A2: RetoNumericoData = {
     "(c) Costo = Área total × $280 por m².",
   ],
   respuestaFinal:
-    "(a) V = π(1.5)²(3.2) ≈ 22.62 m³ ≈ 22 619 litros. (b) A_lat = 2π(1.5)(3.2) ≈ 30.16 m²; A_bases = 2π(1.5)² ≈ 14.14 m²; A_total ≈ 44.30 m². (c) Costo ≈ $12 404.",
+    "(a) V = π(1.5)²(3.2) ≈ 22.62 m³ ≈ 22 619 litros. (b) A_lat = 2π(1.5)(3.2) ≈ 30.16 m²; A_bases = 2π(1.5)² ≈ 14.14 m²; A_total ≈ 44.30 m². (c) Costo ≈ $12 403 (44.296 m² × $280; si se usa el área redondeada a 44.30 m² sale $12 404).",
 };

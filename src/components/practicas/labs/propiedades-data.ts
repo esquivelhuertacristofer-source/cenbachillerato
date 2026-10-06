@@ -182,7 +182,7 @@ export const QUIZ_COMPRENSION: PreguntaQuiz[] = [
     pregunta: "¿Para qué sirven las propiedades físicas y químicas en la práctica?",
     opciones: [
       "Solo para aprobar exámenes de química",
-      "Para identificar sustancias y predecir cómo se comportarán en distintas condiciones",
+      "Para identificar sustancias y prever su comportamiento",
       "Para saber cuánto pesa algo",
       "Para determinar el precio de los materiales",
     ],

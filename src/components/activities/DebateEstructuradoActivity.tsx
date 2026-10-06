@@ -248,10 +248,10 @@ export function DebateEstructuradoActivity({
               fontSize: 18, fontWeight: 800, color: '#fff', textAlign: 'center',
               margin: '0 0 6px', fontFamily: 'var(--font-epilogue), sans-serif',
             }}>
-              Conocé las dos posturas
+              Conoce las dos posturas
             </p>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textAlign: 'center', margin: '0 0 24px' }}>
-              Explorá ambas perspectivas antes de elegir la que vas a defender.
+              Explora ambas perspectivas antes de elegir la que vas a defender.
             </p>
             <div className="deb-posturas-grid">
               {contenido.posturas.map((postura, i) => {
@@ -310,7 +310,7 @@ export function DebateEstructuradoActivity({
               ¿Cuál es tu posición?
             </p>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.50)', margin: '0 0 20px' }}>
-              Elegí la postura que vas a defender con argumentos propios.
+              Elige la postura que vas a defender con argumentos propios.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {contenido.posturas.map((postura, i) => {
@@ -408,7 +408,7 @@ export function DebateEstructuradoActivity({
                 value={argumentacion}
                 onChange={e => !modoRevision && !enviando ? setArgumentacion(e.target.value) : undefined}
                 readOnly={modoRevision || enviando}
-                placeholder="Escribí tu argumentación defendiendo tu postura con evidencias, ejemplos y razonamiento lógico..."
+                placeholder="Escribe tu argumentación defendiendo tu postura con evidencias, ejemplos y razonamiento lógico..."
                 style={{
                   width: '100%', minHeight: 360,
                   background: 'transparent',

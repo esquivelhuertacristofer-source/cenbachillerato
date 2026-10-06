@@ -211,7 +211,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     id: "gl-deduccion",
     termino: "Deducción",
     definicion:
-      "Razonamiento que parte de principios o premisas generales para obtener una conclusión particular necesaria.",
+      "Razonamiento en el que la conclusión se sigue necesariamente de las premisas: si estas son verdaderas, la conclusión no puede ser falsa.",
     ejemplo: "Si todos los cuerpos graves caen, y esta piedra es un cuerpo grave, entonces cae.",
   },
   {
@@ -265,7 +265,7 @@ export const QUIZ: {
   },
   {
     pregunta:
-      "Una falacia ad hominem ataca la persona que presenta el argumento en lugar de refutar el argumento mismo.",
+      "Una falacia ad hominem ataca a la persona que presenta el argumento en lugar de refutar el argumento mismo.",
     opciones: ["Verdadero", "Falso"],
     correcta: 0,
     retro:
@@ -281,7 +281,7 @@ export const QUIZ: {
   },
   {
     pregunta:
-      "Un silogismo categórico se compone de dos premisas y una conclusión, siendo la premisa mayor la que contiene el término medio.",
+      "Un silogismo categórico se compone de dos premisas y una conclusión, siendo la premisa mayor la única que contiene el término medio.",
     opciones: ["Verdadero", "Falso"],
     correcta: 1,
     retro:

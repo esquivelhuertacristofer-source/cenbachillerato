@@ -35,7 +35,7 @@ export function FooterLegal() {
           </nav>
 
           <p style={{ fontSize: 11, color: 'rgba(11,37,69,0.35)', margin: 0, textAlign: 'center' }}>
-            Protección de datos personales conforme a la LFPDPPP y lineamientos del INAI.
+            Protección de datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (DOF 20/03/2025).
           </p>
         </div>
       </div>

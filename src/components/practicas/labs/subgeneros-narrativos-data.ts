@@ -151,7 +151,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     id: "gl-autoficcion",
     termino: "Autoficción",
     definicion: "Subgénero que combina elementos autobiográficos reales con recursos ficcionales, borrando los límites entre verdad y ficción.",
-    ejemplo: "Escenas de la vida rural de Emmanuel Carrère.",
+    ejemplo: "Una novela rusa, de Emmanuel Carrère.",
   },
   {
     id: "gl-neorrealismo",
@@ -199,7 +199,7 @@ export const QUIZ: {
     pregunta: "Las literaturas del Antropoceno abordan temas relacionados con el impacto humano en el medio ambiente y la crisis ecológica.",
     opciones: ["Verdadero", "Falso"],
     correcta: 0,
-    retro: "Sí: el Antropoceno designa la era geológica marcada por la influencia humana en la Tierra, y esta literatura reflexiona sobre ello.",
+    retro: "Sí: el Antropoceno es el nombre propuesto (no oficial) para la época marcada por la influencia humana en la Tierra, y esta literatura reflexiona sobre ello.",
   },
   {
     pregunta: "El neorrealismo urbano retrata la vida rural y campesina alejada de las grandes ciudades.",

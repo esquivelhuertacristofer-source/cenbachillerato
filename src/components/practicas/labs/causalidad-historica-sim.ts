@@ -92,7 +92,7 @@ export const CANDIDATAS: Candidata[] = [
     hasta: 1910,
     clave: "jinetes-amanecer",
     icono: "fa-bolt",
-    porque: "Es el detonante inmediato (coyuntural): llamó a levantarse en una fecha concreta, sobre un terreno ya condicionado por las causas estructurales.",
+    porque: "Es el detonante inmediato (causa contingente): llamó a levantarse en una fecha concreta, sobre un terreno ya condicionado por las causas estructurales.",
   },
   {
     id: "constitucion",
@@ -131,7 +131,7 @@ export const CANDIDATAS: Candidata[] = [
     hasta: 1914,
     clave: "calle-1914",
     icono: "fa-earth-europe",
-    porque: "Es la causa coyuntural de OTRO evento, la Primera Guerra Mundial, y además ocurre 4 años después de 1910. Un hecho no explica todo lo que pasa en su época.",
+    porque: "Es el detonante (causa contingente) de OTRO evento, la Primera Guerra Mundial, y además ocurre 4 años después de 1910. Un hecho no explica todo lo que pasa en su época.",
   },
   {
     id: "napoleon",
@@ -183,8 +183,8 @@ export function evaluar(ids: string[]): Evaluacion {
   let consejo: string;
   if (intrusas > 0) consejo = "Hay candidatas que no explican este evento: no están antes de 1910 o pertenecen a otro proceso. Quítalas.";
   else if (!tieneEstructural) consejo = "Falta una condición profunda y de larga duración (causa estructural).";
-  else if (!tieneCoyuntural) consejo = "Falta el detonante inmediato (causa coyuntural). Sin él no se explica POR QUÉ estalló en 1910.";
-  else if (fuerza < UMBRAL_SOLIDA) consejo = "Ya combinas estructural y coyuntural. Suma más causas válidas para cubrir lo político, lo social y lo agrario.";
+  else if (!tieneCoyuntural) consejo = "Falta el detonante inmediato (causa contingente). Sin él no se explica POR QUÉ estalló en 1910.";
+  else if (fuerza < UMBRAL_SOLIDA) consejo = "Ya combinas condiciones estructurales y un detonante. Suma más causas válidas para cubrir lo político, lo social y lo agrario.";
   else consejo = "Explicación multicausal: condiciones profundas más un detonante.";
   const titulo = nivel === "solida" ? "Explicación sólida y multicausal" : nivel === "parcial" ? "Explicación parcial" : "Explicación frágil";
   return { fuerza, nivel, titulo, consejo, tieneEstructural, tieneCoyuntural, intrusas };

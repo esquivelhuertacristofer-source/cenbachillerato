@@ -1537,9 +1537,9 @@ export const QUIZ_A4: QuizEvaluable = {
     },
     {
       enunciado: "Después de 'I like' un verbo va en forma:",
-      opciones: ["infinitivo (to play)", "-ing (playing)", "pasado (played)", "futuro (will play)"],
+      opciones: ["forma base (play)", "-ing (playing)", "pasado (played)", "futuro (will play)"],
       respuestaCorrecta: 1,
-      retroalimentacion: "Tras 'like' se usa el verbo en -ing: 'I like playing soccer'.",
+      retroalimentacion: "Tras 'like' lo más común es el verbo en -ing: 'I like playing soccer' (también es correcto 'I like to play'); nunca la forma base sola.",
     },
     {
       enunciado: "¿Qué palabra introduce una razón?",

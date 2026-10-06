@@ -13,7 +13,7 @@ export const GENEROS_LITERARIOS_HUECOS: TextoHuecosData = {
   instrucciones: "Completa los huecos con el género literario que corresponde a cada descripción.",
   partes: [
     "Pedro Páramo es una ",
-    " del siglo XX que explora el mundo de los muertos. 'El aleph' de Borges es un ",
+    " del siglo XX que explora el mundo de los muertos. 'El Aleph' de Borges es un ",
     " breve con un final sorprendente. Un texto no ficcional donde el autor argumenta su perspectiva se llama ",
     ". La obra de García Lorca escrita para ser representada en escena pertenece al ",
     ".",

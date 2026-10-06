@@ -22,7 +22,7 @@
       "titulo": "México y las colonias: problemas previos",
       "idea": "La pandemia golpeó más donde ya había informalidad, salud fragmentada, hacinamiento y desigualdad de género.",
       "visual": { "tipo": "comparar", "columnas": [
-        { "titulo": "Escala nacional", "puntos": ["≈55% de la fuerza laboral en la informalidad", "Salud fragmentada: IMSS, ISSSTE, Seguro Popular → INSABI", "Diabetes e hipertensión frecuentes", "Exceso de mortalidad de los más altos del mundo"] },
+        { "titulo": "Escala nacional", "puntos": ["≈55% de la fuerza laboral en la informalidad", "Salud fragmentada: IMSS, ISSSTE, Seguro Popular → INSABI → IMSS-Bienestar", "Diabetes e hipertensión frecuentes", "Exceso de mortalidad de los más altos del mundo"] },
         { "titulo": "Escala local", "puntos": ["Hacinamiento que impedía el confinamiento", "Pérdida inmediata del ingreso diario", "Estudiar en línea era un privilegio", "Más carga, violencia y desempleo para las mujeres"] }
       ] },
       "comprueba": { "pregunta": "Un jornalero sin seguro médico pierde su ingreso desde el primer día de confinamiento. ¿Qué problema previo explica su situación?", "opciones": ["El colapso del turismo mundial", "La caída del precio del petróleo", "La informalidad laboral"], "correcta": 2, "porque": "Sin acceso a seguro médico ni prestaciones de desempleo, los trabajadores informales perdieron sus ingresos diarios de inmediato." }

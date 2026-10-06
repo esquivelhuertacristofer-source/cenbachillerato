@@ -66,7 +66,7 @@ export const QUIZ_A2: QuizEvaluable = {
         "Watt (W)",
         "Newton (N)",
         "Joule (J)",
-        "Caloria (cal)",
+        "Caloría (cal)",
       ],
       respuestaCorrecta: 2,
       retroalimentacion: "El Joule (J) es la unidad de energía y trabajo en el SI. El Watt es la unidad de potencia (J/s).",

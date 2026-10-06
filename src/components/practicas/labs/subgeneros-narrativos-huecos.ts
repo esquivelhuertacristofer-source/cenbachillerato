@@ -24,6 +24,6 @@ export const SUBGENEROS_NARRATIVOS_HUECOS: TextoHuecosData = {
     { respuesta: "sobrenatural", alternativas: ["fantástico","de lo sobrenatural"], pista: "Terror que usa elementos fantásticos como monstruos o fantasmas" },
     { respuesta: "psicológico", alternativas: ["interior","mental"], pista: "Terror que viene de la mente, no de criaturas externas" },
     { respuesta: "autoficción", alternativas: ["auto-ficción","ficción autobiográfica"], pista: "Subgénero que combina lo autobiográfico con lo inventado" },
-    { respuesta: "Antropoceno", alternativas: ["antropoceno","Anthropocene"], pista: "Época geológica caracterizada por el impacto humano en el planeta" },
+    { respuesta: "Antropoceno", alternativas: ["antropoceno","Anthropocene"], pista: "Nombre propuesto para la época marcada por el impacto humano en el planeta" },
   ],
 };

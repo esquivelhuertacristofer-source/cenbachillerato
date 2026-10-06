@@ -13,9 +13,9 @@ export const TIEMPO_HISTORICO_FICHA: FichaTeoricaData = {
   ancla: "CH-I-P02-A1 · El tiempo que medimos y el tiempo que sentimos: tipos de tiempo histórico",
   marcoTeorico: [
     "Tiempo cronológico: sistema lineal que organiza eventos en secuencia ordenada. Base del calendario gregoriano establecido en 1582 por Gregorio XIII, hoy estándar internacional.",
-    "Calendarios mesoamericanos: el sistema maya combina el Tzolk'in (260 días, ciclo ritual) y el Haab' (365 días, solar). Su sincronización produce la Rueda Calendárica de 52 años, equivalente a un siglo occidental.",
+    "Calendarios mesoamericanos: el sistema maya combina el Tzolk'in (260 días, ciclo ritual) y el Haab' (365 días, solar). Su sincronización produce la Rueda Calendárica de 52 años, que cumplía una función análoga a la del siglo occidental como gran unidad de cómputo.",
     "Tonalpohualli azteca (260 días) y Xiuhpohualli (365 días): sistemas paralelos que organizaban la vida religiosa, agrícola y política de los mexicas. Miguel León-Portilla los estudió como sistemas filosóficos completos.",
-    "Tiempo cíclico: concepción del tiempo como ciclos que se repiten. En la cosmología nahuatl, el mundo actual es el Quinto Sol, creado en Teotihuacán cuando los dioses se sacrificaron. Los cuatro soles anteriores terminaron en catástrofes cósmicas.",
+    "Tiempo cíclico: concepción del tiempo como ciclos que se repiten. En la cosmología náhuatl, el mundo actual es el Quinto Sol, creado en Teotihuacán cuando los dioses se sacrificaron. Los cuatro soles anteriores terminaron en catástrofes cósmicas.",
     "Los griegos también concibieron tiempos cíclicos: Polibio describió la anacyclosis (ciclo de regímenes políticos: monarquía → tiranía → aristocracia → oligarquía → democracia → oclocracia).",
     "Tiempo subjetivo (vivido): el tiempo tal como lo experimentan y recuerdan personas y comunidades. Para una familia migrante, el año de su llegada a la ciudad puede ser más significativo que cualquier fecha oficial de la historia nacional.",
     "Memoria colectiva: concepto del sociólogo Maurice Halbwachs (1950). Conjunto de recuerdos compartidos por un grupo social que selecciona, transforma y carga de significado el pasado según las necesidades del presente.",
@@ -31,7 +31,7 @@ export const TIEMPO_HISTORICO_FICHA: FichaTeoricaData = {
   materiales: [],
   conceptos: [
     { termino: "Cronología", definicion: "Ciencia y método que estudia la medición del tiempo y la datación de eventos históricos mediante sistemas calendáricos, capas geológicas o análisis de carbono-14." },
-    { termino: "Cosmogonía", definicion: "Relato o sistema explicativo sobre el origen del universo, el tiempo y los seres humanos. Cada cultura tiene su propia cosmogonía; la nahuatl organiza la historia en cinco eras o 'Soles'." },
+    { termino: "Cosmogonía", definicion: "Relato o sistema explicativo sobre el origen del universo, el tiempo y los seres humanos. Cada cultura tiene su propia cosmogonía; la náhuatl organiza la historia en cinco eras o 'Soles'." },
     { termino: "Memoria colectiva", definicion: "Conjunto de recuerdos compartidos por un grupo social. A diferencia de la historia académica, selecciona el pasado según los valores y necesidades identitarias del presente." },
     { termino: "Historia oral", definicion: "Metodología histórica que recupera testimonios directos de protagonistas o testigos. Fundamental para documentar experiencias de comunidades sin registro escrito." },
     { termino: "Anacyclosis", definicion: "Teoría del historiador griego Polibio sobre el ciclo inevitable de los regímenes políticos: cada forma de gobierno degenera en su versión corrupta antes de transformarse en la siguiente." },
@@ -45,7 +45,7 @@ export const TIEMPO_HISTORICO_FICHA: FichaTeoricaData = {
     { termino: "Anacronismo", definicion: "Error histórico que consiste en atribuir a una época ideas, objetos, valores o prácticas propios de otra época, generalmente trasladando el presente al pasado." },
   ],
   aplicaciones: [
-    "México es uno de los países con mayor diversidad de concepciones del tiempo en el mundo. Los 68 pueblos indígenas reconocidos constitucionalmente tienen sus propios calendarios, ciclos festivos y formas de organizar la memoria colectiva. El calendario ritual totonaco, el sistema de cargos de los pueblos zapotecas y los ciclos agrícolas de comunidades mayas son sistemas vigentes que coexisten con el calendario gregoriano.\n\nEl INAH y el CIESAS han documentado cómo estas concepciones no son 'supervivencias del pasado' sino sistemas vivos que organizan la vida cotidiana de millones de mexicanos. Comprender el tiempo cíclico y subjetivo no es solo estudiar el pasado prehispánico: es reconocer la diversidad epistémica del México contemporáneo.",
+    "México es uno de los países con mayor diversidad de concepciones del tiempo en el mundo. Los pueblos indígenas de México —con 68 agrupaciones lingüísticas reconocidas por el INALI— tienen sus propios calendarios, ciclos festivos y formas de organizar la memoria colectiva. El calendario ritual totonaco, el sistema de cargos de los pueblos zapotecas y los ciclos agrícolas de comunidades mayas son sistemas vigentes que coexisten con el calendario gregoriano.\n\nEl INAH y el CIESAS han documentado cómo estas concepciones no son 'supervivencias del pasado' sino sistemas vivos que organizan la vida cotidiana de millones de mexicanos. Comprender el tiempo cíclico y subjetivo no es solo estudiar el pasado prehispánico: es reconocer la diversidad epistémica del México contemporáneo.",
   ],
   fuente: "León-Portilla, M. (1968). Tiempo y realidad en el pensamiento maya. UNAM. / Florescano, E. (2002). Historia de las historias de la nación mexicana. Taurus. / INAH — Catálogo del Patrimonio Cultural Intangible.",
 };

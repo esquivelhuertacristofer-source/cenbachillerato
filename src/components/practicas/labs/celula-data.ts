@@ -317,7 +317,7 @@ export const GLOSARIO: { termino: string; definicion: string }[] = [
 
 /* ── Contexto y fuente (verbatim de A1) ───────────────────────────────────── */
 export const CONTEXTO =
-  "El ajolote (Ambystoma mexicanum) es quizás el animal de mayor importancia científica endémico de México. Habita exclusivamente los canales de Xochimilco, un ecosistema lacustre que ha perdido el 90% de su extensión original por urbanización, contaminación y especies invasoras (carpa y tilapia). Un censo del Instituto de Biología de la UNAM en 2023 registró menos de 1,000 individuos silvestres —colapso desde más de 6,000 ajolotes por km² en los años 1980. La paradoja es aguda: el ajolote es uno de los animales más estudiados del mundo en biología celular, pero en su hábitat natural está al borde de la extinción.";
+  "El ajolote (Ambystoma mexicanum) es quizás el animal de mayor importancia científica endémico de México. Hoy sobrevive en libertad casi exclusivamente en los canales de Xochimilco, un ecosistema lacustre que ha perdido el 90% de su extensión original por urbanización, contaminación y especies invasoras (carpa y tilapia). Los muestreos del Instituto de Biología de la UNAM documentaron un colapso de unos 6,000 ajolotes por km² en 1998 a apenas 35 por km² en 2014. La paradoja es aguda: el ajolote es uno de los animales más estudiados del mundo en biología celular, pero en su hábitat natural está al borde de la extinción.";
 
 export const FUENTE =
   "Instituto de Biología UNAM — Genoma del Ajolote y Biología de la Regeneración 2023; CINVESTAV — Líneas de Investigación en Biología Celular y Molecular 2023.";
@@ -379,7 +379,7 @@ export const QUIZ_A2: QuizEvaluable = {
         "El aparato de Golgi recibe vesículas del retículo endoplásmico, modifica y empaca las proteínas y lípidos, y los dirige a su destino final: membrana plasmática, lisosomas o secreción.",
     },
     {
-      enunciado: "¿Qué organelo realizan exclusivamente las células vegetales y algunas algas?",
+      enunciado: "¿Qué organelo poseen exclusivamente las células vegetales y algunas algas?",
       opciones: ["Lisosoma", "Mitocondria", "Cloroplasto", "Vacuola pequeña"],
       respuestaCorrecta: 2,
       retroalimentacion:

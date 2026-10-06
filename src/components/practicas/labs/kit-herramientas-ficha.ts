@@ -52,7 +52,7 @@ export const KIT_HERRAMIENTAS_FICHA: FichaTeoricaData = {
     { termino: "Hoja de cálculo", definicion: "Programa para organizar datos en filas y columnas y hacer cálculos." },
     { termino: "Presentación electrónica", definicion: "Programa para crear diapositivas para exponer un tema." },
     { termino: "Respaldo (backup)", definicion: "Copia de seguridad de tus archivos para no perderlos." },
-    { termino: "Plagio", definicion: "Usar el trabajo o ideas de otros sin dar crédito, presentándolo como propio." },
+    { termino: "Plagio", definicion: "Presentar como propio el trabajo de otros." },
     { termino: "Buscador académico", definicion: "Buscador especializado en literatura académica y científica, útil para encontrar artículos revisados." },
   ],
   aplicaciones: [

@@ -29,7 +29,7 @@ export const COMPARATIVOS_INGLES_FICHA: FichaTeoricaData = {
   conceptos: [],
   glosario: [
     { termino: "-er + than", definicion: "Comparativo de adjetivos cortos (1 sílaba)." },
-    { termino: "more + adjective + than", definicion: "Comparativo de adjetivos largos (2+ sílabas)." },
+    { termino: "more + adjective + than", definicion: "Comparativo de adjetivos largos (2+ sílabas; los de 2 sílabas en -y usan -ier: happier)." },
     { termino: "than", definicion: "Palabra que conecta los dos elementos comparados (que)." },
     { termino: "better / worse", definicion: "Comparativos irregulares de good / bad." },
     { termino: "cheaper / more expensive", definicion: "Más barato / más caro (para comparar precios)." },

@@ -33,14 +33,14 @@ export const CICLO: { id: string; orden: number; texto: string; etapa: string; d
     orden: 1,
     texto: "Diseño de alternativas",
     etapa: "Etapa 2",
-    detalle: "La Secretaría de Hacienda y Crédito Público y el CONEVAL analizan la viabilidad técnica y fiscal de las opciones de política.",
+    detalle: "La Secretaría de Hacienda y Crédito Público y, hasta 2025, el CONEVAL han analizado la viabilidad técnica y fiscal de las opciones de política.",
   },
   {
     id: "cic-3",
     orden: 2,
     texto: "Adopción de la política",
     etapa: "Etapa 3",
-    detalle: "Implica autorización legal (leyes, decretos, reglas de operación), asignación presupuestaria y asignación de responsabilidades. El Congreso aprueba el PEF cada diciembre.",
+    detalle: "Implica autorización legal (leyes, decretos, reglas de operación), asignación presupuestaria y asignación de responsabilidades. La Cámara de Diputados aprueba en exclusiva el PEF cada año, a más tardar el 15 de noviembre.",
   },
   {
     id: "cic-4",
@@ -54,7 +54,7 @@ export const CICLO: { id: string; orden: number; texto: string; etapa: string; d
     orden: 4,
     texto: "Evaluación",
     etapa: "Etapa 5",
-    detalle: "El CONEVAL evalúa cada año más de 150 programas sociales federales usando metodologías rigurosas, y retroalimenta el ciclo.",
+    detalle: "Hasta 2025, el CONEVAL evaluaba cada año más de 150 programas sociales federales con metodologías rigurosas; hoy esa función corresponde al INEGI.",
   },
 ];
 
@@ -187,13 +187,13 @@ export const QUIZ: {
     retro: "Correcto. La contraloría social empodera a las comunidades para monitorear la ejecución de obras y programas, denunciar irregularidades y exigir rendición de cuentas a las autoridades.",
   },
   {
-    pregunta: "CONEVAL es la institución encargada de medir la pobreza en México y evaluar la efectividad de los programas sociales del gobierno federal.",
+    pregunta: "Hasta 2025, el CONEVAL fue la institución encargada de medir la pobreza en México y evaluar la efectividad de los programas sociales del gobierno federal.",
     opciones: ["Verdadero", "Falso"],
     correcta: 0,
-    retro: "Correcto. El Consejo Nacional de Evaluación de la Política de Desarrollo Social (CONEVAL) mide la pobreza multidimensional en México con una metodología que combina indicadores de bienestar económico y derechos sociales (salud, educación, vivienda, alimentación, seguridad social y servicios básicos).",
+    retro: "Correcto. El Consejo Nacional de Evaluación de la Política de Desarrollo Social (CONEVAL) midió hasta 2025 la pobreza multidimensional en México con una metodología que combina indicadores de bienestar económico y derechos sociales (salud, educación, vivienda, alimentación, seguridad social y servicios básicos). Tras la reforma constitucional de diciembre de 2024, el CONEVAL se extinguió en julio de 2025 y la medición de la pobreza pasó al INEGI.",
   },
 ];
 
 /** Dato verbatim del contexto mexicano de A1. */
 export const DATO_POLITICAS =
-  "México tiene uno de los sistemas de evaluación de políticas públicas más desarrollados de América Latina, gracias al CONEVAL, creado en 2004 como organismo autónomo. Pero contar con instrumentos rigurosos no garantiza que sus resultados se traduzcan en cambios de política: menos del 30% de las recomendaciones del CONEVAL se implementan.";
+  "México construyó uno de los sistemas de evaluación de políticas públicas más desarrollados de América Latina, gracias al CONEVAL, creado en 2004 (con autonomía constitucional desde 2014) y extinguido en julio de 2025, como consecuencia de la reforma de simplificación orgánica de 2024, que pasó la medición de la pobreza al INEGI. Pero contar con instrumentos rigurosos no garantiza que sus resultados se traduzcan en cambios de política: menos del 30% de las recomendaciones del CONEVAL se implementan.";

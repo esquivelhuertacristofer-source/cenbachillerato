@@ -22,8 +22,8 @@ export const CONICAS_FICHA: FichaTeoricaData = {
     "Circunferencia — ecuación canónica: (x − h)² + (y − k)² = r², donde (h, k) es el centro y r el radio. Identificación rápida: en la ecuación general, si los coeficientes de x² y y² son iguales y no hay término xy, la cónica es una circunferencia.",
     "Parábola — ecuación canónica con vértice en el origen: eje vertical → x² = 4py (abre arriba si p > 0); eje horizontal → y² = 4px. El foco está en (0, p) y la directriz es y = −p. Propiedad focal: todo rayo paralelo al eje se refleja exactamente hacia el foco.",
     "El Gran Telescopio Milimétrico (GTM) del INAOE en el Volcán Sierra Negra (Puebla), a 4,600 m de altitud, tiene un reflector parabólico de 50 m de diámetro. Su superficie sigue exactamente la ecuación de una parábola: las ondas de radio y microondas del universo que llegan paralelas al eje se concentran en el foco, donde está el receptor.",
-    "Identificación de cónicas por coeficientes en Ax² + Cy² + Dx + Ey + F = 0 (sin término xy): A = C → circunferencia; A ≠ C con igual signo → elipse; solo uno de A, C es cero → parábola; A y C con signos opuestos → hipérbola. Regla útil en exámenes de admisión UNAM (EXANI-II) e IPN.",
-    "Aplicaciones en infraestructura mexicana: el Puente Baluarte en la Sierra Madre Occidental (Durango-Sinaloa) —uno de los puentes atirantados más altos del mundo con 402 m sobre el río Baluarte— tiene cables tensados en formas geométricas que los ingenieros civiles de la SCT calculan con geometría analítica de cónicas.",
+    "Identificación de cónicas por coeficientes en Ax² + Cy² + Dx + Ey + F = 0 (sin término xy): A = C → circunferencia; A ≠ C con igual signo → elipse; solo uno de A, C es cero → parábola; A y C con signos opuestos → hipérbola. Regla útil en exámenes de admisión como el de la UNAM, el del IPN o el EXANI-II del CENEVAL.",
+    "Aplicaciones en infraestructura mexicana: el Puente Baluarte en la Sierra Madre Occidental (Durango-Sinaloa) —uno de los puentes atirantados más altos del mundo con 402 m sobre el río Baluarte— sostiene su tablero con cables rectos que forman triángulos con las torres, y los ingenieros de la entonces SCT (hoy SICT) los calcularon con geometría analítica. En un puente colgante, en cambio, el cable principal toma la forma de una parábola: una cónica.",
   ],
 
   objetivos: [
@@ -64,7 +64,7 @@ export const CONICAS_FICHA: FichaTeoricaData = {
     "El GTM del INAOE (reflector parabólico de 50 m) concentra señales de radio y microondas del universo en el foco gracias a la propiedad focal de la parábola.",
     "Aproximadamente 20 millones de hogares mexicanos con televisión satelital (DISH, SKY) usan reflectores parabólicos de ~60 cm de diámetro para concentrar la señal del satélite en el receptor.",
     "Los exámenes de admisión a la UNAM (EXANI-II) y el IPN incluyen identificación de cónicas por su ecuación general.",
-    "El Puente Baluarte (Durango-Sinaloa, 402 m sobre el río Baluarte) usa geometría analítica de cónicas en el cálculo estructural de sus cables tensados.",
+    "El Puente Baluarte (Durango-Sinaloa, 402 m sobre el río Baluarte) es atirantado: sus cables son rectos. La cónica aparece en los puentes colgantes, cuyo cable principal forma una parábola.",
   ],
 
   fuente: "Material elaborado para CEN Bachillerato — Infografía A1 y glosario A5, PM-IV-P07. INAOE GTM 2023; SCT Puente Baluarte 2020; UNAM Instituto de Matemáticas 2022.",

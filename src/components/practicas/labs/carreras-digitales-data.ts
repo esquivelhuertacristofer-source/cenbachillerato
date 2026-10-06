@@ -130,7 +130,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     definicion:
       "Subrepresentación histórica de mujeres y personas de géneros no binarios en carreras de Ciencia, Tecnología, Ingeniería y Matemáticas. Se origina en estereotipos de género, falta de referentes, sesgos en la enseñanza y ambientes laborales poco inclusivos.",
     ejemplo:
-      "Según UNESCO, menos del 30% de los investigadores en ciencia y tecnología a nivel mundial son mujeres, y la brecha es aún mayor en ingeniería de software e inteligencia artificial.",
+      "Según UNESCO, alrededor de un tercio (33%) de las personas investigadoras del mundo son mujeres, y la brecha es aún mayor en ingeniería de software e inteligencia artificial.",
   },
   {
     id: "gl-trayectoria",
@@ -196,4 +196,4 @@ export const QUIZ: {
 
 /** Dato verbatim del contexto mexicano de A1 (brecha de talento / nearshoring). */
 export const DATO_CARRERAS =
-  "México produce alrededor de 5,000 egresados universitarios en carreras de TI por año, pero el mercado laboral demanda más de 40,000 especialistas anuales. Guadalajara (el «Silicon Valley mexicano»), CDMX y Monterrey concentran el 70% del empleo tecnológico nacional.";
+  "México gradúa cada año a decenas de miles de profesionales en carreras de TI, y aun así las empresas reportan dificultades para cubrir vacantes especializadas. Guadalajara (el «Silicon Valley mexicano»), CDMX y Monterrey concentran el 70% del empleo tecnológico nacional.";

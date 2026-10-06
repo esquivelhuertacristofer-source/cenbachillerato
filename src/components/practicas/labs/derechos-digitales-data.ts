@@ -905,8 +905,8 @@ export const RETO_QUIZ: QuizEvaluable = {
       enunciado: "¿Qué es el 'derecho al olvido'?",
       opciones: [
         "El derecho a borrar mensajes enviados en WhatsApp",
-        "El derecho a solicitar que plataformas eliminen datos personales desactualizados o dañinos",
-        "El derecho a no recibir publicidad",
+        "El derecho a pedir que se borren datos personales obsoletos",
+        "El derecho a no recibir publicidad en redes sociales",
         "El derecho a usar internet de forma anónima",
       ],
       respuestaCorrecta: 1,
@@ -924,16 +924,16 @@ export const RETO_QUIZ: QuizEvaluable = {
       enunciado: "La 'discriminación algorítmica' ocurre cuando:",
       opciones: [
         "Un algoritmo recomienda contenido que no te interesa",
-        "Un sistema automatizado toma decisiones que discriminan por características personales como raza o género",
-        "Las redes sociales bloquean cuentas falsas",
-        "Un buscador no encuentra lo que necesitas",
+        "Un sistema automático trata peor a personas por su raza o género",
+        "Las redes sociales bloquean cuentas falsas o de bots",
+        "Un buscador no encuentra la información que necesitas",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
         "La discriminación algorítmica es cuando sistemas automáticos refuerzan sesgos y discriminan a personas por sus características. La ley permite oponerse a los tratamientos automatizados que deciden sobre ti sin intervención humana (art. 26, fr. II).",
     },
     {
-      enunciado: "¿Cuál de estas acciones ejerces tu derecho a la seguridad digital?",
+      enunciado: "¿Con cuál de estas acciones ejerces tu derecho a la seguridad digital?",
       opciones: [
         "Usar la misma contraseña en todas tus cuentas por comodidad",
         "Activar la autenticación de dos factores en tus cuentas importantes",
@@ -973,11 +973,11 @@ export const REFLEXION_A3 = {
     "Identifica correctamente al menos un derecho digital",
     "Describe una situación concreta (real o plausible) de violación",
     "Propone acciones concretas de protección o reparación",
-    "Usa vocabulario del tema (INAI, privacidad, 2FA, derecho al olvido)",
+    "Usa vocabulario del tema (derechos ARCO, privacidad, 2FA, cancelación de datos)",
   ],
   pistas: [
     "¿Has tenido alguna experiencia donde tus datos fueron usados sin tu conocimiento?",
-    "¿Conoces el INAI y para qué sirve?",
+    "¿Sabes ante quién se reclama cuando alguien usa mal tus datos personales?",
     "¿Qué pasaría si una universidad o empresa usa un algoritmo que discrimina por nombre o código postal?",
   ],
 };

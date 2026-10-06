@@ -2,13 +2,16 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calculator, ChevronDown, ChevronUp, Check, RotateCcw, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Calculator, ChevronDown, ChevronUp, Check, RotateCcw, ArrowRight, Loader2, AlertCircle, Dumbbell } from 'lucide-react';
 import { springs } from '@/lib/motion/tokens';
 import { useReducedMotion } from '@/lib/motion/hooks';
 import { celebrate } from '@/lib/motion/celebrate';
 import type { ActividadEjercicioMatematico, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
 import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
+import { coincideNumero } from '@/lib/activities/leer-numero';
+import { tieneVariantes } from '@/lib/ejercicios/variantes';
+import { PracticaConVariantes } from './PracticaConVariantes';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#FB923C', rgba: '251,146,60', faIcon: 'fa-calculator', gradient: '' };
 const MAX_INTENTOS = 3;
@@ -48,12 +51,18 @@ export function EjercicioMatematicoActivity({
   const [maxUnlocked, setMaxUnlocked] = useState(modoRevision ? pasos.length : 0);
   const [imgError, setImgError] = useState(false);
   const [imgTematicaError, setImgTematicaError] = useState(false);
+  const [practicaAbierta, setPracticaAbierta] = useState(false);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const botonPracticaRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => () => { if (shakeTimer.current) clearTimeout(shakeTimer.current); }, []);
 
   const verificado = correcto !== null || solucionRevelada;
   const intentosAgotados = intentos >= MAX_INTENTOS;
+  // Banco de variantes: tras resolver (o ver la solución, o en revisión) el
+  // alumno puede practicar el mismo procedimiento con otros números. Esa
+  // práctica nunca pasa por `onProgreso`: no cambia la calificación.
+  const puedePracticar = tieneVariantes(actividad.codigo) && (correcto === true || solucionRevelada);
 
   // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
   // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
@@ -78,10 +87,7 @@ export function EjercicioMatematicoActivity({
       if (!reducedMotion) void celebrate('small');
       return;
     }
-    const tolerancia = contenido.tolerancia_error ?? 0;
-    const esperada = parseFloat(contenido.respuesta_final ?? '');
-    const dada = parseFloat(respuesta.replace(',', '.'));
-    const esCorrecta = !isNaN(esperada) && !isNaN(dada) && Math.abs(dada - esperada) <= tolerancia;
+    const esCorrecta = coincideNumero(respuesta, contenido.respuesta_final, contenido.tolerancia_error ?? 0);
 
     if (esCorrecta) {
       setCorrecto(true);
@@ -125,6 +131,13 @@ export function EjercicioMatematicoActivity({
     setEntregando(false);
     setPasosAbiertos(Array(pasos.length).fill(false));
     setMaxUnlocked(0);
+    setPracticaAbierta(false);
+  }
+
+  function cerrarPractica() {
+    setPracticaAbierta(false);
+    // Devuelve el foco al botón que abrió el panel.
+    setTimeout(() => botonPracticaRef.current?.focus(), 0);
   }
 
   const card: React.CSSProperties = {
@@ -454,7 +467,10 @@ export function EjercicioMatematicoActivity({
 
       {/* Solucion revelada */}
       <AnimatePresence>
-        {solucionRevelada && contenido.respuesta_final && (
+        {/* En «desarrollo» no hay calificación automática: al registrar el
+            procedimiento se muestra la solución de referencia para que el
+            alumno se autocorrija (antes solo decía «guardado» y nunca la veía). */}
+        {(solucionRevelada || (esDesarrollo && correcto === true)) && contenido.respuesta_final && (
           <motion.div
             initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -468,13 +484,13 @@ export function EjercicioMatematicoActivity({
             }}
           >
             <p style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: '#FBBF24', margin: '0 0 10px' }}>
-              Solución correcta
+              {esDesarrollo ? 'Solución de referencia' : 'Solución correcta'}
             </p>
-            <p style={{ fontSize: 22, fontWeight: 800, color: '#fff', margin: '0 0 6px', fontFamily: 'var(--font-epilogue), sans-serif' }}>
-              {contenido.respuesta_final}{contenido.unidades ? ` ${contenido.unidades}` : ''}
+            <p style={{ fontSize: esDesarrollo ? 17 : 22, fontWeight: esDesarrollo ? 700 : 800, lineHeight: 1.55, color: '#fff', margin: '0 0 6px', fontFamily: 'var(--font-epilogue), sans-serif', whiteSpace: 'pre-line' }}>
+              {contenido.respuesta_final}{!esDesarrollo && contenido.unidades ? ` ${contenido.unidades}` : ''}
             </p>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.48)', margin: 0 }}>
-              Revisá los pasos guía para entender el procedimiento.
+              {esDesarrollo ? 'Compara tu procedimiento con esta solución y con los pasos guía.' : 'Revisa los pasos guía para entender el procedimiento.'}
             </p>
           </motion.div>
         )}
@@ -638,7 +654,42 @@ export function EjercicioMatematicoActivity({
               : <><ArrowRight size={16} /> Continuar</>}
           </motion.button>
         )}
+
+        {/* Practicar con otros números (no cuenta para la calificación) */}
+        {puedePracticar && !practicaAbierta && (
+          <motion.button
+            ref={botonPracticaRef}
+            type="button"
+            className="em-btn-sec"
+            onClick={() => setPracticaAbierta(true)}
+            aria-expanded={false}
+            whileHover={!reducedMotion ? { y: -1 } : {}}
+            whileTap={!reducedMotion ? { scale: 0.98 } : {}}
+            transition={springs.snappy}
+            style={{
+              width: '100%', padding: '16px 24px', borderRadius: 14,
+              border: `1.5px solid rgba(${color.rgba}, 0.30)`,
+              cursor: 'pointer', fontSize: 14, fontWeight: 700,
+              background: `rgba(${color.rgba}, 0.08)`, color: color.hex,
+              fontFamily: 'var(--font-epilogue), sans-serif',
+              transition: 'background 0.2s, transform 0.15s',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            }}
+          >
+            <Dumbbell size={16} aria-hidden="true" />
+            Practicar con otros números
+          </motion.button>
+        )}
       </div>
+
+      {puedePracticar && practicaAbierta && actividad.codigo && (
+        <PracticaConVariantes
+          codigo={actividad.codigo}
+          color={color}
+          reducedMotion={reducedMotion}
+          onCerrar={cerrarPractica}
+        />
+      )}
 
       <style>{`
         @keyframes em-spin { to { transform: rotate(360deg); } }

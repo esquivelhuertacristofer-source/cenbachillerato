@@ -119,7 +119,7 @@ export const QUIZ: QuizItem[] = [
     pregunta: "Los adjetivos largos usan 'more ... than' ('more interesting than').",
     opciones: ["Verdadero", "Falso"],
     correcta: 0,
-    retro: "Sí: con adjetivos de 2+ sílabas se usa 'more'.",
+    retro: "Sí: con la mayoría de adjetivos de 2+ sílabas se usa 'more' (excepto los de 2 sílabas terminados en -y: happy → happier, noisy → noisier).",
   },
   {
     pregunta: "'Bigger more than' es la forma correcta del comparativo.",

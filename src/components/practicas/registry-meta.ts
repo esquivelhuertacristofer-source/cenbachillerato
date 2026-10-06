@@ -513,7 +513,7 @@ export const PRACTICAS_META: Record<string, PracticaMeta> = {
   "espectro-electromagnetico": {
     slug: "espectro-electromagnetico",
     titulo: "Laboratorio 3D — Espectro Electromagnético",
-    descripcion: "Recorre el espectro log-f 10⁴–10²² Hz; identifica las 7 bandas, el umbral ionizante y 11 aplicaciones de México (GTM, IFT, IMSS, ININ). Anclado a infografía A1.",
+    descripcion: "Recorre el espectro log-f 10⁴–10²² Hz; identifica las 7 bandas, el umbral ionizante y 11 aplicaciones de México (GTM, CRT, IMSS, ININ). Anclado a infografía A1.",
   },
   "optica-lentes-espejos": {
     slug: "optica-lentes-espejos",

@@ -136,7 +136,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     id: "gl-software",
     termino: "Software estadístico libre",
     definicion: "Programas gratuitos y abiertos para analizar datos.",
-    ejemplo: "Jamovi, JASP o XLSTAT Free.",
+    ejemplo: "Jamovi, JASP o PSPP.",
   },
 ];
 
@@ -178,4 +178,4 @@ export const QUIZ: {
 
 /** Dato verbatim del contexto mexicano de A1. */
 export const DATO_GRAFICAS =
-  "El INEGI produce más de 300 conjuntos de datos estadísticos públicos, todos accesibles en datos.gob.mx. Sus gráficas son el estándar de referencia para periodistas, investigadores y funcionarios en México.";
+  "El INEGI publica cientos de conjuntos de datos estadísticos abiertos, consultables en inegi.org.mx. Sus gráficas son el estándar de referencia para periodistas, investigadores y funcionarios en México.";

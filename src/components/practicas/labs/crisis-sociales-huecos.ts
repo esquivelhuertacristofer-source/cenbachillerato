@@ -19,8 +19,8 @@ export const CRISIS_SOCIALES_HUECOS: TextoHuecosData = {
     " sociales son los grupos, instituciones y personas que tienen intereses y capacidad de acción ante una crisis.",
   ],
   huecos: [
-    { respuesta: "multicausales", alternativas: ["multidimensionales","complejos"], pista: "Las crisis tienen múltiples causas, no una sola: son ___." },
-    { respuesta: "estructural", alternativas: [], pista: "Tipo de violencia 'silenciosa' inscrita en las estructuras sociales, según Galtung: violencia ___." },
+    { respuesta: "multicausales", alternativas: ["multidimensionales","complejos"], pista: "Las crisis no se explican por un solo factor: son ___." },
+    { respuesta: "estructural", alternativas: [], pista: "Tipo de violencia 'silenciosa' que, según Galtung, daña sin un agresor visible: violencia ___." },
     { respuesta: "multiescalar", alternativas: ["multiescala"], pista: "Perspectiva que conecta distintos niveles de análisis: local, nacional y global. Enfoque ___." },
     { respuesta: "actores", alternativas: ["actores sociales"], pista: "Grupos o instituciones con intereses y capacidad de acción: ___ sociales." },
   ],

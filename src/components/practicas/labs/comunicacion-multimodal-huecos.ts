@@ -20,7 +20,7 @@ export const COMUNICACION_MULTIMODAL_HUECOS: TextoHuecosData = {
   ],
   huecos: [
     { respuesta: "multimodal", alternativas: [], pista: "La comunicación que usa múltiples modos semióticos (texto, imagen, audio, video) se llama comunicación ___." },
-    { respuesta: "filtro", alternativas: ["filter bubble"], pista: "El algoritmo crea una ___ de filtro al personalizar el contenido y reducir la diversidad de perspectivas." },
+    { respuesta: "filtro", alternativas: ["filter bubble"], pista: "Lo que hace el algoritmo con el contenido: deja pasar lo que te gusta y retiene lo demás." },
     { respuesta: "digital", alternativas: [], pista: "La huella en línea y los datos que definen a una persona en el ciberespacio forman su identidad ___." },
     { respuesta: "crítico", alternativas: ["crítica"], pista: "Cuestionar la fuente, la intención y el efecto de un mensaje es hacer análisis ___ de medios." },
   ],

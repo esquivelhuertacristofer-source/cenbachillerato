@@ -56,7 +56,7 @@ export const RETO_A2: RetoNumericoData = {
     "(a) Plantea la proporción: altura_torre / sombra_torre = altura_Sofía / sombra_Sofía.",
     "(a) Sustituye: H / 12.40 = 1.60 / 0.80 → H = 1.60 × (12.40 / 0.80).",
     "(b) k = sombra_torre / sombra_Sofía = 12.40 / 0.80.",
-    "(c) Usa la misma razón: H_monumento / 3.2 = 1.60 / 0.80 → H_monumento = k × 1.60.",
+    "(c) Usa la misma razón: H_monumento / 3.2 = 1.60 / 0.80 → H_monumento = (3.2 / 0.80) × 1.60 = 4 × 1.60 (ojo: aquí la razón no es la k del inciso b).",
   ],
   respuestaFinal: "(a) H = 24.8 m. (b) k = 15.5. (c) H_monumento = 6.4 m.",
 };

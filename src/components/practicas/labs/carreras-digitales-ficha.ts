@@ -19,7 +19,7 @@ export const CARRERAS_DIGITALES_FICHA: FichaTeoricaData = {
     "Brecha de género en STEM: las mujeres representan solo el 25–30% de la matrícula en carreras de ingeniería y tecnología en México (ANUIES 2023). En el mercado laboral TI, la proporción cae al 18–22%.",
     "La brecha no refleja diferencias de capacidad: investigaciones del IIMAS-UNAM documentan que factores culturales, estereotipos de género y falta de referentes femeninos explican la subrepresentación.",
     "Rutas accesibles: UNAM, IPN, UAM y universidades tecnológicas estatales ofrecen carreras de TI. Bootcamps con modelo de pago diferido (Bedu, Ironhack México, Wizeline Academy) permiten acceder sin capital inicial.",
-    "MOOCs gratuitos y con becas: Google Activate, Microsoft Learn, Coursera (becas CONAHCYT), edX y Khan Academy en español. Muchos incluyen certificaciones reconocidas por la industria.",
+    "MOOCs gratuitos y con becas: Microsoft Learn, Coursera (con ayuda financiera), edX y Khan Academy en español. Muchos incluyen certificaciones reconocidas por la industria.",
     "Habilidades transversales más demandadas: pensamiento computacional, alfabetización en datos, colaboración en equipos distribuidos, comunicación efectiva en entornos digitales y ética en manejo de datos.",
   ],
   objetivos: [
@@ -45,7 +45,7 @@ export const CARRERAS_DIGITALES_FICHA: FichaTeoricaData = {
     { termino: "Trayectoria formativa no lineal", definicion: "En el sector digital, muchas personas construyen su carrera combinando educación formal (universidad, técnico) con aprendizaje autodidacta, cursos en línea (MOOC), bootcamps, proyectos personales y comunidades de práctica. No existe una única ruta." },
   ],
   aplicaciones: [
-    "México produce alrededor de 5,000 egresados universitarios en carreras de TI por año, pero el mercado laboral demanda más de 40,000 especialistas anuales. Esta brecha de talento convierte al país en uno de los destinos de nearshoring tecnológico más atractivos de América del Norte para empresas estadounidenses y canadienses. Guadalajara (el 'Silicon Valley mexicano'), CDMX y Monterrey concentran el 70% del empleo tecnológico nacional.\n\nIniciat ivas como Laboratoria —que ha formado a miles de mujeres como desarrolladoras en México y Latinoamérica— y 'Niñas en Tecnología' de la Fundación Televisa muestran que la brecha de género puede reducirse con políticas activas. La Red Nacional de Mujeres en Ciencias y Tecnología del CONAHCYT ofrece mentorías para estudiantes en bachillerato y universidad.",
+    "México gradúa cada año a decenas de miles de profesionales en carreras de TI, y aun así las empresas reportan dificultades para cubrir vacantes especializadas. Esta brecha de talento convierte al país en uno de los destinos de nearshoring tecnológico más atractivos de América del Norte para empresas estadounidenses y canadienses. Guadalajara (el 'Silicon Valley mexicano'), CDMX y Monterrey concentran el 70% del empleo tecnológico nacional.\n\nIniciativas como Laboratoria —que ha formado a miles de mujeres como desarrolladoras en México y Latinoamérica— y Tecnolochicas, de Fundación Televisa, muestran que la brecha de género puede reducirse con políticas activas. Programas públicos y organizaciones civiles ofrecen mentorías para estudiantes de bachillerato y universidad.",
   ],
   fuente: "AMITI (Asociación Mexicana de la Industria de Tecnologías de la Información) — Índice de Talento Digital México 2024; ANUIES — Panorama de la Educación Superior en STEM 2023",
 };

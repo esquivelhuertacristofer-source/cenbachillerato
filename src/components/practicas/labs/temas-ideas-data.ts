@@ -833,7 +833,7 @@ export const QUIZ = {
       enunciado: "Las ideas secundarias son irrelevantes y pueden eliminarse sin afectar el texto.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 1,
-      retroalimentacion: "Las ideas secundarias enriquecen y contextualizan, aunque el texto mantiene sentido sin ellas.",
+      retroalimentacion: "Las ideas secundarias explican, ejemplifican y contextualizan; si se eliminan, el texto pierde riqueza y claridad.",
     },
     {
       enunciado: "Identificar el tema ayuda al escritor a seleccionar qué información incluir en su texto.",

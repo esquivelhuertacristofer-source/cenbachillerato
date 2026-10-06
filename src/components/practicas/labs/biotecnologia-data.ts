@@ -302,10 +302,10 @@ export const DEFINICION =
 export const PUNTOS_CLAVE: string[] = [
   "La biotecnología moderna usa organismos vivos, sistemas biológicos o derivados para desarrollar productos o procesos: ingeniería genética, cultivo de tejidos, fermentación industrial, diagnóstico molecular y edición genómica.",
   "CRISPR-Cas9: sistema de edición genómica de precisión, análogo a un «bisturí molecular». Permite modificar secuencias específicas del ADN con mayor precisión y menor costo que técnicas anteriores. Las investigadoras Jennifer Doudna y Emmanuelle Charpentier recibieron el Nobel de Química 2020 por su desarrollo.",
-  "Luis Herrera-Estrella (LANGEBIO-CINVESTAV Irapuato) fue el primer científico en desarrollar plantas transgénicas funcionales en 1983 —introdujo el primer gen foráneo funcional en una planta. Premio Fronteras del Conocimiento 2021. México es pionero científico y, simultáneamente, el país con más debates sobre transgénicos.",
-  "El debate del maíz transgénico en México: en 2020 el gobierno emitió un decreto para eliminar gradualmente el maíz GM para consumo humano directo. En 2023, un tribunal federal falló contra el decreto argumentando que violaba compromisos del T-MEC con EE.UU. México es el único país del mundo donde el maíz tiene estatus especial por ser su centro de origen.",
-  "OGM en México: la soya transgénica (resistente al herbicida glifosato) se cultiva en ~250,000 ha en Yucatán y Campeche, con controversia por impactos en los apicultores mayas y la biodiversidad de la Selva Yucateca.",
-  "CIBIOGEM (Comisión Intersecretarial de Bioseguridad de los OGM): organismo interministerial que emite permisos de liberación experimental, piloto y comercial de OGM en México.",
+  "Luis Herrera-Estrella (profesor emérito del LANGEBIO-Cinvestav, en Irapuato) fue, en 1983 y desde la Universidad de Gante (Bélgica), uno de los primeros científicos en obtener plantas transgénicas funcionales: logró que un gen foráneo se expresara en una planta. México es pionero científico y, a la vez, escenario de intensos debates sobre transgénicos.",
+  "El debate del maíz transgénico en México: en 2020 el gobierno emitió un decreto para eliminar gradualmente el maíz GM para consumo humano directo. En 2023 se publicó un nuevo decreto y, en diciembre de 2024, un panel de solución de controversias del T-MEC resolvió que las medidas de México contra el maíz GM violaban el tratado; en 2025 México elevó a la Constitución la prohibición de sembrar maíz transgénico. México es el único país del mundo donde el maíz tiene estatus especial por ser su centro de origen.",
+  "OGM en México: la soya transgénica (resistente al herbicida glifosato) obtuvo en 2012 un permiso comercial para ~253,500 ha en siete estados, entre ellos Yucatán y Campeche; el permiso se revocó en 2017 tras la controversia por impactos en los apicultores mayas y la biodiversidad de la Selva Yucateca.",
+  "CIBIOGEM (Comisión Intersecretarial de Bioseguridad de los OGM): órgano intersecretarial que emite permisos de liberación experimental, piloto y comercial de OGM en México.",
   "CONBIOÉTICA (Comisión Nacional de Bioética): dependiente de la Secretaría de Salud, emite guías sobre investigación con células madre, edición genómica de embriones humanos, uso de IA en medicina y ensayos clínicos en poblaciones vulnerables.",
   "LANGEBIO-CINVESTAV aplica CRISPR para mejorar variedades de maíz nativo resistentes a plagas sin transgénesis convencional. El Instituto de Biotecnología de la UNAM en Cuernavaca aplica CRISPR en diagnóstico de tuberculosis, dengue y leishmaniasis.",
 ];
@@ -316,7 +316,7 @@ export interface Hito {
   texto: string;
 }
 export const HITOS: Hito[] = [
-  { anio: "1983", texto: "Primer transgénico vegetal por Herrera-Estrella" },
+  { anio: "1983", texto: "Uno de los primeros transgénicos vegetales, por Herrera-Estrella" },
   { anio: "1996", texto: "Primer cultivo OGM comercial en México" },
   { anio: "2009", texto: "Creación de CIBIOGEM" },
   { anio: "2020", texto: "Decreto anti-maíz GM" },
@@ -349,7 +349,7 @@ export const CASOS_CRITICOS: CasoCritico[] = [
     titulo: "Vaquita marina",
     icono: "fa-fish",
     texto:
-      "La vaquita marina (Phocoena sinus), con menos de 10 individuos en 2024, es el mamífero marino más amenazado del mundo. La CIBIOGEM ha respaldado propuestas de conservación mediante biotecnología reproductiva (criopreservación de material genético), pero no existe ningún individuo en cautiverio.",
+      "La vaquita marina (Phocoena sinus), con menos de 10 individuos en 2024, es el mamífero marino más amenazado del mundo. Se han planteado propuestas de conservación mediante biotecnología reproductiva (criopreservación de material genético), pero no existe ningún individuo en cautiverio.",
   },
   {
     titulo: "Maíz transgénico y soberanía",
@@ -408,7 +408,7 @@ export const GLOSARIO: GlosarioItem[] = [
     definicion:
       "Somática: modifica células del cuerpo; no heredable. Germinal: modifica embriones/gametos; los cambios se heredan indefinidamente.",
     ejemplo:
-      "El tratamiento Casgevy (2023) usa CRISPR en células madre hematopoyéticas de adultos con anemia falciforme: edición somática, no heredable.",
+      "El tratamiento Casgevy (2023) usa CRISPR en células madre hematopoyéticas de pacientes de 12 años o más con anemia falciforme: edición somática, no heredable.",
   },
   {
     termino: "Bioprospección y propiedad intelectual",
@@ -434,7 +434,7 @@ export interface DatoCard {
   icono: string;
 }
 export const DATOS: DatoCard[] = [
-  { valor: "1983", texto: "Primer transgénico vegetal, por Herrera-Estrella en México", icono: "fa-seedling" },
+  { valor: "1983", texto: "Uno de los primeros transgénicos vegetales, del mexicano Herrera-Estrella (en Bélgica)", icono: "fa-seedling" },
   { valor: "Nobel 2020", texto: "Química — Doudna y Charpentier por CRISPR", icono: "fa-award" },
   { valor: "<10", texto: "Vaquitas marinas vivas en 2024; ninguna en cautiverio", icono: "fa-fish" },
   { valor: "1996", texto: "La oveja Dolly: primer mamífero clonado de célula adulta", icono: "fa-clone" },
@@ -478,7 +478,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Por qué el maíz transgénico es tema de debate especial en México?",
       opciones: [
         "Porque México no produce maíz nativo",
-        "Porque México es centro de origen y diversificación del maíz, y hay riesgo de contaminación del germoplasma nativo",
+        "Porque México es centro de origen y diversidad del maíz",
         "Porque el maíz OGM es ilegal en todo el mundo",
         "Porque el maíz Bt produce toxinas peligrosas para humanos",
       ],
@@ -488,30 +488,30 @@ export const QUIZ_A2: QuizEvaluable = {
     },
     {
       enunciado:
-        "¿Cuál principio bioético obliga al médico a respetar la decision informada del paciente sobre su tratamiento?",
-      opciones: ["No maleficencia", "Beneficencia", "Autonomia", "Justicia"],
+        "¿Cuál principio bioético obliga al médico a respetar la decisión informada del paciente sobre su tratamiento?",
+      opciones: ["No maleficencia", "Beneficencia", "Autonomía", "Justicia"],
       respuestaCorrecta: 2,
       retroalimentacion:
-        "El principio de autonomia establece que el paciente tiene derecho a tomar decisiones informadas sobre su propio cuerpo y tratamiento. El consentimiento informado es su expresion concreta.",
+        "El principio de autonomía establece que el paciente tiene derecho a tomar decisiones informadas sobre su propio cuerpo y tratamiento. El consentimiento informado es su expresión concreta.",
     },
     {
-      enunciado: "¿Cuál es la diferencia entre clonacion reproductiva y clonacion terapéutica?",
+      enunciado: "¿Cuál es la diferencia entre clonación reproductiva y clonación terapéutica?",
       opciones: [
         "La reproductiva usa CRISPR y la terapéutica no",
-        "La reproductiva busca crear un individuo completo; la terapéutica busca obtener células madre para tratar enfermedades",
-        "La terapéutica esta prohibida en todos los paises",
+        "La reproductiva crea un individuo; la terapéutica, células madre",
+        "La terapéutica está prohibida en todos los países",
         "No hay diferencia; son el mismo proceso",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "La clonacion reproductiva persigue generar un organismo completo geneticamente identico (como Dolly). La terapéutica usa embriones clonados solo para obtener células madre compatibles con un paciente, sin fines reproductivos.",
+        "La clonación reproductiva persigue generar un organismo completo genéticamente idéntico (como Dolly). La terapéutica usa embriones clonados solo para obtener células madre compatibles con un paciente, sin fines reproductivos.",
     },
     {
-      enunciado: "¿Qué organismo regula en México el uso y liberacion de OGM al ambiente?",
+      enunciado: "¿Qué organismo regula en México el uso y liberación de OGM al ambiente?",
       opciones: ["IMSS", "CIBIOGEM", "UNAM", "PEMEX"],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "La CIBIOGEM (Comision Intersecretarial de Bioseguridad de los Organismos Geneticamente Modificados) es el organismo gubernamental mexicano que aplica el principio de precaucion y regula los OGM.",
+        "La CIBIOGEM (Comisión Intersecretarial de Bioseguridad de los Organismos Genéticamente Modificados) es el organismo gubernamental mexicano que aplica el principio de precaución y regula los OGM.",
     },
   ],
 };

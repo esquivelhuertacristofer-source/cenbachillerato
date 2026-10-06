@@ -583,7 +583,7 @@ export const LECTURA: { texto: string; fuente: string }[] = [
     fuente: "CH-III-P03-A1 · lectura",
   },
   {
-    texto: "Historia en redes sociales: formatos cortos (hilo de Twitter, carrusel de Instagram, TikTok) alcanzan audiencias masivas de jóvenes. El riesgo: simplificación excesiva, descontextualización y viralización de errores históricos.",
+    texto: "Historia en redes sociales: formatos cortos (hilo en X (antes Twitter), carrusel de Instagram, TikTok) alcanzan audiencias masivas de jóvenes. El riesgo: simplificación excesiva, descontextualización y viralización de errores históricos.",
     fuente: "CH-III-P04-A1 · infografía",
   },
   {
@@ -607,7 +607,7 @@ export const HECHOS: string[] = [
 /** Glosario A5 — verbatim. */
 export const GLOSARIO: { termino: string; definicion: string; ejemplo: string }[] = [
   { termino: "Corroboración de fuentes", definicion: "Procedimiento metodológico que consiste en contrastar una fuente con otras evidencias independientes para verificar, matizar o refutar la información que contiene. Elemento central del método histórico crítico.", ejemplo: "Para corroborar la fecha de un decreto colonial, el historiador busca registros notariales, cartas de la época y actas del cabildo que confirmen o contradigan esa fecha." },
-  { termino: "Evidencia histórica", definicion: "Todo vestigio del pasado — objeto, documento, imagen, tradición oral — que puede ser analizado críticamente para sustentar afirmaciones sobre hechos históricos. No toda evidencia tiene el mismo peso.", ejemplo: "Una moneda acuñada en el siglo XVI es evidencia histórica del sistema económico colonial; un relato oral transcrito en el siglo XX es evidencia secundaria de menor inmediatez." },
+  { termino: "Evidencia histórica", definicion: "Todo vestigio del pasado — objeto, documento, imagen, tradición oral — que puede ser analizado críticamente para sustentar afirmaciones sobre hechos históricos. No toda evidencia tiene el mismo peso.", ejemplo: "Una moneda acuñada en el siglo XVI es evidencia histórica del sistema económico colonial; un relato oral sobre la época colonial transcrito en el siglo XX es una evidencia mucho más mediada y de menor inmediatez." },
   { termino: "Análisis documental", definicion: "Técnica sistemática de examen de un documento histórico que considera: autoría, fecha, destinatario, propósito, contexto de producción, lenguaje utilizado y circulación del documento.", ejemplo: "Analizar el Acta de Independencia de México (1821) implica examinar quiénes la firmaron, en qué contexto político fue redactada, qué términos usaron y qué intereses representaba." },
   { termino: "Corroboración cruzada (cross-checking)", definicion: "Comparación de fuentes de tipos distintos (escritas, orales, iconográficas, arqueológicas) sobre el mismo hecho. Cuando coinciden, fortalece la interpretación; cuando divergen, señala aspectos a profundizar.", ejemplo: "Cruzar el relato de un testigo oral con un periódico de la época y una fotografía del evento proporciona una imagen más completa y menos sesgada." },
   { termino: "Validación de evidencias", definicion: "Proceso por el cual el historiador decide si una evidencia es suficientemente sólida para sustentar una afirmación histórica. Implica evaluar su autenticidad, relevancia y consistencia con otras evidencias.", ejemplo: "Antes de citar un documento como prueba, el historiador verifica que no sea una falsificación, que su fecha sea coherente con el hecho descrito y que otros documentos lo respalden." },
@@ -719,7 +719,7 @@ export const QUIZ: QuizEvaluable = {
       retroalimentacion: "Correcto. El análisis documental es una metodología sistemática que va más allá del contenido literal: examina quién escribió el documento, para quién, cuándo, con qué propósito y cómo circuló.",
     },
     {
-      enunciado: "Verdadero o falso: Si dos fuentes contradicen la misma afirmación, el historiador debe elegir la más antigua y descarta la más reciente.",
+      enunciado: "Verdadero o falso: Si dos fuentes se contradicen sobre un mismo hecho, el historiador debe elegir la más antigua y descartar la más reciente.",
       opciones: VF,
       respuestaCorrecta: 1,
       retroalimentacion: "Falso. La antigüedad de una fuente no la hace automáticamente más válida. El historiador pondera la fiabilidad, el contexto y la perspectiva de cada fuente, y puede suspender el juicio si la evidencia es insuficiente.",

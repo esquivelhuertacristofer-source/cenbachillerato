@@ -367,7 +367,7 @@ export const BIOS: Bio[] = [
     funcion: "Fuente principal de energía celular.",
     energia: "4 kcal/g",
     contexto:
-      "México es el centro de origen del maíz. CONABIO documenta 64 razas nativas, domesticadas hace ~9,000 años en el actual Guerrero y Oaxaca; un mexicano promedio consume ~125 kg de tortillas al año.",
+      "México es el centro de origen del maíz. CONABIO documenta 64 razas nativas, domesticadas hace ~9,000 años en la cuenca del río Balsas, en el actual Guerrero; un mexicano promedio consume ~75 kg de tortillas al año.",
     monomeroDesc:
       "Monosacárido: la subunidad. La glucosa (C₆H₁₂O₆) es el azúcar más simple. Muchas glucosas unidas forman polisacáridos como el almidón, el glucógeno y la celulosa.",
     monomero: { nombre: "Glucosa (monosacárido)", geo: _glucosa.geo },
@@ -537,7 +537,7 @@ export const QUIZ_A2: QuizEvaluable = {
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "Los polímeros biológicos (biopolímeros) incluyen cuatro familias: ácidos nucleicos (ADN y ARN), proteínas (polímeros de aminoácidos), polisacáridos como el almidón y la celulosa (polímeros de glucosa), y en algunos contextos los lípidos de membrana (fosfolípidos). Hay muchos tipos de biopolímeros, no solo los ácidos nucleicos.",
+        "Los polímeros biológicos (biopolímeros) incluyen tres grandes familias: ácidos nucleicos (ADN y ARN), proteínas (polímeros de aminoácidos) y polisacáridos como el almidón y la celulosa (polímeros de glucosa). Los lípidos, en cambio, no son polímeros. Hay muchos tipos de biopolímeros, no solo los ácidos nucleicos.",
     },
   ],
 };

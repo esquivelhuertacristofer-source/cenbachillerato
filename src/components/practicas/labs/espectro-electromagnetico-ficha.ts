@@ -19,13 +19,13 @@ export const ESPECTRO_FICHA: FichaTeoricaData = {
   // (CNEYT-V-P05-A1, campo puntos_clave).
   marcoTeorico: [
     "El espectro electromagnético abarca todas las longitudes de onda posibles de la radiación EM, desde ondas de radio (kilómetros) hasta rayos gamma (picómetros). Todas viajan a la misma velocidad: 299,792 km/s (velocidad de la luz en el vacío).",
-    "Ondas de radio (10 cm – km): permiten telecomunicaciones. El IFT (Instituto Federal de Telecomunicaciones) administra el espectro radioeléctrico nacional. En 2023, México realizó su primera subasta de espectro 5G en la banda 3.5 GHz.",
+    "Ondas de radio (10 cm – km): permiten telecomunicaciones. El espectro radioeléctrico nacional lo administró el IFT hasta 2025; hoy lo regula la Comisión Reguladora de Telecomunicaciones (CRT). En 2022, el IFT autorizó el uso de la banda de 3.5 GHz para 5G y ese año arrancaron las primeras redes comerciales 5G en México.",
     "Microondas (1 mm – 10 cm): el Gran Telescopio Milimétrico (GTM) del INAOE en el Volcán Sierra Negra (Puebla), a 4,600 m de altitud, es el radiotelescopio de antena única más grande del mundo en su frecuencia, con 50 m de diámetro.",
-    "Infrarrojo (700 nm – 1 mm): los satélites GOES y MODIS usan sensores infrarrojos para monitorear incendios forestales en México en tiempo real. En 2023 se registraron más de 10,000 incendios, principalmente en Durango, Chihuahua y Jalisco.",
+    "Infrarrojo (700 nm – 1 mm): los satélites GOES y el sensor MODIS (satélites Terra y Aqua) usan detectores infrarrojos para monitorear incendios forestales en México en tiempo real. En 2023 la CONAFOR registró más de 7,000 incendios forestales, que afectaron más de un millón de hectáreas.",
     "Luz visible (380–700 nm): el Observatorio Astronómico Nacional (OAN) de la UNAM en San Pedro Mártir, Baja California —2,800 m de altitud, más de 300 noches despejadas al año— estudia galaxias lejanas y exoplanetas con telescopios ópticos.",
     "Ultravioleta (10–380 nm): el ozono estratosférico absorbe la mayoría. Mario Molina (Premio Nobel de Química 1995, UNAM) demostró que los CFC destruyen la capa de ozono. El Protocolo de Montreal se firmó en 1987 y México lo ratificó en 1988 (en 1985 se había adoptado el Convenio de Viena, su antecedente). La recuperación del ozono es uno de los mayores éxitos ambientales globales.",
     "Rayos X (0.01–10 nm): el IMSS y el ISSSTE operan más de 1,400 equipos de rayos X en México. La tomografía computarizada —que usa rayos X con reconstrucción digital 3D— fue esencial para el diagnóstico de COVID-19 durante la pandemia.",
-    "Rayos gamma (<0.01 nm): el ININ (Instituto Nacional de Investigaciones Nucleares) en Ocoyoacac, Estado de México, aplica radiación gamma en braquiterapia oncológica y en la esterilización de alimentos y dispositivos médicos.",
+    "Rayos gamma (<0.01 nm): el ININ (Instituto Nacional de Investigaciones Nucleares) en Ocoyoacac, Estado de México, produce radioisótopos para medicina nuclear y aplica radiación gamma en la esterilización de alimentos y dispositivos médicos.",
     "El GTM del INAOE participó en el consorcio Event Horizon Telescope que en 2019 capturó la primera imagen de un agujero negro (M87*). Esta contribución mexicana forma parte de uno de los descubrimientos astronómicos más importantes del siglo XXI.",
   ],
 
@@ -40,7 +40,7 @@ export const ESPECTRO_FICHA: FichaTeoricaData = {
   materiales: [
     { nombre: "Visor de espectro 3D",        detalle: "Recorre 18 décadas de frecuencia (10⁴–10²² Hz) con c = λ·f y E = h·f", icono: "fa-wave-square" },
     { nombre: "Modo Visible",                 detalle: "Arcoíris real de 380 nm (violeta) a 700 nm (rojo)", icono: "fa-eye" },
-    { nombre: "Modo Aplicaciones",            detalle: "11 tecnologías reales de México: GTM/IFT/IMSS/ININ y más", icono: "fa-satellite-dish" },
+    { nombre: "Modo Aplicaciones",            detalle: "11 tecnologías reales de México: GTM/CRT/IMSS/ININ y más", icono: "fa-satellite-dish" },
     { nombre: "Infografía A1",                detalle: "El espectro EM con contexto mexicano (INAOE, IFT, IMSS, Mario Molina)", icono: "fa-image" },
   ],
 
@@ -49,7 +49,7 @@ export const ESPECTRO_FICHA: FichaTeoricaData = {
     { termino: "c = λ·f",           definicion: "La velocidad de la luz (c ≈ 3×10⁸ m/s) es el producto de la longitud de onda (λ) y la frecuencia (f). Al subir la frecuencia, la longitud de onda baja proporcionalmente." },
     { termino: "E = h·f",           definicion: "La energía de un fotón es proporcional a su frecuencia: E = h·f, donde h = 6.626×10⁻³⁴ J·s (constante de Planck). Los rayos gamma son los más energéticos." },
     { termino: "Radiación ionizante", definicion: "Radiación con suficiente energía para arrancar electrones de los átomos (rayos X, rayos gamma y UV de onda corta). Puede dañar el ADN y provocar mutaciones o cáncer." },
-    { termino: "Espectro radioeléctrico", definicion: "Porción del espectro EM (9 kHz – 300 GHz) usada para comunicaciones. En México lo administra el IFT mediante concesiones; en 2023 se subastó el espectro 5G en la banda 3.5 GHz." },
+    { termino: "Espectro radioeléctrico", definicion: "Porción del espectro EM (9 kHz – 300 GHz) usada para comunicaciones. En México lo administra la Comisión Reguladora de Telecomunicaciones (antes el IFT) mediante concesiones; las primeras redes 5G arrancaron en 2022 en la banda de 3.5 GHz." },
     { termino: "GTM — INAOE",        definicion: "El Gran Telescopio Milimétrico del INAOE, en el Volcán Sierra Negra (Puebla), a 4,600 m de altitud, es el radiotelescopio de antena única más grande del mundo en su frecuencia (50 m de diámetro); participó en la imagen del agujero negro M87* (2019)." },
   ],
 
@@ -62,7 +62,7 @@ export const ESPECTRO_FICHA: FichaTeoricaData = {
     },
     {
       termino: "Ondas de radio y microondas",
-      definicion: "Ondas de radio (f < 300 MHz, λ > 1 m): telecomunicaciones, radiodifusión AM/FM, WiFi. Microondas (300 MHz - 300 GHz): hornos, radar, telefonía móvil, satélites GPS.",
+      definicion: "Ondas de radio (f < 300 MHz, λ > 1 m): telecomunicaciones, radiodifusión AM/FM. Microondas (300 MHz - 300 GHz): WiFi, hornos, radar, telefonía móvil, satélites GPS.",
     },
     {
       termino: "Infrarrojo (IR)",
@@ -83,7 +83,7 @@ export const ESPECTRO_FICHA: FichaTeoricaData = {
   ],
 
   aplicaciones: [
-    "El IFT administra el espectro radioeléctrico en México; en 2023 subastó espectro 5G (banda 3.5 GHz) a Telcel, AT&T y Movistar.",
+    "La Comisión Reguladora de Telecomunicaciones (antes el IFT) administra el espectro radioeléctrico en México; el 5G arrancó en 2022 en la banda de 3.5 GHz, concesionada principalmente a Telcel y AT&T.",
     "El GTM del INAOE, en colaboración con UMass Amherst, contribuyó al consorcio Event Horizon Telescope que fotografió M87* en 2019.",
     "El IMSS y el ISSSTE operan más de 1,400 equipos de rayos X; la tomografía computarizada fue esencial para diagnosticar COVID-19.",
     "El ININ aplica rayos gamma en braquiterapia oncológica y esterilización de alimentos y dispositivos médicos en Ocoyoacac, Estado de México.",

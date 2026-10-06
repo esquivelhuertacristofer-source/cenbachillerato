@@ -42,7 +42,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Cuál es la diferencia entre un cambio físico y un cambio químico?",
       opciones: [
         "El físico es reversible, el químico no",
-        "En el físico no cambia la composición química; en el químico se forman nuevas sustancias",
+        "Solo en el químico se forman sustancias nuevas",
         "El físico requiere calor, el químico no",
         "No hay diferencia práctica entre ellos",
       ],
@@ -53,7 +53,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Por qué el plástico que tiramos al suelo es un problema ambiental a largo plazo?",
       opciones: [
         "Porque ocupa mucho espacio",
-        "Porque se convierte en microplásticos que persisten en suelos, agua y cadenas alimentarias",
+        "Porque se fragmenta en microplásticos",
         "Porque es feo visualmente",
         "Porque atrae animales peligrosos",
       ],

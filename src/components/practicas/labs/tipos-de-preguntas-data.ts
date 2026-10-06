@@ -41,7 +41,7 @@ export const PREGUNTAS: { id: string; texto: string; tipo: TipoPregunta }[] = [
   { id: "pr-co1", texto: "¿Qué hora es?", tipo: "cotidiana" },
   { id: "pr-co2", texto: "¿Cuánto cuesta este producto?", tipo: "cotidiana" },
   { id: "pr-co3", texto: "¿Dónde está el baño?", tipo: "cotidiana" },
-  { id: "pr-co4", texto: "¿Cuántos habitantes tiene México?", tipo: "cotidiana" },
+  { id: "pr-co4", texto: "¿Cuántos habitantes tiene hoy la Ciudad de México?", tipo: "cotidiana" },
   // científicas (verbatim de A1 y A2)
   { id: "pr-ci1", texto: "¿Por qué se propagan los virus?", tipo: "cientifica" },
   { id: "pr-ci2", texto: "¿Cómo se forman las estrellas?", tipo: "cientifica" },
@@ -96,7 +96,7 @@ export const PREGUNTAS_RAMA: { id: string; texto: string; rama: RamaFilosofica }
   { id: "rm-on2", texto: "¿Es real el mundo o solo una apariencia?", rama: "ontologia" },
   // epistemología (verbatim A1/A2)
   { id: "rm-ep1", texto: "¿Cómo sabemos lo que sabemos?", rama: "epistemologia" },
-  { id: "rm-ep2", texto: "¿Podemos conocer realmente la realidad o solo nuestras percepciones de ella?", rama: "epistemologia" },
+  { id: "rm-ep2", texto: "¿Conocemos la realidad o solo nuestras percepciones?", rama: "epistemologia" },
   // ética (verbatim A1/A2)
   { id: "rm-et1", texto: "¿Qué debemos hacer?", rama: "etica" },
   { id: "rm-et2", texto: "¿Qué debemos hacer ante la injusticia?", rama: "etica" },
@@ -167,7 +167,7 @@ export const QUIZ: {
     retro: "Es una pregunta científica: se responde con observación y evidencia empírica sobre el fenómeno.",
   },
   {
-    pregunta: "La pregunta «¿Podemos conocer realmente la realidad o solo nuestras percepciones de ella?» es una pregunta filosófica de tipo epistemológico.",
+    pregunta: "La pregunta «¿Conocemos la realidad o solo nuestras percepciones?» es una pregunta filosófica de tipo epistemológico.",
     opciones: ["Verdadero", "Falso"],
     correcta: 0,
     retro: "Correcto. La epistemología pregunta por el conocimiento: cómo y qué podemos conocer.",

@@ -526,7 +526,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Qué es la huella de carbono?",
       opciones: [
         "La sombra que proyecta un árbol de carbono",
-        "La cantidad total de emisiones de gases de efecto invernadero generadas por una actividad, persona u organización",
+        "Las emisiones de GEI que genera una actividad o persona",
         "El carbono que queda en el suelo después de un incendio",
         "La medida del carbono en los combustibles fósiles",
       ],
@@ -537,7 +537,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Por qué la quema de combustibles fósiles aumenta el efecto invernadero?",
       opciones: [
         "Porque consume el oxígeno del aire",
-        "Porque libera CO₂ y otros gases atrapados durante millones de años que aumentan la concentración atmosférica de GEI",
+        "Porque libera CO₂ de carbono fijado hace millones de años",
         "Porque produce partículas que bloquean la luz solar",
         "Porque calienta el agua de los océanos directamente",
       ],
@@ -565,7 +565,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Qué es la 'transición energética'?",
       opciones: [
         "El proceso de reparar líneas eléctricas dañadas",
-        "El cambio gradual de un sistema energético basado en combustibles fósiles a uno predominantemente renovable y limpio",
+        "El paso gradual de los combustibles fósiles a fuentes limpias",
         "La reducción del consumo energético a niveles del siglo XIX",
         "El traslado de plantas generadoras de una ciudad a otra",
       ],

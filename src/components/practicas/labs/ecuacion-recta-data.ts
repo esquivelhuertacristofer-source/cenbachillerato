@@ -141,7 +141,7 @@ export const RETO_A2: RetoNumericoData = {
   contexto:
     "La forma y = m·x + b separa lo fijo (la ordenada b, el banderazo) de lo variable (la pendiente m, el costo por distancia). Cada punto de la recta es una pareja distancia–costo posible.",
   problema:
-    "La tarifa de un taxi de la Ciudad de México se modela como una ecuación lineal con dos incógnitas: el costo y (en pesos) en función de la distancia x (en cientos de metros) es y = 1.07·x + 8.74.\n\n" +
+    "La tarifa de un taxi (tarifa hipotética, inspirada en la de la Ciudad de México) se modela como una ecuación lineal con dos incógnitas: el costo y (en pesos) en función de la distancia x (en cientos de metros) es y = 1.07·x + 8.74.\n\n" +
     "a) ¿Cuál es la ordenada al origen y qué significa en este contexto?\n" +
     "b) ¿Cuál es la pendiente y qué significa?\n" +
     "c) Calcula el costo de un viaje de 3 km (x = 30).",

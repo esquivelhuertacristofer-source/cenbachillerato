@@ -24,8 +24,8 @@ export const TIPO_CAUSA_INFO: Record<
     icono: "fa-layer-group",
   },
   coyuntural: {
-    titulo: "Causa coyuntural",
-    subtitulo: "Evento o circunstancia inmediata que actúa como detonante de un proceso ya condicionado.",
+    titulo: "Causa coyuntural o detonante",
+    subtitulo: "Circunstancia de mediano plazo que agrava las tensiones (coyuntural) o hecho inmediato que las hace estallar (detonante, causa contingente).",
     icono: "fa-bolt",
   },
   consecuencia: {
@@ -103,8 +103,8 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
   {
     id: "gl-coyuntural",
     termino: "Causa coyuntural",
-    definicion: "Evento o circunstancia inmediata que actúa como detonante o catalizador de un proceso ya condicionado por causas estructurales.",
-    ejemplo: "El asesinato del archiduque Francisco Fernando en Sarajevo (1914) fue la causa coyuntural que detonó la Primera Guerra Mundial.",
+    definicion: "Circunstancia de mediano plazo (una crisis económica, una guerra, un cambio político) que agrava las tensiones estructurales y vuelve probable el estallido; el detonante inmediato es la causa contingente.",
+    ejemplo: "La crisis económica internacional de 1907-1908 fue una causa coyuntural de la Revolución Mexicana: agravó un descontento que ya tenía raíces estructurales.",
   },
   {
     id: "gl-consecuencia",
@@ -146,7 +146,7 @@ export const QUIZ: {
     pregunta: "Distinguir entre causas estructurales y causas coyunturales ayuda a comprender mejor los procesos históricos complejos.",
     opciones: ["Verdadero", "Falso"],
     correcta: 0,
-    retro: "Correcto. Las estructurales son profundas y de larga duración; las coyunturales son detonantes inmediatos. Ambas son necesarias para explicar un evento.",
+    retro: "Correcto. Las estructurales son profundas y de larga duración; las coyunturales actúan en el mediano plazo, y el detonante inmediato es la causa contingente. Las tres son necesarias para explicar un evento.",
   },
   {
     pregunta: "La relación causa-efecto en historia es siempre determinista: una misma causa produce inevitablemente el mismo efecto en cualquier contexto.",

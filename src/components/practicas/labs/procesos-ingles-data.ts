@@ -177,7 +177,7 @@ export const QUIZ: {
     pregunta: "The sentence 'Could you explain me the steps?' is the most grammatically correct way to politely ask for an explanation in English.",
     opciones: ["True", "False"],
     correcta: 1,
-    retro: "False. The correct structure is 'Could you explain the steps TO me?' or simply 'Could you explain the steps?' The verb 'explain' does not take a direct indirect object before the thing explained; use 'to me' at the end: 'explain [something] to [someone]'.",
+    retro: "False. The correct structure is 'Could you explain the steps TO me?' or simply 'Could you explain the steps?' The verb 'explain' cannot be followed directly by the person (me, him, us) before the thing explained; use 'to me' at the end: 'explain [something] to [someone]'.",
   },
   {
     pregunta: "When answering a question about a process, using the passive voice ('The sample is collected and then analyzed') is appropriate in formal or technical contexts.",

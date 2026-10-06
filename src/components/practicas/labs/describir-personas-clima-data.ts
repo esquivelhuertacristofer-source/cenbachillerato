@@ -649,7 +649,7 @@ export const QUIZ: QuizEvaluable = {
 /** Marco teórico: contexto mexicano de A1, verbatim. */
 export const MARCO: string[] = [
   "El inglés es la segunda lengua más estudiada en México, pero solo el 5–6% de los mexicanos se comunica con fluidez en inglés (EF EPI 2023). Sin embargo, la demanda de trabajadores bilingües crece aceleradamente por el nearshoring tecnológico y la industria turística. En ciudades fronterizas como Tijuana y Ciudad Juárez, el español y el inglés coexisten tan íntimamente que ha emergido un dialecto de contacto con vocabulario, gramática y pronunciación propios.",
-  "Describir personas, ropa y clima en inglés no es solo un ejercicio académico: es una habilidad real para el sector turístico. Los aproximadamente 32 millones de turistas internacionales que visitaron México en 2023 interactuaron con guías, artesanos, restauranteros y hoteleros cuya capacidad de describir en inglés impactó directamente en la experiencia del visitante y en los ingresos del sector.",
+  "Describir personas, ropa y clima en inglés no es solo un ejercicio académico: es una habilidad real para el sector turístico. Los aproximadamente 42 millones de turistas internacionales que visitaron México en 2023 interactuaron con guías, artesanos, restauranteros y hoteleros cuya capacidad de describir en inglés impactó directamente en la experiencia del visitante y en los ingresos del sector.",
   "Physical appearance vocabulary: tall/short (alto/bajo), young/old (joven/mayor), long/short hair (cabello largo/corto). Grammar: use 'have/has' for descriptions → She has dark hair and brown eyes.",
   "Grammar — Present Continuous para estado actual: She IS wearing a red dress (Está usando un vestido rojo), versus Simple Present para hábitos: She wears blue jeans to school. El marcador 'right now / at the moment' (ahora mismo) activa el Present Continuous.",
   "Sensibilidad cultural en las descripciones: evitar estereotipos al describir la apariencia física es tanto una habilidad lingüística como ética. Las recomendaciones de la UNESCO sobre lenguaje no discriminatorio se aplican al inglés como lengua extranjera.",
@@ -659,7 +659,7 @@ export const MARCO: string[] = [
 export const PUNTOS_CLAVE: string[] = [
   "Clothing vocabulary at A2: jacket (chamarra), dress (vestido), jeans (mezclilla), sneakers (tenis/zapatos deportivos), scarf (bufanda), boots (botas). México produce anualmente más de 600 millones de prendas en los estados de Puebla, Tlaxcala y Aguascalientes, gran parte exportada a EE.UU. con la etiqueta 'Made in Mexico'.",
   "Weather vocabulary: sunny (soleado), cloudy (nublado), rainy (lluvioso), windy (ventoso), hot (caluroso), cold (frío), warm (cálido). México tiene extrema variación climática: Hermosillo, Sonora alcanza hasta 48–50 °C en verano ('It is extremely hot today'); Toluca, Estado de México, a 2,700 m de altitud, registra 'very cold and cloudy' la mayor parte del invierno.",
-  "Turismo en México: el país recibió aproximadamente 32 millones de turistas internacionales en 2023 (SECTUR). Personal de hoteles, guías de turistas y artesanos en Cancún, Oaxaca, Chichén Itzá y Puerto Vallarta usan inglés descriptivo a diario: 'The pyramids are very tall and ancient. The weather in the Yucatán Peninsula is hot and humid.'",
+  "Turismo en México: el país recibió aproximadamente 42 millones de turistas internacionales en 2023 (SECTUR/INEGI). Personal de hoteles, guías de turistas y artesanos en Cancún, Oaxaca, Chichén Itzá y Puerto Vallarta usan inglés descriptivo a diario: 'The pyramids are very tall and ancient. The weather in the Yucatán Peninsula is hot and humid.'",
 ];
 
 /** La regla del adjetivo, tal como la enuncia el glosario de A1. */
@@ -670,7 +670,7 @@ export const REGLA_ADJETIVO_A1 =
 export const REFLEXION_A1: string[] = [
   "In Mexico, English proficiency is higher in northern border states (Baja California, Sonora, Chihuahua) than in southern states. ¿Por qué crees que existe esa diferencia regional? What economic, historical and geographic factors explain it?",
   "El 'spanglish fronterizo' mezcla español e inglés de formas que ninguno de los dos idiomas 'oficiales' reconoce. ¿Es esto una 'corrupción' de los idiomas o una forma legítima de creatividad lingüística? ¿Qué dice la lingüística moderna sobre las lenguas de contacto?",
-  "Mexico received about 32 million international tourists in 2023. ¿Qué frases de descripción en inglés necesitaría alguien que trabaja en turismo en tu estado? Make a list of 10 key English phrases for your regional context.",
+  "Mexico received about 42 million international tourists in 2023. ¿Qué frases de descripción en inglés necesitaría alguien que trabaja en turismo en tu estado? Make a list of 10 key English phrases for your regional context.",
 ];
 
 /** Tu turno: la reflexión escrita A3, verbatim. */
@@ -714,4 +714,4 @@ export const GLOSARIO_A5: { termino: string; definicion: string; ejemplo: string
 
 /** Dato de contexto para el pie de la columna lateral (A1, verbatim). */
 export const DATO_BILINGUE =
-  "PRONI y el bachillerato: el Programa Nacional de Inglés de la SEP (PRONI) tiene como meta que los egresados del NEM bachillerato alcancen nivel A2–B1 para 2025. Los trabajadores bilingües en turismo, call centers y nearshoring ganan entre 30 y 60% más que los monolingües, según el índice de talento digital de AMITI 2024.";
+  "PRONI y el bachillerato: el Programa Nacional de Inglés de la SEP (PRONI) atiende la educación básica (preescolar a secundaria); en el bachillerato, el programa de Inglés del MCCEMS plantea llegar a un nivel A2+ y acercarse a B1. En turismo, call centers y nearshoring, hablar inglés suele abrir puestos mejor pagados que los que se ofrecen a personas monolingües.";

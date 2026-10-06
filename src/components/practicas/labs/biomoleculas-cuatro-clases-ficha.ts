@@ -18,9 +18,9 @@ export const BIOMOLECULAS_FICHA: FichaTeoricaData = {
   // Marco teórico — VERBATIM de los puntos_clave de la infografía A1.
   marcoTeorico: [
     "Carbohidratos (glúcidos): fuente principal de energía celular. Se clasifican en monosacáridos (glucosa, fructosa), disacáridos (sacarosa, lactosa) y polisacáridos (almidón, glucógeno, celulosa). México es el centro de origen del maíz —la planta cultivada que más carbohidratos aporta a la humanidad.",
-    "El maíz mexicano: CONABIO documenta 64 razas nativas adaptadas a microclimas específicos. El maíz fue domesticado por culturas mesoamericanas hace ~9,000 años en el actual Guerrero y Oaxaca. Un mexicano promedio consume ~125 kg de tortillas al año.",
+    "El maíz mexicano: CONABIO documenta 64 razas nativas adaptadas a microclimas específicos. El maíz fue domesticado por culturas mesoamericanas hace ~9,000 años en la cuenca del río Balsas, en el actual Guerrero. Un mexicano promedio consume ~75 kg de tortillas al año.",
     "Lípidos (grasas y aceites): moléculas de glicerol y ácidos grasos. Funcionan como reserva energética densa (9 kcal/g vs. 4 kcal/g de carbohidratos), componentes de membranas celulares (fosfolípidos) y señalización hormonal (esteroides). México es el primer productor mundial de aguacate, fruta con hasta 15% de grasa monoinsaturada cardioprotectora.",
-    "Proteínas: polímeros de 20 aminoácidos posibles con funciones estructurales (queratina, colágeno), catalíticas (enzimas), de transporte (hemoglobina) y de defensa (anticuerpos). El frijol y el nopal son fuentes tradicionales de proteína vegetal con complementación ideal de aminoácidos en la dieta mesoamericana.",
+    "Proteínas: polímeros de 20 aminoácidos posibles con funciones estructurales (queratina, colágeno), catalíticas (enzimas), de transporte (hemoglobina) y de defensa (anticuerpos). El frijol es la fuente tradicional de proteína vegetal; combinado con el maíz, sus aminoácidos se complementan (el frijol aporta la lisina que le falta al maíz) en la dieta mesoamericana.",
     "Proteínas de origen alternativo: el chapulín (saltamontes) contiene entre 55–77% de proteína en peso seco —más que la carne de res (~25%)— y su producción requiere 12 veces menos agua. El IPN investiga su producción a escala industrial para reducir la huella hídrica de la proteína alimentaria en México.",
     "Ácidos nucleicos: ADN y ARN. El ADN almacena la información genética en secuencias de nucleótidos; el ARN traduce esa información en proteínas. La molécula de ADN humana tiene ~3,200 millones de pares de bases —extendida mediría ~2 metros de longitud.",
     "El LANGEBIO-CINVESTAV en Irapuato ha secuenciado el genoma completo de más de 15 razas de maíz nativo mexicano, mapeando genes responsables de adaptaciones únicas: resistencia a sequía, altitud y salinidad. Este conocimiento es clave para mejora genómica sin transgénesis.",
@@ -55,7 +55,7 @@ export const BIOMOLECULAS_FICHA: FichaTeoricaData = {
 
   // Glosario — VERBATIM del glosario interactivo A5 de CNEYT-IV-P05.
   glosario: [
-    { termino: "Carbohidrato (glúcido)", definicion: "Biomolécula compuesta por C, H y O con fórmula general Cₙ(H₂O)ₙ; función principal: fuente de energía rápida y almacenamiento." },
+    { termino: "Carbohidrato (glúcido)", definicion: "Biomolécula compuesta por C, H y O con fórmula general Cₘ(H₂O)ₙ; función principal: fuente de energía rápida y almacenamiento." },
     { termino: "Lípido", definicion: "Biomolécula apolar formada principalmente por C, H y O; funciones: reserva energética, componente de membranas y señalización." },
     { termino: "Proteína", definicion: "Polímero de aminoácidos unidos por enlaces peptídicos; funciones: estructura, catálisis (enzimas), transporte, defensa inmune y señalización." },
     { termino: "Ácido nucleico", definicion: "Polímero de nucleótidos (ADN y ARN) que almacena y transmite la información genética y dirige la síntesis de proteínas." },
@@ -63,7 +63,7 @@ export const BIOMOLECULAS_FICHA: FichaTeoricaData = {
     { termino: "Nucleótido", definicion: "Unidad estructural de los ácidos nucleicos; compuesto por una base nitrogenada, un azúcar (ribosa o desoxirribosa) y un grupo fosfato." },
     { termino: "Polímero", definicion: "Molécula grande formada por la unión repetida de subunidades más pequeñas llamadas monómeros. Las proteínas son polímeros de aminoácidos; el ADN, de nucleótidos; el almidón, de moléculas de glucosa." },
     { termino: "Enzima", definicion: "Proteína que actúa como catalizador biológico: acelera reacciones químicas sin consumirse. La amilasa salival que se activa al masticar tortilla descompone el almidón en azúcares simples." },
-    { termino: "Nixtamalización", definicion: "Proceso mesoamericano prehispánico que consiste en cocer el maíz con agua y cal (Ca(OH)₂). Libera niacina unida a proteínas, aumenta el contenido de calcio y mejora la digestibilidad del maíz." },
+    { termino: "Nixtamalización", definicion: "Proceso mesoamericano prehispánico que consiste en cocer el maíz con agua y cal (Ca(OH)₂). Libera la niacina ligada del grano (niacitina), aumenta el contenido de calcio y mejora la digestibilidad del maíz." },
     { termino: "Fosfolípido", definicion: "Lípido con una cabeza hidrófila y dos colas hidrófobas. Es el componente fundamental de las membranas celulares, formando una bicapa que separa el interior y el exterior de cada célula." },
   ],
 

@@ -1028,7 +1028,7 @@ export const TITULO_A1 = "Social English: Small Talk Vocabulary";
 export const GLOSARIO_A1: TerminoGlosario[] = [
   { termino: "How are you?", definicion: "Saludo informal: ¿Cómo estás? / ¿Cómo te encuentras? Es una expresión de cortesía, no siempre una pregunta literal sobre la salud.", ejemplo: "'How are you?' — 'I'm fine, thanks! And you?' (Informal greeting exchange between classmates.)" },
   { termino: "What have you been up to?", definicion: "¿Qué has estado haciendo últimamente? Pregunta informal para iniciar conversación y ponerse al día con alguien.", ejemplo: "'Hey! What have you been up to?' — 'Not much, just studying for finals. What about you?'" },
-  { termino: "By the way", definicion: "Por cierto, a propósito. Se usa para introducir un tema nuevo o información adicional en la conversación.", ejemplo: "'By the way, did you see the fútbol game last night? América won again!' (A propósito, ¿viste el partido de fútbol anoche?)" },
+  { termino: "By the way", definicion: "Por cierto, a propósito. Se usa para introducir un tema nuevo o información adicional en la conversación.", ejemplo: "'By the way, did you see the soccer game last night? América won again!' (A propósito, ¿viste el partido de fútbol anoche?)" },
   { termino: "Anyway", definicion: "De todas formas, de todos modos, bueno. Se usa para cambiar de tema, volver al tema principal, o cerrar educadamente una conversación.", ejemplo: "'Anyway, I should get going — see you tomorrow!' (De todas formas, debo irme — ¡hasta mañana!)" },
   { termino: "Nice to meet you", definicion: "Mucho gusto / Encantado(a) de conocerte. Expresión formal o informal al conocer a alguien por primera vez.", ejemplo: "'Hi, I'm Sofía.' — 'Nice to meet you, Sofía! I'm Diego.' ('Mucho gusto, Sofía. Soy Diego.')" },
   { termino: "See you around", definicion: "Nos vemos por ahí, hasta luego. Expresión informal para despedirse sin una fecha concreta de volverte a ver.", ejemplo: "'I have to go to class now. See you around!' (Tengo que ir a clase. ¡Nos vemos!)" },
@@ -1053,7 +1053,7 @@ export const ACTIVIDAD_A5 = "Escribe un diálogo completo de 8-10 intercambios e
 /** Verdadero/falso A4 — verbatim. */
 export const HECHOS_A4: { enunciado: string; respuesta: boolean; retroalimentacion: string }[] = [
   { enunciado: "'How have you been?' is a polite way to continue a conversation after greeting someone you haven't seen for a while.", respuesta: true, retroalimentacion: "Correct: it's a natural follow-up after 'Hello!' when you haven't met recently." },
-  { enunciado: "'That's interesting!' and 'Really?' are examples of conversation fillers that show you are listening.", respuesta: true, retroalimentacion: "Correct: these are called 'backchannels' — small responses that keep the conversation flowing." },
+  { enunciado: "'That's interesting!' and 'Really?' are examples of backchannels that show you are listening.", respuesta: true, retroalimentacion: "Correct: these are called 'backchannels' — small responses that keep the conversation flowing." },
   { enunciado: "To close a conversation politely you can say 'It was great talking to you. Take care!'", respuesta: true, retroalimentacion: "Correct: this is a natural and friendly way to end a short social exchange." },
   { enunciado: "Starting a conversation with 'Excuse me, could I ask you something?' is too formal and should be avoided.", respuesta: false, retroalimentacion: "No: it is polite and appropriate in many contexts, especially with people you don't know well." },
   { enunciado: "'By the way' is used to introduce a new, often unrelated topic in a conversation.", respuesta: true, retroalimentacion: "Correct: 'By the way, did you hear about the school trip?' introduces a side topic." },
@@ -1067,7 +1067,7 @@ export const AUTOEVALUACION_A3: string[] = [
   "Reconozco y uso señales de turn-taking para participar respetuosamente en una conversación en inglés.",
 ];
 export const ESCRITURA_A3 =
-  "Write a short social dialogue in English (6-8 lines) between two classmates who haven't seen each other for two weeks. Include: a greeting, at least one small talk topic (weekend, fútbol mexicano, a recent event), and a friendly farewell. Use at least 3 expressions from the vocabulary studied.";
+  "Write a short social dialogue in English (6-8 lines) between two classmates who haven't seen each other for two weeks. Include: a greeting, at least one small talk topic (weekend, Mexican soccer, a recent event), and a friendly farewell. Use at least 3 expressions from the vocabulary studied.";
 
 /** Autoevaluación A7 — criterios verbatim. */
 export const AUTOEVALUACION_A7: string[] = [
@@ -1126,7 +1126,7 @@ export const QUIZ: QuizEvaluable = {
     },
     {
       enunciado: "You want to change the topic in a friendly conversation. Which connector works best?",
-      opciones: ["Nice to meet you, but...", "By the way, did you see the fútbol game last night?", "See you around, also...", "How are you, however..."],
+      opciones: ["Nice to meet you, but...", "By the way...", "See you around, also...", "How are you, however..."],
       respuestaCorrecta: 1,
       retroalimentacion: "'By the way' se usa para introducir un tema nuevo o cambiar la dirección de la conversación de forma natural y amigable. Es el conector ideal para small talk.",
     },

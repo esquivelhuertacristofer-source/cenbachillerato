@@ -708,7 +708,7 @@ export const GLOSARIO: { termino: string; definicion: string; ejemplo: string }[
   { termino: "Robert Hooke", definicion: "Científico inglés que en 1665 observó el corcho y acuñó la palabra «célula».", ejemplo: "Vio celdas como las de un panal." },
   { termino: "Anton van Leeuwenhoek", definicion: "Holandés que observó por primera vez microorganismos vivos.", ejemplo: "Los llamó «animáculos»." },
   { termino: "Matthias Schleiden", definicion: "Botánico que concluyó (1838) que todas las plantas están hechas de células.", ejemplo: "Primer pilar de la teoría celular." },
-  { termino: "Theodor Schwann", definicion: "Zoólogo que extendió (1839) la idea celular a los animales.", ejemplo: "Unificó plantas y animales bajo la célula." },
+  { termino: "Theodor Schwann", definicion: "Fisiólogo que extendió (1839) la idea celular a los animales.", ejemplo: "Unificó plantas y animales bajo la célula." },
   { termino: "Rudolf Virchow", definicion: "Médico que afirmó (1855) que toda célula proviene de otra célula.", ejemplo: "«Omnis cellula e cellula»." },
   { termino: "Teoría celular", definicion: "Principio de que la célula es la unidad fundamental de la vida.", ejemplo: "Tiene tres postulados." },
   { termino: "Unidad estructural", definicion: "Todos los seres vivos están formados por una o más células.", ejemplo: "Primer postulado." },

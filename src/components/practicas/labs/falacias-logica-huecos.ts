@@ -20,7 +20,7 @@ export const FALACIAS_LOGICA_HUECOS: TextoHuecosData = {
   ],
   huecos: [
     { respuesta: "silogismo", alternativas: [], pista: "Forma de argumento aristotélico de tres partes: premisa mayor, premisa menor y conclusión." },
-    { respuesta: "deducción", alternativas: ["razonamiento deductivo"], pista: "Tipo de razonamiento que parte de lo general hacia lo particular con necesidad lógica." },
+    { respuesta: "deducción", alternativas: ["razonamiento deductivo"], pista: "Tipo de razonamiento cuya conclusión se sigue necesariamente de las premisas." },
     { respuesta: "inductivo", alternativas: ["inducción"], pista: "Razonamiento que generaliza a partir de casos observados; sus conclusiones son probables." },
     { respuesta: "ad hominem", alternativas: [], pista: "Locución latina que significa 'contra la persona'; es una falacia informal muy común." },
   ],

@@ -69,5 +69,5 @@ export const RETO_A2: RetoNumericoData = {
     "(d) El eje de simetría es la recta vertical x = x_v = 15.",
   ],
   respuestaFinal:
-    "(a) x_v = 15 m, h_max = 9 m. (b) El balón toca el suelo a x = 30 m. (c) h(25) = 5 m > 2.44 m → sí entra el gol. (d) Eje de simetría: x = 15.",
+    "(a) x_v = 15 m, h_max = 9 m. (b) El balón toca el suelo a x = 30 m. (c) h(25) = 5 m > 2.44 m → no es gol: el balón pasa por encima del travesaño. (d) Eje de simetría: x = 15.",
 };

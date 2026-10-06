@@ -192,9 +192,9 @@ export const RABBIT_SLOTS: { pos: Pt; rot: number }[] = (() => {
 export const A2_DESCRIPCION =
   "El estudiante controla variables de una población de conejos con distinto color de pelaje en ambientes cambiantes y observa cómo la presión depredadora cambia las frecuencias alélicas a lo largo de generaciones.";
 export const PREGUNTAS_A2: string[] = [
-  "¿Que le sucederia a la poblacion si el ambiente cambiara bruscamente de pradera a campo nevado?",
-  "¿Por que la seleccion natural no puede crear variacion nueva, solo actuar sobre la existente?",
-  "¿Como ilustra esta simulacion los cuatro postulados de Darwin?",
+  "¿Qué le sucedería a la población si el ambiente cambiara bruscamente de pradera a campo nevado?",
+  "¿Por qué la selección natural no puede crear variación nueva, solo actuar sobre la existente?",
+  "¿Cómo ilustra esta simulación los cuatro postulados de Darwin?",
 ];
 
 /* Los cuatro postulados de la selección natural (verbatim de la lectura A1). */
@@ -512,7 +512,7 @@ export const QUIZ_A2: QuizEvaluable = {
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 0,
       retroalimentacion:
-        "Correcto. Darwin identificó los tres requisitos para que ocurra la selección natural: variación heredable en la población, diferencias en supervivencia/reproducción según esa variación (aptitud diferencial), y que el rasgo sea heritable.",
+        "Correcto. Darwin identificó los tres requisitos para que ocurra la selección natural: variación en la población, diferencias en supervivencia/reproducción según esa variación (aptitud diferencial), y que el rasgo sea heredable.",
     },
     {
       enunciado:

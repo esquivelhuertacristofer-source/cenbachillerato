@@ -344,7 +344,7 @@ export const RETO_DISPERSION: RetoNumericoData = {
   contexto:
     "Es el ejercicio de la progresión de DISPERSIÓN. El Grupo A y el Grupo B tienen la misma media (x̄ = 75), pero sus datos se reparten muy distinto. Carga el conjunto «Grupo A — 5 calificaciones» en el modo «Dispersión» y observa cómo la banda media ± σ se abre: esa anchura es justo lo que vas a calcular.",
   problema:
-    "Dos grupos de 5 estudiantes tienen la siguiente media de calificaciones: Grupo A: 60, 70, 75, 80, 90 y Grupo B: 73, 74, 75, 76, 77. Ambos grupos tienen la misma media (x̄ = 75). Calcula la varianza y la desviación estándar del Grupo A para determinar qué tan dispersas están sus calificaciones.",
+    "Dos grupos de 5 estudiantes tienen las siguientes calificaciones: Grupo A: 60, 70, 75, 80, 90 y Grupo B: 73, 74, 75, 76, 77. Ambos grupos tienen la misma media (x̄ = 75). Calcula la varianza y la desviación estándar del Grupo A para determinar qué tan dispersas están sus calificaciones.",
   campos: [
     { etiqueta: "Varianza poblacional σ² (Σ(x−x̄)² ÷ n)", objetivo: 100, tolerancia: 0.5, unidad: "puntos²", placeholder: "100" },
     { etiqueta: "Desviación estándar σ (√σ²)", objetivo: 10, tolerancia: 0.1, unidad: "puntos", placeholder: "10" },

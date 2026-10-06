@@ -817,7 +817,7 @@ export const GLOSARIO: { termino: string; definicion: string; ejemplo: string }[
   },
   {
     termino: "Lenguaje incluyente",
-    definicion: "Uso del lenguaje que evita la invisibilización o estereotipación de géneros. Puede incluir formas no binarias (la/el directora/director), términos neutros (estudiantado, comunidad) o el uso del género no marcado según contexto.",
+    definicion: "Uso del lenguaje que evita la invisibilización o estereotipación de géneros. Puede incluir desdoblamientos (la directora y el director), términos neutros (estudiantado, comunidad) o el uso del género no marcado según contexto.",
     ejemplo: "En lugar de 'los alumnos', usar 'el alumnado' o 'las y los alumnos' incluye a todas las personas sin asumir un género por defecto.",
   },
 ];

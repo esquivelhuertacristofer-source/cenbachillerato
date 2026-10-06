@@ -111,7 +111,7 @@ export default async function BibliotecaPage({ searchParams }: { searchParams: P
           </h2>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,0.40)", maxWidth: 380, margin: "0 auto", lineHeight: 1.65 }}>
             Las fichas pedagógicas del Semestre {semestre} estarán disponibles pronto.
-            Ejecutá el script de migración 05_biblioteca.sql en Supabase y luego los seeds por UAC.
+            Mientras tanto, encuentras todo el contenido en las materias de tu semestre.
           </p>
         </div>
       )}

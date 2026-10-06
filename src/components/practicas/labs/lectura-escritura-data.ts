@@ -373,15 +373,14 @@ export const GLOSARIO: ParGlosario[] = [
 /* ═══════════════════════════════════════════════════════════════════════════
  * Modo 5 — Tu cuaderno · REFLEXIÓN ESCRITA VERBATIM (LC-I-P01-A3)
  *
- * El `prompt` se conserva tal cual está en la base de datos, incluida la forma
- * «escribís» (voseo), que no corresponde al español de México. Es un defecto de
- * contenido reportado, no corregido aquí: el laboratorio no reescribe la base.
+ * El `prompt` se conserva tal cual está en la base de datos. Tenía la forma
+ * «escribís» (voseo); se corrigió a «escribes» aquí y en la base (2026-10).
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 export const CUADERNO = {
   ancla: "LC-I-P01-A3 · Mi relación personal con leer y escribir",
   prompt:
-    "Piensa en tu propia relación con leer y escribir: ¿cuándo lees? ¿qué tipo de textos prefieres? ¿cuándo escribís? ¿cómo se relacionan esas dos actividades en tu vida diaria? Describe al menos una experiencia concreta donde leer algo te llevó a querer escribir, o donde escribir algo te llevó a querer leer más.",
+    "Piensa en tu propia relación con leer y escribir: ¿cuándo lees? ¿qué tipo de textos prefieres? ¿cuándo escribes? ¿cómo se relacionan esas dos actividades en tu vida diaria? Describe al menos una experiencia concreta donde leer algo te llevó a querer escribir, o donde escribir algo te llevó a querer leer más.",
   pistas: [
     "¿Hubo algún libro, artículo o mensaje que te haya inspirado a escribir algo?",
     "¿Escribes mensajes, diarios personales, publicaciones? ¿Qué lees antes de escribir?",

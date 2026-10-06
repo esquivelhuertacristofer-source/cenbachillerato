@@ -10,7 +10,7 @@ import type { TextoHuecosData } from "./_mecanica-huecos";
 
 export const TALLER_PARRAFOS_HUECOS: TextoHuecosData = {
   ancla: "LC-I-P04-A4 · Completa: identificando tipos de párrafo",
-  instrucciones: "Completa con el tipo de párrafo: descriptivo, narrativo o argumentativo.",
+  instrucciones: "Completa con el tipo de párrafo: descriptivo, narrativo, argumentativo o introductorio.",
   partes: [
     "Un párrafo que detalla cómo es un lugar, sus colores y sonidos, es ",
     ". Un párrafo que cuenta qué pasó primero, después y al final es ",

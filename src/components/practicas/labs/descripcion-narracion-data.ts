@@ -848,7 +848,7 @@ export const RETO_QUIZ: QuizEvaluable = {
       enunciado: "¿Qué tono narrativo predomina en los textos irónicos?",
       opciones: [
         "Dramático y solemne",
-        "Distanciado, señalando contradicciones entre lo dicho y lo real",
+        "Distanciado y crítico",
         "Humorístico y festivo",
         "Misterioso y suspensivo",
       ],
@@ -858,7 +858,7 @@ export const RETO_QUIZ: QuizEvaluable = {
     {
       enunciado: "¿Qué diferencia a un texto narrativo de uno descriptivo?",
       opciones: [
-        "El narrativo cuenta eventos en el tiempo; el descriptivo presenta características sin acción",
+        "El narrativo relata hechos; el descriptivo, rasgos",
         "El narrativo usa más adjetivos que el descriptivo",
         "El descriptivo tiene personajes y el narrativo no",
         "No hay diferencia real entre ambos",
@@ -881,7 +881,7 @@ export const RETO_QUIZ: QuizEvaluable = {
       enunciado: "¿Qué función tiene el escenario en un texto narrativo?",
       opciones: [
         "Solo decorativa: no afecta la trama",
-        "Sitúa la acción en tiempo y espacio y puede influir en los personajes y la trama",
+        "Sitúa la acción en un tiempo y un lugar",
         "Es el personaje principal de la historia",
         "Reemplaza al narrador",
       ],

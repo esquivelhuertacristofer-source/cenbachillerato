@@ -761,7 +761,7 @@ export const QUIZ: QuizEvaluable = {
       retroalimentacion: "El suspenso mantiene la expectativa del lector sobre el desenlace, generando tensión.",
     },
     {
-      enunciado: "Un texto que termina de forma abierta (sin resolver el conflicto explícitamente) usa:",
+      enunciado: "Un texto que termina sin resolver explícitamente el conflicto usa:",
       opciones: ["Un desenlace cerrado", "Un desenlace abierto o final abierto", "Un epílogo", "Una analepsis"],
       respuestaCorrecta: 1,
       retroalimentacion: "El final abierto deja la resolución a la interpretación del lector.",

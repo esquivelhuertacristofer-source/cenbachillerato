@@ -887,7 +887,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Cuál es la función principal de una línea del tiempo en el estudio de la historia?",
       opciones: [
         "Decorar los libros de texto con ilustraciones cronológicas",
-        "Organizar eventos en secuencia temporal para visualizar relaciones de anterioridad, posterioridad y simultaneidad",
+        "Ordenar eventos para ver qué ocurrió antes, después y al mismo tiempo",
         "Demostrar que la historia avanza siempre hacia el progreso",
         "Reemplazar los mapas geográficos en el análisis histórico",
       ],
@@ -968,7 +968,7 @@ export const HUECOS_P04: TextoHuecosData = {
   huecos: [
     { respuesta: "primaria", alternativas: ["primarias"], pista: "Tipo de fuente producida directamente en la época del evento: cartas, diarios, fotografías originales." },
     { respuesta: "secundaria", alternativas: ["secundarias"], pista: "Tipo de fuente que analiza e interpreta las fuentes directas: libros de historia, enciclopedias, monografías." },
-    { respuesta: "crítica", alternativas: ["crítica histórica"], pista: "Método que evalúa la autenticidad (crítica externa) y la veracidad (crítica interna) de los documentos históricos." },
+    { respuesta: "crítica", alternativas: ["crítica histórica"], pista: "Método que evalúa la autenticidad (análisis externo) y la veracidad (análisis interno) de los documentos históricos." },
     { respuesta: "sesgo", alternativas: [], pista: "Perspectiva, interés o prejuicio que condiciona la forma en que una fuente presenta los eventos históricos." },
   ],
 };

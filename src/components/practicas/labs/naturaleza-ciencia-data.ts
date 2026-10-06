@@ -381,7 +381,7 @@ export const LECTURA_A1: string[] = [
 
 /** Recuadro «importante» de la lectura A1 — verbatim. */
 export const RECUADRO_A1 =
-  "La investigación científica en México está coordinada por el CONAHCYT (ex CONACYT). El Sistema Nacional de Investigadoras e Investigadores (SNII) agrupa a más de 35,000 científicos activos en universidades e institutos de todo el país, con presencia en todas las áreas del conocimiento.";
+  "La investigación científica en México está coordinada por la Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI), que en 2025 sustituyó al CONAHCYT (antes CONACYT). El Sistema Nacional de Investigadoras e Investigadores (SNII) agrupa a más de 35,000 científicos activos en universidades e institutos de todo el país, con presencia en todas las áreas del conocimiento.";
 
 /** Nota de actualización (no verbatim): el organismo cambió de nombre en 2025. */
 export const NOTA_RECUADRO = "Actualización: desde 2025 el CONAHCYT se transformó en la Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI).";
@@ -440,7 +440,7 @@ export const QUIZ_A2: QuizEvaluable = {
   reactivos: [
     {
       enunciado: "¿Por qué la ciencia NO es un conjunto de verdades absolutas?",
-      opciones: ["Porque los científicos son poco confiables", "Porque el conocimiento científico se construye, revisa y corrige constantemente", "Porque no usa métodos rigurosos", "Porque está influida por el gobierno"],
+      opciones: ["Porque los científicos son poco confiables", "Porque se revisa y corrige con nueva evidencia", "Porque no usa métodos rigurosos", "Porque está influida por el gobierno"],
       respuestaCorrecta: 1,
       retroalimentacion: "La ciencia es provisional y autocorrectiva: sus conclusiones cambian cuando hay nueva evidencia.",
     },
@@ -452,7 +452,7 @@ export const QUIZ_A2: QuizEvaluable = {
     },
     {
       enunciado: "¿Qué significa que la ciencia es una práctica 'social'?",
-      opciones: ["Que los científicos son muy sociables", "Que se hace en comunidades de personas que comparten, debaten y critican resultados", "Que se hace en redes sociales", "Que todos pueden hacer ciencia sin formación"],
+      opciones: ["Que los científicos son muy sociables", "Que se construye en comunidades que debaten", "Que se hace en redes sociales", "Que todos pueden hacer ciencia sin formación"],
       respuestaCorrecta: 1,
       retroalimentacion: "La ciencia es social porque se construye colectivamente mediante el debate, la crítica y la colaboración entre científicos.",
     },
@@ -464,7 +464,7 @@ export const QUIZ_A2: QuizEvaluable = {
     },
     {
       enunciado: "¿Por qué los intereses económicos o políticos pueden influir en la ciencia?",
-      opciones: ["Porque los científicos son corruptos en general", "Porque la investigación requiere financiamiento y quienes financian pueden orientar las preguntas que se investigan", "Porque la ciencia y la política son lo mismo", "Porque no existen organismos que regulen la ciencia"],
+      opciones: ["Porque los científicos son corruptos en general", "Porque quien financia puede orientar qué se investiga", "Porque la ciencia y la política son lo mismo", "Porque no existen organismos que regulen la ciencia"],
       respuestaCorrecta: 1,
       retroalimentacion: "El financiamiento de la investigación influye en qué preguntas se investigan, aunque el método científico busca neutralizar sesgos.",
     },

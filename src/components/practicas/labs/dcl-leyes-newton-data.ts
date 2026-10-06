@@ -63,10 +63,10 @@ export const QUIZ_A2: QuizEvaluable = {
       // CNEYT-V-P01-A3 — pregunta 4
       enunciado: "¿Cuál es la diferencia entre masa y peso?",
       opciones: [
-        "Son exactamente lo mismo, se miden en kilogramos",
-        "La masa mide la cantidad de materia (kg, constante); el peso es la fuerza gravitacional sobre esa masa (N, varía según el lugar)",
-        "El peso se mide en kg y la masa en N",
-        "La masa varía con la altitud; el peso es constante",
+        "Son la misma magnitud; ambas se miden en kilogramos con una báscula",
+        "La masa es cantidad de materia (kg); el peso es una fuerza (N) que varía con g",
+        "El peso se mide en kilogramos y la masa en newtons, en cualquier lugar",
+        "La masa cambia con la altitud y el lugar; el peso (N) siempre es constante",
       ],
       respuestaCorrecta: 1, // 0-based: opción B
       retroalimentacion:

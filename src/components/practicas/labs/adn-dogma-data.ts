@@ -295,7 +295,7 @@ export const GLOSARIO: GlosarioItem[] = [
   {
     termino: "Replicación del ADN (semiconservativa)",
     definicion:
-      "Proceso por el cual el ADN se duplica antes de la división celular. La ADN helicasa separa las cadenas; la ADN polimerasa III sintetiza la nueva cadena en dirección 5'→3' usando cada cadena como molde. Resultado: dos moléculas hijas idénticas, cada una con una cadena parental.",
+      "Proceso por el cual el ADN se duplica antes de la división celular. La ADN helicasa separa las cadenas; la ADN polimerasa (la III en bacterias; δ y ε en eucariotas) sintetiza la nueva cadena en dirección 5'→3' usando cada cadena como molde. Resultado: dos moléculas hijas idénticas, cada una con una cadena parental.",
     ejemplo: "La replicación ocurre en múltiples orígenes simultáneamente en eucariotas (horquillas de replicación) para copiar los ~3000 millones de pares de bases del genoma humano.",
   },
   {
@@ -364,37 +364,37 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "El ADN se replica de forma semiconservativa: cada cadena original sirve de molde para una nueva cadena.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 0,
-      retroalimentacion: "La afirmación es Verdadero. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+      retroalimentacion: "La afirmación es verdadera. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
     },
     {
       enunciado: "La transcripción produce una molécula de ADN a partir de una de ARN.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 1,
-      retroalimentacion: "La afirmación es Falso. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+      retroalimentacion: "La afirmación es falsa. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
     },
     {
       enunciado: "El ARN mensajero (ARNm) lleva la información genética del núcleo al ribosoma para la traducción.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 0,
-      retroalimentacion: "La afirmación es Verdadero. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+      retroalimentacion: "La afirmación es verdadera. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
     },
     {
       enunciado: "El codón AUG codifica metionina y es el codón de inicio de la traducción.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 0,
-      retroalimentacion: "La afirmación es Verdadero. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+      retroalimentacion: "La afirmación es verdadera. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
     },
     {
       enunciado: "Una mutación puntual silenciosa siempre cambia el aminoácido de la proteína resultante.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 1,
-      retroalimentacion: "La afirmación es Falso. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+      retroalimentacion: "La afirmación es falsa. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
     },
     {
       enunciado: "El ARN ribosómico (ARNr) forma parte de la estructura del ribosoma y cataliza la formación del enlace peptídico.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 0,
-      retroalimentacion: "La afirmación es Verdadero. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+      retroalimentacion: "La afirmación es verdadera. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
     },
   ],
 };

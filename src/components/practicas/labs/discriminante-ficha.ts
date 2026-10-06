@@ -71,11 +71,11 @@ export const DISCRIMINANTE_FICHA: FichaTeoricaData = {
     },
     {
       termino: "Raíz doble",
-      definicion: "Cuando Δ=0, la única raíz es x=−b/(2a). La parábola correspondiente es tangente al eje x.",
+      definicion: "Gráficamente: la parábola toca el eje x en un solo punto, que es su vértice.",
     },
     {
       termino: "Uso práctico del discriminante",
-      definicion: "Permite clasificar las raíces antes de resolver y anticipar la cantidad de intersecciones de la parábola con el eje x.",
+      definicion: "Indica hacia dónde abre la parábola: hacia arriba si Δ > 0 y hacia abajo si Δ < 0.",
     },
   ],
 

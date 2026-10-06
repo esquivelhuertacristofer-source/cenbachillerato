@@ -684,13 +684,13 @@ export const GLOSARIO: { termino: string; definicion: string; ejemplo: string }[
   { termino: "Presión atmosférica", definicion: "Peso del aire por unidad de área; disminuye con la altura.", ejemplo: "En la CDMX el agua hierve a ~92 °C." },
   { termino: "Temperatura", definicion: "Medida de la energía del movimiento de las partículas.", ejemplo: "El aire caliente es menos denso y sube." },
   { termino: "Estados de agregación", definicion: "Formas de la materia: sólido, líquido y gas.", ejemplo: "El agua aparece en los tres en la naturaleza." },
-  { termino: "Ciclo del agua", definicion: "Movimiento continuo del agua por cambios de estado: evaporación, condensación y precipitación.", ejemplo: "Impulsado por la energía del Sol." },
+  { termino: "Ciclo del agua", definicion: "Movimiento continuo del agua impulsado por cambios de estado (evaporación, condensación, solidificación y fusión) y por procesos de transporte como la precipitación y la escorrentía.", ejemplo: "Impulsado por la energía del Sol." },
   { termino: "Tiempo atmosférico", definicion: "Estado de la atmósfera en un lugar y momento concretos.", ejemplo: "Hoy está nublado y llueve." },
   { termino: "Clima", definicion: "Patrón promedio del tiempo en una región durante muchos años.", ejemplo: "El clima cálido-húmedo del sureste de México." },
 ];
 
 export const ACTIVIDAD_A5 =
-  "Para una muestra de 250 g de agua que ocupa 250 cm³: (1) calcula su densidad; (2) di en qué se diferencia del hielo; (3) ordena los tres pasos del ciclo del agua indicando el cambio de estado de cada uno.";
+  "Para una muestra de 250 g de agua que ocupa 250 cm³: (1) calcula su densidad; (2) di en qué se diferencia del hielo; (3) ordena evaporación, condensación y precipitación, indica el cambio de estado de las dos primeras y explica por qué la precipitación no es un cambio de estado.";
 
 export const FUENTE_A1 =
   "MCCEMS 2025 — Ciencias Naturales, Experimentales y Tecnología III «Nuestro hogar. El sistema terrestre», contenido formativo: Capas y composición química de la hidrósfera y la atmósfera · Conceptos involucrados: aire, agua, densidad, presión, temperatura y compuestos químicos · Ciclo biogeoquímico del agua · Concepto de clima y tiempo atmosférico.";
@@ -711,11 +711,11 @@ export const RETO_A2: RetoNumericoData = {
   pasosGuia: [
     "a) densidad = masa/volumen = 500 g / 500 cm³ = 1.0 g/cm³ (la densidad típica del agua).",
     "b) El hielo (0.92 g/cm³) es MENOS denso que el agua líquida (1.0 g/cm³); como tiene menos masa por unidad de volumen, flota. (Es una propiedad inusual del agua: al congelarse se expande.)",
-    "c) Evaporación: líquido → gas (el agua de océanos y lagos pasa a vapor). Condensación: gas → líquido (el vapor forma las gotas de las nubes). Precipitación: líquido o sólido cae como lluvia o nieve.",
+    "c) Evaporación: líquido → gas (el agua de océanos y lagos pasa a vapor). Condensación: gas → líquido (el vapor forma las gotas de las nubes). Solidificación: líquido → sólido (en las nubes frías las gotas se congelan, por ejemplo en granizo, y en invierno se congelan lagos y suelos); su inverso, la fusión (sólido → líquido), ocurre en el deshielo. Ojo: la precipitación no es un cambio de estado; solo transporta el agua, ya líquida o sólida, de la nube al suelo.",
     "d) A mayor altura hay menos aire encima, así que la presión atmosférica es menor. El agua hierve cuando su presión de vapor iguala a la presión externa; si esta es menor (como en la CDMX), hierve a menor temperatura (~92 °C).",
   ],
   respuestaFinal:
-    "a) 1.0 g/cm³. b) El hielo flota por ser menos denso (0.92 < 1.0 g/cm³). c) Evaporación (líq→gas), condensación (gas→líq), precipitación (cae líq/sólido). d) Menor presión atmosférica en altura ⇒ el agua hierve a menor temperatura (~92 °C).",
+    "a) 1.0 g/cm³. b) El hielo flota por ser menos denso (0.92 < 1.0 g/cm³). c) Evaporación (líq→gas), condensación (gas→líq), solidificación (líq→sól, p. ej. granizo; su inverso, la fusión, ocurre en el deshielo; la precipitación no es cambio de estado, solo lleva el agua al suelo). d) Menor presión atmosférica en altura ⇒ el agua hierve a menor temperatura (~92 °C).",
 };
 
 /** Actividad A6 «Completa: el aire, el agua y sus propiedades» — verbatim. */

@@ -47,7 +47,7 @@ export const EJEMPLOS: { id: string; texto: string; categoria: Categoria }[] = [
   { id: "ej-clase2", texto: "El 22% de la población en pobreza frente al 1.7% de clase alta (CONEVAL 2022)", categoria: "clase" },
   { id: "ej-genero", texto: "El patriarcado: estructura donde los hombres tienen mayor poder y privilegios sistémicos", categoria: "genero" },
   { id: "ej-genero2", texto: "La brecha salarial por género", categoria: "genero" },
-  { id: "ej-etnia", texto: "Las poblaciones indígenas con menor acceso a salud y educación de calidad", categoria: "etnia" },
+  { id: "ej-etnia", texto: "Menos servicios en pueblos indígenas", categoria: "etnia" },
   { id: "ej-etnia2", texto: "La menor cobertura de servicios de salud y educación en comunidades indígenas", categoria: "etnia" },
   { id: "ej-edad", texto: "La discriminación por razones de edad", categoria: "edad" },
 ];
@@ -65,7 +65,7 @@ export const CONCEPTOS: { id: string; concepto: string; definicion: string; ejem
   {
     id: "co-interseccionalidad",
     concepto: "Interseccionalidad",
-    definicion: "La forma en que múltiples categorías (género, clase, etnia) se combinan y crean experiencias únicas de desigualdad.",
+    definicion: "El cruce de género, clase y etnia en la desigualdad.",
     ejemplo: "Concepto desarrollado por la jurista Kimberlé Crenshaw: la posición social no la determina una sola característica.",
   },
   {

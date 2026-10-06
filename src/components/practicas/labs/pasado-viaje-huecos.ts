@@ -36,11 +36,11 @@ export const PASADO_VIAJE_HUECOS_A2: TextoHuecosData = {
   ],
   huecos: [
     { respuesta: "organized", alternativas: ["organised"], pista: "Regular: organize + d" },
-    { respuesta: "woke up", alternativas: ["woke"], pista: "Irregular: wake up → woke up" },
-    { respuesta: "took", alternativas: [], pista: "Irregular: take → took" },
-    { respuesta: "told", alternativas: [], pista: "Irregular: tell → told" },
+    { respuesta: "woke up", alternativas: ["woke"], pista: "Irregular: pasado de 'wake up'" },
+    { respuesta: "took", alternativas: [], pista: "Irregular: pasado de 'take'" },
+    { respuesta: "told", alternativas: [], pista: "Irregular: pasado de 'tell'" },
     { respuesta: "climbed", alternativas: [], pista: "Regular: climb + ed" },
-    { respuesta: "was", alternativas: [], pista: "Irregular: be → was (singular subject)" },
+    { respuesta: "was", alternativas: [], pista: "Irregular: pasado de 'be' con sujeto singular" },
   ],
 };
 
@@ -50,7 +50,7 @@ export const PASADO_VIAJE_HUECOS_A6: TextoHuecosData = {
   instrucciones: "Completa los huecos usando past continuous (was/were + -ing), past simple o la expresión de tiempo correcta.",
   partes: [
     "Last summer, I ",
-    " with my cousins at a small beach town. While we ",
+    " with my cousins in a small beach town. While we ",
     " along the shore, we found an old fishing boat. It ",
     " the first time I had ever seen one up close. We ",
     " photos and talked about the adventure all evening.",

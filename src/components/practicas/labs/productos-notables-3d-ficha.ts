@@ -17,10 +17,10 @@ export const PRODUCTOS_NOTABLES_FICHA: FichaTeoricaData = {
   marcoTeorico: [
     "Un trinomio tiene tres términos y un polinomio tiene varios términos. Para sumarlos o restarlos se agrupan los términos semejantes; para multiplicarlos se aplica la propiedad distributiva, multiplicando cada término de uno por cada término del otro y luego reduciendo.",
     "ALGUNOS productos aparecen tan seguido que conviene memorizar su resultado: son los PRODUCTOS NOTABLES.",
-    "1) Binomio al cuadrado (suma): (a mas b) al cuadrado es igual a a al cuadrado, mas 2ab, mas b al cuadrado. Ejemplo: (x mas 3) al cuadrado da x al cuadrado, mas 6x, mas 9. Comprobación: 2 por x por 3 da 6x, y 3 al cuadrado da 9.",
-    "2) Binomio al cuadrado (resta): (a menos b) al cuadrado es igual a a al cuadrado, menos 2ab, mas b al cuadrado. Ejemplo: (x menos 4) al cuadrado da x al cuadrado, menos 8x, mas 16. Observa que el último término siempre es positivo.",
-    "3) Producto de binomios conjugados: (a mas b)(a menos b) es igual a a al cuadrado, menos b al cuadrado (diferencia de cuadrados). Ejemplo: (x mas 5)(x menos 5) da x al cuadrado, menos 25. El término del medio se cancela.",
-    "4) Binomio al cubo (suma): (a mas b) al cubo es igual a a al cubo, mas 3a al cuadrado b, mas 3ab al cuadrado, mas b al cubo.",
+    "1) Binomio al cuadrado (suma): (a más b) al cuadrado es igual a a al cuadrado, más 2ab, más b al cuadrado. Ejemplo: (x más 3) al cuadrado da x al cuadrado, más 6x, más 9. Comprobación: 2 por x por 3 da 6x, y 3 al cuadrado da 9.",
+    "2) Binomio al cuadrado (resta): (a menos b) al cuadrado es igual a a al cuadrado, menos 2ab, más b al cuadrado. Ejemplo: (x menos 4) al cuadrado da x al cuadrado, menos 8x, más 16. Observa que el último término siempre es positivo.",
+    "3) Producto de binomios conjugados: (a más b)(a menos b) es igual a a al cuadrado, menos b al cuadrado (diferencia de cuadrados). Ejemplo: (x más 5)(x menos 5) da x al cuadrado, menos 25. El término del medio se cancela.",
+    "4) Binomio al cubo (suma): (a más b) al cubo es igual a a al cubo, más 3a al cuadrado b, más 3ab al cuadrado, más b al cubo.",
     "Dominar estos patrones permite multiplicar mentalmente y, más adelante, factorizar con rapidez.",
   ],
 

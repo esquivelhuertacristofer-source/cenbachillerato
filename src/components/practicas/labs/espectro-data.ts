@@ -157,10 +157,10 @@ export interface Aplicacion {
 }
 
 export const APLICACIONES: Aplicacion[] = [
-  { id: "fm",        nombre: "Radio FM",                 icono: "fa-radio",          f: 1e8,    categoria: "cotidiana", detalle: "Radiodifusión (~100 MHz). El IFT administra el espectro radioeléctrico nacional (9 kHz – 300 GHz)." },
+  { id: "fm",        nombre: "Radio FM",                 icono: "fa-radio",          f: 1e8,    categoria: "cotidiana", detalle: "Radiodifusión (~100 MHz). La Comisión Reguladora de Telecomunicaciones (antes el IFT) administra el espectro radioeléctrico nacional (9 kHz – 300 GHz)." },
   { id: "wifi",      nombre: "WiFi",                     icono: "fa-wifi",           f: 2.4e9,  categoria: "cotidiana", detalle: "Redes inalámbricas en la banda de 2.4 GHz (microondas)." },
   { id: "microondas", nombre: "Horno de microondas",    icono: "fa-kitchen-set",    f: 2.45e9, categoria: "cotidiana", detalle: "Calienta los alimentos agitando las moléculas de agua a 2.45 GHz." },
-  { id: "cinco_g",   nombre: "5G (banda 3.5 GHz)",       icono: "fa-tower-cell",     f: 3.5e9,  categoria: "cotidiana", detalle: "En 2023 México realizó su primera subasta de espectro 5G en la banda 3.5 GHz." },
+  { id: "cinco_g",   nombre: "5G (banda 3.5 GHz)",       icono: "fa-tower-cell",     f: 3.5e9,  categoria: "cotidiana", detalle: "En 2022 arrancaron en México las primeras redes comerciales 5G, en la banda de 3.5 GHz." },
   { id: "gtm",       nombre: "GTM del INAOE",            icono: "fa-satellite-dish", f: 1.5e11, categoria: "cientifica", detalle: "Gran Telescopio Milimétrico (50 m, Volcán Sierra Negra, Puebla): el radiotelescopio de antena única más grande del mundo en su frecuencia." },
   { id: "ir_satelite", nombre: "Sensores IR (incendios)", icono: "fa-fire",         f: 3e13,   categoria: "cientifica", detalle: "Los satélites GOES y MODIS monitorean incendios forestales en México con sensores infrarrojos." },
   { id: "control",   nombre: "Control remoto IR",        icono: "fa-tv",             f: 3.2e14, categoria: "cotidiana", detalle: "Emite pulsos de luz infrarroja (~940 nm) que el ojo no ve." },
@@ -204,20 +204,20 @@ export const INSTRUCCIONES: string[] = [
 /* ── Preguntas de reflexión (verbatim de la infografía A1) ────────────────── */
 export const PREGUNTAS: string[] = [
   "El GTM del INAOE está a 4,600 m de altitud porque el vapor de agua absorbe parte de las microondas que intenta detectar. ¿Qué principio del espectro electromagnético explica por qué el vapor de agua absorbe esas frecuencias específicas y no otras?",
-  "El IFT subastó espectro 5G a empresas privadas. ¿Debería el espectro electromagnético tratarse como un bien público estatal o como un recurso que puede venderse al mercado? ¿Qué implica cada postura para el acceso a internet en comunidades rurales e indígenas de México?",
+  "El Estado mexicano concesiona y licita espectro radioeléctrico a empresas privadas (antes lo hacía el IFT; desde octubre de 2025, la Comisión Reguladora de Telecomunicaciones). ¿Debería el espectro electromagnético tratarse como un bien público estatal o como un recurso que puede venderse al mercado? ¿Qué implica cada postura para el acceso a internet en comunidades rurales e indígenas de México?",
   "Mario Molina recibió el Nobel por demostrar el daño de los CFC en el ozono, lo que llevó al Protocolo de Montreal. ¿Por qué la comunidad científica y los gobiernos actuaron relativamente rápido en ese caso, mientras que con el cambio climático ha sido mucho más lento? ¿Qué papel juegan los intereses económicos en cada caso?",
 ];
 
 /* ── Puntos clave (verbatim de la infografía A1) ──────────────────────────── */
 export const IDEAS: string[] = [
   "El espectro electromagnético abarca todas las longitudes de onda posibles de la radiación EM, desde ondas de radio (kilómetros) hasta rayos gamma (picómetros). Todas viajan a la misma velocidad: 299,792 km/s (velocidad de la luz en el vacío).",
-  "Ondas de radio (10 cm – km): permiten telecomunicaciones. El IFT (Instituto Federal de Telecomunicaciones) administra el espectro radioeléctrico nacional. En 2023, México realizó su primera subasta de espectro 5G en la banda 3.5 GHz.",
+  "Ondas de radio (10 cm – km): permiten telecomunicaciones. El espectro radioeléctrico nacional lo administró el IFT hasta 2025; hoy lo regula la Comisión Reguladora de Telecomunicaciones (CRT). En 2022, el IFT autorizó el uso de la banda de 3.5 GHz para 5G y ese año arrancaron las primeras redes comerciales 5G en México.",
   "Microondas (1 mm – 10 cm): el Gran Telescopio Milimétrico (GTM) del INAOE en el Volcán Sierra Negra (Puebla), a 4,600 m de altitud, es el radiotelescopio de antena única más grande del mundo en su frecuencia, con 50 m de diámetro.",
-  "Infrarrojo (700 nm – 1 mm): los satélites GOES y MODIS usan sensores infrarrojos para monitorear incendios forestales en México en tiempo real. En 2023 se registraron más de 10,000 incendios, principalmente en Durango, Chihuahua y Jalisco.",
+  "Infrarrojo (700 nm – 1 mm): los satélites GOES y el sensor MODIS (satélites Terra y Aqua) usan detectores infrarrojos para monitorear incendios forestales en México en tiempo real. En 2023 la CONAFOR registró más de 7,000 incendios forestales, que afectaron más de un millón de hectáreas.",
   "Luz visible (380–700 nm): el Observatorio Astronómico Nacional (OAN) de la UNAM en San Pedro Mártir, Baja California —2,800 m de altitud, más de 300 noches despejadas al año— estudia galaxias lejanas y exoplanetas con telescopios ópticos.",
   "Ultravioleta (10–380 nm): el ozono estratosférico absorbe la mayoría. Mario Molina (Premio Nobel de Química 1995, UNAM) demostró que los CFC destruyen la capa de ozono. México ratificó el Protocolo de Montreal en 1985. La recuperación del ozono es uno de los mayores éxitos ambientales globales.",
   "Rayos X (0.01–10 nm): el IMSS y el ISSSTE operan más de 1,400 equipos de rayos X en México. La tomografía computarizada —que usa rayos X con reconstrucción digital 3D— fue esencial para el diagnóstico de COVID-19 durante la pandemia.",
-  "Rayos gamma (<0.01 nm): el ININ (Instituto Nacional de Investigaciones Nucleares) en Ocoyoacac, Estado de México, aplica radiación gamma en braquiterapia oncológica y en la esterilización de alimentos y dispositivos médicos.",
+  "Rayos gamma (<0.01 nm): el ININ (Instituto Nacional de Investigaciones Nucleares) en Ocoyoacac, Estado de México, produce radioisótopos para medicina nuclear y aplica radiación gamma en la esterilización de alimentos y dispositivos médicos.",
   "El GTM del INAOE participó en el consorcio Event Horizon Telescope que en 2019 capturó la primera imagen de un agujero negro (M87*). Esta contribución mexicana forma parte de uno de los descubrimientos astronómicos más importantes del siglo XXI.",
 ];
 
@@ -226,13 +226,13 @@ export const GLOSARIO: { termino: string; definicion: string }[] = [
   { termino: "Longitud de onda", definicion: "Distancia entre dos crestas consecutivas de una onda. Se mide en metros. Las ondas con mayor longitud de onda tienen menor frecuencia y menor energía." },
   { termino: "Frecuencia", definicion: "Número de oscilaciones por segundo de una onda, medida en hercios (Hz). Las ondas de alta frecuencia tienen alta energía —por eso los rayos gamma son ionizantes y peligrosos para el ADN celular." },
   { termino: "Radiación ionizante", definicion: "Radiación con suficiente energía para arrancar electrones de los átomos. Los rayos X y los rayos gamma son ionizantes. La radiación ionizante puede dañar el ADN y provocar mutaciones o cáncer." },
-  { termino: "Espectro radioeléctrico", definicion: "Porción del espectro EM con frecuencias entre 9 kHz y 300 GHz, usada para comunicaciones. Es un bien público administrado por el Estado —en México, el IFT asigna las frecuencias mediante concesiones y subastas públicas." },
+  { termino: "Espectro radioeléctrico", definicion: "Porción del espectro EM con frecuencias por debajo de 3,000 GHz (3 THz), usada para comunicaciones. Es un bien público administrado por el Estado —en México lo administró el IFT hasta 2025 y hoy lo regula la Comisión Reguladora de Telecomunicaciones (CRT), que otorga concesiones y licita frecuencias." },
   { termino: "Telescopio milimétrico", definicion: "Instrumento astronómico que detecta radiación en la banda milimétrica y submilimétrica del espectro. Revela galaxias en formación, nubes moleculares y la radiación de fondo cósmico de microondas que proviene del Big Bang." },
 ];
 
 /* ── Contexto mexicano y fuente (verbatim de la infografía A1) ────────────── */
 export const CONTEXTO =
-  "México tiene contribuciones significativas a la astronomía y física del espectro electromagnético. El Gran Telescopio Milimétrico del INAOE, en colaboración con la Universidad de Massachusetts Amherst, es el instrumento de observación milimétrica más sensible del mundo y contribuyó al mapa tridimensional del universo lejano. Junto con instalaciones globales del consorcio Event Horizon Telescope, capturó en 2019 la primera fotografía de un agujero negro.";
+  "México tiene contribuciones significativas a la astronomía y física del espectro electromagnético. El Gran Telescopio Milimétrico del INAOE, en colaboración con la Universidad de Massachusetts Amherst, es el radiotelescopio de plato único más grande del mundo en su banda y contribuyó al mapa tridimensional del universo lejano. Junto con instalaciones globales del consorcio Event Horizon Telescope, capturó en 2019 la primera fotografía de un agujero negro.";
 
 export const FUENTE =
   "INAOE — Gran Telescopio Milimétrico: avances y resultados 2023; IFT — Informe Estadístico de Telecomunicaciones en México 2023; AEM — Programa Espacial Mexicano 2021–2030.";
@@ -250,7 +250,7 @@ export const DATOS: { valor: string; texto: string; icono: string }[] = [
   { valor: "c = 299 792 km/s", texto: "rapidez de la luz: igual para TODA onda EM", icono: "fa-gauge-high" },
   { valor: "c = λ·f", texto: "más frecuencia ⇒ menos longitud de onda", icono: "fa-wave-square" },
   { valor: "E = h·f", texto: "más frecuencia ⇒ más energía del fotón", icono: "fa-bolt" },
-  { valor: "9 kHz – 300 GHz", texto: "espectro radioeléctrico que administra el IFT", icono: "fa-tower-broadcast" },
+  { valor: "9 kHz – 300 GHz", texto: "espectro radioeléctrico que administra la CRT (antes el IFT)", icono: "fa-tower-broadcast" },
 ];
 
 /* ── Formato (es-MX) ──────────────────────────────────────────────────────── */

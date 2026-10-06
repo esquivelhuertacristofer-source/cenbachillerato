@@ -822,7 +822,7 @@ export const GLOSARIO: { termino: string; definicion: string; ejemplo: string }[
   { termino: "suddenly / all of a sudden", definicion: "De repente — para eventos inesperados.", ejemplo: "Suddenly, it started to rain." },
   { termino: "irregular verbs (list)", definicion: "Irregulares frecuentes: go→went, see→saw, eat→ate, buy→bought, meet→met, take→took.", ejemplo: "We met our friends and took a bus." },
   { termino: "while / when", definicion: "Mientras / cuando — para situar dos eventos simultáneos o relacionados.", ejemplo: "I was reading when the phone rang." },
-  { termino: "at the end / in the end", definicion: "Al final (de un evento o historia).", ejemplo: "In the end, we decided to stay home." },
+  { termino: "at the end / in the end", definicion: "«Al final de…» (lleva of) / «finalmente» (conector de cierre).", ejemplo: "In the end, we decided to stay home." },
 ];
 export const ACTIVIDAD_A5 = "Narra en 6 oraciones lo que hiciste el fin de semana pasado. Usa al menos 4 verbos irregulares y 3 conectores narrativos.";
 

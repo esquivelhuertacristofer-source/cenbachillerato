@@ -17,10 +17,10 @@ export const ECUACION_BALANZA_FICHA: FichaTeoricaData = {
 
   // Marco teórico — VERBATIM de la lectura A1.
   marcoTeorico: [
-    "Una IGUALDAD es una relación que afirma que dos expresiones valen lo mismo; se escribe con el signo igual, como en 4 mas 3 igual a 7. En álgebra distinguimos dos tipos de igualdad.",
-    "Una IDENTIDAD es una igualdad que es verdadera para CUALQUIER valor de las letras que aparecen. Por ejemplo, (a mas b) al cuadrado igual a, a al cuadrado mas 2ab mas b al cuadrado, se cumple sin importar qué números pongamos en a y en b. Las identidades expresan reglas siempre válidas.",
-    "Una ECUACIÓN, en cambio, es una igualdad que solo es verdadera para CIERTOS valores de la incógnita. Por ejemplo, x mas 2 igual a 5 solo es verdadera cuando x vale 3; para cualquier otro número la igualdad es falsa. Resolver una ecuación es encontrar el valor o los valores que la hacen verdadera.",
-    "La igualdad cumple cuatro propiedades fundamentales:\n- Reflexiva: toda cantidad es igual a sí misma; a igual a, a.\n- Simétrica: si a es igual a b, entonces b es igual a, a.\n- Transitiva: si a es igual a b, y b es igual a c, entonces a es igual a c.\n- Uniformidad: si a es igual a b, podemos sumar, restar, multiplicar o dividir (por un número distinto de cero) la misma cantidad en ambos lados y la igualdad se conserva; por ejemplo, si a igual a b, entonces a mas c igual a b mas c.",
+    "Una IGUALDAD es una relación que afirma que dos expresiones valen lo mismo; se escribe con el signo igual, como en 4 más 3 igual a 7. En álgebra distinguimos dos tipos de igualdad.",
+    "Una IDENTIDAD es una igualdad que es verdadera para CUALQUIER valor de las letras que aparecen. Por ejemplo, (a más b) al cuadrado igual a, a al cuadrado más 2ab más b al cuadrado, se cumple sin importar qué números pongamos en a y en b. Las identidades expresan reglas siempre válidas.",
+    "Una ECUACIÓN, en cambio, es una igualdad que solo es verdadera para CIERTOS valores de la incógnita. Por ejemplo, x más 2 igual a 5 solo es verdadera cuando x vale 3; para cualquier otro número la igualdad es falsa. Resolver una ecuación es encontrar el valor o los valores que la hacen verdadera.",
+    "La igualdad cumple cuatro propiedades fundamentales:\n- Reflexiva: toda cantidad es igual a sí misma; a igual a, a.\n- Simétrica: si a es igual a b, entonces b es igual a a.\n- Transitiva: si a es igual a b, y b es igual a c, entonces a es igual a c.\n- Uniformidad: si a es igual a b, podemos sumar, restar, multiplicar o dividir (por un número distinto de cero) la misma cantidad en ambos lados y la igualdad se conserva; por ejemplo, si a igual a b, entonces a más c igual a b más c.",
     "La propiedad de uniformidad es la base para resolver ecuaciones: hacemos la misma operación a los dos lados para despejar la incógnita.",
   ],
 
@@ -42,7 +42,7 @@ export const ECUACION_BALANZA_FICHA: FichaTeoricaData = {
   // Conceptos centrales — formulados a partir de la lectura A1.
   conceptos: [
     { termino: "Propiedad reflexiva", definicion: "Toda cantidad es igual a sí misma; a = a." },
-    { termino: "Propiedad simétrica", definicion: "Si a es igual a b, entonces b es igual a, a." },
+    { termino: "Propiedad simétrica", definicion: "Si a es igual a b, entonces b es igual a a." },
     { termino: "Propiedad transitiva", definicion: "Si a es igual a b, y b es igual a c, entonces a es igual a c." },
     { termino: "Propiedad de uniformidad", definicion: "Si a = b, se puede sumar, restar, multiplicar o dividir (por un número distinto de cero) la misma cantidad en ambos lados y la igualdad se conserva." },
   ],

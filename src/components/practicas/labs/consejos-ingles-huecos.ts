@@ -22,6 +22,6 @@ export const CONSEJOS_INGLES_HUECOS: TextoHuecosData = {
     { respuesta: "should", alternativas: [], pista: "Pedir consejo: What do you think I ___ do?" },
     { respuesta: "must", alternativas: [], pista: "Expresión de empatía: That ___ be tough (debe ser difícil)." },
     { respuesta: "thought", alternativas: [], pista: "Have you ___ about + verb-ing? (pensado en...)" },
-    { respuesta: "were", alternativas: [], pista: "If I ___ you, I would... (condicional II: were, no was)." },
+    { respuesta: "were", alternativas: [], pista: "If I ___ you, I would... (condicional II: forma especial de 'be' que se usa con todas las personas)." },
   ],
 };

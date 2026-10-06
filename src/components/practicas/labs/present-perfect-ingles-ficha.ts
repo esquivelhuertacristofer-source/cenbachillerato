@@ -26,7 +26,7 @@ export const PRESENT_PERFECT_INGLES_FICHA: FichaTeoricaData = {
     { termino: "field of study", definicion: "Campo de estudio: el área académica o disciplina en la que una persona se especializa o que le interesa." },
     { termino: "experience", definicion: "Experiencia: conocimiento o habilidad adquirida mediante la práctica o vivencias. También puede referirse a un evento específico que se vivió." },
     { termino: "achievement", definicion: "Logro: algo que se consiguió mediante esfuerzo y dedicación. En un contexto académico o profesional, se refiere a éxitos concretos." },
-    { termino: "volunteer work", definicion: "Servicio social / trabajo voluntario: actividades realizadas sin recibir pago, generalmente para ayudar a una comunidad u organización. En México, el servicio social universitario es un requisito." },
+    { termino: "volunteer work", definicion: "Trabajo voluntario: actividades realizadas sin recibir pago, generalmente para ayudar a una comunidad u organización. ¡Ojo! No es lo mismo que el servicio social de México, que es obligatorio (en inglés se le suele llamar 'community service' o 'social service')." },
     { termino: "internship", definicion: "Pasantía / práctica profesional: período de trabajo en una empresa u organización, generalmente parte de los estudios, para ganar experiencia práctica. Puede ser pagada o no pagada." },
     { termino: "skill", definicion: "Habilidad: capacidad o destreza para hacer algo bien, ya sea técnica (programar, diseñar) o interpersonal (comunicarse, liderar). Puede ser natural o aprendida." },
     { termino: "opportunity", definicion: "Oportunidad: circunstancia o momento favorable para hacer algo o alcanzar un objetivo. Muy usado en contextos académicos y profesionales." },
@@ -36,7 +36,7 @@ export const PRESENT_PERFECT_INGLES_FICHA: FichaTeoricaData = {
     { termino: "I have always been interested in...", definicion: "Uses the present perfect with 'always' to describe a long-standing interest that started in the past and continues now." },
     { termino: "This experience taught me...", definicion: "A past simple structure to explain what you learned from a specific experience. 'Teach' (past: taught) is used with a person as the indirect object." },
     { termino: "First... Then... After that... Finally...", definicion: "Sequencing connectors used to organize a narrative in chronological order. Essential for telling a story or describing a sequence of events clearly." },
-    { termino: "That is why I decided to...", definicion: "A cause-and-effect connector in the past tense, used to explain the reason for a decision. Links an experience to a conclusion or action." },
+    { termino: "That is why I decided to...", definicion: "A cause-and-effect connector ('That is why') followed by the past simple ('I decided'), used to explain the reason for a decision. Links an experience to a conclusion or action." },
     { termino: "It was a challenging / rewarding / eye-opening experience.", definicion: "Adjective phrases used to evaluate a past experience. 'Challenging' = difficult but worthy. 'Rewarding' = satisfying. 'Eye-opening' = it changed how you see something." },
   ],
 };

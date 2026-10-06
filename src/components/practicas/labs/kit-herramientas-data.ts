@@ -714,7 +714,7 @@ export const GLOSARIO: ParTermino[] = [
   {
     id: "gl-plagio",
     termino: "Plagio",
-    definicion: "Usar el trabajo o ideas de otros sin dar crédito, presentándolo como propio.",
+    definicion: "Presentar como propio el trabajo de otros.",
     ejemplo: "Verbatim de A2: es una falta académica y ética grave.",
   },
   {
@@ -768,8 +768,8 @@ export const COMPRENSION_A1: { pregunta: string; guia: string }[] = [
     guia: "Keep es para notas y listas; Calendar es para planificar tareas y eventos en el tiempo.",
   },
   {
-    pregunta: "¿Por qué Wikipedia no es una fuente primaria?",
-    guia: "Porque cualquiera puede editarla y no siempre es verificada por expertos; es un punto de partida, no una fuente definitiva.",
+    pregunta: "¿Por qué no conviene citar Wikipedia como fuente principal de un trabajo académico?",
+    guia: "Porque cualquiera puede editarla; es un punto de partida, no una fuente definitiva.",
   },
   {
     pregunta: "¿Qué implica usar herramientas digitales responsablemente?",
@@ -814,15 +814,15 @@ export const RETO_QUIZ: QuizEvaluable = {
       retroalimentacion: "Google Scholar es un buscador especializado en literatura académica y científica.",
     },
     {
-      enunciado: "¿Por qué Wikipedia no es una fuente primaria?",
+      enunciado: "¿Por qué no conviene citar Wikipedia como fuente principal de un trabajo académico?",
       opciones: [
         "Porque está en inglés",
-        "Porque cualquiera puede editarla y no siempre es verificada por expertos",
+        "Porque cualquiera puede editarla",
         "Porque es muy antigua",
         "Porque no tiene imágenes",
       ],
       respuestaCorrecta: 1,
-      retroalimentacion: "Wikipedia es un buen punto de partida, pero al ser editable por cualquiera, no se considera fuente primaria confiable.",
+      retroalimentacion: "Wikipedia es un buen punto de partida, pero es una fuente terciaria (resume otras fuentes) y cualquiera puede editarla: conviene ir a las fuentes que cita.",
     },
     {
       enunciado: "¿Cuál de estas herramientas es más adecuada para planificar tus exámenes y tareas?",
@@ -834,7 +834,7 @@ export const RETO_QUIZ: QuizEvaluable = {
       enunciado: "¿Qué es el plagio en el contexto digital?",
       opciones: [
         "Descargar música para uso personal",
-        "Usar el trabajo o ideas de otros sin dar crédito, presentándolo como propio",
+        "Presentar como propio el trabajo de otros",
         "Compartir artículos en redes sociales",
         "Guardar páginas web en favoritos",
       ],

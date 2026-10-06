@@ -1431,7 +1431,7 @@ function ReflexionCard({ accent, rgba }: { accent: string; rgba: string }) {
 
       <p style={{ margin: "13px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.55 }}>
         <i className="fa-solid fa-circle-info" style={{ marginRight: 7 }} />
-        La cuarta pista y el cuarto criterio mencionan el INAI porque así están redactados en la actividad. Si escribes tu
+        Cuando escribas tu
         reflexión, nombra la autoridad vigente: la Secretaría Anticorrupción y Buen Gobierno (LFPDPPP, art. 2, fr. XV).
       </p>
     </div>

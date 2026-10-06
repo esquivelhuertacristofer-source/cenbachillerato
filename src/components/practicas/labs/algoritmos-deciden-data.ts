@@ -153,8 +153,8 @@ export const QUIZ: {
   {
     pregunta: "¿Qué es un algoritmo?",
     opciones: [
-      "Un virus informático",
-      "Un conjunto de instrucciones ordenadas para resolver un problema",
+      "Un virus informático que daña archivos",
+      "Una serie ordenada de pasos para resolver algo",
       "Una red social",
       "Un tipo de contraseña segura",
     ],
@@ -170,7 +170,7 @@ export const QUIZ: {
       "Educarte sobre temas importantes",
     ],
     correcta: 2,
-    retro: "Los algoritmos de redes sociales están optimizados para que pases más tiempo en la plataforma y ver más anuncios.",
+    retro: "Los algoritmos de redes sociales están optimizados para que pases más tiempo en la plataforma y veas más anuncios.",
   },
   {
     pregunta: "¿Por qué los algoritmos tienden a promover contenido que genera emociones fuertes?",
@@ -198,8 +198,8 @@ export const QUIZ: {
     pregunta: "¿Qué es una «burbuja de filtro»?",
     opciones: [
       "Un sistema de protección de datos personales",
-      "El fenómeno donde el algoritmo te muestra solo contenido que confirma tus ideas previas",
-      "Una lista de contactos bloqueados",
+      "Que el algoritmo solo te muestre lo que ya piensas",
+      "Una lista de los contactos que bloqueaste",
       "Una función de privacidad en redes sociales",
     ],
     correcta: 1,

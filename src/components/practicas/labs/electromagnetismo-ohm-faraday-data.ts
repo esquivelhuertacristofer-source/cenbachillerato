@@ -79,8 +79,8 @@ export const RETO_A2: RetoNumericoData = {
     "Inciso (a-ii): Potencia: P = V²/R = 120²/470 = 14,400/470 ≈ 30.6 W. Verificación: P = I×V = 0.255×120 = 30.6 W ✓. También P = I²×R = 0.255²×470 = 0.065×470 ≈ 30.6 W ✓.",
     "Inciso (a-iii): Energía en kWh: E = P × t = 30.6 W × 8 h = 244.8 Wh = 0.245 kWh. (Recordar: 1 kWh = 1,000 Wh; dividir entre 1,000).",
     "Inciso (a-iv): Costo = E × precio = 0.245 kWh × $1.50 MXN/kWh ≈ $0.37 MXN. Una resistencia de 470 Ω encendida 8 horas seguidas cuesta menos de 40 centavos de peso mexicano.",
-    "Inciso (b): Potencia mecánica = eficiencia × potencia eléctrica = 0.92 × 150 kW = 138 kW. El 8% restante (12 kW) se disipa como calor en el bobinado del motor (pérdidas por resistencia óhmica y fricción).",
-    "Comparación: 138 kW ≈ 185 hp (caballos de fuerza), la potencia mecánica de un tren del Metro. La alta eficiencia del motor eléctrico (92%) frente al motor de combustión interna (~35%) es la razón principal por la que el transporte eléctrico es más eficiente energéticamente.",
+    "Inciso (b): Potencia mecánica = eficiencia × potencia eléctrica = 0.92 × 150 kW = 138 kW. El 8% restante (12 kW) se disipa como calor (pérdidas óhmicas en el bobinado, pérdidas en el núcleo y fricción en los rodamientos).",
+    "Comparación: 138 kW ≈ 185 hp (caballos de fuerza), la potencia mecánica de uno de los motores de tracción de un tren del Metro. La alta eficiencia del motor eléctrico (92%) frente al motor de combustión interna (~35%) es la razón principal por la que el transporte eléctrico es más eficiente energéticamente.",
   ],
 
   respuestaFinal:

@@ -1480,7 +1480,7 @@ export const PAREJAS_A9: { izquierda: string; derecha: string }[] = [
   { izquierda: "between", derecha: "In the space that separates two things (entre — dos cosas)." },
   { izquierda: "opposite", derecha: "On the other side of a street or space (frente a, en el lado contrario)." },
   { izquierda: "on the corner of", derecha: "Located at the intersection of two streets (en la esquina de)." },
-  { izquierda: "in front of", derecha: "Facing something, on the opposite side (enfrente de)." },
+  { izquierda: "in front of", derecha: "Close to the front part of something (delante de)." },
   { izquierda: "next to", derecha: "Immediately beside something or someone (al lado de)." },
 ];
 export const DISTRACTORES_A9 = ["At the back of something (detrás de).", "'Can' is also used to express possibility — something that is possible to find or do in a place."];
@@ -1508,7 +1508,7 @@ export function rondaA9(rnd: () => number): { orden: number[]; defs: number[] } 
 /** Glosario A1 «Describing Places with Prepositions» — verbatim. */
 export const GLOSARIO_A1: { termino: string; definicion: string; ejemplo: string }[] = [
   { termino: "next to", definicion: "Immediately beside something or someone (al lado de).", ejemplo: "The pharmacy is next to the bakery." },
-  { termino: "in front of", definicion: "Facing something, on the opposite side (enfrente de).", ejemplo: "There is a fountain in front of the school." },
+  { termino: "in front of", definicion: "Close to the front part of something (delante de).", ejemplo: "There is a fountain in front of the school." },
   { termino: "between", definicion: "In the space that separates two things (entre — dos cosas).", ejemplo: "The bank is between the hotel and the restaurant." },
   { termino: "behind", definicion: "At the back of something (detrás de).", ejemplo: "The parking lot is behind the shopping center." },
   { termino: "there is", definicion: "Used to say that something exists or can be found in a place (singular).", ejemplo: "There is a library on the second floor." },
@@ -1568,7 +1568,7 @@ export const HUECOS_A2: TextoHuecosData = {
   ],
   huecos: [
     { respuesta: "There is", alternativas: ["There's"], pista: "Singular existence" },
-    { respuesta: "in front of", alternativas: ["opposite"], pista: "Facing something, on the opposite side" },
+    { respuesta: "in front of", alternativas: ["opposite"], pista: "Directly before the front part of something" },
     { respuesta: "Between", alternativas: ["between"], pista: "In the space separating two things" },
     { respuesta: "there is", alternativas: ["there's"], pista: "Singular — one garden" },
     { respuesta: "behind", alternativas: [], pista: "At the back of something" },

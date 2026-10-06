@@ -299,17 +299,17 @@ export interface PuntoConvergencia {
  * ══════════════════════════════════════════════════════════════════════ */
 
 export const PROBLEMA =
-  "La probabilidad es la rama de las matematicas que estudia el azar y la incertidumbre. Nos permite asignar un numero entre 0 y 1 (o entre 0% y 100%) a la posibilidad de que ocurra un evento, y eso tiene aplicaciones practicas inmensas: desde el pronostico del tiempo hasta las primas de seguros, pasando por los ensayos clinicos de medicamentos.";
+  "La probabilidad es la rama de las matemáticas que estudia el azar y la incertidumbre. Nos permite asignar un número entre 0 y 1 (o entre 0% y 100%) a la posibilidad de que ocurra un evento, y eso tiene aplicaciones prácticas inmensas: desde el pronóstico del tiempo hasta las primas de seguros, pasando por los ensayos clínicos de medicamentos.";
 
 export const DEFINICION =
   "Un experimento aleatorio es aquel cuyo resultado no puede predecirse con certeza. El espacio muestral (Ω o S) es el conjunto de todos los resultados posibles del experimento.";
 
 /** Lectura A1 — párrafos verbatim. */
 export const LECTURA_A1: string[] = [
-  "El punto de partida es el experimento aleatorio: cualquier proceso cuyo resultado no podemos predecir con certeza antes de realizarlo. Lanzar un dado, sacar una carta de una baraja, medir la temperatura maxima de manana, o tomar una muestra de 100 personas para medir su presion arterial, son todos experimentos aleatorios. El espacio muestral (usualmente escrito como omega) es el conjunto de todos los resultados posibles del experimento. Para un dado de seis caras, omega = {1, 2, 3, 4, 5, 6}. Un evento es cualquier subconjunto del espacio muestral: por ejemplo, el evento 'sacar un numero par' es el subconjunto {2, 4, 6}.",
-  "La probabilidad clasica (o de Laplace) define P(A) = numero de casos favorables al evento A / numero total de casos posibles del espacio muestral. Esta formula asume que todos los resultados son igualmente posibles (equiprobabilidad): funciona perfectamente para dados, monedas, cartas y urnas ideales, pero no para la mayoria de situaciones reales.",
-  "La probabilidad frecuentista define P(A) como la frecuencia relativa del evento A en un numero muy grande de repeticiones del experimento: P(A) = numero de veces que ocurrio A / numero total de repeticiones. La ley de los grandes numeros garantiza que, conforme aumenta el numero de repeticiones, la frecuencia relativa se acerca al valor verdadero de la probabilidad.",
-  "Los axiomas de Kolmogorov (1933) dan el fundamento matematico riguroso de la probabilidad: (1) P(A) es mayor o igual a 0 para cualquier evento A; (2) P(omega) = 1, la probabilidad del espacio muestral completo es 1; (3) si dos eventos A y B son mutuamente excluyentes (A interseccion B = vacio), entonces P(A union B) = P(A) + P(B). El complemento de un evento A es el conjunto de todos los resultados que no pertenecen a A: P(A') = 1 - P(A). Si la probabilidad de lluvia es 0.30, la probabilidad de que no llueva es 0.70.",
+  "El punto de partida es el experimento aleatorio: cualquier proceso cuyo resultado no podemos predecir con certeza antes de realizarlo. Lanzar un dado, sacar una carta de una baraja, medir la temperatura máxima de mañana, o tomar una muestra de 100 personas para medir su presión arterial, son todos experimentos aleatorios. El espacio muestral (usualmente escrito como omega) es el conjunto de todos los resultados posibles del experimento. Para un dado de seis caras, omega = {1, 2, 3, 4, 5, 6}. Un evento es cualquier subconjunto del espacio muestral: por ejemplo, el evento 'sacar un número par' es el subconjunto {2, 4, 6}.",
+  "La probabilidad clásica (o de Laplace) define P(A) = número de casos favorables al evento A / número total de casos posibles del espacio muestral. Esta fórmula asume que todos los resultados son igualmente posibles (equiprobabilidad): funciona perfectamente para dados, monedas, cartas y urnas ideales, pero no para la mayoría de situaciones reales.",
+  "La probabilidad frecuentista define P(A) como la frecuencia relativa del evento A en un número muy grande de repeticiones del experimento: P(A) = número de veces que ocurrió A / número total de repeticiones. La ley de los grandes números garantiza que, conforme aumenta el número de repeticiones, la frecuencia relativa se acerca al valor verdadero de la probabilidad.",
+  "Los axiomas de Kolmogorov (1933) dan el fundamento matemático riguroso de la probabilidad: (1) P(A) es mayor o igual a 0 para cualquier evento A; (2) P(omega) = 1, la probabilidad del espacio muestral completo es 1; (3) si dos eventos A y B son mutuamente excluyentes (A intersección B = vacío), entonces P(A unión B) = P(A) + P(B). El complemento de un evento A es el conjunto de todos los resultados que no pertenecen a A: P(A') = 1 - P(A). Si la probabilidad de lluvia es 0.30, la probabilidad de que no llueva es 0.70.",
 ];
 
 /** Preguntas de comprensión de la lectura A1 — verbatim. */
@@ -364,9 +364,9 @@ export const DATOS: DatoClave[] = [
 
 /** Contexto mexicano — verbatim de la retroalimentación del quiz A2. */
 export const CONTEXTO =
-  "La SSA (Secretaria de Salud) usa modelos probabilisticos de transmision de enfermedades (tasas de reproduccion R0, probabilidades de contagio por contacto) para estimar cuantas personas pueden infectarse en una temporada de influenza o un brote de dengue, y decide con base en eso cuantas dosis de vacuna producir y distribuir en cada region del pais. Esta es estadistica inferencial y modelado probabilistico aplicados directamente a politica publica de salud.";
+  "La SSA (Secretaría de Salud) usa modelos probabilísticos de transmisión de enfermedades (tasas de reproducción R0, probabilidades de contagio por contacto) para estimar cuántas personas pueden infectarse en una temporada de influenza o un brote de dengue, y decide con base en eso cuántas dosis de vacuna producir y distribuir en cada región del país. Esta es estadística inferencial y modelado probabilístico aplicados directamente a política pública de salud.";
 
-export const FUENTE = "Material CEN Bachillerato — PM-VI. Ref.: Kolmogorov, 1933; ley de los grandes numeros.";
+export const FUENTE = "Material CEN Bachillerato — PM-VI. Ref.: Kolmogorov, 1933; ley de los grandes números.";
 
 /** Glosario A5 — los 6 términos verbatim. */
 export interface GlosarioItem {
@@ -398,7 +398,7 @@ export const GLOSARIO: GlosarioItem[] = [
     termino: "Probabilidad subjetiva",
     definicion:
       "Estimación de la probabilidad basada en el juicio personal, experiencia o información experta, sin un espacio muestral simétrico ni experimentos repetidos. Puede variar entre personas.",
-    ejemplo: "Un médico estima: 'hay un 80% de probabilidad de que el paciente se recupere'. Un meteorólogo: 'probabilidad de 65% de lluvia mañana'.",
+    ejemplo: "Un médico estima: 'hay un 80% de probabilidad de que el paciente se recupere'. Un aficionado: 'creo que hay 65% de probabilidad de que mi equipo gane el domingo'.",
   },
   {
     termino: "Axiomas de Kolmogorov",
@@ -423,38 +423,38 @@ export const QUIZ_A2: QuizEvaluable = {
     {
       enunciado: "¿Cuál es la definición de probabilidad clásica (de Laplace) y qué supuesto fundamental requiere?",
       opciones: [
-        "P(A) = frecuencia de A en muchas repeticiones; requiere un numero grande de experimentos",
-        "P(A) = numero de casos favorables a A / numero total de casos posibles; requiere que todos los resultados sean igualmente posibles (equiprobabilidad)",
-        "P(A) = grado de creencia subjetiva en A; no requiere ningun supuesto matematico",
+        "P(A) = frecuencia de A en muchas repeticiones; requiere un número grande de experimentos",
+        "P(A) = número de casos favorables a A / número total de casos posibles; requiere que todos los resultados sean igualmente posibles (equiprobabilidad)",
+        "P(A) = grado de creencia subjetiva en A; no requiere ningún supuesto matemático",
         "P(A) = 1 - P(A'); requiere conocer la probabilidad del complemento de A",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "La probabilidad clasica de Laplace calcula P(A) = casos favorables / casos posibles, pero SOLO funciona bajo el supuesto de equiprobabilidad: todos los resultados del espacio muestral deben ser igualmente posibles. Funciona perfectamente para dados no cargados, monedas equilibradas, cartas bien mezcladas. No aplica a situaciones reales donde los resultados no son equiprobables (por ejemplo, la probabilidad de ganar una loteria no es 1/numero de participantes si los boletos no estan distribuidos uniformemente).",
+        "La probabilidad clásica de Laplace calcula P(A) = casos favorables / casos posibles, pero SOLO funciona bajo el supuesto de equiprobabilidad: todos los resultados del espacio muestral deben ser igualmente posibles. Funciona perfectamente para dados no cargados, monedas equilibradas, cartas bien mezcladas. No aplica a situaciones reales donde los resultados no son equiprobables (por ejemplo, la probabilidad de ganar una lotería no es 1/número de participantes si los boletos no están distribuidos uniformemente).",
     },
     {
       enunciado: "¿Qué garantiza la ley de los grandes números en el contexto de la probabilidad frecuentista?",
       opciones: [
-        "Que con mas datos la media siempre aumenta",
-        "Que conforme aumenta el numero de repeticiones del experimento, la frecuencia relativa del evento converge al valor verdadero de la probabilidad",
+        "Que con más datos la media siempre aumenta",
+        "Que conforme aumenta el número de repeticiones del experimento, la frecuencia relativa del evento converge al valor verdadero de la probabilidad",
         "Que en un juego de azar siempre recuperas lo perdido si juegas suficientes veces",
-        "Que la muestra siempre tiene exactamente las mismas proporciones que la poblacion",
+        "Que la muestra siempre tiene exactamente las mismas proporciones que la población",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "La ley de los grandes numeros establece que la frecuencia relativa de un evento en un experimento aleatorio converge al valor de la probabilidad verdadera conforme el numero de repeticiones tiende a infinito. Con pocas repeticiones hay mucha variabilidad por azar (puedo obtener 7 caras de 10 lanzamientos de una moneda justa). Con miles de repeticiones, la frecuencia relativa se acerca al 50% para una moneda equilibrada. Ojo: esto no significa que 'te toca' un evento si no ha salido; cada repeticion es independiente.",
+        "La ley de los grandes números establece que la frecuencia relativa de un evento en un experimento aleatorio converge al valor de la probabilidad verdadera conforme el número de repeticiones tiende a infinito. Con pocas repeticiones hay mucha variabilidad por azar (puedo obtener 7 caras de 10 lanzamientos de una moneda justa). Con miles de repeticiones, la frecuencia relativa se acerca al 50% para una moneda equilibrada. Ojo: esto no significa que 'te toca' un evento si no ha salido; cada repetición es independiente.",
     },
     {
       enunciado: "¿Cuáles son los axiomas de Kolmogorov que fundamentan matemáticamente la probabilidad?",
       opciones: [
-        "P(A) esta entre -1 y 1; P(vacio) = 0; P(A union B) = P(A) x P(B)",
-        "P(A) es mayor o igual a 0; P(espacio muestral) = 1; si A y B son mutuamente excluyentes, P(A union B) = P(A) + P(B)",
-        "P(A) esta entre 0 y 100; P(espacio muestral) = 100; P(A interseccion B) = P(A) + P(B)",
-        "P(A) = P(A'); P(espacio muestral) = 0.5; P(A union B) = P(A) - P(B)",
+        "P(A) está entre -1 y 1; P(vacío) = 0; P(A unión B) = P(A) x P(B)",
+        "P(A) es mayor o igual a 0; P(espacio muestral) = 1; si A y B son mutuamente excluyentes, P(A unión B) = P(A) + P(B)",
+        "P(A) está entre 0 y 100; P(espacio muestral) = 100; P(A intersección B) = P(A) + P(B)",
+        "P(A) = P(A'); P(espacio muestral) = 0.5; P(A unión B) = P(A) - P(B)",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "Los tres axiomas de Kolmogorov (1933) son: (1) la probabilidad de cualquier evento es no negativa, P(A) >= 0; (2) la probabilidad del espacio muestral completo es 1, P(omega) = 1; (3) si dos eventos son mutuamente excluyentes (no pueden ocurrir al mismo tiempo), la probabilidad de que ocurra al menos uno es la suma de sus probabilidades, P(A union B) = P(A) + P(B). De estos tres principios se pueden deducir todas las demas propiedades y formulas de la probabilidad.",
+        "Los tres axiomas de Kolmogorov (1933) son: (1) la probabilidad de cualquier evento es no negativa, P(A) >= 0; (2) la probabilidad del espacio muestral completo es 1, P(omega) = 1; (3) si dos eventos son mutuamente excluyentes (no pueden ocurrir al mismo tiempo), la probabilidad de que ocurra al menos uno es la suma de sus probabilidades, P(A unión B) = P(A) + P(B). De estos tres principios se pueden deducir todas las demás propiedades y fórmulas de la probabilidad.",
     },
     {
       enunciado: "Si la probabilidad de que llueva mañana es P(lluvia) = 0.35, ¿cuál es la probabilidad de que NO llueva?",
@@ -467,25 +467,25 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Cuál de los siguientes es un ejemplo de probabilidad subjetiva?",
       opciones: [
         "La probabilidad de sacar un 6 al lanzar un dado justo es 1/6",
-        "La probabilidad de que un recien nacido sea nino es 0.51 segun los registros del INEGI",
-        "El medico dice: 'Dados tus sintomas y tu historial, yo diria que hay un 70% de probabilidad de que sea una infeccion viral'",
-        "El pronostico del tiempo dice que hay 40% de probabilidad de lluvia basado en modelos de los ultimos 30 anos",
+        "La probabilidad de que un recién nacido sea niño es 0.51 según los registros del INEGI",
+        "El médico dice: 'Dados tus síntomas y tu historial, yo diría que hay un 70% de probabilidad de que sea una infección viral'",
+        "El pronóstico del tiempo dice que hay 40% de probabilidad de lluvia basado en modelos de los últimos 30 años",
       ],
       respuestaCorrecta: 2,
       retroalimentacion:
-        "La probabilidad subjetiva es el grado de creencia personal de un experto basada en experiencia e informacion disponible, no en un calculo formal de casos equiprobables ni en frecuencias historicas de millones de repeticiones. La estimacion del medico es tipicamente subjetiva: combina experiencia clinica, intuicion y la informacion del paciente particular. La opcion a es clasica (equiprobabilidad), la b es frecuentista (datos del INEGI), la d es frecuentista (modelos historicos de lluvia).",
+        "La probabilidad subjetiva es el grado de creencia personal de un experto basada en experiencia e información disponible, no en un cálculo formal de casos equiprobables ni en frecuencias históricas de millones de repeticiones. La estimación del médico es típicamente subjetiva: combina experiencia clínica, intuición y la información del paciente particular. La opción a es clásica (equiprobabilidad), la b es frecuentista (datos del INEGI), la d es frecuentista (modelos históricos de lluvia).",
     },
     {
       enunciado: "¿En cuál de las siguientes situaciones mexicanas se usa la probabilidad para tomar decisiones de política pública?",
       opciones: [
-        "El INEGI decide cuantos empleados contratar para el proximo censo",
-        "La SSA estima probabilidades de contagio de enfermedades infecciosas para decidir cuantas vacunas producir y distribuir antes de una temporada de influenza",
-        "Un estudiante decide en que universidad estudiar segun su promedio de preparatoria",
-        "Un maestro decide cuantas preguntas poner en un examen",
+        "El INEGI decide cuántos empleados contratar para el próximo censo",
+        "La SSA estima probabilidades de contagio de enfermedades infecciosas para decidir cuántas vacunas producir y distribuir antes de una temporada de influenza",
+        "Un estudiante decide en qué universidad estudiar según su promedio de preparatoria",
+        "Un maestro decide cuántas preguntas poner en un examen",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "La SSA (Secretaria de Salud) usa modelos probabilisticos de transmision de enfermedades (tasas de reproduccion R0, probabilidades de contagio por contacto) para estimar cuantas personas pueden infectarse en una temporada de influenza o un brote de dengue, y decide con base en eso cuantas dosis de vacuna producir y distribuir en cada region del pais. Esta es estadistica inferencial y modelado probabilistico aplicados directamente a politica publica de salud.",
+        "La SSA (Secretaría de Salud) usa modelos probabilísticos de transmisión de enfermedades (tasas de reproducción R0, probabilidades de contagio por contacto) para estimar cuántas personas pueden infectarse en una temporada de influenza o un brote de dengue, y decide con base en eso cuántas dosis de vacuna producir y distribuir en cada región del país. Esta es estadística inferencial y modelado probabilístico aplicados directamente a política pública de salud.",
     },
   ],
 };

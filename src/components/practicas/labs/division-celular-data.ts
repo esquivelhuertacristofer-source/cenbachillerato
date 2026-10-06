@@ -533,7 +533,7 @@ export const GLOSARIO: GlosarioItem[] = [
   { termino: "Mitosis", definicion: "División celular que produce dos células hijas idénticas a la madre (2n → 2n).", ejemplo: "La piel se renueva gracias a la mitosis." },
   { termino: "Meiosis", definicion: "Dos divisiones sucesivas que producen cuatro células haploides distintas (2n → n).", ejemplo: "La meiosis forma los gametos en ovarios y testículos." },
   { termino: "Crossing over", definicion: "Intercambio de fragmentos de ADN entre cromátidas de homólogos durante la Profase I.", ejemplo: "El crossing over recombina los genes y aumenta la diversidad." },
-  { termino: "Recombinación genética", definicion: "Nuevas combinaciones de genes que surgen por crossing over y distribución independiente.", ejemplo: "Por la recombinación, ningún hermano es genéticamente igual a otro." },
+  { termino: "Recombinación genética", definicion: "Nuevas combinaciones de genes que surgen por crossing over y distribución independiente.", ejemplo: "Por la recombinación, dos hermanos no son genéticamente iguales (salvo los gemelos idénticos, que vienen del mismo cigoto)." },
   { termino: "Gameto", definicion: "Célula sexual haploide (óvulo o espermatozoide) que se une en la fecundación.", ejemplo: "Al unirse dos gametos haploides se restaura el número diploide (n + n = 2n)." },
 ];
 

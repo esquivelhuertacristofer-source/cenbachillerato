@@ -183,7 +183,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Qué es la eutrofización de un cuerpo de agua?",
       opciones: [
         "La salinización excesiva de lagos y ríos por evaporación",
-        "El enriquecimiento excesivo de nutrientes (N y P) que causa proliferación de algas y agotamiento del oxígeno disuelto",
+        "El exceso de nutrientes (N y P) que dispara la proliferación de algas",
         "La contaminación por metales pesados de origen industrial",
         "El calentamiento artificial del agua por plantas termoeléctricas",
       ],

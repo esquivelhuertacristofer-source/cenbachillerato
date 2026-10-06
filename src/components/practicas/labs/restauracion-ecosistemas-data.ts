@@ -805,7 +805,7 @@ export const GLOSARIO: { termino: string; definicion: string; ejemplo: string }[
   { termino: "Área Natural Protegida (ANP)", definicion: "Zona del territorio nacional con características relevantes que el Estado protege y maneja para conservar la biodiversidad y los servicios ecosistémicos.", ejemplo: "La Reserva de la Biosfera Calakmul, en Campeche, es una de las ANP más grandes de México." },
   { termino: "CONANP", definicion: "Comisión Nacional de Áreas Naturales Protegidas; organismo federal encargado de administrar y conservar las ANP de México.", ejemplo: "La CONANP gestiona más de 180 ANP que cubren cerca del 11 % del territorio nacional." },
   { termino: "LGEEPA", definicion: "Ley General del Equilibrio Ecológico y la Protección al Ambiente; principal marco jurídico ambiental federal de México (1988).", ejemplo: "La LGEEPA define las categorías de ANP y regula las actividades que pueden realizarse en ellas." },
-  { termino: "Reserva de la biosfera", definicion: "Categoría de ANP con zonas núcleo (protección estricta), amortiguamiento y transición; designadas por la UNESCO dentro del programa MAB.", ejemplo: "La Reserva de la Biosfera El Vizcaíno, en Baja California Sur, protege ballenas grises y lobos marinos." },
+  { termino: "Reserva de la biosfera", definicion: "Categoría de ANP con zonas núcleo (protección estricta), amortiguamiento y transición; decretadas por el gobierno federal según la LGEEPA; muchas además forman parte de la red MAB de la UNESCO.", ejemplo: "La Reserva de la Biosfera El Vizcaíno, en Baja California Sur, protege ballenas grises y lobos marinos." },
   { termino: "Corredor biológico", definicion: "Zona de conectividad que une áreas protegidas aisladas para permitir el movimiento de especies y el flujo genético.", ejemplo: "El Corredor Biológico Mesoamericano conecta áreas protegidas desde México hasta Panamá." },
   { termino: "Restauración ecológica", definicion: "Proceso de asistir la recuperación de un ecosistema degradado, dañado o destruido para restablecer su estructura, composición y función.", ejemplo: "La reforestación con especies nativas en cuencas hidrográficas es una forma de restauración ecológica." },
 ];
@@ -853,7 +853,7 @@ export const QUIZ_A2: QuizEvaluable = {
       retroalimentacion: "Las Reservas de Biosfera tienen zonas diferenciadas: una zona núcleo (máxima protección, sin actividades extractivas) y zonas de amortiguamiento donde se permiten actividades sostenibles controladas. No todo es libre.",
     },
     {
-      enunciado: "Más del 80% de la biodiversidad silvestre de México se encuentra en tierras de ejidos y comunidades agrarias, no solo en ANP.",
+      enunciado: "Entre el 60 y el 80% de los bosques y selvas de México se encuentran en tierras de ejidos y comunidades agrarias, no solo en ANP.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 0,
       retroalimentacion: "Correcto. Esto significa que la conservación de la biodiversidad en México depende en gran medida del manejo que hacen las comunidades locales e indígenas de sus tierras, no solo de las áreas protegidas formales.",

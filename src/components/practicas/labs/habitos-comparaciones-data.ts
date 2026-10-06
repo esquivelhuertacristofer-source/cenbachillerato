@@ -799,7 +799,7 @@ export const HECHOS: Hecho[] = [
   {
     enunciado: "El superlativo de adjetivos largos usa 'the most' ('the most interesting').",
     respuesta: true,
-    retro: "Sí: con adjetivos de 2+ sílabas se usa 'the most'.",
+    retro: "Sí: con la mayoría de adjetivos de 2+ sílabas se usa 'the most' (los de 2 sílabas terminados en -y usan -iest: the healthiest, the happiest).",
   },
   {
     enunciado: "Después de 'like' se puede usar un sustantivo o un verbo con -ing ('I like music / I like dancing').",

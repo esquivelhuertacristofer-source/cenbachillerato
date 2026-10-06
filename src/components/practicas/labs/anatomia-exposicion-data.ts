@@ -653,7 +653,7 @@ export const RETO_QUIZ: QuizEvaluable = {
       enunciado: "¿Qué significa 'practicar' una exposición antes de presentarla?",
       opciones: [
         "Memorizarla palabra por palabra",
-        "Ensayarla varias veces para familiarizarse con el contenido y el tiempo",
+        "Ensayarla en voz alta varias veces",
         "Solo leer las diapositivas",
         "Pedirle a alguien más que la presente",
       ],

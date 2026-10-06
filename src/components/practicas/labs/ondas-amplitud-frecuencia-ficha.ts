@@ -21,7 +21,7 @@ export const ONDAS_FICHA: FichaTeoricaData = {
     "El sonido es una onda mecánica longitudinal que requiere un medio material para propagarse (no hay sonido en el vacío). La velocidad del sonido en el aire a 20°C es aproximadamente 340 m/s. En agua, el sonido viaja ≈1,480 m/s (más rápido, porque el agua es menos compresible); en sólidos, puede superar los 5,000 m/s.",
     "México es uno de los países más sísmicamente activos del mundo. Los terremotos generan dos tipos de ondas sísmicas que viajan a velocidades distintas:\n• Ondas P (primarias o de compresión): son longitudinales, viajan a ≈8 km/s en la corteza y son las primeras en detectarse. Son menos destructivas pero se propagan por sólidos, líquidos y gases.\n• Ondas S (secundarias o de corte): son transversales, viajan a ≈4 km/s y son más destructivas. Solo se propagan por sólidos (no pasan por el núcleo líquido de la Tierra, lo que sirvió para descubrir su estructura interna).",
     "El Sistema de Alerta Sísmica Mexicano (SASMEX), operado por el CIRES, aprovecha exactamente la diferencia de velocidad entre las ondas P y S. Sus sensores en la costa del Pacífico (Guerrero, Oaxaca) detectan las ondas P de un terremoto (que llegan primero, siendo más rápidas). Al detectarlas, el sistema transmite una alerta a velocidad de la luz (señal de radio/celular) a la Ciudad de México antes de que lleguen las destructivas ondas S (que viajan más lento). Este margen de 40-120 segundos puede ser suficiente para evacuar edificios, detener el metro y preparar hospitales.",
-    "El Efecto Doppler describe el cambio en la frecuencia percibida de una onda cuando la fuente o el receptor están en movimiento relativo. Cuando una ambulancia de la Cruz Roja Mexicana se acerca, las ondas de sonido se comprimen (mayor frecuencia, tono más agudo); cuando se aleja, las ondas se expanden (menor frecuencia, tono más grave). Los radares de velocidad en las carreteras mexicanas (SCT) usan el Efecto Doppler con ondas de radio: emiten una onda de frecuencia conocida y miden la diferencia de frecuencia del eco para calcular la velocidad del vehículo.",
+    "El Efecto Doppler describe el cambio en la frecuencia percibida de una onda cuando la fuente o el receptor están en movimiento relativo. Cuando una ambulancia de la Cruz Roja Mexicana se acerca, las ondas de sonido se comprimen (mayor frecuencia, tono más agudo); cuando se aleja, las ondas se expanden (menor frecuencia, tono más grave). Los radares de velocidad en las carreteras mexicanas usan el Efecto Doppler con ondas de radio: emiten una onda de frecuencia conocida y miden la diferencia de frecuencia del eco para calcular la velocidad del vehículo.",
   ],
 
   objetivos: [
@@ -62,7 +62,7 @@ export const ONDAS_FICHA: FichaTeoricaData = {
 
   aplicaciones: [
     "El SASMEX aprovecha la diferencia de velocidad entre ondas P y S para alertar a la CDMX con 40-120 segundos de margen antes de que lleguen las ondas S destructivas.",
-    "Los radares de velocidad en carreteras mexicanas (SCT) usan el Efecto Doppler con ondas de radio para calcular la velocidad de los vehículos.",
+    "Los radares de velocidad en carreteras mexicanas usan el Efecto Doppler con ondas de radio para calcular la velocidad de los vehículos.",
     "Los sonares navales y ultrasonidos médicos usan ondas sonoras de alta frecuencia para mapear fondos marinos y obtener imágenes del interior del cuerpo.",
   ],
 

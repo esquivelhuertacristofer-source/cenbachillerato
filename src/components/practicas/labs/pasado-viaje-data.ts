@@ -640,7 +640,7 @@ export const GLOSARIO_A5: { termino: string; definicion: string; ejemplo: string
   {
     termino: "It was the first time I...",
     definicion: "Expresión para hablar de una experiencia completamente nueva.",
-    ejemplo: "It was the first time I cooked for the whole family.",
+    ejemplo: "It was the first time I had cooked for the whole family.",
   },
   {
     termino: "time expressions (past)",
@@ -699,10 +699,10 @@ export const QUIZ: QuizEvaluable = {
       retroalimentacion: "Correct: providing context (place, people, feelings) makes past narratives richer and clearer.",
     },
     {
-      enunciado: "The expression 'It was the first time I...' is followed by the past simple ('It was the first time I tried sushi').",
+      enunciado: "The expression 'It was the first time I...' is normally followed by the past perfect ('It was the first time I had tried sushi').",
       opciones: ["True", "False"],
       respuestaCorrecta: 0,
-      retroalimentacion: "Correct: 'It was the first time I + past simple' describes a new experience.",
+      retroalimentacion: "Correct: 'It was the first time I + past perfect (had + participle)' describes a new experience. In informal speech you may also hear the past simple.",
     },
     {
       enunciado: "To say you were in the middle of doing something when another event happened, you use the past simple for both verbs ('I walked when it rained').",

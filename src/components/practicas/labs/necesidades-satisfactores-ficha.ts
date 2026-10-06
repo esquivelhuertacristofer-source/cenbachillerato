@@ -32,7 +32,7 @@ export const NECESIDADES_SATISFACTORES_FICHA: FichaTeoricaData = {
     { termino: "Enfoque de derechos", definicion: "Perspectiva que entiende el bienestar como un conjunto de derechos garantizados para todas las personas, no como un favor." },
   ],
   aplicaciones: [
-    "El CONEVAL mide la pobreza en México con un enfoque multidimensional que incluye ingreso, rezago educativo, acceso a servicios de salud, vivienda y alimentación. En 2022, el 36.3% de la población mexicana vivía en pobreza — datos que ilustran la complejidad de los fenómenos sociales.",
+    "La medición oficial de la pobreza en México —a cargo del CONEVAL hasta 2025 y hoy del INEGI— usa un enfoque multidimensional que incluye ingreso, rezago educativo, acceso a servicios de salud, vivienda y alimentación. En 2022, el 36.3% de la población mexicana vivía en pobreza (en 2024, el 29.6%, según la primera medición del INEGI) (en 2024, el 29.6%, según la primera medición del INEGI) — datos que ilustran la complejidad de los fenómenos sociales.",
   ],
   fuente: "Material elaborado para CEN Bachillerato — CS-II",
 };

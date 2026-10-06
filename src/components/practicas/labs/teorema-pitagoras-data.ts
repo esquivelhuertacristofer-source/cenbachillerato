@@ -27,7 +27,7 @@ export const RETO_A2: RetoNumericoData = {
     "Un ingeniero civil necesita verificar que una rampa de acceso para personas con discapacidad esté bien construida. La rampa tiene una longitud horizontal de 4.8 m y sube una altura de 0.6 m.\n" +
     "(a) ¿Cuál es la longitud real de la superficie inclinada de la rampa?\n" +
     "(b) Si la norma exige que la relación altura/longitud horizontal no supere 1/8, ¿cumple esta rampa con la norma? (Calcula la relación altura/longitud horizontal.)\n" +
-    "(c) Un poste de luz cercano proyecta una sombra diagonal en el plano del suelo. Si la base del poste está a 9 m de un punto de referencia y la punta de la sombra está a 15 m, ¿a qué altura (en línea recta sobre el suelo) está la punta de la sombra respecto al mismo punto de referencia?",
+    "(c) Junto a la rampa se apoya una escalera de 15 m contra un muro vertical; el pie de la escalera queda a 9 m del muro. ¿A qué altura del muro llega la escalera?",
   campos: [
     {
       etiqueta: "(a) Longitud inclinada de la rampa",

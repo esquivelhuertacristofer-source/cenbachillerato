@@ -110,7 +110,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
   },
   {
     id: "gl-critica",
-    termino: "Crítica de fuentes (heurística)",
+    termino: "Crítica de fuentes (crítica histórica)",
     definicion: "Proceso metodológico para evaluar la autenticidad, confiabilidad y perspectiva de una fuente histórica. Incluye crítica externa (¿es auténtica?) e interna (¿qué dice realmente y con qué sesgo?).",
     ejemplo: "Al analizar las crónicas de Bernal Díaz del Castillo, evaluar su punto de vista de conquistador español y sus motivaciones al narrar la Conquista.",
   },

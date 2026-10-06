@@ -30,7 +30,7 @@ export const CAUSALIDAD_HISTORICA_FICHA: FichaTeoricaData = {
     { termino: "Causalidad histórica", definicion: "Relación de causa y efecto entre fenómenos históricos: las causas son condiciones o eventos anteriores que generan o posibilitan el surgimiento de nuevos eventos o procesos." },
     { termino: "Multicausalidad", definicion: "Principio historiográfico que reconoce que los eventos históricos son resultado de múltiples causas de distinta naturaleza (política, económica, social, cultural) que interactúan entre sí." },
     { termino: "Causa estructural", definicion: "Condición profunda y duradera —política, económica, social o cultural— que crea el terreno propicio para que un evento histórico ocurra. Opera a largo plazo." },
-    { termino: "Causa coyuntural", definicion: "Evento o circunstancia inmediata que actúa como detonante o catalizador de un proceso histórico ya condicionado por causas estructurales." },
+    { termino: "Causa coyuntural", definicion: "Circunstancia de mediano plazo (una crisis económica, una guerra, un cambio político) que agrava las tensiones estructurales y vuelve probable el estallido; el detonante inmediato es la causa contingente." },
     { termino: "Consecuencia histórica", definicion: "Efecto o resultado de un evento o proceso histórico, que puede ser inmediato o de largo plazo, intencionado o no previsto por los actores." },
     { termino: "Agencia histórica", definicion: "Capacidad de los actores históricos (individuos, grupos, movimientos) para tomar decisiones y actuar, influyendo en el curso de los eventos históricos." },
   ],

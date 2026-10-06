@@ -54,7 +54,7 @@ export const ETAPAS: EtapaDef[] = [
     descripcion:
       "Paso 1 — Glucólisis (citoplasma): 1 glucosa -> 2 piruvatos + 2 ATP netos + 2 NADH.",
     detalle:
-      "Primera etapa de la respiración celular. Ocurre en el citosol. Convierte 1 glucosa (6C) en 2 piruvatos (3C) con ganancia neta de 2 ATP y 2 NADH. No requiere oxígeno; es la única vía energética en anaerobios estrictos.",
+      "Primera etapa de la respiración celular. Ocurre en el citosol. Convierte 1 glucosa (6C) en 2 piruvatos (3C) con ganancia neta de 2 ATP y 2 NADH. No requiere oxígeno; es la vía energética principal de muchos organismos anaerobios.",
     fuente: "A2",
   },
   {
@@ -136,7 +136,7 @@ export const ETAPAS: EtapaDef[] = [
     productos: "2 piruvato + 2 NADH",
     atp: 2,
     descripcion:
-      "Primera etapa de la respiración celular. Ocurre en el citosol. Convierte 1 glucosa (6C) en 2 piruvatos (3C) con ganancia neta de 2 ATP y 2 NADH. No requiere oxígeno; es la única vía energética en anaerobios estrictos.",
+      "Primera etapa de la respiración celular. Ocurre en el citosol. Convierte 1 glucosa (6C) en 2 piruvatos (3C) con ganancia neta de 2 ATP y 2 NADH. No requiere oxígeno; es la vía energética principal de muchos organismos anaerobios.",
     detalle:
       "Los eritrocitos (glóbulos rojos) carecen de mitocondrias y obtienen toda su energía solo de la glucólisis.",
     fuente: "A5",
@@ -282,7 +282,7 @@ export const IDEAS: string[] = [
 
 /* ── Glosario (verbatim del glosario A5) ──────────────────────────────────── */
 export const GLOSARIO: { termino: string; definicion: string }[] = [
-  { termino: "Glucólisis", definicion: "Primera etapa de la respiración celular. Ocurre en el citosol. Convierte 1 glucosa (6C) en 2 piruvatos (3C) con ganancia neta de 2 ATP y 2 NADH. No requiere oxígeno; es la única vía energética en anaerobios estrictos." },
+  { termino: "Glucólisis", definicion: "Primera etapa de la respiración celular. Ocurre en el citosol. Convierte 1 glucosa (6C) en 2 piruvatos (3C) con ganancia neta de 2 ATP y 2 NADH. No requiere oxígeno; es la vía energética principal de muchos organismos anaerobios." },
   { termino: "Ciclo de Krebs (ciclo del ácido cítrico)", definicion: "Segunda etapa de la respiración aerobia. Ocurre en la matriz mitocondrial. El piruvato se convierte en acetil-CoA (2C) que ingresa al ciclo, produciendo por cada vuelta: 3 NADH, 1 FADH₂, 1 GTP (≈1 ATP) y 2 CO₂. Por glucosa: 2 vueltas = 6 NADH, 2 FADH₂, 2 ATP y 4 CO₂." },
   { termino: "Cadena de transporte de electrones y fosforilación oxidativa", definicion: "Tercera etapa. Ocurre en la membrana interna mitocondrial. Los electrones de NADH y FADH₂ pasan por proteínas (complejos I-IV) que bombean H⁺ al espacio intermembranoso. El flujo de H⁺ de regreso a través de la ATP sintasa genera ~32-34 ATP. El O₂ es el aceptor final de electrones, formando H₂O." },
   { termino: "Fase lumínica de la fotosíntesis", definicion: "Ocurre en las membranas de los tilacoides del cloroplasto. La luz solar excita la clorofila; los fotosistemas II y I captan fotones. El agua se fotoliza (H₂O → O₂ + H⁺ + e⁻) y los electrones energizados generan ATP (fotofosforilación) y NADPH. El O₂ se libera." },

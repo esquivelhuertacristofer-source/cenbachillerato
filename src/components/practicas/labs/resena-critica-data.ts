@@ -139,7 +139,7 @@ export const QUIZ: {
     retro: "Sí: la idea principal expresa la tesis o valoración central y las ideas secundarias la argumentan.",
   },
   {
-    pregunta: "La reseña crítica de una obra literaria puede prescindir completamente del análisis del movimiento literario al que pertenece.",
+    pregunta: "Situar la obra en su movimiento literario no aporta nada a una reseña crítica.",
     opciones: ["Verdadero", "Falso"],
     correcta: 1,
     retro: "No: contextualizar la obra en su movimiento literario enriquece la interpretación y da profundidad a la reseña.",

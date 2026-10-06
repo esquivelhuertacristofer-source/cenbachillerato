@@ -15,13 +15,13 @@ export const INECUACIONES_FICHA: FichaTeoricaData = {
 
   // Marco teórico — VERBATIM de los puntos_clave de la infografía A1.
   marcoTeorico: [
-    "Una inecuación es una expresión matemática que usa un símbolo de desigualdad (<, >, ≤, ≥) para comparar dos cantidades. A diferencia de una ecuación (solución única), la inecuación tiene un conjunto infinito de soluciones: un intervalo en una variable, o una región del plano en dos variables.",
+    "Una inecuación es una expresión matemática que usa un símbolo de desigualdad (<, >, ≤, ≥) para comparar dos cantidades. A diferencia de una ecuación lineal con una incógnita (que tiene una sola solución), una inecuación lineal suele tener un conjunto infinito de soluciones: un intervalo en una variable, o una región del plano en dos variables.",
     "Resolución de una inecuación lineal: se opera igual que una ecuación, con una excepción crítica — al multiplicar o dividir ambos lados por un número NEGATIVO, el signo de la desigualdad se invierte. Ejemplo: −2x > 6 → dividir entre −2 (negativo) → x < −3 (el signo cambia).",
     "Representación en recta numérica: punto abierto (○) si el valor límite NO está incluido (< o >); punto cerrado (●) si SÍ está incluido (≤ o ≥). La solución de x > 3 es ○ en 3 con flecha hacia la derecha.",
     "Representación en plano cartesiano: una inecuación con dos variables (como 2x + 3y ≤ 600) define un semiplano. La recta es la frontera; la región sombreada es el conjunto de soluciones. Si el símbolo es ≤ o ≥, la recta frontera está incluida (trazo continuo); si es < o >, está excluida (trazo punteado).",
     "Aplicación en presupuesto familiar: si un hogar mexicano tiene ingresos de $12,000 MXN al mes y el alquiler cuesta al menos $4,000 MXN, los gastos disponibles satisfacen: gastos_otros ≤ 8,000. La ENIGH 2022 del INEGI documenta que los hogares del 40% más pobre destinan más del 50% de su ingreso a alimentación — una restricción de desigualdad que define su espacio de opciones.",
-    "Inecuaciones en producción agrícola: un agricultor en Sonora tiene 100 hectáreas. Si quiere sembrar trigo (x ha) y maíz (y ha), la restricción de tierra es: x + y ≤ 100. Si necesita al menos 20 ha de trigo para cubrir costos mínimos: x ≥ 20. El sistema define la región factible — base matemática de la programación lineal que usa la SAGARPA en planificación agropecuaria.",
-    "Inecuaciones en normas técnicas: el Reglamento de Construcciones de la CDMX establece que la altura máxima en zona residencial tipo H es h ≤ 10 m, y que el área construida no exceda el 60% del terreno: área_construida ≤ 0.60 × área_terreno. Dos inecuaciones que todo arquitecto debe satisfacer simultáneamente antes de presentar un proyecto.",
+    "Inecuaciones en producción agrícola: un agricultor en Sonora tiene 100 hectáreas. Si quiere sembrar trigo (x ha) y maíz (y ha), la restricción de tierra es: x + y ≤ 100. Si necesita al menos 20 ha de trigo para cubrir costos mínimos: x ≥ 20. El sistema define la región factible — base matemática de la programación lineal que usa la SADER (antes SAGARPA) en planificación agropecuaria.",
+    "Inecuaciones en normas técnicas: los programas de desarrollo urbano de la CDMX asignan a cada predio una zonificación, por ejemplo H/3/40: como máximo 3 niveles (niveles ≤ 3) y al menos 40% de área libre, es decir, área_desplante ≤ 0.60 × área_terreno. Dos inecuaciones que todo arquitecto debe satisfacer simultáneamente antes de presentar un proyecto.",
     "La CONASAMI fija el salario mínimo como una inecuación: salario_pagado ≥ salario_mínimo. En la economía informal mexicana — que emplea a casi el 56% de los trabajadores (INEGI 2023) — esta inecuación frecuentemente no se cumple, lo que constituye una violación de la norma con consecuencias en pobreza y seguridad social.",
   ],
 
@@ -60,7 +60,7 @@ export const INECUACIONES_FICHA: FichaTeoricaData = {
 
   aplicaciones: [
     "Presupuesto familiar: los hogares del 40% más pobre destinan más del 50% de su ingreso a alimentación (ENIGH 2022, INEGI) — una restricción de desigualdad que define su espacio de opciones.",
-    "Producción agrícola en Sonora: restricciones de tierra (x + y ≤ 100 ha) y costos mínimos (x ≥ 20 ha de trigo) forman la región factible usada por la SAGARPA.",
+    "Producción agrícola en Sonora: restricciones de tierra (x + y ≤ 100 ha) y costos mínimos (x ≥ 20 ha de trigo) forman la región factible usada por la SADER (antes SAGARPA).",
     "Reglamento de Construcciones de la CDMX: altura máxima h ≤ 10 m y área construida ≤ 60% del terreno — inecuaciones con consecuencias legales.",
     "Salario mínimo (CONASAMI): salario_pagado ≥ salario_mínimo; en la economía informal mexicana (56% de los trabajadores, INEGI 2023) esta inecuación frecuentemente no se cumple.",
     "Empresas como FEMSA, Bimbo y Gruma usan programación lineal — sistemas de inecuaciones — para optimizar rutas de distribución, mezclas de materias primas y horarios de producción.",

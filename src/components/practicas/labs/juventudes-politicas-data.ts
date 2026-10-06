@@ -71,20 +71,20 @@ export const CONCEPTOS: { id: string; concepto: string; definicion: string; ejem
   {
     id: "co-cultural",
     concepto: "Participación cultural",
-    definicion: "Usar el arte, la música, el grafiti, las redes sociales o la cultura popular como medios para expresar demandas políticas, visibilizar injusticias y construir identidades colectivas.",
+    definicion: "Usar el arte, el grafiti o las redes para expresar demandas políticas.",
     ejemplo: "El rap que denuncia la violencia policial, los murales que reivindican derechos y los memes que critican al poder.",
   },
   {
     id: "co-comunitaria",
     concepto: "Participación comunitaria",
-    definicion: "Integrarse a brigadas comunitarias de limpieza, comités de seguridad vecinal, redes de ayuda mutua o proyectos culturales en el barrio o comunidad.",
+    definicion: "Integrarse a brigadas, comités vecinales o redes de ayuda mutua.",
     ejemplo: "Construye capital social y se reconoce en instrumentos como la Ley General de Desarrollo Social y la Ley de la Juventud de cada entidad.",
   },
   {
     id: "co-art35",
     concepto: "Artículo 35 de la CPEUM",
     definicion: "Establece que son derechos del ciudadano votar en las elecciones y consultas populares, poder ser votado para cargos de elección popular, y asociarse individual y libremente para tomar parte en los asuntos políticos del país.",
-    ejemplo: "El derecho a ser votado y a asociarse políticamente se adquiere al cumplir 18 años (ciudadanía plena).",
+    ejemplo: "Estos derechos se adquieren con la ciudadanía, a los 18 años; para ser votado, cada cargo fija además una edad mínima (por ejemplo, 25 años para senador y 35 para la Presidencia).",
   },
 ];
 
@@ -120,7 +120,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     id: "gl-activismo",
     termino: "Activismo digital",
     definicion: "Uso de plataformas y herramientas digitales para difundir causas, movilizar apoyos, organizar acciones colectivas y presionar a autoridades o empresas.",
-    ejemplo: "#FridaysForFuture comenzó con la campaña digital de Greta Thunberg y movilizó a millones de jóvenes en todo el mundo hacia la acción climática presencial.",
+    ejemplo: "#FridaysForFuture comenzó con la huelga escolar de Greta Thunberg frente al Parlamento sueco (2018), se difundió por redes sociales y movilizó a millones de jóvenes en todo el mundo hacia la acción climática presencial.",
   },
   {
     id: "gl-diversidad",

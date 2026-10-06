@@ -218,7 +218,7 @@ export const LECTURA_A1: string[] = [
   "La estadística nació de necesidades concretas de los estados modernos: contar a la población, medir la mortalidad, distribuir recursos. John Graunt, en 1662, publicó sus Observaciones Naturales y Políticas sobre las Listas de Mortalidad de Londres, considerado el primer análisis estadístico sistemático de la historia: a partir de los registros de muertes de la ciudad, identificó patrones de mortalidad según causas y estaciones del año. Florence Nightingale, en 1858, usó gráficas innovadoras de causas de muerte durante la guerra de Crimea para convencer al Parlamento británico de que las condiciones sanitarias, y no las batallas, eran la principal causa de muerte entre los soldados. Hoy, la estadística es la base de la medicina basada en evidencia, la economía, la educación y las políticas públicas.",
   "La estadística se divide en dos grandes ramas. La estadística descriptiva se ocupa de resumir, organizar y presentar datos de un conjunto observado: calcula promedios, elabora tablas, construye gráficas. No va más allá de los datos que tiene en mano. La estadística inferencial, en cambio, usa los resultados de una muestra para sacar conclusiones sobre una población más grande. Por ejemplo, una encuesta aplicada a 1,200 personas puede darnos información estadísticamente válida sobre las preferencias de millones de mexicanos, siempre que la muestra sea representativa.",
   "Para trabajar con estadística es fundamental comprender los tipos de variables. Las variables cualitativas describen categorías o atributos: pueden ser nominales (sin orden natural, como color de ojos, municipio de nacimiento o partido político) u ordinales (con orden definido, como nivel educativo: primaria, secundaria, bachillerato, licenciatura; o grado de satisfacción: muy insatisfecho, insatisfecho, neutral, satisfecho, muy satisfecho). Las variables cuantitativas expresan cantidades numéricas: pueden ser discretas (se cuentan en valores enteros, como número de hijos, número de materias reprobadas) o continuas (pueden tomar cualquier valor real dentro de un intervalo, como estatura, temperatura, tiempo).",
-  "En México existen fuentes de datos estadísticos de gran relevancia pública. El INEGI (Instituto Nacional de Estadística y Geografía) realiza el Censo de Población y Vivienda cada diez años y levanta la Encuesta Nacional de Ingresos y Gastos de los Hogares (ENIGH) periódicamente para medir condiciones de vida. El CONEVAL (Consejo Nacional de Evaluación de la Política de Desarrollo Social) mide la pobreza multidimensional en México usando datos del INEGI. El CONAPO (Consejo Nacional de Población) elabora proyecciones demográficas. La Secretaría de Salud, el IMSS y el ISSSTE generan datos sobre salud pública, mortalidad y enfermedades.",
+  "En México existen fuentes de datos estadísticos de gran relevancia pública. El INEGI (Instituto Nacional de Estadística y Geografía) realiza el Censo de Población y Vivienda cada diez años y levanta la Encuesta Nacional de Ingresos y Gastos de los Hogares (ENIGH) periódicamente para medir condiciones de vida. El CONEVAL (Consejo Nacional de Evaluación de la Política de Desarrollo Social) midió la pobreza multidimensional en México hasta 2025, cuando esa función pasó al INEGI usando datos del INEGI. El CONAPO (Consejo Nacional de Población) elabora proyecciones demográficas. La Secretaría de Salud, el IMSS y el ISSSTE generan datos sobre salud pública, mortalidad y enfermedades.",
   "Una distinción conceptual clave es la diferencia entre población y muestra. La población es el conjunto completo de todos los elementos de interés para el estudio: todos los mexicanos, todas las escuelas del país, todas las empresas de un sector. El Censo del INEGI intenta medir a toda la población cada diez años. Una muestra es un subconjunto de la población, seleccionado de forma representativa para inferir características del total. Las encuestas nacionales como la ENIGH trabajan con muestras de miles de hogares para estimar condiciones de millones.",
   "Finalmente, la ética en el manejo de datos es un tema urgente. La privacidad de los datos personales debe protegerse: los microdatos del INEGI están anonimizados para impedir identificar a personas concretas. Los sesgos de representación son otro problema serio: los grupos más marginalizados (comunidades indígenas en zonas de difícil acceso, personas en situación de calle, migrantes irregulares) frecuentemente quedan subcontados en los datos oficiales, lo que sesga las políticas diseñadas a partir de esos datos.",
 ];
@@ -321,69 +321,69 @@ export const QUIZ_A2: QuizEvaluable = {
     {
       enunciado: "¿Cuál es la diferencia principal entre la estadística descriptiva y la estadística inferencial?",
       opciones: [
-        "La descriptiva usa graficas y la inferencial solo usa numeros",
-        "La descriptiva resume y organiza los datos observados sin ir mas alla; la inferencial usa una muestra para sacar conclusiones sobre una poblacion mas grande",
+        "La descriptiva usa gráficas y la inferencial solo usa números",
+        "La descriptiva resume y organiza los datos observados sin ir más allá; la inferencial usa una muestra para sacar conclusiones sobre una población más grande",
         "La descriptiva es para datos cualitativos y la inferencial para datos cuantitativos",
-        "Son identicas; solo tienen nombres distintos segun el contexto en que se usan",
+        "Son idénticas; solo tienen nombres distintos según el contexto en que se usan",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "La estadistica descriptiva describe lo que hay en los datos sin extrapolacion: calcula medias, construye tablas y graficas del conjunto observado. La inferencial va mas alla: usa una muestra representativa para estimar parametros de la poblacion completa con un margen de error controlado. Por ejemplo, la ENIGH del INEGI usa una muestra de hogares para estimar las condiciones de vida de todos los hogares mexicanos.",
+        "La estadística descriptiva describe lo que hay en los datos sin extrapolación: calcula medias, construye tablas y gráficas del conjunto observado. La inferencial va más allá: usa una muestra representativa para estimar parámetros de la población completa con un margen de error controlado. Por ejemplo, la ENIGH del INEGI usa una muestra de hogares para estimar las condiciones de vida de todos los hogares mexicanos.",
     },
     {
       enunciado: "¿Cuál de las siguientes variables es cuantitativa continua?",
-      opciones: ["Numero de hijos en el hogar", "Nivel educativo (primaria, secundaria, bachillerato)", "Ingreso mensual en pesos del jefe de hogar", "Municipio de residencia del encuestado"],
+      opciones: ["Número de hijos en el hogar", "Nivel educativo (primaria, secundaria, bachillerato)", "Ingreso mensual en pesos del jefe de hogar", "Municipio de residencia del encuestado"],
       respuestaCorrecta: 2,
       retroalimentacion:
-        "El ingreso mensual en pesos puede tomar cualquier valor real positivo (por ejemplo, 8,750.50 pesos), por lo que es cuantitativa continua. El numero de hijos es cuantitativa discreta (solo enteros). El nivel educativo es cualitativa ordinal (tiene orden pero no es numerica). El municipio de residencia es cualitativa nominal (sin orden natural).",
+        "El ingreso mensual en pesos puede tomar cualquier valor real positivo (por ejemplo, 8,750.50 pesos), por lo que es cuantitativa continua. El número de hijos es cuantitativa discreta (solo enteros). El nivel educativo es cualitativa ordinal (tiene orden pero no es numérica). El municipio de residencia es cualitativa nominal (sin orden natural).",
     },
     {
-      enunciado: "¿Qué mide el CONEVAL en México y qué tipo de datos usa del INEGI?",
+      enunciado: "¿Qué medía el CONEVAL en México y qué tipo de datos usaba del INEGI?",
       opciones: [
-        "La inflacion mensual usando precios de la canasta basica",
+        "La inflación mensual usando precios de la canasta básica",
         "La pobreza multidimensional, usando datos de la ENIGH del INEGI sobre ingresos y acceso a servicios",
         "El desempleo trimestral mediante la ENOE",
-        "Las proyecciones de poblacion futura por estado y municipio",
+        "Las proyecciones de población futura por estado y municipio",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "El CONEVAL (Consejo Nacional de Evaluacion de la Politica de Desarrollo Social) mide la pobreza multidimensional en Mexico: considera tanto el ingreso como el acceso a derechos sociales (educacion, salud, seguridad social, alimentacion, vivienda). Para ello usa principalmente los datos de la ENIGH (Encuesta Nacional de Ingresos y Gastos de los Hogares) que levanta el INEGI cada dos anos.",
+        "El CONEVAL (Consejo Nacional de Evaluación de la Política de Desarrollo Social) medía, hasta 2025, la pobreza multidimensional en México: considera tanto el ingreso como el acceso a derechos sociales (educación, salud, seguridad social, alimentación, vivienda). Para ello usaba (y hoy usa el INEGI) principalmente los datos de la ENIGH (Encuesta Nacional de Ingresos y Gastos de los Hogares) que levanta el INEGI cada dos años.",
     },
     {
       enunciado: "En una encuesta del INEGI, ¿cuál es la diferencia entre la 'población' del estudio y la 'muestra'?",
       opciones: [
-        "La poblacion son los encuestadores y la muestra son las preguntas del cuestionario",
-        "La poblacion es el conjunto completo de todos los elementos de interes (todos los hogares mexicanos); la muestra es el subconjunto seleccionado para ser encuestado",
-        "La poblacion es la muestra mas grande y la muestra es la poblacion mas pequeña; son lo mismo con diferente nombre",
-        "La poblacion solo aplica al Censo y la muestra solo a encuestas urbanas",
+        "La población son los encuestadores y la muestra son las preguntas del cuestionario",
+        "La población es el conjunto completo de todos los elementos de interés (todos los hogares mexicanos); la muestra es el subconjunto seleccionado para ser encuestado",
+        "La población es la muestra más grande y la muestra es la población más pequeña; son lo mismo con diferente nombre",
+        "La población solo aplica al Censo y la muestra solo a encuestas urbanas",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "La poblacion es el universo completo de estudio: todos los hogares, todas las personas, o todas las empresas sobre las que se quiere obtener informacion. La muestra es el subconjunto representativo que realmente se encuesta. La ENIGH encuesta decenas de miles de hogares (muestra) para estimar condiciones de vida de los mas de 35 millones de hogares mexicanos (poblacion).",
+        "La población es el universo completo de estudio: todos los hogares, todas las personas, o todas las empresas sobre las que se quiere obtener información. La muestra es el subconjunto representativo que realmente se encuesta. La ENIGH encuesta decenas de miles de hogares (muestra) para estimar condiciones de vida de los más de 35 millones de hogares mexicanos (población).",
     },
     {
       enunciado: "¿Por qué los grupos marginalizados frecuentemente quedan subcontados en las estadísticas oficiales del INEGI?",
       opciones: [
-        "Porque el INEGI les hace cuestionarios mas cortos para ahorrar tiempo",
-        "Porque comunidades en zonas de dificil acceso, personas en situacion de calle y migrantes irregulares son mas dificiles de alcanzar con los metodos de levantamiento estandar, generando sesgos de representacion",
-        "Porque esas personas no tienen derecho a participar en las encuestas nacionales",
-        "Porque el INEGI deliberadamente los excluye para mejorar las estadisticas de pobreza",
+        "Porque el INEGI les hace cuestionarios más cortos para ahorrar tiempo",
+        "Porque comunidades en zonas de difícil acceso, personas en situación de calle y migrantes irregulares son más difíciles de alcanzar con los métodos de levantamiento estándar, generando sesgos de representación",
+        "Porque la ley no les reconoce el derecho a participar en las encuestas y censos nacionales",
+        "Porque el INEGI deliberadamente los excluye para mejorar las estadísticas de pobreza",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "El sesgo de representacion en datos oficiales ocurre por razones practicas y metodologicas: comunidades indigenas en zonas rurales de dificil acceso, personas sin domicilio fijo, trabajadores informales sin direccion registrada y migrantes en situacion irregular son grupos que los metodos de levantamiento estandar (basados en marcos muestrales de viviendas) dificultan alcanzar. Esto genera estadisticas que subestiman sus condiciones de vida y necesidades.",
+        "El sesgo de representación en datos oficiales ocurre por razones prácticas y metodológicas: comunidades indígenas en zonas rurales de difícil acceso, personas sin domicilio fijo, trabajadores informales sin dirección registrada y migrantes en situación irregular son grupos que los métodos de levantamiento estándar (basados en marcos muestrales de viviendas) dificultan alcanzar. Esto genera estadísticas que subestiman sus condiciones de vida y necesidades.",
     },
     {
       enunciado: "Florence Nightingale es considerada pionera de la estadística aplicada porque:",
       opciones: [
-        "Invento la formula para calcular la media aritmetica en 1858",
-        "Uso graficas innovadoras de causas de muerte durante la guerra de Crimea para convencer al Parlamento britanico de que las condiciones sanitarias, no las batallas, eran la principal causa de muerte entre soldados",
-        "Fundo el primer departamento de estadistica oficial de Gran Bretana en el siglo XIX",
-        "Publico las primeras tablas de mortalidad de Londres en 1662",
+        "Inventó la fórmula para calcular la media aritmética en 1858",
+        "Usó gráficas innovadoras de causas de muerte durante la guerra de Crimea para convencer al Parlamento británico de que las condiciones sanitarias, no las batallas, eran la principal causa de muerte entre soldados",
+        "Fundó el primer departamento de estadística oficial de Gran Bretaña en el siglo XIX",
+        "Publicó las primeras tablas de mortalidad de Londres en 1662",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "Nightingale uso visualizacion de datos (sus famosos diagramas de area polar o 'diagramas de rosa') para mostrar que la mayoria de las muertes de soldados britanicos en Crimea se debian a enfermedades infecciosas prevenibles con mejores condiciones sanitarias, no a heridas de batalla. Este uso estrategico de estadisticas graficas para influir en politicas publicas la convierte en una de las fundadoras de la estadistica aplicada. Las tablas de mortalidad de 1662 son obra de John Graunt.",
+        "Nightingale usó visualización de datos (sus famosos diagramas de área polar o 'diagramas de rosa') para mostrar que la mayoría de las muertes de soldados británicos en Crimea se debían a enfermedades infecciosas prevenibles con mejores condiciones sanitarias, no a heridas de batalla. Este uso estratégico de estadísticas gráficas para influir en políticas públicas la convierte en una de las fundadoras de la estadística aplicada. Las tablas de mortalidad de 1662 son obra de John Graunt.",
     },
   ],
 };

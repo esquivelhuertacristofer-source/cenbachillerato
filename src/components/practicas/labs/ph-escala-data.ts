@@ -57,7 +57,7 @@ export const QUIZ_A2: QuizEvaluable = {
     },
     {
       // respuesta: true → respuestaCorrecta: 0 ("Verdadero")
-      enunciado: "La neutralización de un ácido con una base siempre produce sal y agua.",
+      enunciado: "La neutralización de un ácido como el HCl con un hidróxido como el NaOH produce sal y agua.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 0,
       retroalimentacion:

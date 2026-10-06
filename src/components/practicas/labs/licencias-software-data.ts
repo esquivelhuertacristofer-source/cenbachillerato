@@ -93,7 +93,7 @@ export const QUIZ: QuizItem[] = [
     pregunta: "¿Cuál es la característica principal del software propietario?",
     opciones: [
       "Se puede modificar libremente",
-      "Su código fuente es secreto y no puede redistribuirse sin autorización",
+      "Su código fuente es cerrado",
       "Es siempre gratuito",
       "Solo funciona en Linux",
     ],
@@ -120,8 +120,8 @@ export const QUIZ: QuizItem[] = [
   {
     pregunta: "¿Qué significa que un programa es 'de código abierto'?",
     opciones: [
-      "Que es gratuito siempre",
-      "Que puedes ver, modificar y distribuir su código fuente",
+      "Que siempre es gratuito para todos",
+      "Que puedes estudiar y modificar su código",
       "Que solo funciona en internet",
       "Que no tiene derechos de autor",
     ],

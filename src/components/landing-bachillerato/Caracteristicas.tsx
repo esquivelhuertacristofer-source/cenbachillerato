@@ -21,7 +21,7 @@ const CARACTERISTICAS = [
   },
   {
     icono: "🔐",
-    titulo: "LFPDPPP + INAI",
+    titulo: "LFPDPPP 2025",
     descripcion: "Gestión de datos personales conforme a la Ley Federal de Protección de Datos.",
   },
   {

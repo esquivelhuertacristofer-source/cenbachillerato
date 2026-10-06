@@ -50,7 +50,7 @@ export const FUENTE =
 /** Las tres pistas de la reflexión A3, verbatim. */
 export const PISTAS_A3: string[] = [
   "¿Qué muestras en tus redes que no mostrarías en persona y viceversa?",
-  "¿Cómo reacciones cuando alguien es agresivo contigo o con otros en línea?",
+  "¿Cómo reaccionas cuando alguien es agresivo contigo o con otros en línea?",
   "¿Qué aspecto de tu identidad te importa más proteger o proyectar en digital?",
 ];
 
@@ -833,7 +833,7 @@ export const QUIZ: QuizEvaluable = {
       enunciado: "¿Qué significa que las identidades digitales 'se construyen'?",
       opciones: [
         "Que son completamente falsas",
-        "Que decidimos conscientemente qué mostramos, cómo nos presentamos y con quién interactuamos",
+        "Que elegimos qué mostrar y cómo presentarnos",
         "Que solo existen en las redes sociales",
         "Que no reflejan nuestra personalidad real",
       ],
@@ -844,7 +844,7 @@ export const QUIZ: QuizEvaluable = {
       enunciado: "¿Qué es la empatía digital?",
       opciones: [
         "Compartir mucho contenido de otros para apoyarlos",
-        "Ponerse en el lugar del otro en entornos virtuales y reconocer el impacto de las palabras digitales",
+        "Ponerse en el lugar del otro también en línea",
         "Tener muchos seguidores en redes",
         "Responder a todos los comentarios que te hacen",
       ],

@@ -31,7 +31,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Por qué el ciclo del fósforo es diferente a los ciclos del carbono y del nitrógeno?",
       opciones: [
         "Porque el fósforo es un gas a temperatura ambiente",
-        "Porque el fósforo no tiene una fase atmosférica significativa; circula principalmente entre la litosfera, el suelo y los seres vivos",
+        "Porque el fósforo no tiene una fase atmosférica significativa",
         "Porque el fósforo solo existe en los océanos",
         "Porque los microorganismos no participan en el ciclo del fósforo",
       ],
@@ -53,7 +53,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Qué papel juegan los hongos y las bacterias en los ciclos biogeoquímicos?",
       opciones: [
         "Solo perjudican los ciclos al consumir nutrientes",
-        "Son descomponedores que liberan nutrientes de la materia orgánica muerta, haciéndolos disponibles para los productores",
+        "Liberan nutrientes al descomponer la materia orgánica muerta",
         "Solo intervienen en el ciclo del nitrógeno",
         "No tienen un papel relevante en los ciclos biogeoquímicos",
       ],

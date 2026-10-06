@@ -64,7 +64,7 @@ export const QUIZ_A2: QuizEvaluable = {
       ],
       respuestaCorrecta: 2, // "y = -½x² + 4x" — coeficiente a=-½<0
       retroalimentacion:
-        "Una parábola y = ax² + bx + c abre hacia abajo cuando a < 0. En y = -½x² + 4x, el coeficiente a = -½ < 0, por lo que abre hacia abajo y tiene un máximo. La opción b es una circunferencia; c y d tienen a > 0 (abren hacia arriba).",
+        "Una parábola y = ax² + bx + c abre hacia abajo cuando a < 0. En y = -½x² + 4x, el coeficiente a = -½ < 0, por lo que abre hacia abajo y tiene un máximo. La opción b es una circunferencia; las opciones a y d tienen coeficiente principal positivo (abren hacia arriba).",
     },
     {
       enunciado:
@@ -72,7 +72,7 @@ export const QUIZ_A2: QuizEvaluable = {
       opciones: [
         "Las ventanas circulares de los aviones",
         "Las antenas parabólicas satelitales y los espejos de telescopios reflectores",
-        "Los arcos de los puentes colgantes (que son catenarias, no parábolas)",
+        "Los cables de los puentes colgantes que sostienen el tablero",
         "Las pantallas curvas de televisores OLED",
       ],
       respuestaCorrecta: 1, // "Las antenas parabólicas satelitales y los espejos de telescopios reflectores"

@@ -289,7 +289,7 @@ function ContinuarCardBienvenida({ nombre }: { nombre: string }) {
             <span style={{ color: "#7DD3FC" }}>Tu semestre te espera.</span>
           </h2>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", margin: 0, lineHeight: 1.70, maxWidth: 420 }}>
-            7 áreas de aprendizaje diseñadas para este semestre. Elegí cualquier materia y comenzá tu camino.
+            7 áreas de aprendizaje diseñadas para este semestre. Elige cualquier materia y comienza tu camino.
           </p>
         </div>
 

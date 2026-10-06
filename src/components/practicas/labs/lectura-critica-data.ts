@@ -65,7 +65,7 @@ export const PREGUNTAS_A1: { pregunta: string; respuesta: string }[] = [
   },
   {
     pregunta: "¿Qué es el sentido global del texto?",
-    respuesta: "El propósito comunicativo, el lector al que va dirigido y el efecto que busca producir.",
+    respuesta: "Su propósito, destinatario y efecto en conjunto.",
   },
 ];
 
@@ -928,7 +928,7 @@ export const QUIZ: QuizEvaluable = {
       enunciado: "Identificar la postura del autor implica:",
       opciones: [
         "Buscar errores ortográficos o gramaticales",
-        "Reconocer su punto de vista, valores y qué perspectivas omite deliberadamente",
+        "Reconocer su punto de vista y sus valores",
         "Contar cuántas veces repite una idea",
         "Traducir sus metáforas a lenguaje literal",
       ],
@@ -940,7 +940,7 @@ export const QUIZ: QuizEvaluable = {
       enunciado: "¿Qué distingue a un lector crítico de uno literal?",
       opciones: [
         "El lector crítico solo lee textos académicos",
-        "El lector crítico cuestiona, interpreta y evalúa; el literal solo extrae lo que el texto dice explícitamente",
+        "El crítico evalúa; el literal solo extrae lo explícito",
         "El lector crítico desconfía de todo lo escrito",
         "No hay diferencia real entre ambos tipos de lectura",
       ],
@@ -952,7 +952,7 @@ export const QUIZ: QuizEvaluable = {
       enunciado: "El 'sentido global del texto' se refiere a:",
       opciones: [
         "La extensión total del texto",
-        "El propósito comunicativo, el lector al que va dirigido y el efecto que busca producir",
+        "Su propósito, destinatario y efecto en conjunto",
         "El número de ideas que contiene",
         "El vocabulario más difícil del texto",
       ],

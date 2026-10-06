@@ -35,7 +35,7 @@ export const FALACIAS_LOGICA_FICHA: FichaTeoricaData = {
   glosario: [
     { termino: "Proposición", definicion: "Enunciado declarativo que puede ser verdadero o falso. Es la unidad mínima del razonamiento lógico." },
     { termino: "Silogismo", definicion: "Forma de razonamiento deductivo compuesta por una premisa mayor, una premisa menor y una conclusión que se sigue necesariamente." },
-    { termino: "Deducción", definicion: "Razonamiento que parte de principios o premisas generales para obtener una conclusión particular necesaria." },
+    { termino: "Deducción", definicion: "Razonamiento en el que la conclusión se sigue necesariamente de las premisas: si estas son verdaderas, la conclusión no puede ser falsa." },
     { termino: "Inducción", definicion: "Razonamiento que a partir de casos particulares observados infiere una generalización probable." },
     { termino: "Falacia", definicion: "Argumento que parece válido pero contiene un error lógico o una trampa retórica. Puede ser formal (estructural) o informal (contextual)." },
     { termino: "Tabla de verdad", definicion: "Herramienta que lista todos los valores posibles de proposiciones simples y calcula el valor de verdad de proposiciones compuestas (∧, ∨, →, ↔)." },

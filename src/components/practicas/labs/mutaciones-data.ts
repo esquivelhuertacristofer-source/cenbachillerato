@@ -489,7 +489,7 @@ export const GLOSARIO: GlosarioItem[] = [
   {
     termino: "Mutaciones germinales vs somáticas",
     definicion:
-      "Germinales: ocurren en células de la línea germinal (gametos); son heredables y afectan a toda la descendencia. Somáticas: ocurren en células del cuerpo del individuo; no son heredables, pero pueden causar cáncer si afectan genes reguladores del ciclo celular (proto-oncogenes, genes supresores de tumor).",
+      "Germinales: ocurren en células de la línea germinal (gametos); son heredables y pueden transmitirse a la descendencia. Somáticas: ocurren en células del cuerpo del individuo; no son heredables, pero pueden causar cáncer si afectan genes reguladores del ciclo celular (proto-oncogenes, genes supresores de tumor).",
     ejemplo:
       "La fibrosis quística (mutación germinal del gen CFTR) se hereda. El melanoma surge de mutaciones somáticas en células de la piel inducidas por UV.",
   },
@@ -566,7 +566,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "Las mutaciones germinales se diferencian de las somáticas porque:",
       opciones: [
         "Son siempre dañinas y causan cáncer",
-        "Ocurren en células reproductoras y pueden transmitirse a la descendencia",
+        "Pueden transmitirse a la descendencia",
         "Solo afectan a células musculares",
         "No alteran la secuencia del ADN",
       ],

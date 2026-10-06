@@ -527,7 +527,7 @@ export const TITULO_A1 = "Matriz energética de México: renovables, no renovabl
 
 /** Contexto mexicano de la infografía A1 — verbatim (2 párrafos). */
 export const CONTEXTO_A1: string[] = [
-  "México tiene uno de los mayores potenciales de energía renovable del mundo: el norte es de los lugares con más radiación solar del planeta, el Istmo de Tehuantepec tiene vientos de clase 7 (los más intensos clasificados), y su posición geotectónica le da un enorme recurso geotérmico. Sin embargo, la transición energética es lenta y políticamente compleja: Pemex y CFE son empresas estratégicas del Estado con millones de trabajadores y décadas de inversión acumulada.",
+  "México tiene uno de los mayores potenciales de energía renovable del mundo: el norte es de los lugares con más radiación solar del planeta, el Istmo de Tehuantepec tiene vientos de clase 7 (los más intensos clasificados), y su posición geotectónica le da un enorme recurso geotérmico. Sin embargo, la transición energética es lenta y políticamente compleja: Pemex y CFE son empresas estratégicas del Estado con cientos de miles de trabajadores y décadas de inversión acumulada.",
   "El INECC proyecta que, sin una aceleración en la transición energética, México no cumplirá sus compromisos del Acuerdo de París para 2030. Al mismo tiempo, la llegada de inversión industrial por nearshoring —que requiere garantías de suministro eléctrico limpio para cumplir estándares ESG de sus clientes norteamericanos— presiona al gobierno a expandir la capacidad de generación renovable, especialmente en los estados del norte.",
 ];
 
@@ -535,11 +535,11 @@ export const CONTEXTO_A1: string[] = [
 export const PUNTOS_A1: string[] = [
   "Composición actual de la generación eléctrica en México: ~75% combustibles fósiles (gas natural, petróleo, carbón), ~10% hidroeléctrica, ~7% eólica, ~4% solar, ~1.5% geotérmica, resto nuclear y otras (SENER 2024).",
   "Petróleo: México produjo 1.8 millones de barriles diarios en 2023 (Pemex). Los principales campos están en el Golfo (Campeche, Tabasco, Veracruz). La producción ha caído desde el pico histórico de 3.4 mbd en 2004.",
-  "Hidroeléctrica: segunda fuente de generación renovable. Las presas de Chiapas (Angostura, Malpaso) y Guerrero generan la mayor parte. Riesgo creciente por sequías intensificadas por el cambio climático.",
-  "Eólica: México tiene el mayor corredor eólico de América Latina en el Istmo de Tehuantepec (La Ventosa, La Venta). Oaxaca concentra el 70% de la capacidad instalada eólica del país.",
-  "Solar: México recibe entre 4.4 y 6.3 kWh/m²/día de radiación solar. Sonora, Chihuahua y Baja California tienen el mayor potencial solar del planeta. La capacidad instalada solar creció 300% entre 2018 y 2023.",
-  "Geotermia: México es el quinto productor mundial de energía geotérmica. Los campos Los Humeros (Puebla) y Cerro Prieto (Baja California) son los principales. Recurso disponible las 24 horas, sin variabilidad climática.",
-  "Compromiso del Acuerdo de París: en su Contribución Determinada a Nivel Nacional, México se comprometió a reducir sus emisiones de gases de efecto invernadero un 22% (hasta 36% con apoyo internacional) para 2030. Por separado, la Ley de Transición Energética fijó la meta de 35% de generación eléctrica limpia para 2024 (aún no alcanzada).",
+  "Hidroeléctrica: una de las principales fuentes de generación renovable. Las presas de Chiapas (Angostura, Malpaso) y Guerrero generan la mayor parte. Riesgo creciente por sequías intensificadas por el cambio climático.",
+  "Eólica: México tiene el mayor corredor eólico de América Latina en el Istmo de Tehuantepec (La Ventosa, La Venta). Oaxaca concentra más de un tercio de la capacidad instalada eólica del país.",
+  "Solar: México recibe entre 4.4 y 6.3 kWh/m²/día de radiación solar. Sonora, Chihuahua y Baja California están entre las regiones con mayor potencial solar del planeta. La capacidad instalada solar creció 300% entre 2018 y 2023.",
+  "Geotermia: México está entre los diez mayores productores mundiales de energía geotérmica. Los campos Los Humeros (Puebla) y Cerro Prieto (Baja California) son los principales. Recurso disponible las 24 horas, sin variabilidad climática.",
+  "Compromiso del Acuerdo de París: en su Contribución Determinada a Nivel Nacional, México se comprometió (actualización de 2022) a reducir sus emisiones de gases de efecto invernadero un 35% (hasta 40% con apoyo internacional) para 2030. Por separado, la Ley de Transición Energética fijó la meta de 35% de generación eléctrica limpia para 2024 (aún no alcanzada).",
   "Debate soberanía energética vs. transición: la política energética de México privilegia el fortalecimiento de Pemex y CFE como empresas del Estado. El debate entre soberanía energética y transición acelerada a renovables define el futuro del sector.",
   "Nearshoring y demanda energética: la llegada de nuevas plantas industriales por nearshoring aumenta la demanda de electricidad en el norte de México, presionando la capacidad de generación y la necesidad de nuevas plantas.",
 ];
@@ -556,8 +556,8 @@ export const ACTIVIDAD_POST_A1 =
 
 /** Glosario de la infografía A1 — verbatim. */
 export const GLOSARIO_A1: { termino: string; definicion: string }[] = [
-  { termino: "Matriz energética", definicion: "Distribución porcentual de las distintas fuentes de energía que un país usa para generar electricidad y calefacción. Refleja decisiones políticas, geográficas y económicas." },
-  { termino: "Energía geotérmica", definicion: "Energía producida aprovechando el calor interno de la Tierra. Se extrae perforando pozos en zonas volcánicamente activas y usando el vapor para mover turbinas. México es el 5° productor mundial." },
+  { termino: "Matriz energética", definicion: "Distribución porcentual de las distintas fuentes de energía que un país usa (electricidad, transporte, industria y hogares). Refleja decisiones políticas, geográficas y económicas." },
+  { termino: "Energía geotérmica", definicion: "Energía producida aprovechando el calor interno de la Tierra. Se extrae perforando pozos en zonas volcánicamente activas y usando el vapor para mover turbinas. México está entre los diez mayores productores mundiales." },
   { termino: "Capacidad instalada", definicion: "Potencia máxima de generación eléctrica que puede producir una planta o un país en condiciones óptimas. Se mide en megawatts (MW) o gigawatts (GW). Diferente de la generación real, que depende de condiciones climáticas." },
   { termino: "Soberanía energética", definicion: "Principio político que defiende el control estatal sobre los recursos y la producción de energía de un país, priorizando la autonomía frente a empresas extranjeras o mercados internacionales." },
   { termino: "ESG (Environmental, Social, Governance)", definicion: "Estándares internacionales que evalúan a las empresas según su desempeño ambiental, social y de gobernanza. Empresas con presencia en México exigen energía renovable (ESG ambiental) para cumplir compromisos con sus clientes globales." },
@@ -621,7 +621,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "La energía geotérmica solo se puede generar en países con volcanes activos como Islandia y no en México.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 1,
-      retroalimentacion: "México es el 5º productor mundial de energía geotérmica; los campos de Los Humeros (Puebla) y Cerro Prieto (Baja California) son relevantes a nivel mundial.",
+      retroalimentacion: "México está entre los diez mayores productores mundiales de energía geotérmica; los campos de Los Humeros (Puebla) y Cerro Prieto (Baja California) son relevantes a nivel mundial.",
     },
     {
       enunciado: "Las fuentes de energía renovable no emiten ningún tipo de gases de efecto invernadero en todo su ciclo de vida.",
@@ -639,7 +639,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "México ha cumplido ya el 100% de su generación eléctrica con fuentes renovables.",
       opciones: ["Verdadero", "Falso"],
       respuestaCorrecta: 1,
-      retroalimentacion: "México aún genera aproximadamente el 80% de su electricidad con combustibles fósiles; las renovables representan alrededor del 20% aunque van en aumento.",
+      retroalimentacion: "México aún genera alrededor del 75% de su electricidad con combustibles fósiles; las fuentes limpias representan cerca del 25% (las renovables, unos 20-22%) y van en aumento.",
     },
     {
       enunciado: "La energía hidroeléctrica es una fuente renovable pero puede tener impactos ambientales negativos como inundación de ecosistemas.",

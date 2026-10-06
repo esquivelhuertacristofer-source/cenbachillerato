@@ -19,7 +19,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Qué distingue un bioma de un ecosistema?",
       opciones: [
         "Un bioma es microscópico; un ecosistema es macroscópico",
-        "Un bioma es una región geográfica amplia con clima y vegetación característica; un ecosistema incluye la comunidad biótica y el entorno abiótico a cualquier escala",
+        "El bioma es una gran región por clima y vegetación; el ecosistema, de cualquier escala",
         "Son sinónimos perfectos",
         "Un ecosistema solo aplica al mar; un bioma, a la tierra",
       ],
@@ -37,7 +37,7 @@ export const QUIZ_A2: QuizEvaluable = {
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "México comparte el título de megadiverso con solo 17 países del mundo que juntos albergan más del 70% de la biodiversidad del planeta. La combinación de climas, topografía y su posición biogeográfica explican esta riqueza.",
+        "México es uno de los 17 países megadiversos del mundo, que juntos albergan más del 70% de la biodiversidad del planeta. La combinación de climas, topografía y su posición biogeográfica explican esta riqueza.",
     },
     {
       enunciado: "¿Cuál de estos factores abióticos es determinante para distinguir un desierto de una selva tropical?",
@@ -55,7 +55,7 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Qué son los servicios ecosistémicos?",
       opciones: [
         "Empresas que limpian ecosistemas contaminados",
-        "Los beneficios que los ecosistemas proporcionan a las sociedades humanas (alimentos, agua limpia, regulación del clima, polinización)",
+        "Los beneficios que los ecosistemas brindan a las personas",
         "Los servicios turísticos en áreas naturales protegidas",
         "Las actividades económicas que se realizan dentro de un ecosistema",
       ],

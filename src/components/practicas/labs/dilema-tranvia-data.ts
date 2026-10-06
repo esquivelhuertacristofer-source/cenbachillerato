@@ -765,7 +765,7 @@ export const GLOSARIO: { termino: string; definicion: string; ejemplo: string }[
   { termino: "Moral", definicion: "Conjunto de normas, valores y costumbres que orientan la conducta en una comunidad.", ejemplo: "Las normas de honestidad aprendidas en casa." },
   { termino: "Justicia", definicion: "Valor que busca dar a cada quien lo que le corresponde y un trato equitativo.", ejemplo: "Repartir cargas y beneficios de forma equitativa." },
   { termino: "Libertad", definicion: "Capacidad de decidir y actuar de forma responsable, asumiendo sus consecuencias.", ejemplo: "Elegir con base en razones propias." },
-  { termino: "Dilema moral", definicion: "Situación en la que valores o deberes entran en conflicto y obligan a decidir.", ejemplo: "Decir la verdad aunque dañe a alguien." },
+  { termino: "Dilema moral", definicion: "Situación en la que valores o deberes entran en conflicto y obligan a decidir.", ejemplo: "¿Decir la verdad aunque dañe a un amigo, o callar para protegerlo?" },
 ];
 
 /** Debate A3 — verbatim. */

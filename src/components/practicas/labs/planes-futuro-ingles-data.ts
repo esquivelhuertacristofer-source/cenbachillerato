@@ -964,12 +964,12 @@ export const HUECOS_A2: TextoHuecosData = {
     " wait for you.",
   ],
   huecos: [
-    { respuesta: "is going to", alternativas: ["'s going to"], pista: "Predicción basada en evidencia visible (nubes oscuras) → be going to" },
-    { respuesta: "will", alternativas: ["'ll"], pista: "Decisión espontánea tomada en el momento de hablar → will" },
-    { respuesta: "is going to", alternativas: ["'s going to"], pista: "Plan decidido antes de este momento (ya aplicó) → be going to" },
-    { respuesta: "will", alternativas: ["'ll"], pista: "Decisión no tomada aún, espontánea o tentativa → will" },
-    { respuesta: "Will", alternativas: ["will"], pista: "Ofrecimiento espontáneo o decisión inmediata → will" },
-    { respuesta: "will", alternativas: ["'ll"], pista: "Promesa o decisión espontánea en el momento → will" },
+    { respuesta: "is going to", alternativas: ["'s going to"], pista: "Predicción basada en evidencia visible (nubes oscuras)" },
+    { respuesta: "will", alternativas: ["'ll"], pista: "Decisión espontánea tomada en el momento de hablar" },
+    { respuesta: "is going to", alternativas: ["'s going to"], pista: "Plan decidido antes de este momento (ya aplicó)" },
+    { respuesta: "will", alternativas: ["'ll"], pista: "Decisión tentativa, todavía no tomada ('maybe')" },
+    { respuesta: "Will", alternativas: ["will"], pista: "Pregunta sobre la decisión inmediata de la otra persona (el auxiliar de futuro va al inicio)" },
+    { respuesta: "will", alternativas: ["'ll"], pista: "Promesa o decisión espontánea en el momento" },
   ],
 };
 

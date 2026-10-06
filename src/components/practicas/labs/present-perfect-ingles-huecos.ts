@@ -21,7 +21,7 @@ export const PRESENT_PERFECT_INGLES_HUECOS: TextoHuecosData = {
     " a science project for the school community.",
   ],
   huecos: [
-    { respuesta: "have", alternativas: ["'ve"], pista: "Present perfect: have/has + past participle. 'I ___ always been...' — usa la forma correcta de 'have' para 'I'" },
+    { respuesta: "have", alternativas: ["'ve"], pista: "Present perfect: auxiliar + past participle. 'I ___ always been...' — ¿qué auxiliar corresponde a 'I'?" },
     { respuesta: "did", alternativas: ["completed","performed","carried out"], pista: "Past simple — evento específico en el pasado ('When I was...')" },
     { respuesta: "have", alternativas: ["'ve"], pista: "'Since then' → present perfect. 'I ___ taken' — ¿cuál es el auxiliar?" },
     { respuesta: "participated", alternativas: ["took part"], pista: "'Last year' → pasado simple. 'I ___ in a science fair'" },

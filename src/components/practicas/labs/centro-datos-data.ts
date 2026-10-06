@@ -843,11 +843,11 @@ export const QUIZ_A2: QuizEvaluable = {
       enunciado: "¿Qué significa que las apps 'gratuitas' en realidad se pagan con datos?",
       opciones: ["Que hay un cargo oculto en la factura telefónica", "Que la información personal del usuario es el producto que se vende a anunciantes", "Que debes compartir la app con amigos para usarla gratis", "Que tienes que ver anuncios sin saltarlos"],
       respuestaCorrecta: 1,
-      retroalimentacion: "El modelo de negocio de muchas apps gratuitas es vender datos de usuarios a anunciantes.",
+      retroalimentacion: "El modelo de negocio de muchas apps gratuitas se basa en los datos de sus usuarios: los usan para venderles a los anunciantes publicidad dirigida y, en algunos casos, los comparten o venden a terceros.",
     },
     {
       enunciado: "¿Qué es el 'colonialismo de datos' según el tema estudiado?",
-      opciones: ["Una forma de piratería de software", "La extracción de datos de usuarios de países en desarrollo por plataformas de países del Norte Global", "El robo de contraseñas", "La exportación ilegal de computadoras"],
+      opciones: ["Una forma de piratería de software comercial", "La extracción de datos del Sur por plataformas del Norte", "El robo de contraseñas de cuentas bancarias", "La exportación ilegal de computadoras usadas"],
       respuestaCorrecta: 1,
       retroalimentacion: "El colonialismo de datos es la extracción de información de millones de personas de países como México por plataformas extranjeras.",
     },

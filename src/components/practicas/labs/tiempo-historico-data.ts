@@ -86,7 +86,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     id: "gl-calendario",
     termino: "Calendario",
     definicion: "Sistema de organización del tiempo que divide el año en meses, semanas y días, basado en ciclos astronómicos (solar, lunar o lunisolar). Cada cultura ha desarrollado el suyo.",
-    ejemplo: "El calendario gregoriano, usado mundialmente, se basa en el año solar de 365.25 días; el calendario maya Haab también usaba 365 días pero integrado en un sistema ritual.",
+    ejemplo: "El calendario gregoriano, usado mundialmente, se basa en el año solar, con una duración media de 365.2425 días; el calendario maya Haab también usaba 365 días pero integrado en un sistema ritual.",
   },
   {
     id: "gl-braudel",

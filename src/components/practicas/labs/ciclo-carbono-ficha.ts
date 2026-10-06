@@ -18,8 +18,8 @@ export const CICLO_CARBONO_FICHA: FichaTeoricaData = {
   marcoTeorico: [
     "Los ciclos biogeoquímicos mueven materiales entre cuatro reservorios: la atmósfera, la hidrosfera, la litosfera y la biosfera. La energía solar y la gravedad son los motores que mantienen activos estos ciclos.",
     "El ciclo del carbono en equilibrio: las plantas absorben CO₂ por fotosíntesis, los animales lo liberan por respiración, los descomponedores lo devuelven al suelo. La actividad humana añade ~37 Gt de CO₂ adicional por año, cantidad que los ecosistemas no reabsorben al ritmo actual.",
-    "México emite aproximadamente 750 millones de toneladas de CO₂ equivalente por año (INECC 2022), el 1.4% de las emisiones globales. El 25% proviene de la deforestación y cambio de uso de suelo —una de las proporciones más altas entre economías emergentes.",
-    "La Cuenca Lerma-Chapala, la más importante del centro del país, ha perdido el 74% de su caudal natural entre 1940 y 2020 por sobrexplotación agrícola e industrial. El Lago de Chapala alcanzó su nivel mínimo histórico en 2021 con apenas el 27% de capacidad.",
+    "México emite aproximadamente 750 millones de toneladas de CO₂ equivalente por año (INECC 2022), el 1.4% de las emisiones globales. Las principales fuentes son el transporte, la generación de electricidad y la industria; la deforestación y el cambio de uso de suelo también liberan CO₂ y reducen la capacidad de los sumideros forestales.",
+    "La Cuenca Lerma-Chapala, la más importante del centro del país, ha perdido el 74% de su caudal natural entre 1940 y 2020 por sobrexplotación agrícola e industrial. El Lago de Chapala tocó su mínimo histórico en 1955 (cerca del 10% de su capacidad), estuvo de nuevo muy cerca en 2002 (alrededor del 14%) y en sequías recientes, como las de 2021 y 2024, volvió a bajar a niveles preocupantes.",
     "El ciclo del nitrógeno está siendo alterado por el uso masivo de fertilizantes: México aplica ~2 millones de toneladas anuales de fertilizantes nitrogenados. El nitrógeno no absorbido se lixivia al agua subterránea o escurre a ríos causando eutrofización.",
     "La eutrofización —enriquecimiento de nutrientes en cuerpos de agua— provoca floraciones de algas que consumen el oxígeno disuelto y matan peces. El lago Catemaco en Veracruz y la Bahía de Banderas son ejemplos recurrentes de este fenómeno en México.",
     "El ciclo del fósforo es el más lento: el fósforo no tiene fase gaseosa, circula exclusivamente entre suelos, agua y seres vivos. Las reservas mundiales de roca fosfática podrían agotarse en 300–400 años según estimaciones del USGS.",
@@ -56,7 +56,7 @@ export const CICLO_CARBONO_FICHA: FichaTeoricaData = {
   glosario: [
     { termino: "Ciclo biogeoquímico", definicion: "Movimiento continuo de elementos químicos entre los componentes bióticos y abióticos de la biosfera." },
     { termino: "Evapotranspiración", definicion: "Suma de la evaporación del agua superficial y la transpiración de las plantas; incorpora vapor de agua a la atmósfera." },
-    { termino: "Fijación de nitrógeno", definicion: "Conversión del N₂ atmosférico en amonio (NH₄⁺) o nitratos por bacterias fijadoras, haciéndolo asimilable para las plantas." },
+    { termino: "Fijación de nitrógeno", definicion: "Conversión del N₂ atmosférico en amoníaco o amonio (NH₃/NH₄⁺) por bacterias fijadoras, haciéndolo asimilable para las plantas." },
     { termino: "Denitrificación", definicion: "Proceso bacteriano que convierte nitratos (NO₃⁻) de nuevo en N₂ gaseoso, completando el ciclo del nitrógeno." },
     { termino: "Ciclo del fósforo", definicion: "Ciclo sin fase gaseosa significativa; el P se libera por erosión de rocas, pasa al suelo y agua, y es absorbido por plantas y animales." },
     { termino: "Sumidero de carbono", definicion: "Reservorio que absorbe más CO₂ del que libera, reduciendo su concentración en la atmósfera." },

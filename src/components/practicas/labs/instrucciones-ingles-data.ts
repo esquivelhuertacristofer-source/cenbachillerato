@@ -686,7 +686,7 @@ export const QUIZ_A3: QuizEvaluable = {
       enunciado: "'___ that, let the dough rest for 30 minutes.' Which connector fits best?",
       opciones: ["Suddenly", "First", "After", "In the end"],
       respuestaCorrecta: 2,
-      retroalimentacion: "'After that' (often shortened to 'after') connects sequential steps in instructions.",
+      retroalimentacion: "'After that' connects sequential steps in instructions. 'After' alone is not used as a sentence connector: say 'After that' or 'Afterwards'.",
     },
   ],
 };

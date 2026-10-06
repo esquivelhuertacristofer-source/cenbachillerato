@@ -132,7 +132,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     id: "gl-imperialismo",
     termino: "Imperialismo y dependencia",
     definicion: "El imperialismo del siglo XIX-XX fue la expansión de las potencias europeas y de EE.UU. sobre territorios y economías de Asia, África y América Latina, generando relaciones de dependencia económica y política. México fue un caso típico de semicolonialismo económico.",
-    ejemplo: "Durante el Porfiriato, empresas extranjeras controlaban el 70% de los ferrocarriles, la mayoría de las minas y los pozos petroleros de México.",
+    ejemplo: "Hasta 1908, cuando el gobierno creó Ferrocarriles Nacionales de México, empresas extranjeras controlaban la mayor parte de los ferrocarriles, la mayoría de las minas y los pozos petroleros de México.",
   },
   {
     id: "gl-guerrafria",
@@ -174,7 +174,7 @@ export const QUIZ: {
     pregunta: "La Guerra Fría (1947-1991) fue un conflicto exclusivamente militar entre Estados Unidos y la URSS, sin impacto en México ni en América Latina.",
     opciones: ["Verdadero", "Falso"],
     correcta: 1,
-    retro: "Falso. La Guerra Fría impactó profundamente a México y América Latina: el gobierno mexicano reprimió movimientos de izquierda (como en 1968) por presión de EE.UU., y la Revolución Cubana (1959) generó tensiones regionales que afectaron las políticas internas de toda la región.",
+    retro: "Falso. La Guerra Fría impactó profundamente a México y América Latina: el gobierno mexicano justificó la represión de movimientos de izquierda (como en 1968) con el discurso anticomunista de la época, en estrecho contacto con agencias de EE.UU., y la Revolución Cubana (1959) generó tensiones regionales que afectaron las políticas internas de toda la región.",
   },
   {
     pregunta: "El análisis de procesos históricos en perspectiva global permite identificar cómo fenómenos locales (como la Independencia de México) se conectan con procesos más amplios (como las Revoluciones Atlánticas del siglo XVIII-XIX).",

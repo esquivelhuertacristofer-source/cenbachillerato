@@ -111,7 +111,7 @@ export const PARES: { id: string; termino: string; definicion: string; ejemplo: 
     id: "gl-licencia",
     termino: "Licencia permisiva",
     definicion: "Licencia que autoriza usar, compartir y a veces modificar una obra o programa.",
-    ejemplo: "LibreOffice y otras herramientas de software libre.",
+    ejemplo: "Programas con licencia MIT o Apache, que permiten reutilizar el código incluso en software cerrado.",
   },
 ];
 

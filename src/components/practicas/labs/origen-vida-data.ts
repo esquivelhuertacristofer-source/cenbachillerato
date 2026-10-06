@@ -87,7 +87,7 @@ export const HIPOTESIS: Hipotesis[] = [
     icono: "fa-flask-vial",
     color: "#38bdf8",
     descripcion:
-      "En 1953, Stanley Miller y Harold Urey simularon estas condiciones en laboratorio y obtuvieron aminoácidos, validando experimentalmente que los bloques de la vida pueden formarse abioticamente.",
+      "En 1953, Stanley Miller y Harold Urey simularon estas condiciones en laboratorio y obtuvieron aminoácidos, validando experimentalmente que los bloques de la vida pueden formarse abióticamente.",
     evidencia:
       "Simularon la atmósfera primitiva (CH₄, NH₃, H₂, H₂O) y aplicaron descargas eléctricas; tras una semana obtuvieron más de 20 aminoácidos distintos (glicina, alanina, ácido aspártico…) sin ninguna célula presente.",
   },
@@ -261,7 +261,7 @@ export const GLOSARIO: TerminoGlosario[] = [
   {
     termino: "Experimento de Miller-Urey (1953)",
     definicion:
-      "Stanley Miller y Harold Urey simularon la atmósfera primitiva (CH₄, NH₃, H₂, H₂O) y aplicaron descargas eléctricas. Tras una semana obtuvieron más de 20 aminoácidos distintos, confirmando la síntesis abiótica de moléculas orgánicas.",
+      "Stanley Miller y Harold Urey simularon la atmósfera primitiva (CH₄, NH₃, H₂, H₂O) y aplicaron descargas eléctricas. Tras una semana obtuvieron varios aminoácidos (glicina, alanina, ácido aspártico); un reanálisis de sus muestras en 2008 identificó más de 20, confirmando la síntesis abiótica de moléculas orgánicas.",
     ejemplo: "El experimento produjo glicina, alanina, ácido aspártico y otros aminoácidos sin ninguna célula presente, solo reacciones químicas.",
   },
   {
@@ -319,7 +319,7 @@ export const INSTRUCCIONES: string[] = [
 export const IDEAS: string[] = [
   "Las hipótesis abióticas explican cómo se formaron las moléculas orgánicas, no cómo apareció «de golpe» un ser vivo.",
   "Oparin-Haldane propuso la síntesis abiótica en una atmósfera reductora; Miller-Urey la puso a prueba en el laboratorio.",
-  "Miller obtuvo aminoácidos, no proteínas ni seres vivos: demostró que los precursores se forman abioticamente.",
+  "Miller obtuvo aminoácidos, no proteínas ni seres vivos: demostró que los precursores se forman abióticamente.",
   "Los ventiladeros hidrotermales son atractivos porque no necesitan una atmósfera reductora.",
   "El mundo de ARN resuelve el dilema ADN-proteína: el ARN almacena información y cataliza (ribozimas).",
   "La panspermia explica la llegada de moléculas orgánicas, pero traslada el problema del origen último.",
@@ -343,7 +343,7 @@ export const QUIZ_A2: QuizEvaluable = {
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
-        "Miller obtuvo aminoácidos y otras moléculas orgánicas, demostrando que los bloques de la vida pueden formarse abioticamente. Este resultado respaldó la hipótesis de Oparin y Haldane.",
+        "Miller obtuvo aminoácidos y otras moléculas orgánicas, demostrando que los bloques de la vida pueden formarse abióticamente. Este resultado respaldó la hipótesis de Oparin y Haldane.",
     },
     {
       enunciado: "¿Cuál hipótesis propone que el ARN fue la primera molécula capaz de almacenar información y catalizar reacciones?",
@@ -372,10 +372,10 @@ export const QUIZ_A2: QuizEvaluable = {
     {
       enunciado: "¿Por qué se descartó la hipótesis de la generación espontánea en el siglo XIX?",
       opciones: [
-        "Porque Oparin la refutó matemáticamente",
-        "Porque los experimentos de Pasteur demostraron que la vida solo surge de vida preexistente",
-        "Porque Miller demostró lo contrario",
-        "Porque la panspermia la sustituyó",
+        "Porque Oparin la refutó matemáticamente en 1924",
+        "Porque Pasteur demostró que la vida solo surge de vida previa",
+        "Porque Miller demostró lo contrario en su experimento",
+        "Porque la panspermia la sustituyó como explicación",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:
@@ -384,10 +384,10 @@ export const QUIZ_A2: QuizEvaluable = {
     {
       enunciado: "Los ventiladeros hidrotermales son atractivos como cuna de la vida porque:",
       opciones: [
-        "Tienen mucho oxígeno libre",
-        "Proveen gradientes de energía y minerales sin necesitar atmósfera reductora",
+        "Tienen mucho oxígeno libre disuelto",
+        "Ofrecen gradientes de energía y de minerales",
         "Están cerca de la superficie oceánica",
-        "Emiten radiación ultravioleta",
+        "Emiten radiación ultravioleta intensa",
       ],
       respuestaCorrecta: 1,
       retroalimentacion:

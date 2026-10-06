@@ -530,25 +530,25 @@ export function estrellasPorError(pp: number): number {
  * ══════════════════════════════════════════════════════════════════════ */
 
 export const PROBLEMA =
-  "La probabilidad condicional responde a una pregunta fundamental: ¿como cambia la probabilidad de un evento cuando ya sabemos que otro evento ha ocurrido?";
+  "La probabilidad condicional responde a una pregunta fundamental: ¿cómo cambia la probabilidad de un evento cuando ya sabemos que otro evento ha ocurrido?";
 
 export const DEFINICION =
-  "P(A|B) = P(A interseccion B) / P(B): el espacio muestral se reduce a los resultados compatibles con B.";
+  "P(A|B) = P(A intersección B) / P(B): el espacio muestral se reduce a los resultados compatibles con B.";
 
 /** Lectura A1 — los seis párrafos, verbatim (la fila de la plataforma viene sin tildes). */
 export const LECTURA_A1: string[] = [
-  "La probabilidad condicional responde a una pregunta fundamental: ¿como cambia la probabilidad de un evento cuando ya sabemos que otro evento ha ocurrido? Formalmente, la probabilidad de A dado B (escrita P(A|B)) es la probabilidad de que A ocurra sabiendo que B ya ocurrio. La formula es: P(A|B) = P(A interseccion B) / P(B), siempre que P(B) sea mayor que cero.",
-  "La intuicion detras de esta formula es que el espacio muestral se reduce: ya no consideramos todos los resultados posibles, sino solo los que son compatibles con B. Por ejemplo, en un grupo de 100 personas, 40 son hombres y 60 son mujeres. De los 40 hombres, 10 fuman. La probabilidad de que una persona seleccionada al azar fume dado que es hombre es P(fuma|hombre) = 10/40 = 0.25. El espacio muestral se redujo de 100 a los 40 hombres.",
-  "Dos eventos son independientes cuando conocer que uno ocurrio no cambia la probabilidad del otro: P(A|B) = P(A). Si los eventos son independientes, la regla del producto se simplifica: P(A interseccion B) = P(A) * P(B). En cambio, si son dependientes, P(A interseccion B) = P(A) * P(B|A). Esta regla del producto es esencial para calcular probabilidades conjuntas.",
-  "El teorema de Bayes es una de las formulas mas poderosas de la estadistica moderna. Permite actualizar la probabilidad de una hipotesis a la luz de nueva evidencia. La formula basica es: P(B|A) = P(A|B) * P(B) / P(A). En contextos reales, esto significa que podemos calcular la probabilidad de que una hipotesis sea verdadera (por ejemplo, que un paciente tenga una enfermedad) dado que observamos cierta evidencia (que la prueba diagnostica salio positiva), usando la probabilidad previa de la enfermedad (prevalencia) y las caracteristicas de la prueba.",
-  "En medicina, las pruebas diagnosticas se caracterizan por su sensibilidad y especificidad. La sensibilidad es P(positivo | enfermo): que tan bien detecta la prueba a los enfermos verdaderos. La especificidad es P(negativo | sano): que tan bien descarta a los sanos verdaderos. Un resultado positivo no garantiza la enfermedad: el Valor Predictivo Positivo (VPP) es la probabilidad de estar realmente enfermo dado que la prueba salio positiva, P(enfermo | positivo). Este valor depende crucialmente de la prevalencia de la enfermedad en la poblacion: una prueba muy buena puede tener un VPP bajo si la enfermedad es muy rara, porque los falsos positivos en personas sanas son numerosos.",
-  "En Mexico, el IMSS e ISSSTE aplican estas herramientas en sus programas de deteccion temprana de cancer, diabetes e hipertension. Entender la probabilidad condicional permite al paciente y al medico interpretar correctamente un resultado positivo: no es una sentencia, es una probabilidad que debe confirmarse con pruebas adicionales.",
+  "La probabilidad condicional responde a una pregunta fundamental: ¿cómo cambia la probabilidad de un evento cuando ya sabemos que otro evento ha ocurrido? Formalmente, la probabilidad de A dado B (escrita P(A|B)) es la probabilidad de que A ocurra sabiendo que B ya ocurrió. La fórmula es: P(A|B) = P(A intersección B) / P(B), siempre que P(B) sea mayor que cero.",
+  "La intuición detrás de esta fórmula es que el espacio muestral se reduce: ya no consideramos todos los resultados posibles, sino solo los que son compatibles con B. Por ejemplo, en un grupo de 100 personas, 40 son hombres y 60 son mujeres. De los 40 hombres, 10 fuman. La probabilidad de que una persona seleccionada al azar fume dado que es hombre es P(fuma|hombre) = 10/40 = 0.25. El espacio muestral se redujo de 100 a los 40 hombres.",
+  "Dos eventos son independientes cuando conocer que uno ocurrió no cambia la probabilidad del otro: P(A|B) = P(A). Si los eventos son independientes, la regla del producto se simplifica: P(A intersección B) = P(A) * P(B). En cambio, si son dependientes, P(A intersección B) = P(A) * P(B|A). Esta regla del producto es esencial para calcular probabilidades conjuntas.",
+  "El teorema de Bayes es una de las fórmulas más poderosas de la estadística moderna. Permite actualizar la probabilidad de una hipótesis a la luz de nueva evidencia. La fórmula básica es: P(B|A) = P(A|B) * P(B) / P(A). En contextos reales, esto significa que podemos calcular la probabilidad de que una hipótesis sea verdadera (por ejemplo, que un paciente tenga una enfermedad) dado que observamos cierta evidencia (que la prueba diagnóstica salió positiva), usando la probabilidad previa de la enfermedad (prevalencia) y las características de la prueba.",
+  "En medicina, las pruebas diagnósticas se caracterizan por su sensibilidad y especificidad. La sensibilidad es P(positivo | enfermo): qué tan bien detecta la prueba a los enfermos verdaderos. La especificidad es P(negativo | sano): qué tan bien descarta a los sanos verdaderos. Un resultado positivo no garantiza la enfermedad: el Valor Predictivo Positivo (VPP) es la probabilidad de estar realmente enfermo dado que la prueba salió positiva, P(enfermo | positivo). Este valor depende crucialmente de la prevalencia de la enfermedad en la población: una prueba muy buena puede tener un VPP bajo si la enfermedad es muy rara, porque los falsos positivos en personas sanas son numerosos.",
+  "En México, el IMSS e ISSSTE aplican estas herramientas en sus programas de detección temprana de cáncer, diabetes e hipertensión. Entender la probabilidad condicional permite al paciente y al médico interpretar correctamente un resultado positivo: no es una sentencia, es una probabilidad que debe confirmarse con pruebas adicionales.",
 ];
 
 /** Preguntas de comprensión de la lectura A1 — verbatim. */
 export const PREGUNTAS: string[] = [
   "¿Qué significa la probabilidad condicional P(A|B) y cómo se interpreta geométricamente en términos del espacio muestral?",
-  "¿Qué significa que dos eventos sean independientes y cómo se simplifica el calculo de la probabilidad conjunta en ese caso?",
+  "¿Qué significa que dos eventos sean independientes y cómo se simplifica el cálculo de la probabilidad conjunta en ese caso?",
   "¿Qué hace el teorema de Bayes y por qué es importante para el razonamiento bajo incertidumbre?",
   "¿Por qué el Valor Predictivo Positivo (VPP) de una prueba diagnóstica depende de la prevalencia de la enfermedad y no solo de la sensibilidad y especificidad?",
 ];
@@ -598,7 +598,7 @@ export const DATOS: DatoClave[] = [
 export const CONTEXTO =
   "El IMSS y el ISSSTE realizan campañas de detección temprana de cáncer de cérvix (VPH/Papanicolaou), diabetes e hipertensión. Un resultado positivo en una prueba de tamizaje no es una sentencia: es una probabilidad que depende de la prevalencia en la población estudiada, y por eso los protocolos exigen confirmarlo con una segunda prueba antes de dar un diagnóstico definitivo.";
 
-export const FUENTE = "Material CEN Bachillerato — PM-VI. Ref.: Bayes, 1763; aplicaciones diagnosticas IMSS-ISSSTE.";
+export const FUENTE = "Material CEN Bachillerato — PM-VI. Ref.: Bayes, 1763; aplicaciones diagnósticas IMSS-ISSSTE.";
 
 /** Glosario A5 — los 6 términos verbatim. */
 export interface GlosarioItem {
@@ -615,7 +615,7 @@ export const GLOSARIO: GlosarioItem[] = [
   },
   {
     termino: "Regla del producto (eventos independientes)",
-    definicion: "Dos eventos A y B son independientes si la ocurrencia de uno no afecta al otro: P(A∩B) = P(A) × P(B). Si no son independientes: P(A∩B) = P(A) × P(B|A).",
+    definicion: "Para calcular P(A∩B): si A y B son independientes, P(A∩B) = P(A) × P(B). Si no son independientes: P(A∩B) = P(A) × P(B|A).",
     ejemplo: "Lanzar una moneda y un dado: P(cara∩6) = P(cara)×P(6) = 0.5×(1/6) = 1/12, porque son independientes.",
   },
   {
@@ -647,7 +647,7 @@ export const RETO_A2: RetoNumericoData = {
   contexto:
     "El ejercicio aplica el teorema de Bayes a una prueba de detección: combina la prevalencia con la sensibilidad y la especificidad para obtener el Valor Predictivo Positivo.",
   problema:
-    "Una prueba de deteccion de diabetes tiene sensibilidad del 90% (P(positivo|diabetes) = 0.90) y especificidad del 95% (P(negativo|sin diabetes) = 0.95). En una poblacion donde la prevalencia de diabetes es del 10% (P(diabetes) = 0.10). Usando el teorema de Bayes, calcula el Valor Predictivo Positivo (VPP): la probabilidad de tener diabetes dado que la prueba salio positiva, expresada en porcentaje.",
+    "Una prueba de detección de diabetes tiene sensibilidad del 90% (P(positivo|diabetes) = 0.90) y especificidad del 95% (P(negativo|sin diabetes) = 0.95). En una población donde la prevalencia de diabetes es del 10% (P(diabetes) = 0.10). Usando el teorema de Bayes, calcula el Valor Predictivo Positivo (VPP): la probabilidad de tener diabetes dado que la prueba salió positiva, expresada en porcentaje.",
   campos: [
     { etiqueta: "P(positivo y diabetes)", objetivo: 0.09, tolerancia: 0.002, unidad: "en decimal", placeholder: "0.090" },
     { etiqueta: "P(positivo total)", objetivo: 0.135, tolerancia: 0.002, unidad: "en decimal", placeholder: "0.135" },
