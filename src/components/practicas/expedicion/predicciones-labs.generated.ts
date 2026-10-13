@@ -675,28 +675,28 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "comoComprobarlo": "En «Escribe el aviso», cambia la forma de la primera oración entre fue, fueron y fuimos, y mira cuántos niños dibuja la tutora y si aparece el signo «?»."
   },
   "conicas-lugares-geometricos": {
-    "escena": "Un plano con una circunferencia de radio 4 y un punto de prueba Q que se mueve con deslizadores; una barra compara su distancia al centro con el radio.",
-    "pregunta": "Si Q queda a una distancia del centro igual al radio, ¿dónde está?",
+    "escena": "Un doble cono de vidrio atravesado por un plano que puedes inclinar; el borde del corte se ilumina y su forma aparece en una pizarra.",
+    "pregunta": "Si inclinas el plano exactamente igual que el lado del cono, ¿qué curva aparece en el corte?",
     "opciones": [
       {
         "id": "a",
-        "texto": "Dentro de la circunferencia",
-        "icono": "fa-circle-dot"
+        "texto": "Una elipse cerrada",
+        "icono": "fa-circle"
       },
       {
         "id": "b",
-        "texto": "Fuera de la circunferencia",
-        "icono": "fa-arrow-up-right-from-square"
+        "texto": "Una parábola abierta",
+        "icono": "fa-satellite-dish"
       },
       {
         "id": "c",
-        "texto": "Justo sobre la curva",
-        "icono": "fa-bullseye"
+        "texto": "Las dos ramas de una hipérbola",
+        "icono": "fa-arrows-left-right"
       }
     ],
-    "correcta": "c",
-    "porque": "La circunferencia es el conjunto de puntos que están a una misma distancia, el radio, del centro. Si la distancia de Q es menor queda dentro; si es mayor, fuera.",
-    "comoComprobarlo": "Mueve los deslizadores de Q hasta que las dos barras de distancia midan lo mismo y mira dónde cae el punto."
+    "correcta": "b",
+    "porque": "Con menos inclinación el plano corta todos los lados de una napa y la curva se cierra: elipse. Paralelo a un lado, nunca lo alcanza y la curva queda abierta: parábola. Con más inclinación corta las dos napas: hipérbola.",
+    "comoComprobarlo": "En «Cono de Apolonio», sube la inclinación del plano poco a poco hasta llegar a la marca de la generatriz y mira la pizarra."
   },
   "conjuntos-venn-3d": {
     "escena": "Un grupo de 40 estudiantes: 22 practican fútbol y 18 básquetbol. Un muñeco por estudiante se acomoda en dos círculos que se traslapan.",
@@ -1897,6 +1897,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "correcta": "a",
     "porque": "El foco convierte en luz solo el 5% de la electricidad; el otro 95% se disipa como calor. La hidroeléctrica aprovecha cerca del 90%. La suma útil más calor siempre es la entrada.",
     "comoComprobarlo": "Usa la barra superior para elegir cada aparato y compara el tamaño de la parte verde y la naranja en la columna final."
+  },
+  "fotosintesis": {
+    "escena": "Una planta en maceta bajo una luz cuyo color puedes cambiar: blanca, roja, azul o verde, siempre con la misma intensidad.",
+    "pregunta": "Con la misma intensidad, ¿con qué color de luz la planta libera menos O₂?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Con luz roja",
+        "icono": "fa-circle"
+      },
+      {
+        "id": "b",
+        "texto": "Con luz verde",
+        "icono": "fa-leaf"
+      },
+      {
+        "id": "c",
+        "texto": "Con luz azul",
+        "icono": "fa-droplet"
+      }
+    ],
+    "correcta": "b",
+    "porque": "La clorofila absorbe sobre todo el rojo y el azul-violeta y refleja el verde. Si casi no absorbe la luz, no hay energía para romper el agua y casi no sale O₂: por eso la hoja se ve verde.",
+    "comoComprobarlo": "En «Planta», deja la intensidad fija y cambia el color de la luz entre roja, azul y verde; cuenta las burbujas de O₂ y mira la tasa."
   },
   "fracciones-porcentajes": {
     "escena": "Un pastel y una barra muestran 1/2, con un poste amarillo de referencia en la mitad de la barra.",
@@ -3240,7 +3264,7 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     ],
     "correcta": "b",
     "porque": "Dentro del foco los rayos salen de la lente todavía separándose y nunca se cruzan. Tu ojo los prolonga hacia atrás y ve una imagen virtual, derecha y más grande: es una lupa.",
-    "comoComprobarlo": "Baja el deslizador de distancia del objeto hasta que la marca del medidor pase la f, y observa la imagen punteada."
+    "comoComprobarlo": "Baja el deslizador de distancia del objeto hasta que la marca del medidor pase la f, y busca la imagen detrás de la lente."
   },
   "optimizacion-cilindro": {
     "escena": "Una lata sin tapa de 1000 cm³ cuyo radio puedes cambiar, junto a la gráfica del material que gasta",
