@@ -64,9 +64,13 @@ describe("espejos del registro de laboratorios", () => {
 
   it("ningún laboratorio cae al nombre derivado del slug", () => {
     // nombreLab() sin título devuelve el slug con guiones y mayúsculas: eso es
-    // exactamente lo que el alumno no debe leer nunca.
-    const feos = slugs.filter((s) => nombreLab(s) === s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
+    // exactamente lo que el alumno no debe leer nunca. Se comprueba la causa
+    // (falta el título) y no el resultado: «Valor Posicional» o «Fluidos» son
+    // títulos legítimos que coinciden con su slug embellecido.
+    const feos = slugs.filter((s) => !LAB_CATALOGO[s]?.titulo);
     expect(feos).toEqual([]);
+    expect(nombreLab("valor-posicional")).toBe("Valor Posicional");
+    expect(nombreLab("crisis-sociales")).toBe("Crisis Sociales");
   });
 
   it("cada laboratorio resuelve a un componente que existe en disco", () => {

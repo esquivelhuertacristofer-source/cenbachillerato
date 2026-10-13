@@ -49,10 +49,13 @@ ${entradas}
 /** Nombre limpio del lab, sin el prefijo del tipo de laboratorio. */
 export function nombreLab(slug: string): string {
   const t = LAB_CATALOGO[slug]?.titulo;
-  if (!t) return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return t.replace(/^Laboratorio(\s+\w+)?\s*[—-]\s*/u, "").trim();
+  if (!t) return slug.replace(/-/g, " ").replace(/\\b\\w/g, (c) => c.toUpperCase());
+  return t.replace(/^Laboratorio(\\s+\\w+)?\\s*[—-]\\s*/u, "").trim();
 }
 `;
+// Ojo: esto vive dentro de una plantilla de texto, que se come las barras
+// invertidas sueltas; por eso van dobles. Sin duplicarlas, la regex salía como
+// «(s+w+)?s*» y todas las tarjetas mostraban «Laboratorio 3D — …».
 
 writeFileSync(DESTINO, salida, "utf8");
 console.log(`lab-catalogo.ts regenerado con ${Object.keys(PRACTICAS_META).length} laboratorios.`);
