@@ -4,27 +4,37 @@
  * Escena 3D del laboratorio "Interacciones entre subsistemas terrestres" — R3F.
  * Se carga de forma diferida (ssr:false) desde LabSubsistemas.tsx.
  *
- * Una Tierra con sus cuatro subsistemas visibles a la vez:
- *  · LITOSFERA  → el núcleo rocoso del planeta.
- *  · HIDROSFERA → el océano (cambia de color con el pH; sube con el nivel del mar).
- *  · BIOSFERA   → parches de vegetación cuya cantidad/verdor sigue la cobertura.
- *  · ATMÓSFERA  → la capa exterior translúcida que se tiñe de azul a rojo con la
- *                 temperatura y se engrosa con el CO₂.
- * Casquetes polares que se encogen al calentarse, un volcán que emite una pluma
- * de SO₂/CO₂ según la actividad volcánica y burbujas de metano del permafrost
- * cuando se dispara el punto de no retorno.
+ * La Tierra fotográfica de la NASA, abierta en cuña como en una lámina de
+ * National Geographic, con sus cuatro subsistemas a la vista:
+ *  · LITOSFERA  → el corte: corteza, manto en convección, núcleo externo líquido
+ *                 y núcleo interno incandescente; límites de placas; volcán.
+ *  · HIDROSFERA → océanos que se tiñen con la acidez, hielo marino que retrocede
+ *                 con el calor y el ciclo del agua en el Golfo de México.
+ *  · BIOSFERA   → la vegetación de la foto; la deforestación abre claros cafés y
+ *                 la selva amazónica fija CO₂ (o humea).
+ *  · ATMÓSFERA  → halo que se tiñe con el calentamiento; casquete de capas
+ *                 exagerado sobre el corte con el efecto invernadero en vivo.
+ * EXPERIMENTO CENTRAL: el termómetro junto a la Tierra sube y se pone rojo al
+ * mover el CO₂; la marca blanca es el límite de +1.5 °C.
  *
+ * Cada esfera (modo) lleva la cámara de viaje a su lugar y realza lo suyo.
  * Patrón R3F: useFrame solo dentro de <Canvas>; las animaciones mutan REFS
  * (sin setState ni Math.random/Date.now en el render → apto React Compiler).
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Html, Stars, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, Html, Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { calcularEstado, CO2_MAX, CO2_REF } from "./subsistemas-data";
-import { Escenario } from "./_escenario";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { calcularEstado } from "./subsistemas-data";
+import { ViaLactea } from "./_espacio";
+import { TierraCorte, lonLat, type MetaTierra } from "./subsistemas-tierra3d";
+import { LimitesPlacas, Volcan, CicloAgua, FlujoCarbono, Metano, Invernadero, Termometro, yTermometro } from "./subsistemas-procesos3d";
+import {
+  ALT_ATMOS, LUGAR, retencionInfrarrojo, R_CORTEZA, R_NUCLEO_EXTERNO, R_NUCLEO_INTERNO, type LonLat, type ModoEsfera,
+} from "./subsistemas-capas";
 
 export interface SubsistemasSceneProps {
   co2: number;
@@ -35,124 +45,132 @@ export interface SubsistemasSceneProps {
   pausado: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** Esfera en foco (la cámara viaja a ella). */
+  modo?: ModoEsfera;
 }
 
-const R = 2.0; // radio del planeta
+type Pt = [number, number, number];
+const R = 2.0;            // radio del planeta
+const FOV = 40;
+const TAN_V = Math.tan((FOV / 2) * (Math.PI / 180));
+/** Dirección hacia el Sol (mundo). */
+const SOL = new THREE.Vector3(0.1, 0.42, 1).normalize();
 
-/* Puntos repartidos sobre la esfera (espiral de Fibonacci) — DETERMINISTA. */
-function puntosEsfera(n: number): THREE.Vector3[] {
-  const pts: THREE.Vector3[] = [];
-  const phi = Math.PI * (3 - Math.sqrt(5));
-  for (let i = 0; i < n; i++) {
-    const y = 1 - (i / (n - 1)) * 2;
-    const r = Math.sqrt(Math.max(0, 1 - y * y));
-    const th = phi * i;
-    pts.push(new THREE.Vector3(Math.cos(th) * r, y, Math.sin(th) * r));
+/** Vista general: un poco más de frente a la cara z del corte (la que da al Sol). */
+const DIR_SISTEMA = new THREE.Vector3(0.78, 0.62, 1).normalize();
+/** «Izquierda» en pantalla desde esa vista (ahí va el termómetro). */
+const IZQ_SISTEMA = new THREE.Vector3(-DIR_SISTEMA.z, 0, DIR_SISTEMA.x).normalize();
+
+/* ── Encuadre ──────────────────────────────────────────────────────────── */
+/** Distancia para que el contenido ocupe ~62 % del alto y ~88 % del ancho; el
+ *  objetivo se corre hacia abajo para quedar entre la barra y la misión. */
+function encuadrar(centro: THREE.Vector3, medioAncho: number, medioAlto: number, aspect: number, arriba: THREE.Vector3) {
+  const d = Math.max(medioAlto / (TAN_V * 0.62), medioAncho / (TAN_V * 0.88 * aspect));
+  const corrimiento = 0.05 * 2 * d * TAN_V;
+  return { objetivo: centro.clone().addScaledVector(arriba, -corrimiento), distancia: d };
+}
+
+function marcoLugar(ll: LonLat) {
+  const n = lonLat(ll, 1);
+  const este = new THREE.Vector3(0, 1, 0).cross(n).normalize();
+  const norte = new THREE.Vector3().crossVectors(n, este).normalize();
+  return { n, este, norte };
+}
+
+interface Toma { objetivo: THREE.Vector3; distancia: number; dir: THREE.Vector3; min: number }
+
+function tomaDe(modo: ModoEsfera, aspect: number): Toma {
+  const Y = new THREE.Vector3(0, 1, 0);
+  if (modo === "litosfera") {
+    const dir = new THREE.Vector3(1, 0.85, 1.05).normalize();
+    const e = encuadrar(new THREE.Vector3(0.62, 0.5, 0.62), 1.85, 1.55, aspect, Y);
+    return { ...e, dir, min: 2.6 };
   }
-  return pts;
+  if (modo === "atmosfera") {
+    const dir = new THREE.Vector3(0.28, 0.22, 1).normalize();
+    const e = encuadrar(new THREE.Vector3(1.3, 1.28, 0.05), 1.75, 1.5, aspect, Y);
+    return { ...e, dir, min: 2.6 };
+  }
+  if (modo === "hidrosfera") {
+    const { n, este, norte } = marcoLugar([-96, 21.5]);
+    const dir = n.clone().addScaledVector(norte, -0.95).addScaledVector(este, 0.15).normalize();
+    const e = encuadrar(lonLat([-96, 21.5], R * 1.04), 0.46, 0.32, aspect, norte);
+    return { ...e, dir, min: 0.7 };
+  }
+  if (modo === "biosfera") {
+    const { n, este, norte } = marcoLugar([-62, -4]);
+    const dir = n.clone().addScaledVector(norte, -0.6).addScaledVector(este, 0.1).normalize();
+    const e = encuadrar(lonLat([-62, -4], R * 1.04), 0.72, 0.5, aspect, norte);
+    return { ...e, dir, min: 0.9 };
+  }
+  // sistema: la Tierra y, a su izquierda, el termómetro
+  const dir = DIR_SISTEMA.clone();
+  const izq = IZQ_SISTEMA.clone();
+  const angosto = aspect < 1;
+  const e = angosto
+    ? encuadrar(izq.clone().multiplyScalar(0.8), 3.2, 2.4, aspect, Y)
+    : encuadrar(izq.clone().multiplyScalar(0.75), 2.95, 2.3, aspect, Y);
+  return { ...e, dir, min: 4.2 };
 }
 
-/* ─── Biosfera: parches de vegetación sobre la superficie ───────────────── */
-const VEG_TOTAL = 80;
-function Vegetacion({ veg, estresada }: { veg: number; estresada: number }) {
-  // posiciones fijas; se muestran las primeras (veg%) como verdes.
-  const pts = useMemo(() => puntosEsfera(VEG_TOTAL).filter((p) => p.y > -0.78), []);
-  const activos = Math.round((veg / 100) * pts.length);
-  // verdor: de verde sano a pardo seco según el estrés (0 sano … 1 seco)
-  const colSano = useMemo(() => new THREE.Color("#36d07a"), []);
-  const colSeco = useMemo(() => new THREE.Color("#b5862f"), []);
-  const col = useMemo(() => colSano.clone().lerp(colSeco, Math.min(1, Math.max(0, estresada))), [colSano, colSeco, estresada]);
+/* ── Cámara guiada: viaja (sin saltos) a la toma de cada esfera ─────────── */
+function Guia({ toma, clave }: { toma: Toma; clave: string }) {
+  const camera = useThree((s) => s.camera);
+  const controls = useThree((s) => s.controls) as OrbitControlsImpl | null;
+  const resta = useRef(0);
+  const ultima = useRef("");
+  const iniciada = useRef(false);
+  const tmp = useMemo(() => new THREE.Vector3(), []);
 
-  return (
-    <group>
-      {pts.map((p, i) => {
-        const activo = i < activos;
-        const pos = p.clone().multiplyScalar(R + 0.02);
-        const up = p.clone().normalize();
-        const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), up);
-        const h = activo ? 0.16 + (i % 5) * 0.02 : 0.0001;
-        return (
-          <mesh key={i} position={pos} quaternion={quat} scale={activo ? 1 : 0.0001} castShadow>
-            <coneGeometry args={[0.055, h, 6]} />
-            <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.25} roughness={0.8} />
-          </mesh>
-        );
-      })}
-    </group>
-  );
-}
+  useEffect(() => {
+    if (!controls) return undefined;
+    const soltar = () => { resta.current = 0; };
+    controls.addEventListener("start", soltar);
+    return () => controls.removeEventListener("start", soltar);
+  }, [controls]);
 
-/* ─── Casquetes polares (se encogen con el calentamiento) ───────────────── */
-function Casquete({ y, escala }: { y: number; escala: number }) {
-  return (
-    <mesh position={[0, y * (R - 0.02), 0]} scale={[escala, escala * 0.5, escala]}>
-      <sphereGeometry args={[0.95, 24, 16, 0, Math.PI * 2, 0, Math.PI / 3.1]} />
-      <meshStandardMaterial color="#eaf6ff" emissive="#bfe0ff" emissiveIntensity={0.3} roughness={0.4} transparent opacity={0.96} />
-    </mesh>
-  );
-}
-
-/* ─── Pluma de partículas (volcán o metano) ─────────────────────────────── */
-function Pluma({ origen, dir, n, color, vel, pausado, ancho }: {
-  origen: THREE.Vector3; dir: THREE.Vector3; n: number; color: string; vel: number; pausado: boolean; ancho: number;
-}) {
-  const CAP = 24;
-  const ref = useRef<THREE.InstancedMesh>(null);
-  const fases = useRef<number[]>(Array.from({ length: CAP }, (_, i) => i / CAP));
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const base = useMemo(() => {
-    // dos vectores perpendiculares a dir para dispersar lateralmente
-    const u = new THREE.Vector3(1, 0, 0);
-    if (Math.abs(dir.dot(u)) > 0.9) u.set(0, 0, 1);
-    const a = new THREE.Vector3().crossVectors(dir, u).normalize();
-    const b = new THREE.Vector3().crossVectors(dir, a).normalize();
-    return { a, b };
-  }, [dir]);
-
-  useFrame((_, delta) => {
-    const m = ref.current;
-    if (!m) return;
-    const d = pausado ? 0 : delta;
-    for (let i = 0; i < CAP; i++) {
-      if (i < n) {
-        fases.current[i] = ((fases.current[i] ?? i / CAP) + d * vel) % 1;
-        const t = fases.current[i]!;
-        const spread = ancho * t;
-        const ox = Math.sin(i * 1.7) * spread;
-        const oy = Math.cos(i * 2.3) * spread;
-        const p = origen.clone()
-          .add(dir.clone().multiplyScalar(t * 2.4))
-          .add(base.a.clone().multiplyScalar(ox))
-          .add(base.b.clone().multiplyScalar(oy));
-        dummy.position.copy(p);
-        dummy.scale.setScalar(0.09 * (1 - t * 0.5));
-      } else {
-        dummy.position.set(0, -999, 0);
-        dummy.scale.setScalar(0.0001);
-      }
-      dummy.updateMatrix();
-      m.setMatrixAt(i, dummy.matrix);
+  useFrame((_, dtRaw) => {
+    if (!controls) return;
+    const dt = Math.min(dtRaw, 0.05);
+    if (!iniciada.current) {
+      // Entrada: la cámara llega desde lejos.
+      iniciada.current = true;
+      controls.target.copy(toma.objetivo);
+      camera.position.copy(toma.objetivo).addScaledVector(toma.dir, toma.distancia * 2.4);
     }
-    m.instanceMatrix.needsUpdate = true;
+    if (clave !== ultima.current) { ultima.current = clave; resta.current = 2.6; }
+    if (resta.current <= 0) return;
+    resta.current -= dt;
+    tmp.copy(camera.position).sub(controls.target);
+    const largo = THREE.MathUtils.damp(tmp.length(), toma.distancia, 2.6, dt);
+    tmp.normalize().lerp(toma.dir, 1 - Math.exp(-dt * 2.6)).normalize().multiplyScalar(largo);
+    controls.target.lerp(toma.objetivo, 1 - Math.exp(-dt * 3));
+    camera.position.copy(controls.target).add(tmp);
+    controls.update();
   });
-
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, CAP]}>
-      <sphereGeometry args={[1, 8, 8]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.2} toneMapped={false} transparent opacity={0.85} />
-    </instancedMesh>
-  );
+  return null;
 }
 
-/* ─── Etiqueta de un subsistema ─────────────────────────────────────────────
- * Tamaño fijo en píxeles (sin distanceFactor), ≥ 14 px, desplazada hacia afuera
- * del planeta para no taparlo. El dato corto solo se muestra en pantallas anchas. */
-function Etiqueta({ pos, color, icono, nombre, dato, ancho }: {
-  pos: [number, number, number]; color: string; icono: string; nombre: string; dato?: string; ancho: boolean;
+/** Nunca dentro del planeta, ni orbitando alrededor de un punto de la superficie. */
+function FueraDelPlaneta() {
+  useFrame(({ camera }) => {
+    const l = camera.position.length();
+    if (l < R * 1.12) camera.position.setLength(R * 1.12);
+  });
+  return null;
+}
+
+/* ── Etiqueta: tamaño fijo (sin distanceFactor), ≥ 14 px ────────────────── */
+function Etiqueta({ pos, color, icono, nombre, dato, ancho, lado = "centro" }: {
+  pos: THREE.Vector3 | Pt; color: string; icono: string; nombre: string; dato?: string; ancho: boolean;
+  lado?: "centro" | "izq" | "der";
 }) {
+  // En celular las etiquetas van centradas en su punto: a un lado se salían de la pantalla.
+  const l = ancho ? lado : "centro";
+  const tx = l === "izq" ? "translate(-100%, -50%)" : l === "der" ? "translate(0, -50%)" : "translate(-50%, -50%)";
   return (
-    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 1, padding: "4px 10px", borderRadius: 10, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.5)", fontFamily: "system-ui, sans-serif" }}>
+    <Html position={pos} pointerEvents="none" zIndexRange={[20, 0]} style={{ transform: tx }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 1, padding: "4px 10px", borderRadius: 10, background: "rgba(4,10,22,0.86)", border: `1.5px solid ${color}`, whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.5)", fontFamily: "system-ui, sans-serif", backdropFilter: "blur(6px)" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
           <i className={`fa-solid ${icono}`} style={{ color, fontSize: 14 }} />
           <span style={{ color: "#eaf2fb", fontSize: 14, fontWeight: 900 }}>{nombre}</span>
@@ -163,210 +181,185 @@ function Etiqueta({ pos, color, icono, nombre, dato, ancho }: {
   );
 }
 
-/* ─── Termómetro: EL medidor del experimento ───────────────────────────────
- * Sube y se tiñe de azul a rojo con ΔT. La marca blanca es el límite de +1,5 °C. */
-const T_MIN = -0.5, T_MAX = 4.5, T_ALTO = 3.4, T_BASE_Y = -1.9;
-function Termometro({ deltaT, x }: { deltaT: number; x: number }) {
-  const f = Math.min(1, Math.max(0.02, (deltaT - T_MIN) / (T_MAX - T_MIN)));
-  const col = useMemo(() => new THREE.Color("#4aa8ff").lerp(new THREE.Color("#ff4d2e"), Math.min(1, Math.max(0, deltaT / 3))), [deltaT]);
-  const yMarca = T_BASE_Y + ((1.5 - T_MIN) / (T_MAX - T_MIN)) * T_ALTO;
-  const yCero = T_BASE_Y + ((0 - T_MIN) / (T_MAX - T_MIN)) * T_ALTO;
+/** En celular caben menos etiquetas sin encimarse: lo que se quita sigue en el panel. */
+const OCULTAR_ANGOSTO: Record<ModoEsfera, string[]> = {
+  sistema: ["a"], atmosfera: ["m", "r"], hidrosfera: ["n"], litosfera: ["e"], biosfera: [],
+};
+
+const sobre = (ll: LonLat, alt: number) => lonLat(ll, R * (1 + alt));
+/** Punto en una cara del corte: plano x (eje 0) o z (eje 2); ángulo desde el ecuador. */
+const enCara = (eje: 0 | 2, rFrac: number, angGrados: number): THREE.Vector3 => {
+  const a = (angGrados * Math.PI) / 180;
+  const h = Math.cos(a) * rFrac * R, v = Math.sin(a) * rFrac * R;
+  return eje === 0 ? new THREE.Vector3(0.02, v, h) : new THREE.Vector3(h, v, 0.02);
+};
+
+/* ── Luz: un Sol y un entorno de Lightformers (sin HDR de internet) ─────── */
+function Luces() {
+  const p = useMemo(() => SOL.clone().multiplyScalar(12).toArray() as Pt, []);
   return (
-    <group position={[x, 0, 0]}>
-      {/* tubo de vidrio */}
-      <mesh position={[0, T_BASE_Y + T_ALTO / 2, 0]}>
-        <boxGeometry args={[0.34, T_ALTO, 0.34]} />
-        <meshStandardMaterial color="#cfe6ff" transparent opacity={0.22} roughness={0.2} />
-      </mesh>
-      {/* bulbo */}
-      <mesh position={[0, T_BASE_Y - 0.1, 0]}>
-        <sphereGeometry args={[0.34, 20, 20]} />
-        <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.5} roughness={0.35} />
-      </mesh>
-      {/* columna de líquido */}
-      <mesh position={[0, T_BASE_Y + (T_ALTO * f) / 2, 0]} scale={[1, f, 1]}>
-        <boxGeometry args={[0.2, T_ALTO, 0.2]} />
-        <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.5} roughness={0.35} />
-      </mesh>
-      {/* marca de 0 °C (1850) */}
-      <mesh position={[0, yCero, 0.2]}>
-        <boxGeometry args={[0.56, 0.05, 0.05]} />
-        <meshStandardMaterial color="#9fe3b5" emissive="#9fe3b5" emissiveIntensity={0.4} />
-      </mesh>
-      {/* marca del límite +1,5 °C */}
-      <mesh position={[0, yMarca, 0.2]}>
-        <boxGeometry args={[0.7, 0.07, 0.07]} />
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />
-      </mesh>
-    </group>
+    <>
+      <ambientLight intensity={0.08} />
+      <hemisphereLight args={["#9fb7d8", "#0b0f18", 0.2]} />
+      <directionalLight position={p} intensity={3.0} color="#fff6e8" />
+      <Environment resolution={128} environmentIntensity={0.7}>
+        <Lightformer intensity={2.4} position={p} scale={[6, 6, 1]} color="#fff3dd" />
+        <Lightformer intensity={0.5} position={[6, -3, -6]} scale={[10, 6, 1]} color="#6ea8ff" />
+        <Lightformer intensity={0.3} position={[0, 8, 0]} rotation-x={Math.PI / 2} scale={[10, 10, 1]} color="#cfe0ff" />
+      </Environment>
+    </>
   );
 }
 
-/* ─── El planeta y sus subsistemas ──────────────────────────────────────── */
-function Planeta(props: SubsistemasSceneProps) {
-  const { co2, veg, volc, permafrost, pausado } = props;
+/* ── El planeta, sus procesos y las etiquetas de la esfera en foco ──────── */
+function Planeta(props: SubsistemasSceneProps & { ligero: boolean }) {
+  const { co2, veg, volc, permafrost, pausado, ligero } = props;
+  const modo = props.modo ?? "sistema";
   const ancho = useThree((st) => st.size.width) >= 640;
   const est = useMemo(() => calcularEstado(co2, veg, volc, permafrost), [co2, veg, volc, permafrost]);
+  const corteRef = useRef(R);
 
-  const planeta = useRef<THREE.Group>(null);
-  useFrame((_, delta) => {
-    if (planeta.current && !pausado) planeta.current.rotation.y += delta * 0.06;
-  });
+  const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
+  const meta: MetaTierra = {
+    abre: modo === "sistema" || modo === "litosfera" || modo === "atmosfera" ? 1 : 0,
+    atmos: modo === "atmosfera" ? 1 : 0,
+    hidro: modo === "hidrosfera" ? 1 : 0,
+    bio: modo === "biosfera" ? 1 : 0,
+    lito: modo === "litosfera" ? 1 : 0,
+    veg: veg / 100,
+    estres: clamp01(est.deltaT / 3.5),
+    acido: clamp01((8.2 - est.ph) / 0.25),
+    hieloN: 70 + Math.max(0, est.deltaT) * 4.5,
+    hieloS: 61 + Math.max(0, est.deltaT) * 4.5,
+    calor: clamp01(est.deltaT / 3.5),
+    aerosol: volc / 10,
+  };
 
-  // ── colores derivados del estado ──
-  // atmósfera: azul frío → rojo caliente según deltaT (0…4 °C)
-  const tintAtmos = useMemo(() => {
-    const frio = new THREE.Color("#6fc0ff");
-    const calido = new THREE.Color("#ff5532");
-    return frio.clone().lerp(calido, Math.min(1, Math.max(0, est.deltaT / 4)));
-  }, [est.deltaT]);
-  // opacidad de la atmósfera con el CO₂
-  const opAtmos = 0.10 + Math.min(0.22, ((co2 - CO2_REF) / (CO2_MAX - CO2_REF)) * 0.22);
+  // Efecto invernadero: fracción del infrarrojo que la troposfera devuelve.
+  const retencion = retencionInfrarrojo(est.co2eff);
+  const erosion = clamp01((100 - veg) / 70);
+  const evaporacion = clamp01(0.45 + est.deltaT * 0.14);
+  const lluvia = clamp01(est.precip / 100);
+  const cap = ligero ? 0.5 : 1;
 
-  // océano: azul (pH alto) → verdoso ácido (pH bajo)
-  const tintOceano = useMemo(() => {
-    const sano = new THREE.Color("#1d72c4");
-    const acido = new THREE.Color("#3fae8f");
-    const f = Math.min(1, Math.max(0, (8.2 - est.ph) / 0.4));
-    return sano.clone().lerp(acido, f);
-  }, [est.ph]);
-
-  const hielo = Math.min(1, Math.max(0.12, 1 - est.deltaT / 4));
-  const nivelMarShell = 1 + Math.min(0.05, est.nivelMar / 2400); // crecimiento sutil del océano
-  const estresVeg = Math.max(0, Math.min(1, est.deltaT / 3 + (100 - veg) / 200));
-
-  // volcán: posición fija sobre la superficie
-  const volcPos = useMemo(() => new THREE.Vector3(1.4, -0.5, 1.1).normalize().multiplyScalar(R + 0.05), []);
-  const volcDir = useMemo(() => volcPos.clone().normalize(), [volcPos]);
-  const metPolo = useMemo(() => new THREE.Vector3(0, R + 0.1, 0), []);
+  const termoPos = useMemo(() => IZQ_SISTEMA.clone().multiplyScalar(3.35), []);
+  const termoGiro = Math.atan2(DIR_SISTEMA.x, DIR_SISTEMA.z);
+  const etiquetas = useMemo(() => {
+    const dT = `${est.deltaT >= 0 ? "+" : ""}${est.deltaT.toFixed(1)} °C`;
+    switch (modo) {
+      case "litosfera": return [
+        { k: "c", pos: enCara(0, (R_CORTEZA + 1) / 2, ancho ? 68 : 48), color: "#d8b48e", icono: "fa-layer-group", nombre: "Corteza", dato: "0–35 km", lado: "izq" as const },
+        { k: "m", pos: enCara(0, 0.76, 34), color: "#ff8a4c", icono: "fa-arrows-spin", nombre: "Manto: convección", dato: "hasta 2 890 km", lado: "izq" as const },
+        { k: "e", pos: enCara(2, (R_NUCLEO_INTERNO + R_NUCLEO_EXTERNO) / 2, 62), color: "#ffb030", icono: "fa-water", nombre: "Núcleo externo (líquido)", dato: "hierro fundido", lado: "der" as const },
+        { k: "i", pos: new THREE.Vector3(R * 0.3, 0.02, R * 0.05), color: "#fff1b0", icono: "fa-sun", nombre: "Núcleo interno", dato: "sólido · ~5 400 °C", lado: "der" as const },
+      ];
+      case "atmosfera": return [
+        { k: "t", pos: enCara(2, 1 + ALT_ATMOS.tropo / 2, 84), color: "#6fb8ff", icono: "fa-cloud", nombre: "Troposfera", dato: dT, lado: "izq" as const },
+        { k: "e", pos: enCara(2, 1 + (ALT_ATMOS.tropo + ALT_ATMOS.estrato) / 2, ancho ? 61 : 30), color: "#a993ff", icono: "fa-shield-halved", nombre: "Estratosfera · ozono", dato: "absorbe la UV", lado: "der" as const },
+        { k: "m", pos: enCara(2, 1 + (ALT_ATMOS.estrato + ALT_ATMOS.meso) / 2, 38), color: "#7d90ff", icono: "fa-meteor", nombre: "Mesosfera", lado: "der" as const },
+        { k: "r", pos: enCara(2, 1 + (ALT_ATMOS.meso + ALT_ATMOS.termo) / 2, 15), color: "#c58cf0", icono: "fa-satellite", nombre: "Termosfera", lado: "der" as const },
+      ];
+      case "hidrosfera": return [
+        { k: "v", pos: sobre(LUGAR.golfo, 0.05), color: "#bfe9ff", icono: "fa-arrow-up", nombre: "Evaporación", dato: `${Math.round(evaporacion * 100)} %`, lado: "der" as const },
+        { k: "n", pos: sobre(LUGAR.nube, 0.105), color: "#eaf2fb", icono: "fa-cloud", nombre: "Condensación", lado: "centro" as const },
+        { k: "l", pos: sobre([-100.6, 19.6], 0.04), color: "#4fb0ff", icono: "fa-cloud-rain", nombre: "Precipitación", dato: `índice ${Math.round(est.precip)}`, lado: "izq" as const },
+        ...(ancho ? [{ k: "e", pos: sobre([-97.0, 23.4], 0.006), color: erosion > 0.15 ? "#d39a5c" : "#3d9cf0", icono: "fa-water", nombre: erosion > 0.15 ? "Escurrimiento + erosión" : "Escurrimiento", lado: "der" as const }] : []),
+      ];
+      case "biosfera": return [
+        { k: "s", pos: sobre([-66, -2], 0.16), color: "#34D399", icono: "fa-tree", nombre: "Selva amazónica", dato: `${Math.round(veg)} % de cobertura`, lado: "izq" as const },
+        { k: "f", pos: sobre([-57, -7], 0.12), color: "#d8f3ff", icono: "fa-arrow-down", nombre: "Fotosíntesis: fija CO₂", lado: "der" as const },
+        ...(veg < 95 ? [{ k: "h", pos: sobre([-60, -9.5], 0.03), color: "#c9a27a", icono: "fa-fire", nombre: "Claros y humo", dato: `${Math.round(100 - veg)} % talado`, lado: "der" as const }] : []),
+      ];
+      default: return [
+        { k: "a", pos: new THREE.Vector3(-0.6, R * 1.2, 0.5), color: "#7cc4ff", icono: "fa-wind", nombre: "Atmósfera", dato: dT, lado: "centro" as const },
+        { k: "h", pos: sobre([-38, 8], 0.02), color: "#3aa0ff", icono: "fa-water", nombre: "Hidrosfera", dato: `pH ${est.ph.toFixed(2)}`, lado: "centro" as const },
+        { k: "l", pos: enCara(2, 0.72, 40), color: "#ff9a5c", icono: "fa-mountain", nombre: "Litosfera", dato: volc > 0 ? "volcán activo" : "estable", lado: "der" as const },
+        { k: "b", pos: sobre([-60, -12], 0.02), color: "#34D399", icono: "fa-leaf", nombre: "Biosfera", dato: `${Math.round(veg)} % cobertura`, lado: "centro" as const },
+      ];
+    }
+  }, [modo, est.deltaT, est.ph, est.precip, evaporacion, erosion, veg, volc, ancho]);
 
   return (
     <group>
+      <TierraCorte radio={R} dirSol={SOL} meta={meta} pausado={pausado} corteRef={corteRef} segmentos={ligero ? 96 : 160} />
+      <LimitesPlacas radio={R} fuerza={modo === "litosfera" ? 0.95 : modo === "sistema" ? 0.35 : 0} corteRef={corteRef} />
+      <Volcan radio={R} volc={volc} pausado={pausado} cap={Math.round(56 * cap)} cono={modo === "sistema" || modo === "litosfera"} />
+      <Metano radio={R} activo={est.puntoNoRetorno} pausado={pausado} cap={Math.round(36 * cap)} />
+      <CicloAgua radio={R} evaporacion={evaporacion} lluvia={lluvia} erosion={erosion} pausado={pausado} cap={Math.round(110 * cap)} visible={modo === "hidrosfera"} />
+      <FlujoCarbono radio={R} veg={veg / 100} pausado={pausado} cap={Math.round(90 * cap)} visible={modo === "biosfera"} />
+      <Invernadero radio={R} retencion={retencion} pausado={pausado} cap={Math.round(40 * cap)} visible={modo === "atmosfera"} />
 
-      {/* grupo que rota lentamente: litosfera + océano + biosfera + casquetes + volcán */}
-      <group ref={planeta}>
-        {/* LITOSFERA: núcleo rocoso */}
-        <mesh castShadow receiveShadow>
-          <sphereGeometry args={[R - 0.06, 48, 48]} />
-          <meshStandardMaterial color="#7a5a3a" emissive="#2c1d10" emissiveIntensity={0.2} roughness={0.95} flatShading />
-        </mesh>
+      {modo === "sistema" && (
+        <group position={termoPos} rotation={[0, termoGiro, 0]}>
+          <Termometro deltaT={est.deltaT} />
+          {ancho && (
+            <Etiqueta pos={[0.62, yTermometro(1.5), 0]} color="#ffffff" icono="fa-temperature-half" nombre="+1.5 °C" lado="der" ancho={false} />
+          )}
+        </group>
+      )}
 
-        {/* HIDROSFERA: océano translúcido */}
-        <mesh scale={nivelMarShell}>
-          <sphereGeometry args={[R, 56, 56]} />
-          <meshStandardMaterial color={tintOceano} emissive={tintOceano} emissiveIntensity={0.25} roughness={0.25} metalness={0.2} transparent opacity={0.82} />
-        </mesh>
-
-        {/* BIOSFERA: vegetación */}
-        <Vegetacion veg={veg} estresada={estresVeg} />
-
-        {/* casquetes polares */}
-        <Casquete y={1} escala={hielo} />
-        <Casquete y={-1} escala={hielo} />
-
-        {/* volcán (litosfera → atmósfera) */}
-        <mesh position={volcPos} quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), volcDir)}>
-          <coneGeometry args={[0.18, 0.34, 8]} />
-          <meshStandardMaterial color="#5b4636" emissive="#1a0f08" emissiveIntensity={0.3} roughness={1} />
-        </mesh>
-        {volc > 0 && (
-          <Pluma origen={volcPos.clone().add(volcDir.clone().multiplyScalar(0.2))} dir={volcDir} n={Math.round(volc * 2)} color="#ffb24a" vel={0.5} pausado={pausado} ancho={0.5} />
-        )}
-
-        {/* metano del permafrost (punto de no retorno) */}
-        {est.puntoNoRetorno && (
-          <Pluma origen={metPolo} dir={new THREE.Vector3(0, 1, 0)} n={14} color="#c084fc" vel={0.4} pausado={pausado} ancho={0.7} />
-        )}
-      </group>
-
-      {/* ATMÓSFERA: capa exterior (no rota, se tiñe con la temperatura) */}
-      <mesh scale={1.16}>
-        <sphereGeometry args={[R, 40, 40]} />
-        <meshStandardMaterial color={tintAtmos} emissive={tintAtmos} emissiveIntensity={0.5} transparent opacity={opAtmos} side={THREE.BackSide} depthWrite={false} />
-      </mesh>
-      <mesh scale={1.165}>
-        <sphereGeometry args={[R, 40, 40]} />
-        <meshStandardMaterial color={tintAtmos} emissive={tintAtmos} emissiveIntensity={0.35} transparent opacity={opAtmos * 0.5} side={THREE.FrontSide} depthWrite={false} />
-      </mesh>
-
-      {/* termómetro de ΔT (el medidor del experimento) */}
-      <Termometro deltaT={est.deltaT} x={-3.5} />
-
-      {/* Cuatro etiquetas, una por subsistema, cada una en su cuadrante.
-       * La atmósfera lleva la lectura del termómetro. */}
-      <Etiqueta ancho={ancho} pos={[0, 3.05, 0]} color="#7cc4ff" icono="fa-wind" nombre="Atmósfera" dato={`${est.deltaT >= 0 ? "+" : ""}${est.deltaT.toFixed(1)} °C`} />
-      <Etiqueta ancho={ancho} pos={[3.3, 0.5, 0.6]} color="#3aa0ff" icono="fa-water" nombre="Hidrosfera" dato={`pH ${est.ph.toFixed(2)}`} />
-      <Etiqueta ancho={ancho} pos={[-1.6, -2.9, 1.8]} color="#c2895a" icono="fa-mountain" nombre="Litosfera" dato={volc > 0 ? "volcán activo" : "estable"} />
-      <Etiqueta ancho={ancho} pos={[2.0, -2.9, 1.8]} color="#34D399" icono="fa-leaf" nombre="Biosfera" dato={`${Math.round(veg)}% cobertura`} />
-
-      {/* Sol como motor energético (sin rótulo: la info va al panel) */}
-      <mesh position={[5.0, 3.6, -3.0]}>
-        <sphereGeometry args={[0.45, 20, 20]} />
-        <meshStandardMaterial color="#ffd24a" emissive="#ffd24a" emissiveIntensity={1.6} />
-      </mesh>
+      {etiquetas.filter((e) => ancho || !OCULTAR_ANGOSTO[modo].includes(e.k)).map((e) => (
+        <Etiqueta key={`${modo}-${e.k}`} pos={e.pos} color={e.color} icono={e.icono} nombre={e.nombre} dato={e.dato} ancho={ancho} lado={e.lado} />
+      ))}
     </group>
   );
 }
 
-/* ─── Canvas + contenido ───────────────────────────────────────────────── */
-export default function SubsistemasScene(props: SubsistemasSceneProps) {
-  return (
-    <Canvas
-      shadows
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-    >
-      <Contenido {...props} />
-    </Canvas>
-  );
-}
+/* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
+function Contenido(props: SubsistemasSceneProps & { ligero: boolean }) {
+  const { autoRotate, resetNonce, ligero } = props;
+  const modo = props.modo ?? "sistema";
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const [debil, setDebil] = useState(false);
+  const toma = useMemo(() => tomaDe(modo, aspect), [modo, aspect]);
 
-function Contenido(props: SubsistemasSceneProps) {
-  const { accent, autoRotate, resetNonce } = props;
-  const angosto = useThree((st) => st.size.width) < 640;
-  // contenido ~60 % del alto, entre la barra de arriba y la misión de abajo
-  const cam: [number, number, number] = angosto ? [9, 3.6, 12] : [7.4, 3.2, 9.4];
   return (
     <>
-      <PerspectiveCamera makeDefault position={cam} fov={44} />
-      {/* AQUÍ NO HAY SUELO: ESTO ES EL ESPACIO.
-       *
-       * La campaña de calidad 3D le puso mesa a 112 escenas porque la falta de
-       * suelo era la causa real de que se vieran planas, y la altura se dedujo
-       * de donde cada escena ya ponía su sombra de contacto. En casi todas
-       * acierta —una molécula, un matraz y una balanza se leen como objetos
-       * sobre un banco de laboratorio—, pero aquí el objeto es la Tierra: un
-       * plano gris debajo del planeta, con su sombra proyectada, es un error de
-       * física, no de gusto.
-       *
-       * Se conserva la luz y el entorno de `Escenario` —que es lo que da el
-       * volumen— y se quitan la mesa y la niebla, igual que en
-       * `GravitacionScene`. Las estrellas ponen el fondo que antes ponía el
-       * suelo: sin ellas la escena se queda flotando en un vacío liso. */}
-      <Escenario acento={accent} suelo={-3.1} mesa={false} niebla={false} />
-      <Stars radius={70} depth={30} count={1400} factor={3} saturation={0} fade speed={0.6} />
+      <PerformanceMonitor onDecline={() => setDebil(true)} />
+      <Luces />
+      <ViaLactea brillo={0.7} />
 
+      <Suspense fallback={null}>
+        <group key={`${resetNonce}`}>
+          <Planeta {...props} />
+        </group>
+      </Suspense>
 
-      <group key={`${resetNonce}`}>
-        <Planeta {...props} />
-      </group>
-
+      <Guia toma={toma} clave={`${modo}|${toma.distancia.toFixed(2)}|${resetNonce}`} />
+      <FueraDelPlaneta />
 
       <OrbitControls
+        makeDefault
         enablePan={false}
-        minDistance={6}
-        maxDistance={28}
-        minPolarAngle={Math.PI / 8}
-        maxPolarAngle={Math.PI / 1.9}
-        target={[0, -0.7, 0]}
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={toma.min}
+        maxDistance={24}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />
 
-      <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.6} luminanceThreshold={0.5} luminanceSmoothing={0.3} mipmapBlur radius={0.7} />
-        <Vignette eskil={false} offset={0.28} darkness={0.44} />
-      </EffectComposer>
+      {!ligero && !debil && (
+        <EffectComposer enableNormalPass={false} multisampling={4}>
+          <Bloom intensity={0.7} luminanceThreshold={0.86} luminanceSmoothing={0.2} mipmapBlur radius={0.7} />
+          <Vignette eskil={false} offset={0.26} darkness={0.5} />
+        </EffectComposer>
+      )}
     </>
+  );
+}
+
+export default function SubsistemasScene(props: SubsistemasSceneProps) {
+  // Celular / táctil: sin postproceso, menos partículas y texturas 2K (el kit ya baja).
+  const ligero = useMemo(() => {
+    if (typeof window === "undefined") return true;
+    return window.matchMedia?.("(pointer: coarse)").matches || window.innerWidth < 640;
+  }, []);
+  return (
+    <Canvas dpr={[1, 1.75]} gl={{ antialias: true, alpha: true }}
+      camera={{ position: [14, 9, 14], fov: FOV, near: 0.02, far: 5000 }}>
+      <Contenido {...props} ligero={ligero} />
+    </Canvas>
   );
 }

@@ -17,7 +17,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, SceneBoundary } from "./_kit";
-import { LabShell, Bloque, Dato, BotonHerramienta } from "./_shell";
+import { LabShell, Bloque, Dato, BotonHerramienta, Deslizador } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
@@ -26,6 +26,7 @@ import {
   type Modo, MODOS, organelosDe, organeloPorId, CELULAS,
   COMPARACION, TAMANOS,
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, GLOSARIO, CONTEXTO, FUENTE, DATOS, QUIZ_A2,
+  CRESTAS_MIN, CRESTAS_MAX, CRESTAS_INICIO, CRESTAS_META, superficieInterna,
 } from "./celula-data";
 
 /** Clave de la mejor marca de este laboratorio. */
@@ -49,6 +50,10 @@ export function LabCelula({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // corte de la célula (grados de apertura) y «zoom al interior» de la mitocondria
+  const [corte, setCorte] = useState(110);
+  const [interior, setInterior] = useState(false);
+  const [crestas, setCrestas] = useState(CRESTAS_INICIO);
   // teoría (cajón deslizable) y sonido
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
@@ -75,6 +80,7 @@ export function LabCelula({ color }: PracticaLabProps) {
   const bump = () => setResetNonce((n) => n + 1);
   const cambiarModo = (m: Modo) => {
     setModo(m);
+    setInterior(false);
     const primero = organelosDe(m)[0];
     setSelected(primero ? primero.id : null);
     if (sonido) audioRef.current?.blip();
@@ -83,7 +89,21 @@ export function LabCelula({ color }: PracticaLabProps) {
   const resetModo = () => {
     const primero = organelosDe(modo)[0];
     setSelected(primero ? primero.id : null);
+    setInterior(false);
+    setCorte(110);
     bump();
+  };
+  const elegir = (id: string) => {
+    setSelected(id);
+    if (id !== "mitocondria") setInterior(false);
+    if (sonido) audioRef.current?.blip();
+  };
+  const puedeEntrar = modo !== "procariota";
+  const entrarSalir = () => {
+    if (!puedeEntrar) return;
+    if (!interior) setSelected("mitocondria");
+    setInterior((v) => !v);
+    if (sonido) audioRef.current?.blip();
   };
 
   // valores en vivo
@@ -112,8 +132,13 @@ export function LabCelula({ color }: PracticaLabProps) {
   const vioCloroplasto = useLatch(modo === "vegetal" && selected === "cloroplasto");
   const vioVegetal = useLatch(modo === "vegetal");
   const vioProcariota = useLatch(modo === "procariota");
+  const vioInterior = useLatch(interior && puedeEntrar);
+  const plegoMas = useLatch(interior && puedeEntrar && crestas >= CRESTAS_META);
 
-  const lectura = <>{cel.etq} · {lista.length} estructuras{selEnModo ? ` · ${selEnModo.nombre.replace(" (RE)", "").replace(" (nucleoide)", "")}` : ""}</>;
+  const superficie = superficieInterna(crestas);
+  const lectura = interior && puedeEntrar
+    ? <>Mitocondria por dentro · {crestas} crestas · ATP ×{superficie.toFixed(1)}</>
+    : <>{cel.etq} · {lista.length} estructuras{selEnModo ? ` · ${selEnModo.nombre.replace(" (RE)", "").replace(" (nucleoide)", "")}` : ""}</>;
 
   const lista14: React.CSSProperties = { margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 };
   const celdaCmp: React.CSSProperties = { padding: "8px 10px", background: "rgba(4,10,22,0.35)", fontSize: 14, lineHeight: 1.3, color: T.text2, minWidth: 0 };
@@ -129,10 +154,13 @@ export function LabCelula({ color }: PracticaLabProps) {
           <CelulaScene
             modo={modo}
             selected={selEnModo ? selEnModo.id : null}
-            onSelect={(id) => setSelected(id)}
+            onSelect={elegir}
             playing={playing}
             accent={accent}
             resetNonce={resetNonce}
+            corte={corte}
+            interior={interior && puedeEntrar}
+            crestas={crestas}
           />
         </SceneBoundary>
       }
@@ -144,16 +172,21 @@ export function LabCelula({ color }: PracticaLabProps) {
       herramientas={
         <>
           <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
-          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar giro" : "Reanudar giro"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          {puedeEntrar && (
+            <BotonHerramienta icono={interior ? "fa-magnifying-glass-minus" : "fa-magnifying-glass-plus"} titulo={interior ? "Salir de la mitocondria" : "Entrar a la mitocondria"} activo={interior} onClick={entrarSalir} />
+          )}
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar movimiento" : "Reanudar movimiento"} activo={playing} onClick={() => setPlaying((p) => !p)} />
           <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar la vista" onClick={resetModo} />
         </>
       }
       lectura={lectura}
       objetivos={[
-        { txt: "En la célula vegetal, toca el cloroplasto: es lo que la animal no tiene", done: vioCloroplasto },
-        { txt: "Recorre los organelos de la célula animal", done: recorrioAnimal },
-        { txt: "Pasa a la célula vegetal y busca el cloroplasto y la pared celular", done: vioVegetal },
-        { txt: "Compara con la procariota: sin núcleo y con ADN circular", done: vioProcariota },
+        { txt: "Entra a la mitocondria con la lupa y mira sus crestas", done: vioInterior, modo: ["animal", "vegetal"] },
+        { txt: `Pliega más la membrana interna (${CRESTAS_META}+ crestas): ¿sale más ATP?`, done: plegoMas, modo: ["animal", "vegetal"] },
+        { txt: "En la célula vegetal, toca el cloroplasto: es lo que la animal no tiene", done: vioCloroplasto, modo: "vegetal" },
+        { txt: "Recorre los organelos de la célula animal", done: recorrioAnimal, modo: "animal" },
+        { txt: "Pasa a la célula vegetal y busca el cloroplasto y la pared celular", done: vioVegetal, modo: "vegetal" },
+        { txt: "Compara con la procariota: sin núcleo y con ADN circular", done: vioProcariota, modo: "procariota" },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}
       pestanas={[
@@ -163,13 +196,68 @@ export function LabCelula({ color }: PracticaLabProps) {
           icono: "fa-hand-pointer",
           contenido: (
             <>
+              {interior && puedeEntrar ? (
+                <Bloque titulo="Por dentro de la mitocondria" icono="fa-bolt">
+                  <Deslizador
+                    label="Pliegues de la membrana interna"
+                    icon="fa-wave-square"
+                    colr="#fb923c"
+                    valor={`${crestas} crestas`}
+                    min={CRESTAS_MIN}
+                    max={CRESTAS_MAX}
+                    step={1}
+                    value={crestas}
+                    onChange={setCrestas}
+                    hintL="lisa"
+                    hintR="muy plegada"
+                  />
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                    <Dato label="crestas" value={`${crestas}`} col="#fdba74" />
+                    <Dato label="superficie interna" value={`×${superficie.toFixed(1)}`} col="#fbbf24" />
+                  </div>
+                  <p style={{ margin: 0, color: T.text2, lineHeight: 1.5 }}>
+                    {crestas >= CRESTAS_META
+                      ? "Más pliegues = más membrana interna, y ahí están la cadena de transporte de electrones y la ATP sintasa: salen más chispas de ATP. Por eso las células con mucha demanda de energía tienen mitocondrias con muchas crestas."
+                      : "Las chispas amarillas son ATP que sale de las ATP sintasas de la membrana interna. Pliega más la membrana y observa qué pasa con el ATP."}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 14, color: T.text3, lineHeight: 1.45 }}>
+                    Modelo cualitativo (no a escala): cada cresta suma superficie a la membrana interna. Fíjate también en el ADN circular propio de la mitocondria, evidencia de la teoría endosimbiótica.
+                  </p>
+                  <button type="button" onClick={entrarSalir}
+                    style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center", padding: "10px 14px", borderRadius: 10, border: `1px solid ${T.line}`, background: "rgba(4,10,22,0.5)", color: "#fff", fontSize: 14, fontWeight: 800 }}>
+                    <i className="fa-solid fa-magnifying-glass-minus" aria-hidden /> Volver a la célula
+                  </button>
+                </Bloque>
+              ) : (
+                <Bloque titulo="Explora" icono="fa-scissors">
+                  <Deslizador
+                    label="Corte de la célula"
+                    icon="fa-scissors"
+                    colr={modoCol}
+                    valor={corte === 0 ? "cerrada" : `${corte}°`}
+                    min={0}
+                    max={160}
+                    step={5}
+                    value={corte}
+                    onChange={setCorte}
+                    hintL="cerrada"
+                    hintR="muy abierta"
+                  />
+                  {puedeEntrar && (
+                    <button type="button" onClick={entrarSalir}
+                      style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center", padding: "10px 14px", borderRadius: 10, border: "1px solid #fb923c88", background: "rgba(251,146,60,0.14)", color: "#fff", fontSize: 14, fontWeight: 800 }}>
+                      <i className="fa-solid fa-magnifying-glass-plus" aria-hidden /> Entrar a la mitocondria
+                    </button>
+                  )}
+                </Bloque>
+              )}
               <Bloque titulo={`Organelos: ${cel.etq}`} icono={cel.icono}>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 160px), 1fr))", gap: 8 }}>
                   {lista.map((o) => {
                     const on = selEnModo?.id === o.id;
                     const oc = `#${o.color.replace("#", "")}`;
                     return (
-                      <button key={o.id} type="button" onClick={() => setSelected(o.id)}
+                      <button key={o.id} type="button" onClick={() => elegir(o.id)}
                         style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 9, textAlign: "left", width: "100%", borderRadius: 10, padding: "9px 11px", border: `1px solid ${on ? oc : "rgba(255,255,255,0.12)"}`, background: on ? `${oc}1f` : "rgba(4,10,22,0.4)" }}>
                         <span style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: on ? "#04121f" : oc, background: on ? oc : `${oc}22` }}>
                           <i className={`fa-solid ${o.icono}`} />
@@ -303,7 +391,7 @@ export function LabCelula({ color }: PracticaLabProps) {
                 <FichaTeorica data={CELULA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
               </Bloque>
               <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
-                Las funciones de cada organelo son <strong>verbatim</strong>: las del núcleo, mitocondria, cloroplasto, RE y Golgi provienen del glosario A5 (etiqueta «GLOSARIO A5»); las de membrana, pared, ribosomas, lisosomas, vacuola y nucleoide se basan en la infografía A1 (etiqueta «INFOGRAFÍA A1»). La tabla comparativa y la barra de tamaño son verbatim de A5 y A1. La célula en 3D es <strong>esquemática</strong>: formas, colores y posiciones son representaciones visuales (no a escala ni con número real de organelos). Fuente: {FUENTE}
+                Los rótulos breves junto a cada organelo en 3D son un resumen; la función completa (en el panel) es <strong>verbatim</strong>. Las funciones de cada organelo son <strong>verbatim</strong>: las del núcleo, mitocondria, cloroplasto, RE y Golgi provienen del glosario A5 (etiqueta «GLOSARIO A5»); las de membrana, pared, ribosomas, lisosomas, vacuola y nucleoide se basan en la infografía A1 (etiqueta «INFOGRAFÍA A1»). La tabla comparativa y la barra de tamaño son verbatim de A5 y A1. La célula en 3D es <strong>esquemática</strong>: formas, colores y posiciones son representaciones visuales (no a escala ni con número real de organelos); la vista «por dentro de la mitocondria» es un modelo cualitativo. Fuente: {FUENTE}
               </p>
             </>
           ),

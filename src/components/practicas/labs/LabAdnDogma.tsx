@@ -53,6 +53,7 @@ import {
   HECHOS,
   QUIZ_A2,
 } from "./adn-dogma-data";
+import { MODELO_3D, HEBRA_COLOR, anticodon } from "./adn-dogma-modelo";
 
 const AdnDogmaScene = dynamic(() => import("./AdnDogmaScene"), {
   ssr: false,
@@ -218,6 +219,9 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
   const [progreso, setProgreso] = useState<number>(0);
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
+  // ritmo de la animación y cámara que sigue a la maquinaria
+  const [velocidad, setVelocidad] = useState(1);
+  const [guiada, setGuiada] = useState(true);
   // reto evaluable (B) y sonido (C)
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
   const [sonido, setSonido] = useState(false);
@@ -279,9 +283,9 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
   useEffect(() => {
     if (!playing || total === 0) return;
     if (paso >= total) return;
-    const t = setInterval(() => setProgreso((p) => Math.min(total, p + 1)), 850);
+    const t = setInterval(() => setProgreso((p) => Math.min(total, p + 1)), 850 / velocidad);
     return () => clearInterval(t);
-  }, [playing, total, paso]);
+  }, [playing, total, paso, velocidad]);
 
   const cambiarModo = (m: Modo) => {
     setModo(m);
@@ -353,6 +357,47 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
         : proteina.join("-") === proteinaOrig.join("-")
           ? { col: "#86efac", txt: "Mutación silenciosa: cambió el ADN pero la proteína es la misma (el código genético es degenerado)." }
           : { col: "#fbbf24", txt: "Mutación de sentido erróneo o de longitud distinta: la proteína cambió." };
+
+  // lo que muestra la escena, en números (panel «Lo que ves en 3D»)
+  const pares = codificante.split("");
+  const nAT = pares.filter((b) => b === "A" || b === "T").length;
+  const nGC = pares.length - nAT;
+  const codonA = codones[Math.min(paso, Math.max(0, codones.length - 1))];
+  const vista3d: { label: string; value: string; col?: string }[] =
+    modo === "replicacion"
+      ? [
+          { label: "Pares A–T (2 puentes H)", value: String(nAT), col: BASE_COLOR.A },
+          { label: "Pares G–C (3 puentes H)", value: String(nGC), col: BASE_COLOR.G },
+          { label: "Puentes H del gen", value: String(nAT * 2 + nGC * 3) },
+          { label: "Vueltas de la hélice", value: (pares.length / 10.5).toFixed(2) },
+        ]
+      : modo === "transcripcion"
+        ? [
+            { label: "ARNm sintetizado", value: `${paso} de ${total} nt`, col: HEBRA_COLOR.arn },
+            { label: "Uracilos (U) en el ARNm", value: String(arnm.slice(0, paso).split("").filter((b) => b === "U").length), col: BASE_COLOR.U },
+            { label: "Lee la hebra", value: "molde 3'→5'" },
+            { label: "Sintetiza", value: "ARN 5'→3'" },
+          ]
+        : [
+            { label: "Codón en el sitio A", value: codonA ? codonA.codon : "—", col: modoCol },
+            { label: "Anticodón del ARNt", value: codonA && !codonA.paro ? anticodon(codonA.codon) : "—" },
+            { label: "Aminoácido", value: codonA ? (codonA.paro ? "paro" : codonA.amino.abr) : "—", col: codonA?.amino.color },
+            { label: "Cadena", value: `${Math.min(paso, proteina.length)} aa` },
+          ];
+  const leyenda: { txt: string; col: string; redondo?: boolean }[] = [
+    { txt: "A", col: BASE_COLOR.A },
+    { txt: modo === "replicacion" ? "T" : "T / U (ARN)", col: modo === "replicacion" ? BASE_COLOR.T : BASE_COLOR.U },
+    { txt: "G", col: BASE_COLOR.G },
+    { txt: "C", col: BASE_COLOR.C },
+    ...(modo === "traduccion"
+      ? [{ txt: "ARNm", col: HEBRA_COLOR.arn, redondo: true }, { txt: "ARNt", col: "#fda4af", redondo: true }]
+      : [{ txt: "Hebra codificante", col: HEBRA_COLOR.codificante, redondo: true }, { txt: "Hebra molde", col: HEBRA_COLOR.molde, redondo: true }]),
+    ...(modo === "replicacion"
+      ? [{ txt: "Hebra nueva", col: HEBRA_COLOR.nueva, redondo: true }, { txt: "Cebador de ARN", col: HEBRA_COLOR.cebador, redondo: true }]
+      : modo === "transcripcion"
+        ? [{ txt: "ARNm", col: HEBRA_COLOR.arn, redondo: true }]
+        : []),
+  ];
 
   // codones simplificados para el reto de cálculo (codón → aminoácido)
   const codonesReto = codones.map((c) => ({ codon: c.codon, abr: c.amino.abr, paro: c.paro }));
@@ -515,9 +560,26 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
         <Deslizador label={modo === "traduccion" ? "Codones leídos" : "Bases procesadas"} icon="fa-ruler-horizontal" colr={modoCol}
           valor={`${paso} / ${total}`} min={0} max={Math.max(1, total)} step={1} value={paso}
           onChange={(v) => { setPlaying(false); setProgreso(v); }} hintL="inicio" hintR="final" />
+        <Deslizador label="Ritmo de la animación" icon="fa-gauge-high" colr={modoCol}
+          valor={`${velocidad.toFixed(2).replace(/0$/, "")}×`} min={0.25} max={2.5} step={0.25} value={velocidad}
+          onChange={setVelocidad} hintL="lento" hintR="rápido" />
         <div style={{ color: T.text2 }}>
           <i className="fa-solid fa-hand-pointer" style={{ marginRight: 8, color: modoCol }} aria-hidden />
-          También puedes <strong style={{ color: "#fff" }}>arrastrar la perilla brillante</strong> en la escena 3D.
+          También puedes <strong style={{ color: "#fff" }}>arrastrar la {modo === "traduccion" ? "maquinaria (el ribosoma)" : modo === "transcripcion" ? "ARN polimerasa" : "helicasa"}</strong> por el anillo brillante de la escena 3D, o pausar y avanzar paso a paso.
+        </div>
+      </Bloque>
+
+      <Bloque titulo="Lo que ves en 3D" icono="fa-eye">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+          {vista3d.map((d) => <Dato key={d.label} label={d.label} value={d.value} col={d.col} />)}
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 12px", color: T.text2 }}>
+          {leyenda.map((l) => (
+            <span key={l.txt} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <span aria-hidden style={{ width: 12, height: 12, borderRadius: l.redondo ? 99 : 3, background: l.col, boxShadow: `0 0 0 1px ${l.col}66` }} />
+              {l.txt}
+            </span>
+          ))}
         </div>
       </Bloque>
 
@@ -546,6 +608,14 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
               <strong>{e.nombre}</strong>
               <div style={{ color: T.text2 }}>{e.funcion}</div>
             </div>
+          </div>
+        ))}
+      </Bloque>
+      <Bloque titulo="El modelo 3D, etapa por etapa" icono="fa-cube">
+        {MODELO_3D.map((m) => (
+          <div key={m.titulo}>
+            <strong>{m.titulo}</strong>
+            <div style={{ color: T.text2 }}>{m.texto}</div>
           </div>
         ))}
       </Bloque>
@@ -670,6 +740,9 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
                 arrastrable={eppListo}
                 onScrub={onArrastraPaso}
                 onGrab={onGrabAdn}
+                velocidad={velocidad}
+                guiada={guiada}
+                yaArrastro={arrastro}
               />
             </SceneBoundary>
 
@@ -704,6 +777,7 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
             <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reanudar"} activo={playing} onClick={() => setPlaying((p) => !p)} />
             <BotonHerramienta icono="fa-forward-step" titulo="Paso adelante" onClick={() => { setPlaying(false); setProgreso((p) => Math.min(total, p + 1)); }} />
             <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+            <BotonHerramienta icono="fa-video" titulo={guiada ? "Cámara guiada (sigue a la maquinaria)" : "Cámara libre"} activo={guiada} onClick={() => setGuiada((g) => !g)} />
           </>
         }
         lectura={lectura}

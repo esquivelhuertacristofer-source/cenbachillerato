@@ -13,6 +13,9 @@
  * a rojo al mover el CO₂; una marca blanca señala el límite de +1,5 °C.
  * Incluye los escenarios guiados de la simulación (referencia 1850, hoy,
  * deforestación, erupción mayor, permafrost y restauración).
+ * La Tierra es fotográfica (NASA) y está abierta en cuña: cada esfera es un
+ * modo y la cámara viaja a ella (corte del interior, casquete de la atmósfera
+ * con el efecto invernadero, ciclo del agua en el Golfo, selva que fija CO₂).
  * Ecosistemas, interacciones y energía — subsistemas terrestres (MCCEMS 2025).
  */
 
@@ -26,6 +29,8 @@ import { SUBSISTEMAS_FICHA } from "./subsistemas-terrestres-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { QUIZ_A2 } from "./subsistemas-terrestres-data";
 import { LabSfx } from "./lab-audio";
+import { CREDITO_ESPACIO } from "./_espacio";
+import { MODOS_ESFERA, FOCO_ESFERA, CAPAS_INTERIOR, CAPAS_ATMOSFERA, retencionInfrarrojo, type ModoEsfera } from "./subsistemas-capas";
 import {
   SUBSISTEMAS, ESCENARIOS, INTERACCIONES, calcularEstado,
   CO2_MIN, CO2_MAX, CO2_STEP, CO2_DEFAULT, CO2_REF, CO2_HOY,
@@ -53,6 +58,15 @@ const MORADO = "#c084fc";
 
 const RETO_KEY = "cen-subsistemas-terrestres-reto";
 
+/** Segunda línea de la leyenda: qué significa lo que se ve en cada esfera. */
+const LEYENDA: Record<ModoEsfera, string> = {
+  sistema: "Termómetro: marca blanca = +1,5 °C",
+  atmosfera: "Amarillo: luz solar · rojo: infrarrojo · violeta: UV",
+  hidrosfera: "Evaporación → nube → lluvia → escurrimiento",
+  litosfera: "Naranja: límites de placas · el manto circula",
+  biosfera: "Verde: vegetación · café: claros talados",
+};
+
 const botonCss = (on: boolean, col: string): React.CSSProperties => ({
   cursor: "pointer", padding: "11px 14px", borderRadius: 12, border: `1px solid ${on ? col : T.line}`,
   background: on ? `${col}22` : T.inset, color: on ? "#fff" : T.text2, fontSize: 14, fontWeight: 800,
@@ -69,6 +83,9 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
   const [pausado, setPausado] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
+  const [modo, setModo] = useState<ModoEsfera>("sistema");
+  const [visitados, setVisitados] = useState<ModoEsfera[]>(["sistema"]);
+  const esferasVistas = (["atmosfera", "hidrosfera", "litosfera", "biosfera"] as const).filter((m) => visitados.includes(m)).length;
 
   // objetivos
   const [vioCO2, setVioCO2] = useState(false);        // CO₂ ≥ 400 ppm: el termómetro sube
@@ -103,6 +120,13 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
 
   const bump = () => setResetNonce((n) => n + 1);
 
+  const cambiarModo = (id: string) => {
+    const m = id as ModoEsfera;
+    if (sonido) audioRef.current?.blip();
+    setModo(m);
+    setVisitados((v) => (v.includes(m) ? v : [...v, m]));
+  };
+
   const est = useMemo(() => calcularEstado(co2, veg, volc, permafrost), [co2, veg, volc, permafrost]);
 
   // marca objetivos según el estado actual
@@ -128,10 +152,11 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
   }, [est.deltaT, est.puntoNoRetorno]);
 
   const objetivos = [
-    { txt: "Sube el CO₂ a 400 ppm o más y mira subir el termómetro", done: vioCO2 },
+    { txt: "Sube el CO₂ a 400 ppm o más y mira subir el termómetro", done: vioCO2, modo: "sistema" },
+    { txt: "Viaja por las cuatro esferas: atmósfera, hidrosfera, litosfera y biosfera", done: esferasVistas >= 4 },
     { txt: "Calienta el planeta +1.5 °C", done: vioCalor },
-    { txt: "Deforesta hasta ≤ 50%", done: vioDefor },
-    { txt: "Activa un volcán", done: vioVolcan },
+    { txt: "Deforesta hasta ≤ 50%", done: vioDefor, modo: ["biosfera", "hidrosfera", "sistema"] },
+    { txt: "Activa un volcán", done: vioVolcan, modo: ["litosfera", "sistema"] },
     { txt: "Dispara el permafrost", done: vioPNR },
     { txt: "Resuelve el reto evaluable de la actividad A3", done: ejercicioAprobado },
   ];
@@ -148,6 +173,9 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
     </div>
   );
 
+  // Efecto invernadero (mismo cálculo que la escena): fracción del infrarrojo que vuelve al suelo.
+  const retencion = retencionInfrarrojo(est.co2eff);
+
   const lectura = <>{fmtDelta(est.deltaT)} °C · mar {fmtDelta(est.nivelMar, 0)} cm · pH {fmt2(est.ph)}</>;
 
   return (
@@ -163,6 +191,7 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
             pausado={pausado}
             autoRotate={autoRotate}
             resetNonce={resetNonce}
+            modo={modo}
           />
         </SceneBoundary>
       }
@@ -174,10 +203,11 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
           <BotonHerramienta icono="fa-rotate-left" titulo="Volver a 1850" onClick={reset} />
         </>
       }
+      modos={{ opciones: MODOS_ESFERA, valor: modo, cambiar: cambiarModo }}
       leyenda={
         <>
           <div style={{ fontWeight: 900, color: alerta.col }}>{alerta.txt}</div>
-          <div style={{ color: T.text2 }}>Termómetro: marca blanca = +1,5 °C</div>
+          <div style={{ color: T.text2 }}>{LEYENDA[modo]}</div>
         </>
       }
       lectura={lectura}
@@ -189,6 +219,17 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
           icono: "fa-sliders",
           contenido: (
             <>
+              <Bloque titulo={FOCO_ESFERA[modo].titulo} icono={MODOS_ESFERA.find((m) => m.id === modo)?.icono ?? "fa-earth-americas"}>
+                <p style={{ margin: 0, color: T.text2 }}>{FOCO_ESFERA[modo].mira}</p>
+                <p style={{ margin: 0, color: T.text }}><i className="fa-solid fa-hand-pointer" style={{ color: accent, marginRight: 8 }} />{FOCO_ESFERA[modo].mueve}</p>
+                {modo === "atmosfera" && (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                    <Dato label="CO₂ efectivo" value={`${fmt0(est.co2eff)} ppm`} col={AZUL} />
+                    <Dato label="Infrarrojo devuelto" value={`${fmt0(retencion * 100)} %`} col={ROJO} />
+                  </div>
+                )}
+              </Bloque>
+
               <Bloque titulo="Variables de la simulación" icono="fa-sliders">
                 <Deslizador label="CO₂ atmosférico" icon="fa-smog" colr={AZUL}
                   valor={`${fmt0(co2)} ppm`} min={CO2_MIN} max={CO2_MAX} step={CO2_STEP} value={co2}
@@ -268,6 +309,28 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
                   </ul>
                 </Bloque>
               ))}
+              <Bloque titulo="El interior de la Tierra (lo que muestra el corte)" icono="fa-layer-group">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  En el corte, los radios son proporcionales al radio real de la Tierra (6 371 km); solo la corteza se dibuja unas tres veces más gruesa, porque con sus ~35 km sería una línea invisible.
+                </p>
+                {CAPAS_INTERIOR.map((c) => (
+                  <div key={c.nombre} style={{ display: "grid", gap: 2, paddingLeft: 12, borderLeft: `3px solid ${c.color}` }}>
+                    <span style={{ fontWeight: 800, color: T.text }}>{c.nombre} · <span style={{ color: T.text3 }}>{c.rango} · {c.estado}</span></span>
+                    <span style={{ color: T.text2 }}>{c.nota}</span>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Las capas de la atmósfera" icono="fa-cloud">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  En la escena las capas están exageradas: la atmósfera real es una película delgadísima comparada con el planeta.
+                </p>
+                {CAPAS_ATMOSFERA.map((c) => (
+                  <div key={c.nombre} style={{ display: "grid", gap: 2, paddingLeft: 12, borderLeft: `3px solid ${c.color}` }}>
+                    <span style={{ fontWeight: 800, color: T.text }}>{c.nombre} · <span style={{ color: T.text3 }}>{c.rango}</span></span>
+                    <span style={{ color: T.text2 }}>{c.nota}</span>
+                  </div>
+                ))}
+              </Bloque>
               <Bloque titulo="Interacciones clave" icono="fa-arrows-left-right">
                 {INTERACCIONES.map((it, i) => (
                   <div key={i} style={{ color: T.text2 }}>
@@ -286,6 +349,9 @@ export function LabSubsistemas({ color }: PracticaLabProps) {
               </Bloque>
               <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
                 Modelo cualitativo con fines didácticos: usa números de referencia conocidos (sensibilidad climática ~3 °C por duplicación de CO₂, IPCC; pH preindustrial 8.2) para mostrar la dirección y el orden de las interacciones entre subsistemas, no para predecir valores exactos.
+              </p>
+              <p style={{ marginTop: 10, fontSize: 14, color: T.text3 }}>
+                Los límites de placas son un trazo aproximado de los principales. {CREDITO_ESPACIO}
               </p>
             </>
           ),

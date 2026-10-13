@@ -179,3 +179,42 @@ export function sci(n: number, dec = 2): string {
 
 /** Distancia en km, separador de miles es-MX. */
 export const fmtKm = (m: number): string => ES(m / 1000, 0);
+
+/* ── Agregados para la escena «élite» (no cambian nada de lo anterior) ────── */
+
+/**
+ * Día sideral: lo que tarda la Tierra en girar una vez respecto a las
+ * estrellas (23 h 56 min). Es el período que de verdad iguala un satélite
+ * geoestacionario; T_TIERRA_H = 24 h queda como la aproximación del problema.
+ */
+export const T_SIDEREO_H = 23.9345;
+
+/** Órbita baja de comparación: la Estación Espacial Internacional. */
+export const ALT_EEI = 400e3;          // m
+export const INCL_EEI = 51.6;          // ° (inclinación de su órbita)
+export const ORBITA_EEI = resolverOrbita(ALT_EEI); // T ≈ 92 min, v ≈ 7.7 km/s
+
+/**
+ * Marea relativa a la del problema. La fuerza de marea depende de la
+ * DIFERENCIA de atracción entre los dos lados de la Tierra, que cae como 1/r³
+ * (más rápido que la fuerza misma, 1/r²).
+ */
+export function mareaRelativa(r: number): number {
+  return Math.pow(R_DEF / r, 3);
+}
+
+/**
+ * El salto con el mismo impulso de piernas: misma rapidez de despegue en todos
+ * los cuerpos (la que en la Tierra sube 0.5 m). Altura h = v²/(2g) y tiempo en
+ * el aire t = 2v/g. La masa no aparece: con la misma rapidez, todos suben igual.
+ */
+export const H_SALTO_TIERRA = 0.5;                               // m
+export const V_SALTO = Math.sqrt(2 * G_TIERRA * H_SALTO_TIERRA); // ≈ 3.13 m/s
+
+export function resolverSalto(g: number): { h: number; tAire: number } {
+  return { h: (V_SALTO * V_SALTO) / (2 * g), tAire: (2 * V_SALTO) / g };
+}
+
+/** Aclaración honesta para el modo Peso cuando se elige Júpiter. */
+export const NOTA_JUPITER =
+  "Júpiter no tiene suelo firme: su g = 24.79 m/s² se mide en la cima de las nubes. El astronauta parado ahí es un experimento mental.";

@@ -387,3 +387,36 @@ export const QUIZ_A2: QuizEvaluable = {
     },
   ],
 };
+
+/* ── Rótulos breves de la escena 3D (resumen de la función, NO verbatim) ──────
+ * El texto completo y verbatim sigue en `funcion`; esto es lo que cabe en un
+ * rótulo junto al organelo. */
+export const RESUMEN_FUNCION: Record<string, string> = {
+  membrana: "Controla qué entra y qué sale",
+  pared: "Da forma y protección",
+  nucleo: "Guarda el ADN y dirige la célula",
+  mitocondria: "Respiración celular: produce ATP",
+  cloroplasto: "Fotosíntesis: luz → glucosa y O₂",
+  re: "Rugoso: proteínas · Liso: lípidos",
+  golgi: "Modifica, empaca y envía proteínas",
+  ribosomas: "Sintetizan proteínas",
+  lisosoma: "Digieren desechos",
+  vacuola: "Agua y turgencia",
+  nucleoide: "ADN circular, sin núcleo",
+};
+
+/* ── «Por dentro de la mitocondria»: modelo cualitativo de las crestas ─────── */
+export const CRESTAS_MIN = 2;
+export const CRESTAS_MAX = 14;
+export const CRESTAS_INICIO = 5;
+/** Umbral de la misión «pliega más la membrana interna». */
+export const CRESTAS_META = 10;
+/**
+ * Superficie de la membrana interna respecto a una membrana SIN pliegues
+ * (modelo simplificado: cada cresta suma ~0.25 de la superficie lisa). En la
+ * membrana interna están la cadena de transporte de electrones y la ATP
+ * sintasa, así que más superficie = más ATP posible.
+ */
+export function superficieInterna(crestas: number): number {
+  return 1 + 0.25 * crestas;
+}

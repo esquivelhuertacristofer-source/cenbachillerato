@@ -27,6 +27,8 @@ import { GRAVITACION_FICHA } from "./gravitacion-universal-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./gravitacion-universal-data";
 import { LabSfx } from "./lab-audio";
+import { CREDITO_ESPACIO } from "./_espacio";
+import type { VistaOrbita } from "./GravitacionScene";
 import {
   type Modo, resolverFuerza, resolverPeso, resolverOrbita, cuerpoPorId, CUERPOS,
   R_MIN, R_MAX, R_DEF, F_DEF,
@@ -34,7 +36,9 @@ import {
   ALT_MIN, ALT_MAX, ALT_GEO, ALT_DEF, T_TIERRA_H,
   PROBLEMA, PASOS, IDEAS, DATOS,
   sci, fmt0, fmt1, fmt2, fmtKm,
+  mareaRelativa, resolverSalto, V_SALTO, ORBITA_EEI, NOTA_JUPITER,
 } from "./gravitacion-data";
+import { CurvaGravitacion } from "./gravitacion-curvas";
 
 const GravitacionScene = dynamic(() => import("./GravitacionScene"), {
   ssr: false,
@@ -56,6 +60,12 @@ const MODOS: { id: Modo; etq: string; icono: string; col: string; desc: string }
   { id: "orbita", etq: "Órbita", icono: "fa-satellite",                        col: C_ORBITA, desc: "Satélite geoestacionario: T = 2π·√(r³/GM)" },
 ];
 
+const VISTAS: { id: VistaOrbita; etq: string; icono: string; desc: string }[] = [
+  { id: "espacio", etq: "Desde el espacio", icono: "fa-earth-americas", desc: "Cámara fija respecto a las estrellas: la Tierra gira y el satélite le da la vuelta." },
+  { id: "tierra", etq: "Girando con la Tierra", icono: "fa-arrows-spin", desc: "La cámara gira con la Tierra, como la ve alguien en México: si el satélite es geoestacionario, se queda quieto; lo que se mueve es el cielo." },
+  { id: "satelite", etq: "Desde el satélite", icono: "fa-satellite", desc: "Vas montado detrás del satélite: en la geoestacionaria, México se queda siempre debajo de ti." },
+];
+
 const RETO_KEY = "cen-gravitacion-universal-reto";
 
 export function LabGravitacion({ color }: PracticaLabProps) {
@@ -66,9 +76,15 @@ export function LabGravitacion({ color }: PracticaLabProps) {
   const [cuerpoId, setCuerpoId] = useState<string>(CUERPO_DEF); // (b)
   const [m, setM] = useState<number>(M_DEF);          // (b)
   const [alt, setAlt] = useState<number>(ALT_DEF);    // (c)
-  const [t, setT] = useState<number>(0);              // (c) tiempo de simulación (h)
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
+  // agregados de la escena «élite»
+  const [mareas, setMareas] = useState<boolean>(true);          // (a) abultamiento de marea
+  const [salto, setSalto] = useState<number>(0);                // (b) contador de saltos
+  const [saltosEn, setSaltosEn] = useState<string[]>([]);       // (b) cuerpos donde ya saltó
+  const [velocidad, setVelocidad] = useState<number>(3);        // (c) horas simuladas por segundo
+  const [vista, setVista] = useState<VistaOrbita>("espacio");   // (c) punto de vista
+  const [eei, setEei] = useState<boolean>(false);               // (c) comparar con la EEI
 
   // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
@@ -94,37 +110,25 @@ export function LabGravitacion({ color }: PracticaLabProps) {
     };
   }, []);
 
-  // Reproduce el movimiento orbital (rAF) — solo en el modo órbita.
-  useEffect(() => {
-    if (modo !== "orbita" || !playing) return;
-    let raf = 0;
-    let last = 0;
-    const tick = (ts: number) => {
-      if (last === 0) last = ts;
-      const dt = Math.min((ts - last) / 1000, 0.05);
-      last = ts;
-      setT((prev) => {
-        const next = prev + dt * 4;     // 4 h de simulación por segundo real
-        return next >= 48 ? 0 : next;
-      });
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [modo, playing]);
+  // El movimiento orbital lo lleva la escena (useFrame): aquí solo se decide
+  // si el tiempo corre (`playing`) y a qué velocidad.
 
   const bump = () => setResetNonce((n) => n + 1);
   const resetModo = () => {
     if (modo === "fuerza") setR(R_DEF);
     else if (modo === "peso") { setCuerpoId(CUERPO_DEF); setM(M_DEF); }
-    else { setAlt(ALT_DEF); setT(0); }
+    else { setAlt(ALT_DEF); setVista("espacio"); }
     bump();
   };
   const cambiarModo = (nm: Modo) => {
     if (sonido) audioRef.current?.blip();
     setModo(nm);
-    setT(0);
     bump();
+  };
+  const saltar = () => {
+    if (sonido) audioRef.current?.blip();
+    setSalto((n) => n + 1);
+    setSaltosEn((prev) => (prev.includes(cuerpoId) ? prev : [...prev, cuerpoId]));
   };
 
   // valores en vivo según el modo
@@ -142,12 +146,18 @@ export function LabGravitacion({ color }: PracticaLabProps) {
   const modoActual = MODOS.find((x) => x.id === modo)!;
   const modoCol = modoActual.col;
 
+  const salt = resolverSalto(cuerpo.g);
+  const marea = mareaRelativa(r);
+  const saltoLunaJupiter = saltosEn.includes("luna") && saltosEn.includes("jupiter");
+
   const objetivos = [
     { txt: "Duplica la distancia Tierra–Luna y comprueba que la fuerza baja a la cuarta parte", done: modo === "fuerza" && Math.abs(ratioF - 0.25) < 0.03, modo: "fuerza" },
     { txt: "Explora la fuerza gravitacional Tierra–Luna (modo Fuerza)", done: modo === "fuerza" && r !== R_DEF, modo: "fuerza" },
+    { txt: "Haz saltar al astronauta en la Luna y en Júpiter: mismo impulso, ¿dónde sube más?", done: saltoLunaJupiter, modo: "peso" },
     { txt: "Compara el peso en distintos cuerpos celestes (modo Peso)", done: modo === "peso" || modo === "orbita", modo: ["peso", "orbita"] },
     { txt: "Descubre la órbita geoestacionaria Mexsat (modo Órbita)", done: modo === "orbita", modo: "orbita" },
     { txt: "Lleva el satélite a 35 786 km de altura: su período es de 24 h y parece fijo", done: modo === "orbita" && orb.geo, modo: "orbita" },
+    { txt: "Mira la órbita «Girando con la Tierra»: el Mexsat geoestacionario no se mueve sobre México", done: modo === "orbita" && orb.geo && vista === "tierra", modo: "orbita" },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
 
@@ -178,7 +188,9 @@ export function LabGravitacion({ color }: PracticaLabProps) {
       retoKey={RETO_KEY}
       escena={
         <SceneBoundary fallback={sceneFallback}>
-          <GravitacionScene modo={modo} r={r} cuerpoId={cuerpoId} m={m} alt={alt} t={t} accent={accent} resetNonce={resetNonce} />
+          <GravitacionScene modo={modo} r={r} mareas={mareas} cuerpoId={cuerpoId} m={m} salto={salto}
+            alt={alt} playing={playing} velocidad={velocidad} vista={vista} eei={eei}
+            accent={accent} resetNonce={resetNonce} />
         </SceneBoundary>
       }
       modos={{
@@ -189,6 +201,9 @@ export function LabGravitacion({ color }: PracticaLabProps) {
       herramientas={
         <>
           <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          {modo === "peso" && (
+            <BotonHerramienta icono="fa-person-running" titulo="Saltar (mismo impulso en todos los cuerpos)" onClick={saltar} />
+          )}
           {modo === "orbita" && (
             <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reproducir la órbita"} activo={playing} onClick={() => setPlaying((p) => !p)} />
           )}
@@ -233,6 +248,16 @@ export function LabGravitacion({ color }: PracticaLabProps) {
                     <p style={{ margin: 0, color: T.text2 }}>
                       La marca blanca es la fuerza del problema ({sci(F_DEF)} N). Al duplicar la distancia, la fuerza baja a la <strong style={{ color: "#fff" }}>cuarta parte</strong>: ley del inverso del cuadrado.
                     </p>
+                    <CurvaGravitacion tipo="fuerza" x={r / R_DEF} y={ratioF} col={C_FUERZA} />
+                  </Bloque>
+                  <Bloque titulo="Mareas" icono="fa-water">
+                    <button type="button" className="gv-btn" aria-pressed={mareas} onClick={() => setMareas((v) => !v)}
+                      style={{ color: mareas ? "#04121f" : "#7dd3fc", background: mareas ? "#7dd3fc" : "#7dd3fc1f", border: "1px solid #7dd3fc66" }}>
+                      <i className="fa-solid fa-water" style={{ marginRight: 7 }} aria-hidden />{mareas ? "Ocultar el abultamiento del océano" : "Mostrar el abultamiento del océano"}
+                    </button>
+                    <p style={{ margin: 0, color: T.text2 }}>
+                      La Luna jala más fuerte el lado de la Tierra que tiene enfrente que el lado opuesto: el océano se estira hacia los dos lados (en la escena, muy exagerado). Esa diferencia cae como <strong style={{ color: "#fff" }}>1/r³</strong>: ahora la marea es <strong style={{ color: "#fff" }}>{fmt2(marea)}×</strong> la de la distancia del problema.
+                    </p>
                   </Bloque>
                   <Bloque titulo="Lecturas" icono="fa-list">
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
@@ -271,6 +296,19 @@ export function LabGravitacion({ color }: PracticaLabProps) {
                       En <strong style={{ color: "#fff" }}>{cuerpo.nombre}</strong> pesas ≈ {fmt1(pz.kgf)} kg-fuerza. Tu masa, {fmt0(m)} kg, <strong style={{ color: "#fff" }}>no cambia</strong>.
                     </p>
                   </Bloque>
+                  <Bloque titulo="Experimento: el salto" icono="fa-person-running">
+                    <button type="button" className="gv-btn" onClick={saltar} style={{ color: "#04121f", background: C_PESO, border: `1px solid ${C_PESO}` }}>
+                      <i className="fa-solid fa-person-running" style={{ marginRight: 7 }} aria-hidden />Saltar en {cuerpo.nombre}
+                    </button>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                      <Dato label="altura del salto" value={`${fmt2(salt.h)} m`} col={C_PESO} />
+                      <Dato label="tiempo en el aire" value={`${fmt2(salt.tAire)} s`} col={C_PESO} />
+                    </div>
+                    <p style={{ margin: 0, color: T.text2 }}>
+                      Despega siempre a {fmt2(V_SALTO)} m/s (lo que en la Tierra sube 0.5 m). Con menos g sube más y tarda más en caer: h = v²/(2g). Mientras vuela, la báscula marca <strong style={{ color: "#fff" }}>0 N</strong> aunque la gravedad sigue jalando: va en caída libre.
+                    </p>
+                    {cuerpo.id === "jupiter" && <p style={{ margin: 0, color: "#fcd34d" }}>{NOTA_JUPITER}</p>}
+                  </Bloque>
                   <Bloque titulo="Lecturas" icono="fa-list">
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
                       <Dato label="masa m" value={`${fmt0(m)} kg`} />
@@ -299,6 +337,42 @@ export function LabGravitacion({ color }: PracticaLabProps) {
                         ? "T = 24 h, igual a la rotación terrestre: el satélite parece FIJO."
                         : `La marca blanca son las 24 h de la Tierra. El satélite ${orb.Th < T_TIERRA_H ? "adelanta" : "se retrasa respecto"} a la Tierra y se mueve por el cielo.`}
                     </p>
+                    <CurvaGravitacion tipo="periodo" x={alt / 1000} y={orb.Th} col={C_ORBITA} />
+                  </Bloque>
+                  <Bloque titulo="Punto de vista" icono="fa-video">
+                    <div className="gv-bodies">
+                      {VISTAS.map((vv) => {
+                        const on = vv.id === vista;
+                        return (
+                          <button key={vv.id} type="button" className="gv-tab" data-on={on} onClick={() => setVista(vv.id)}
+                            style={{ ["--gvc" as string]: C_ORBITA, background: on ? `${C_ORBITA}22` : "transparent" }}>
+                            <div style={{ fontSize: 18, marginBottom: 3, color: on ? C_ORBITA : "inherit" }}><i className={`fa-solid ${vv.icono}`} aria-hidden /></div>
+                            <div style={{ fontSize: 14, fontWeight: 900 }}>{vv.etq}</div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p style={{ margin: 0, color: T.text2 }}>{VISTAS.find((vv) => vv.id === vista)!.desc}</p>
+                  </Bloque>
+                  <Bloque titulo="Tiempo y comparación" icono="fa-clock">
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {[1, 3, 8].map((vel) => (
+                        <button key={vel} type="button" className="gv-btn" aria-pressed={velocidad === vel} onClick={() => setVelocidad(vel)}
+                          style={{ color: velocidad === vel ? "#04121f" : C_ORBITA, background: velocidad === vel ? C_ORBITA : `${C_ORBITA}1f`, border: `1px solid ${C_ORBITA}66` }}>
+                          {vel} h por segundo
+                        </button>
+                      ))}
+                    </div>
+                    <button type="button" className="gv-btn" aria-pressed={eei} onClick={() => setEei((x) => !x)}
+                      style={{ color: eei ? "#04121f" : "#fde68a", background: eei ? "#fde68a" : "#fde68a1f", border: "1px solid #fde68a66" }}>
+                      <i className="fa-solid fa-satellite" style={{ marginRight: 7 }} aria-hidden />{eei ? "Quitar la Estación Espacial" : "Comparar con la Estación Espacial (400 km)"}
+                    </button>
+                    {eei && (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                        <Dato label="período EEI" value={`${fmt0(ORBITA_EEI.Th * 60)} min`} col="#fde68a" />
+                        <Dato label="rapidez EEI" value={`${fmt2(ORBITA_EEI.v / 1000)} km/s`} col="#fde68a" />
+                      </div>
+                    )}
                   </Bloque>
                   <Bloque titulo="Lecturas" icono="fa-list">
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
@@ -381,8 +455,18 @@ export function LabGravitacion({ color }: PracticaLabProps) {
               <Bloque titulo="Ficha teórica" icono="fa-book">
                 <FichaTeorica data={GRAVITACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
               </Bloque>
+              <Bloque titulo="Qué está a escala y qué no" icono="fa-ruler-combined">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  <li><strong style={{ color: "#fff" }}>Fuerza:</strong> la Tierra y la Luna SÍ están a escala entre sí (la Luna mide 0.27 Tierras). La distancia en pantalla es proporcional a r, pero 10 veces más corta que la real (16 veces en celular; la real es de 60 radios terrestres). Las flechas miden proporcional a F; si no caben entre los dos cuerpos se recortan y la etiqueta lo dice. El abultamiento de la marea está muy exagerado (en el océano abierto es de menos de un metro).</li>
+                  <li><strong style={{ color: "#fff" }}>Peso:</strong> los cuerpos NO están a escala (Júpiter es 11 veces más grande que la Tierra y la Luna, casi 4 veces más chica) y el astronauta está agrandado. La flecha W sí es proporcional al peso, y el salto sigue h = v²/(2g) y t = 2v/g en tiempo real.</li>
+                  <li><strong style={{ color: "#fff" }}>Órbita:</strong> el radio de cada órbita SÍ es proporcional al radio terrestre (por eso la EEI casi roza la Tierra y el Mexsat queda a 6.6 radios). Los satélites están muy agrandados. La Tierra gira una vez por día sideral (23 h 56 min), que es el período real de la órbita geoestacionaria. Cerca de 35 786 km la escena mantiene al satélite en su lugar, como lo hacen sus motores de control de posición.</li>
+                </ul>
+              </Bloque>
               <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
                 Física exacta de cálculo cerrado: Ley de Gravitación Universal (F = G·M·m/r²), peso (W = m·g, con g_Tierra = 9.81 m/s²) y órbita circular con la 3.ª ley de Kepler (T = 2π·√(r³/GM), v = √(GM/r)). Tamaños y distancias del sistema solar <strong>no</strong> están a escala real (la Luna está 30 diámetros terrestres más lejos de lo que cabe en pantalla); las longitudes de las flechas son proporcionales a sus magnitudes (acotadas para verse). El radio de la órbita sí es proporcional al radio terrestre. Valores, datos y procedimiento son verbatim del enunciado A2.
+              </p>
+              <p style={{ marginTop: 10, fontSize: 14, color: T.text3 }}>
+                {CREDITO_ESPACIO} La posición del Mexsat (≈ 113° Oeste) es ilustrativa.
               </p>
             </>
           ),
