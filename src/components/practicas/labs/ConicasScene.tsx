@@ -1,46 +1,55 @@
 "use client";
 
 /**
- * Escena 3D — "Cónicas: circunferencia y parábola como lugares geométricos"
- * (PM-IV-P07-A1).
+ * Escena 3D — «Cónicas como lugares geométricos» (PM-IV-P07), versión sala de
+ * museo de matemáticas.
  *
- * Un PLANO CARTESIANO flotante (rejilla en z = 0, ejes X e Y) que se puede
- * orbitar. Según el modo:
- *
- *  · CIRCUNFERENCIA — se dibuja la curva (x−h)²+(y−k)²=r², el CENTRO, un punto P
- *    que recorre la curva con su RADIO (siempre = r: ahí se ve el "lugar
- *    geométrico de los puntos equidistantes del centro") y un punto de prueba Q
- *    cuya distancia al centro lo clasifica dentro / sobre / fuera.
- *
- *  · PARÁBOLA — se dibuja x²=4py, el FOCO (0,p), la DIRECTRIZ y=−p y el VÉRTICE.
- *    Un punto P recorre la parábola mostrando que su distancia al foco es IGUAL a
- *    su distancia a la directriz (la definición). Opcional: la PROPIEDAD FOCAL
- *    (rayos paralelos al eje que se reflejan al foco), base del GTM y las antenas.
+ * Una sala oscura con piso pulido y luz de museo. Según el modo:
+ *  · CONO — el cono de Apolonio cortado por un plano que el alumno inclina y
+ *    desplaza (conicas-apolonio3d.tsx), con la forma canónica del corte y su
+ *    ecuación en una pizarra.
+ *  · CIRCUNFERENCIA, ELIPSE, PARÁBOLA, HIPÉRBOLA — los lugares geométricos
+ *    trazados sobre una pizarra de esquisto (conicas-lugares3d.tsx).
+ *  · APLICACIONES — antena parabólica, órbita de Kepler y galería de los
+ *    susurros (conicas-aplicaciones3d.tsx).
  *
  * Patrón R3F: el default export solo monta <Canvas> y delega en <Contenido>.
- * React Compiler: nada de Math.random()/Date.now()/setState en render; la
- * geometría se memoiza y la animación de P llega como prop `fase` (0..1) desde el
- * shell; useFrame solo late en un ref (cosmético).
+ * La fase del punto móvil llega por props (0..1) y cada pieza la suaviza en
+ * `useFrame`. En celular o GPU débil: sin postproceso, menos rayos, piso mate.
  */
 
 import * as THREE from "three";
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Html, Line } from "@react-three/drei";
+import { useMemo, useState } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, ContactShadows, PerformanceMonitor } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { MesaLaboratorio, EntornoLaboratorio, calidadEscena } from "./_escenario";
+import { type Modo } from "./conicas-data";
+import { Guia, encuadrar, FOV, FONDO_SALA, type Pt } from "./conicas-museo3d";
+import { EscenaApolonio, SUELO_SALA, PIZ_X, PIZ_LADO, PIZ_U } from "./conicas-apolonio3d";
+import { EscenaCircunferencia, EscenaElipse, EscenaParabola, EscenaHiperbola, PizarraSala, U } from "./conicas-lugares3d";
+import { EscenaAntena, EscenaOrbita, EscenaGaleria, ANT_Y, ORB_Y } from "./conicas-aplicaciones3d";
 import {
-  type Modo, calcCirc, calcParab, curvaCirc, curvaParab, puntoParab, distanciasParab,
-  PARAB_HALF, fmtNum2, fmtPar,
-} from "./conicas-data";
+  type ModoConicas, type VistaAplicacion, type Corte, type Elipse, type Hiperbola,
+  H_NAPA, LADO_PIZARRA, R_ANTENA, A_ORBITA, A_GALERIA,
+} from "./conicas-museo-data";
 
 export interface ConicasSceneProps {
-  modo: Modo;
+  modo: ModoConicas | Modo;
   // circunferencia
   h: number; k: number; r: number; qx: number; qy: number;
   // parábola
   p: number;
+  // cono de Apolonio
+  corte: Corte;
+  // elipse / hipérbola
+  elipse: Elipse;
+  hiperbola: Hiperbola;
+  // aplicaciones
+  vista: VistaAplicacion;
+  fAntena: number; hReceptor: number; senalAntena: number;
+  eOrbita: number;
+  cGaleria: number; xOyente: number; senalGaleria: number;
   // común
   fase: number;            // 0..1, posición del punto móvil P
   mostrarFocal: boolean;   // parábola: propiedad focal (rayos)
@@ -50,244 +59,121 @@ export interface ConicasSceneProps {
   resetNonce: number;
 }
 
-type Pt = [number, number, number];
-
-const CENTRO_COL = "#f5d36b";
-const RADIO_COL = "#34D399";
-const Q_DENTRO = "#34D399", Q_SOBRE = "#fbbf24", Q_FUERA = "#fb7185";
-const FOCO_COL = "#f5d36b";
-const DIR_COL = "#fb7185";
-const VERT_COL = "#60a5fa";
-const DFOCO_COL = "#34D399";
-const DDIR_COL = "#c4b5fd";
-const RAY_COL = "#7dd3fc";
-const AXIS_COL = "#7dd3fc";
-const GRID_COL = "#1f3a4d";
-
-const G = 8;                // semirango del plano: −8 … +8
-const U = 0.5;             // unidades de escena por unidad del plano
-const YMAX = 7.4;          // tope vertical para trazar la parábola dentro del plano
-
-/** Lleva un punto del plano (gx, gy) a coordenadas de escena (z = 0). */
-const S = (gx: number, gy: number): Pt => [gx * U, gy * U, 0];
-/** Lleva una lista de puntos del plano a puntos de escena. */
-const SL = (pts: [number, number][]): Pt[] => pts.map(([x, y]) => S(x, y));
-
-/* ── Etiqueta flotante reutilizable ──────────────────────────────────────── */
-function Etiqueta({
-  pos, color, children, size = 14, bg = "rgba(6,16,31,0.82)",
-}: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
-}) {
-  return (
-    <Html position={pos} center pointerEvents="none">
-      <div style={{
-        whiteSpace: "nowrap", padding: "4px 10px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
-      }}>
-        {children}
-      </div>
-    </Html>
-  );
-}
-
-/* ── Esfera-marcador (punto del plano) ───────────────────────────────────── */
-function Marcador({ p, color, radio = 0.15 }: { p: Pt; color: string; radio?: number }) {
-  return (
-    <mesh position={p} castShadow>
-      <sphereGeometry args={[radio, 24, 24]} />
-      <meshStandardMaterial color="#fff" emissive={color} emissiveIntensity={1.6} toneMapped={false} />
-    </mesh>
-  );
-}
-
-/* ── Rejilla del plano cartesiano (líneas en z = 0) ──────────────────────── */
-function Rejilla() {
-  const geo = useMemo(() => {
-    const pts: number[] = [];
-    for (let i = -G; i <= G; i++) {
-      pts.push(i * U, -G * U, 0, i * U, G * U, 0);
-      pts.push(-G * U, i * U, 0, G * U, i * U, 0);
+/* ── Encuadre de cada vista ──────────────────────────────────────────────── */
+function marcoDe(p: ConicasSceneProps, aspect: number, angosto: boolean): { objetivo: Pt; distancia: number; dir: Pt; clave: string } {
+  if (p.modo === "cono") {
+    const xmax = angosto ? 3.0 : PIZ_X + PIZ_LADO * PIZ_U + 0.5;
+    return { ...(angosto ? encuadrar(-2.6, 2.6, -H_NAPA - 0.7, H_NAPA + 0.45, aspect, true) : encuadrar(-3.1, xmax, SUELO_SALA + 0.2, H_NAPA + 1.2, aspect)), dir: angosto ? [0.3, 0.5, 1] : [0.1, 0.42, 1], clave: "cono" };
+  }
+  if (p.modo === "aplicaciones") {
+    if (p.vista === "antena") return { ...encuadrar(-R_ANTENA - 0.7, R_ANTENA + 0.7, SUELO_SALA + 0.3, ANT_Y + 4.3, aspect, angosto), dir: [0.3, 0.42, 1], clave: "antena" };
+    if (p.vista === "orbita") {
+      const e = encuadrar(-A_ORBITA - 0.8, A_ORBITA + 0.8, -3.3, 2.6, aspect, angosto);
+      return { objetivo: [0, ORB_Y - 0.6, 0], distancia: e.distancia * 0.95, dir: [0.1, 0.78, 1], clave: "orbita" };
     }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pts), 3));
-    return g;
-  }, []);
-  return (
-    <lineSegments geometry={geo}>
-      <lineBasicMaterial color={GRID_COL} transparent opacity={0.55} />
-    </lineSegments>
-  );
+    const e = encuadrar(-A_GALERIA * 0.72 - 0.6, A_GALERIA * 0.72 + 0.6, -2.9, 3.3, aspect, angosto);
+    return { objetivo: [0, SUELO_SALA + 0.4, 0.2], distancia: e.distancia * 0.98, dir: [0.05, 0.95, 1], clave: "galeria" };
+  }
+  const L = LADO_PIZARRA * U + 0.3;
+  return { ...encuadrar(-L, L, -L, L + 0.6, aspect, angosto), dir: [0.34, 0.2, 1], clave: "pizarra" };
 }
 
-/* ── Ejes X, Y + origen ───────────────────────────────────────────────────── */
-function Ejes() {
+/* ── Contenido ────────────────────────────────────────────────────────────── */
+function Contenido(props: ConicasSceneProps & { ligero: boolean }) {
+  const { modo, accent, resetNonce, autoRotate, pausado, ligero } = props;
+  const size = useThree((st) => st.size);
+  const angosto = size.width < 640;
+  const aspect = size.width / Math.max(1, size.height);
+  const [debil, setDebil] = useState(false);
+  const calidad = useMemo(() => calidadEscena(), []);
+  const fino = ligero || debil || calidad === "baja";
+  const marco = marcoDe(props, aspect, angosto);
+  const espacio = modo === "aplicaciones" && props.vista === "orbita";
+  const esPizarra = modo === "circunferencia" || modo === "elipse" || modo === "parabola" || modo === "hiperbola";
+
   return (
     <>
-      <Line points={[S(-G, 0), S(G, 0)]} color={AXIS_COL} lineWidth={2.2} />
-      <Line points={[S(0, -G), S(0, G)]} color={AXIS_COL} lineWidth={2.2} />
-      <mesh position={S(0, 0)}>
-        <sphereGeometry args={[0.07, 12, 12]} />
-        <meshStandardMaterial color={AXIS_COL} emissive={AXIS_COL} emissiveIntensity={0.8} toneMapped={false} />
-      </mesh>
-    </>
-  );
-}
+      <PerformanceMonitor onDecline={() => setDebil(true)} />
+      <color attach="background" args={[espacio ? "#02040a" : FONDO_SALA]} />
+      {!espacio && <fog attach="fog" args={[FONDO_SALA, 30, 70]} />}
 
-/* ── CIRCUNFERENCIA ───────────────────────────────────────────────────────── */
-function EscenaCirc({ h, k, r, qx, qy, fase, accent }: {
-  h: number; k: number; r: number; qx: number; qy: number; fase: number; accent: string;
-}) {
-  const c = useMemo(() => calcCirc(h, k, r, qx, qy), [h, k, r, qx, qy]);
-  const curva = useMemo(() => SL(curvaCirc(h, k, r)), [h, k, r]);
+      {/* Luz de museo: un cenital cálido con penumbra suave, relleno del color
+          del laboratorio y un contraluz frío que recorta las siluetas. */}
+      <ambientLight intensity={espacio ? 0.12 : 0.3} />
+      {!espacio && (
+        <spotLight
+          position={[-2, 14, 9]} angle={0.6} penumbra={0.9} intensity={340} decay={2} color="#fff3e2"
+          castShadow={!fino} shadow-mapSize-width={1024} shadow-mapSize-height={1024} shadow-bias={-0.0004}
+        />
+      )}
+      <pointLight position={[-9, 4, 6]} intensity={espacio ? 4 : 14} color={accent} />
+      <pointLight position={[6, 6, -8]} intensity={espacio ? 4 : 18} color="#bfe8ff" />
+      <EntornoLaboratorio acento={accent} />
 
-  // punto P que recorre la circunferencia (lugar geométrico)
-  const ang = fase * Math.PI * 2;
-  const Pg: [number, number] = [h + r * Math.cos(ang), k + r * Math.sin(ang)];
-  const P = S(Pg[0], Pg[1]);
-  const C = S(h, k);
-  const Q = S(qx, qy);
-  const qCol = c.estadoQ === "dentro" ? Q_DENTRO : c.estadoQ === "sobre" ? Q_SOBRE : Q_FUERA;
+      {!espacio && (
+        <>
+          <MesaLaboratorio y={SUELO_SALA} tam={60} brillo={0.45} color="#0a1828" calidad={fino ? "baja" : calidad} />
+          <ContactShadows position={[0, SUELO_SALA + 0.01, 0]} opacity={0.6} scale={30} blur={2.4} far={8} color="#01040a" />
+        </>
+      )}
 
-  return (
-    <group>
-      {/* la curva */}
-      <CurvaTubo puntos={curva} color={accent} grosor={0.072} />
-      {/* centro */}
-      <Marcador p={C} color={CENTRO_COL} radio={0.13} />
-      <Etiqueta pos={[C[0], C[1] - 0.42, 0.05]} color={CENTRO_COL} bg="rgba(6,16,31,0.9)">
-        <strong>C</strong>&nbsp;{fmtPar(h, k)}
-      </Etiqueta>
-      {/* radio: centro → P (siempre = r) */}
-      <CurvaTubo puntos={[C, P]} color={RADIO_COL} grosor={0.061} />
-      <Etiqueta pos={[(C[0] + P[0]) / 2, (C[1] + P[1]) / 2 + 0.32, 0.05]} color={RADIO_COL}>
-        r = {fmtNum2(r)}
-      </Etiqueta>
-      <Marcador p={P} color={RADIO_COL} radio={0.13} />
-      {/* punto de prueba Q: dentro / sobre / fuera */}
-      <Line points={[C, Q]} color={qCol} lineWidth={2.4} dashed dashSize={0.16} gapSize={0.12} />
-      <Marcador p={Q} color={qCol} radio={0.15} />
-      <Etiqueta pos={[Q[0], Q[1] + 0.44, 0.05]} color={qCol} bg="rgba(6,16,31,0.92)">
-        <strong>Q</strong> {fmtPar(qx, qy)} · {c.estadoQ}
-      </Etiqueta>
-    </group>
-  );
-}
-
-/* ── PARÁBOLA ─────────────────────────────────────────────────────────────── */
-function EscenaParab({ p, fase, mostrarFocal, accent }: {
-  p: number; fase: number; mostrarFocal: boolean; accent: string;
-}) {
-  const par = useMemo(() => calcParab(p), [p]);
-  // medio-ancho efectivo: que la curva no se salga del plano por arriba
-  const halfEff = Math.min(PARAB_HALF, Math.sqrt(4 * p * YMAX));
-  const curva = useMemo(() => SL(curvaParab(p, halfEff)), [p, halfEff]);
-
-  // punto P que recorre la parábola (oscila a ambos lados del vértice)
-  const t = halfEff * Math.sin(fase * Math.PI * 2);
-  const Pg = puntoParab(t, p);
-  const P = S(Pg[0], Pg[1]);
-  const F = S(0, par.focoY);
-  const V = S(0, 0);
-  const foot = S(Pg[0], par.directrizY); // pie de la perpendicular a la directriz
-  const d = distanciasParab(t, p);
-
-  // rayos de la propiedad focal: bajan paralelos al eje y se reflejan al foco
-  const rayos = useMemo(() => {
-    const xs = [-0.7, -0.4, 0.4, 0.7].map((f) => f * halfEff);
-    return xs.map((x) => {
-      const [hx, hy] = puntoParab(x, p);
-      return { entra: [S(x, YMAX), S(hx, hy)] as Pt[], sale: [S(hx, hy), S(0, par.focoY)] as Pt[] };
-    });
-  }, [p, halfEff, par.focoY]);
-
-  return (
-    <group>
-      {/* directriz y = −p */}
-      <Line points={[S(-G, par.directrizY), S(G, par.directrizY)]} color={DIR_COL} lineWidth={2.6} dashed dashSize={0.22} gapSize={0.14} />
-      <Etiqueta pos={[S(G, par.directrizY)[0] - 0.7, S(0, par.directrizY)[1] - 0.34, 0.05]} color={DIR_COL} bg="rgba(6,16,31,0.85)">
-        directriz y = {fmtNum2(par.directrizY)}
-      </Etiqueta>
-
-      {/* propiedad focal */}
-      {mostrarFocal && rayos.map((ry, i) => (
-        <group key={i}>
-          <Line points={ry.entra} color={RAY_COL} lineWidth={1.8} transparent opacity={0.8} />
-          <Line points={ry.sale} color={RAY_COL} lineWidth={1.8} transparent opacity={0.8} />
-        </group>
-      ))}
-
-      {/* la curva */}
-      <CurvaTubo puntos={curva} color={accent} grosor={0.072} />
-
-      {/* vértice */}
-      <Marcador p={V} color={VERT_COL} radio={0.12} />
-
-      {/* foco */}
-      <Marcador p={F} color={FOCO_COL} radio={0.14} />
-      <Etiqueta pos={[F[0] + 0.55, F[1] + 0.1, 0.05]} color={FOCO_COL} bg="rgba(6,16,31,0.92)">
-        <strong>F</strong> {fmtPar(0, par.focoY)}
-      </Etiqueta>
-
-      {/* las dos distancias iguales: P→foco y P→directriz */}
-      <CurvaTubo puntos={[P, F]} color={DFOCO_COL} grosor={0.058} />
-      <Etiqueta pos={[(P[0] + F[0]) / 2 + 0.3, (P[1] + F[1]) / 2, 0.06]} color={DFOCO_COL}>
-        d₁ = {fmtNum2(d.aFoco)}
-      </Etiqueta>
-      <CurvaTubo puntos={[P, foot]} color={DDIR_COL} grosor={0.058} />
-      <Etiqueta pos={[(P[0] + foot[0]) / 2 - 0.45, (P[1] + foot[1]) / 2, 0.06]} color={DDIR_COL}>
-        d₂ = {fmtNum2(d.aDirectriz)}
-      </Etiqueta>
-      <Marcador p={P} color={accent} radio={0.14} />
-    </group>
-  );
-}
-
-/* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ modo, h, k, r, qx, qy, p, fase, mostrarFocal, accent, autoRotate, pausado, resetNonce }: ConicasSceneProps) {
-  return (
-    <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={-G * U - 0.4} />
-
-
-      <group key={`${modo}-${resetNonce}`}>
-        <Rejilla />
-        <Ejes />
-        {modo === "circunferencia"
-          ? <EscenaCirc h={h} k={k} r={r} qx={qx} qy={qy} fase={fase} accent={accent} />
-          : <EscenaParab p={p} fase={fase} mostrarFocal={mostrarFocal} accent={accent} />}
+      <group key={`${modo}-${props.vista}-${resetNonce}`}>
+        {modo === "cono" && <EscenaApolonio corte={props.corte} fino={fino} />}
+        {esPizarra && <PizarraSala />}
+        {modo === "circunferencia" && (
+          <EscenaCircunferencia h={props.h} k={props.k} r={props.r} qx={props.qx} qy={props.qy} fase={props.fase} accent={accent} />
+        )}
+        {modo === "elipse" && <EscenaElipse el={props.elipse} fase={props.fase} accent={accent} />}
+        {modo === "parabola" && <EscenaParabola p={props.p} fase={props.fase} mostrarFocal={props.mostrarFocal} accent={accent} fino={fino} />}
+        {modo === "hiperbola" && <EscenaHiperbola hi={props.hiperbola} fase={props.fase} accent={accent} />}
+        {modo === "aplicaciones" && props.vista === "antena" && (
+          <EscenaAntena f={props.fAntena} hR={props.hReceptor} senal={props.senalAntena} fino={fino} accent={accent} />
+        )}
+        {modo === "aplicaciones" && props.vista === "orbita" && <EscenaOrbita e={props.eOrbita} fase={props.fase} accent={accent} fino={fino} />}
+        {modo === "aplicaciones" && props.vista === "galeria" && (
+          <EscenaGaleria c={props.cGaleria} xL={props.xOyente} senal={props.senalGaleria} fino={fino} />
+        )}
       </group>
 
-
-
+      <Guia objetivo={marco.objetivo} distancia={marco.distancia} dir={marco.dir} claveVista={`${marco.clave}-${resetNonce}-${angosto}`} />
       <OrbitControls
         makeDefault
         enablePan={false}
-        minDistance={7}
-        maxDistance={26}
-        minPolarAngle={Math.PI / 5}
-        maxPolarAngle={Math.PI / 1.55}
-        target={[0, -0.5, 0]}
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={5}
+        maxDistance={46}
+        minPolarAngle={Math.PI / 9}
+        maxPolarAngle={espacio ? Math.PI / 1.6 : Math.PI / 2.05}
         autoRotate={autoRotate && !pausado}
         autoRotateSpeed={0.45}
       />
 
-      <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.5} luminanceThreshold={0.62} luminanceSmoothing={0.3} mipmapBlur />
-        <Vignette eskil={false} offset={0.2} darkness={0.4} />
-      </EffectComposer>
+      {!fino && (
+        <EffectComposer enableNormalPass={false} multisampling={4}>
+          <Bloom intensity={0.7} luminanceThreshold={0.82} luminanceSmoothing={0.2} mipmapBlur />
+          <Vignette eskil={false} offset={0.25} darkness={0.55} />
+        </EffectComposer>
+      )}
     </>
   );
 }
 
 export default function ConicasScene(props: ConicasSceneProps) {
+  // Celular / táctil: sin postproceso y con menos rayos.
+  const ligero = useMemo(() => {
+    if (typeof window === "undefined") return true;
+    return window.matchMedia?.("(pointer: coarse)").matches || window.innerWidth < 640;
+  }, []);
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.5, 3, 14.5], fov: 46 }}>
-      <Contenido {...props} />
+    <Canvas
+      shadows
+      dpr={[1, 1.75]}
+      gl={{ antialias: true, alpha: false, toneMapping: THREE.ACESFilmicToneMapping }}
+      onCreated={({ gl }) => { gl.localClippingEnabled = true; }}
+      camera={{ position: [4, 4, 22], fov: FOV, near: 0.1, far: 1200 }}
+    >
+      <Contenido {...props} ligero={ligero} />
     </Canvas>
   );
 }

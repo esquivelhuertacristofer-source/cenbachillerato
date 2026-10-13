@@ -1,12 +1,12 @@
 {
-  "escena": "Un plano con una circunferencia de radio 4 y un punto de prueba Q que se mueve con deslizadores; una barra compara su distancia al centro con el radio.",
-  "pregunta": "Si Q queda a una distancia del centro igual al radio, ¿dónde está?",
+  "escena": "Un doble cono de vidrio atravesado por un plano que puedes inclinar; el borde del corte se ilumina y su forma aparece en una pizarra.",
+  "pregunta": "Si inclinas el plano exactamente igual que el lado del cono, ¿qué curva aparece en el corte?",
   "opciones": [
-    { "id": "a", "texto": "Dentro de la circunferencia", "icono": "fa-circle-dot" },
-    { "id": "b", "texto": "Fuera de la circunferencia", "icono": "fa-arrow-up-right-from-square" },
-    { "id": "c", "texto": "Justo sobre la curva", "icono": "fa-bullseye" }
+    { "id": "a", "texto": "Una elipse cerrada", "icono": "fa-circle" },
+    { "id": "b", "texto": "Una parábola abierta", "icono": "fa-satellite-dish" },
+    { "id": "c", "texto": "Las dos ramas de una hipérbola", "icono": "fa-arrows-left-right" }
   ],
-  "correcta": "c",
-  "porque": "La circunferencia es el conjunto de puntos que están a una misma distancia, el radio, del centro. Si la distancia de Q es menor queda dentro; si es mayor, fuera.",
-  "comoComprobarlo": "Mueve los deslizadores de Q hasta que las dos barras de distancia midan lo mismo y mira dónde cae el punto."
+  "correcta": "b",
+  "porque": "Con menos inclinación el plano corta todos los lados de una napa y la curva se cierra: elipse. Paralelo a un lado, nunca lo alcanza y la curva queda abierta: parábola. Con más inclinación corta las dos napas: hipérbola.",
+  "comoComprobarlo": "En «Cono de Apolonio», sube la inclinación del plano poco a poco hasta llegar a la marca de la generatriz y mira la pizarra."
 }
