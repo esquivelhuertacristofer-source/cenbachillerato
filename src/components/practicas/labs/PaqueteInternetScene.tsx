@@ -4,11 +4,14 @@
  * Escena 3D del laboratorio "El viaje de un paquete por Internet" (CD-I-P10).
  * Tres vistas:
  *
- *  - viaje: red esquemática de la Ciudad de México a Madrid. Tu casa, el
- *    proveedor, el servidor DNS, los routers de Guadalajara y Monterrey, los
- *    centros de datos de Querétaro, Ashburn y Madrid y el cable submarino
- *    MAREA bajo el Atlántico. La consulta DNS y los paquetes recorren la ruta
- *    más corta; los enlaces cortados se ven rotos y la ruta se desvía.
+ *  - viaje: el viaje de un paquete A TODAS LAS ESCALAS, con una cámara que las
+ *    recorre en orden durante cada envío (piezas en archivos paquete-internet-*):
+ *      · capas  — la encapsulación: datos → TCP → IP → trama wifi/Ethernet;
+ *      · ruta   — la red troncal como maqueta: paquetes numerados por varios
+ *                 caminos, enlaces que se cortan al tocarlos, reensamble en orden;
+ *      · globo  — la Tierra fotográfica de noche con los cables submarinos reales
+ *                 (aproximados) y el destello de tu paquete cruzándolos;
+ *      · centro — los pasillos de un centro de datos; el paquete entra a un servidor.
  *  - consulta: una wifi pública en un café con un espía, el router, el
  *    servidor de la IA legítimo y uno de phishing, y la banda donde se
  *    verifican las cinco afirmaciones que devuelve la IA.
@@ -21,27 +24,20 @@
  */
 
 import * as THREE from "three";
-import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
+import { Suspense, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
-  type NodoId,
   type EnlaceId,
-  type Enlace,
   type DestinoId,
   type SitioId,
   type AfirmacionId,
   type DecisionIA,
   type DestinoFinalId,
-  NODOS,
-  ENLACES,
-  nodo,
-  DESTINOS,
   SITIOS,
   AFIRMACIONES_IA,
-  T_DNS,
-  T_DATOS,
   T_ENVIO_IA,
   T_RESP_IA,
   T_VUELO,
@@ -53,6 +49,12 @@ import {
   masa,
   num,
 } from "./paquete-internet-data";
+import { type EscalaId, type TramoId, planEnvio, rutasAlternas } from "./paquete-internet-viaje";
+import { CamaraCtx, DetallesCtx, RelojCtx, esDebil, asignar, suave as suaveC, pasoReloj, nuevoEncuadre, soltarCamara, fijarSigue, gastarVuelo, type MandoCamara, type RelojEnvio } from "./paquete-internet-comun";
+import { EscalaGlobo, poseGlobo } from "./paquete-internet-tierra";
+import { EscalaRuta, poseRuta } from "./paquete-internet-ruta";
+import { EscalaCentro, poseCentro } from "./paquete-internet-centro-datos";
+import { EscalaCapas, poseCapas } from "./paquete-internet-capas";
 
 export type VistaPaquete = "viaje" | "consulta" | "dispositivo";
 
@@ -68,6 +70,22 @@ export interface PaqueteSceneProps {
   conDns: boolean;
   paquetesVisibles: number;
   dnsResuelto: boolean;
+  /** Escala que se mira en el modo viaje. */
+  escala: EscalaId;
+  /** Hay un envío en curso o recién llegado (si no, todo en reposo). */
+  envioActivo: boolean;
+  /** La cámara acompaña sola al paquete (recorrido automático). */
+  seguir: boolean;
+  /** Paquetes reales del envío (se dibujan hasta 8). */
+  paquetesTotales: number;
+  /** Capas puestas a mano en la escala «capas» (0–3). */
+  capasNivel: number;
+  tramo: TramoId;
+  /** Bytes de datos del primer paquete y firma (primeros bytes) del archivo. */
+  bytesDatos: number;
+  firma: string;
+  ipDestino: string;
+  onCortar?: (id: EnlaceId) => void;
   // Consulta
   sitio: SitioId | null;
   iaNonce: number;
@@ -88,20 +106,19 @@ export interface PaqueteSceneProps {
 
 type Pt = [number, number, number];
 
-const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
+const suave = suaveC;
 const OK = "#34d399";
 const NO = "#f87171";
 const AMARILLO = "#fbbf24";
 
-/** Las etiquetas secundarias (`sec`) solo se ven con «Ver detalles»; en el celular se ocultan (esa información está en el panel). */
-const DetallesCtx = createContext(false);
+/* Las etiquetas secundarias (`sec`) solo se ven con «Ver detalles»; en el celular se ocultan (DetallesCtx, compartido con las escalas). */
 
-function Etiqueta({ pos, children, df = 10, col, fs = 14, sec = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; sec?: boolean }) {
+function Etiqueta({ pos, children, df: _df = 10, col, fs = 14, sec = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; sec?: boolean }) {
   const detalles = useContext(DetallesCtx);
   const angosto = useThree((st) => st.size.width) < 640;
   if (sec && (!detalles || angosto)) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -229,60 +246,8 @@ function Pulso({ pos, nonce, retraso, color }: { pos: Pt; nonce: number; retraso
 }
 
 /* ════════════════════════════════════════════════════════════════════════
- * 1. EL VIAJE DEL PAQUETE
+ * Piezas compartidas con la consulta (centro de datos esquemático)
  * ════════════════════════════════════════════════════════════════════════ */
-
-const Y_CABLE = 0.34;
-const POS_DNS: Pt = [-4.7, 0, 3.15];
-
-function vNodo(id: NodoId): THREE.Vector3 {
-  const p = nodo(id).pos;
-  return new THREE.Vector3(p[0], Y_CABLE, p[2]);
-}
-
-function curvaEnlace(e: Enlace): THREE.CatmullRomCurve3 {
-  const a = vNodo(e.a);
-  const b = vNodo(e.b);
-  if (e.tipo === "submarino") {
-    return new THREE.CatmullRomCurve3(
-      [a, new THREE.Vector3(2.2, 0.1, 0.8), new THREE.Vector3(2.75, -0.58, 0.62), new THREE.Vector3(3.7, -0.62, 0.4), new THREE.Vector3(4.65, -0.58, 0.18), new THREE.Vector3(5.05, 0.1, 0.08), b],
-      false,
-      "centripetal",
-    );
-  }
-  const mid = a.clone().lerp(b, 0.5);
-  mid.y += 0.12 + a.distanceTo(b) * 0.06;
-  return new THREE.CatmullRomCurve3([a, mid, b], false, "centripetal");
-}
-
-const CURVAS = Object.fromEntries(ENLACES.map((e) => [e.id, curvaEnlace(e)])) as Record<EnlaceId, THREE.CatmullRomCurve3>;
-const TUBOS = Object.fromEntries(ENLACES.map((e) => [e.id, new THREE.TubeGeometry(CURVAS[e.id], 64, e.tipo === "submarino" ? 0.05 : 0.035, 8, false)])) as Record<EnlaceId, THREE.TubeGeometry>;
-
-function enlaceEntre(a: NodoId, b: NodoId): Enlace | undefined {
-  return ENLACES.find((e) => (e.a === a && e.b === b) || (e.a === b && e.b === a));
-}
-
-/** Puntos del camino que siguen los paquetes por la ruta "casa>isp>qro". */
-function clavePorRuta(rutaClave: string): string {
-  const ids = rutaClave.split(">").filter(Boolean) as NodoId[];
-  const pts: THREE.Vector3[] = [new THREE.Vector3(nodo("casa").pos[0] - 0.55, 0.55, nodo("casa").pos[2] + 0.1)];
-  for (let k = 0; k + 1 < ids.length; k++) {
-    const e = enlaceEntre(ids[k]!, ids[k + 1]!);
-    if (!e) continue;
-    const sp = CURVAS[e.id].getSpacedPoints(24);
-    const orden = e.a === ids[k] ? sp : [...sp].reverse();
-    pts.push(...(pts.length > 1 ? orden.slice(1) : orden));
-  }
-  return claveDe(pts);
-}
-
-const CLAVE_DNS = claveDe([
-  new THREE.Vector3(nodo("casa").pos[0] - 0.55, 0.55, nodo("casa").pos[2] + 0.1),
-  vNodo("isp"),
-  new THREE.Vector3(POS_DNS[0], 0.7, POS_DNS[2]),
-  vNodo("isp"),
-  new THREE.Vector3(nodo("casa").pos[0] - 0.55, 0.55, nodo("casa").pos[2] + 0.1),
-]);
 
 function Led({ pos, color, fase = 0 }: { pos: Pt; color: string; fase?: number }) {
   const mat = useRef<THREE.MeshStandardMaterial>(null);
@@ -331,254 +296,7 @@ function CentroDatos({ pos, color, destacado }: { pos: Pt; color: string; destac
   );
 }
 
-function RouterTroncal({ pos }: { pos: Pt }) {
-  return (
-    <group position={pos}>
-      <mesh position={[0, 0.22, 0]} castShadow>
-        <cylinderGeometry args={[0.34, 0.4, 0.44, 8]} />
-        <meshStandardMaterial color="#1f3a5a" roughness={0.4} metalness={0.4} />
-      </mesh>
-      <mesh position={[0, 0.45, 0]}>
-        <cylinderGeometry args={[0.36, 0.36, 0.04, 8]} />
-        <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={0.35} />
-      </mesh>
-      {[0, 1, 2, 3].map((k) => (
-        <Led key={k} pos={[Math.cos((k / 4) * Math.PI * 2) * 0.3, 0.3, Math.sin((k / 4) * Math.PI * 2) * 0.3 + 0.12]} color="#22d3ee" fase={k} />
-      ))}
-    </group>
-  );
-}
 
-function Casa({ pos }: { pos: Pt }) {
-  return (
-    <group position={pos}>
-      <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.8, 0.6, 0.7]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={0.7} />
-      </mesh>
-      <mesh position={[0, 0.8, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
-        <coneGeometry args={[0.68, 0.42, 4]} />
-        <meshStandardMaterial color="#b45309" roughness={0.7} />
-      </mesh>
-      <mesh position={[0.12, 0.2, 0.355]}>
-        <boxGeometry args={[0.18, 0.34, 0.01]} />
-        <meshStandardMaterial color="#78350f" />
-      </mesh>
-      {/* Celular */}
-      <group position={[-0.55, 0.02, 0.1]}>
-        <mesh position={[0, 0.3, 0]} rotation={[-0.25, 0.3, 0]}>
-          <boxGeometry args={[0.2, 0.38, 0.03]} />
-          <meshStandardMaterial color="#0f172a" metalness={0.5} roughness={0.3} />
-        </mesh>
-        <mesh position={[0.006, 0.303, 0.018]} rotation={[-0.25, 0.3, 0]}>
-          <boxGeometry args={[0.17, 0.33, 0.005]} />
-          <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={0.9} toneMapped={false} />
-        </mesh>
-      </group>
-      {/* Router wifi */}
-      <group position={[0.62, 0, 0.3]}>
-        <mesh position={[0, 0.06, 0]}>
-          <boxGeometry args={[0.32, 0.08, 0.22]} />
-          <meshStandardMaterial color="#111827" roughness={0.4} />
-        </mesh>
-        {[-0.1, 0.1].map((x) => (
-          <mesh key={x} position={[x, 0.24, -0.08]}>
-            <cylinderGeometry args={[0.012, 0.012, 0.3, 6]} />
-            <meshStandardMaterial color="#111827" />
-          </mesh>
-        ))}
-        <Led pos={[0, 0.07, 0.115]} color="#22c55e" />
-      </group>
-    </group>
-  );
-}
-
-function Proveedor({ pos }: { pos: Pt }) {
-  return (
-    <group position={pos}>
-      <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.7, 1.1, 0.6]} />
-        <meshStandardMaterial color="#1e3a5f" roughness={0.45} metalness={0.25} />
-      </mesh>
-      {[0.3, 0.55, 0.8].map((y) => (
-        <mesh key={y} position={[0, y, 0.305]}>
-          <boxGeometry args={[0.56, 0.06, 0.01]} />
-          <meshStandardMaterial color="#7dd3fc" emissive="#7dd3fc" emissiveIntensity={0.5} />
-        </mesh>
-      ))}
-      <mesh position={[0.2, 1.45, 0]}>
-        <cylinderGeometry args={[0.02, 0.03, 0.7, 6]} />
-        <meshStandardMaterial color="#cbd5e1" metalness={0.7} />
-      </mesh>
-      <Led pos={[0.2, 1.82, 0]} color="#ef4444" />
-    </group>
-  );
-}
-
-function ServidorDns({ pos, resuelto }: { pos: Pt; resuelto: boolean }) {
-  return (
-    <group position={pos}>
-      <mesh position={[0, 0.36, 0]} castShadow>
-        <boxGeometry args={[0.42, 0.72, 0.42]} />
-        <meshStandardMaterial color="#422006" roughness={0.5} />
-      </mesh>
-      {[0.2, 0.36, 0.52].map((y, k) => (
-        <group key={y}>
-          <mesh position={[0, y, 0.215]}>
-            <boxGeometry args={[0.34, 0.1, 0.01]} />
-            <meshStandardMaterial color="#1c1917" />
-          </mesh>
-          <Led pos={[0.12, y, 0.225]} color={resuelto ? AMARILLO : "#a16207"} fase={k} />
-        </group>
-      ))}
-    </group>
-  );
-}
-
-function Estacion({ pos }: { pos: Pt }) {
-  return (
-    <group position={pos}>
-      <mesh position={[0, 0.2, 0]} castShadow>
-        <boxGeometry args={[0.46, 0.4, 0.4]} />
-        <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
-      </mesh>
-      <mesh position={[0, 0.43, 0]}>
-        <boxGeometry args={[0.52, 0.06, 0.46]} />
-        <meshStandardMaterial color="#0e7490" roughness={0.5} />
-      </mesh>
-    </group>
-  );
-}
-
-function MarcaCorte({ id }: { id: EnlaceId }) {
-  const p = CURVAS[id].getPointAt(0.5);
-  return (
-    <group position={[p.x, p.y + 0.02, p.z]}>
-      {[1, -1].map((s) => (
-        <mesh key={s} rotation={[0, 0, s * Math.PI / 4]}>
-          <boxGeometry args={[0.36, 0.07, 0.07]} />
-          <meshStandardMaterial color={NO} emissive={NO} emissiveIntensity={1.2} toneMapped={false} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function EscenaViaje({
-  destino,
-  rutaClave,
-  cortados,
-  envioNonce,
-  conDns,
-  paquetesVisibles,
-  dnsResuelto,
-  modoColor,
-}: {
-  destino: DestinoId;
-  rutaClave: string;
-  cortados: EnlaceId[];
-  envioNonce: number;
-  conDns: boolean;
-  paquetesVisibles: number;
-  dnsResuelto: boolean;
-  modoColor: string;
-}) {
-  const ids = rutaClave.split(">").filter(Boolean) as NodoId[];
-  const enRuta = new Set<EnlaceId>();
-  for (let k = 0; k + 1 < ids.length; k++) {
-    const e = enlaceEntre(ids[k]!, ids[k + 1]!);
-    if (e) enRuta.add(e.id);
-  }
-  const clavePaquetes = useMemo(() => clavePorRuta(rutaClave), [rutaClave]);
-  const dest = DESTINOS.find((d) => d.id === destino)!;
-  const posDest = nodo(destino).pos;
-  const inicioDatos = conDns ? T_DNS : 0;
-
-  return (
-    <group position={[0, -0.6, 0]}>
-      {/* Continente americano, océano y Europa */}
-      <mesh position={[-2.6, -0.16, 0.5]} receiveShadow>
-        <boxGeometry args={[10.2, 0.32, 6.4]} />
-        <meshStandardMaterial color="#10263a" roughness={0.9} />
-      </mesh>
-      <mesh position={[6.35, -0.16, 0.5]} receiveShadow>
-        <boxGeometry args={[2.9, 0.32, 6.4]} />
-        <meshStandardMaterial color="#10263a" roughness={0.9} />
-      </mesh>
-      <mesh position={[3.65, -0.8, 0.5]}>
-        <boxGeometry args={[2.4, 0.04, 6.4]} />
-        <meshStandardMaterial color="#0b1a2b" roughness={1} />
-      </mesh>
-      <mesh position={[3.65, -0.05, 0.5]}>
-        <boxGeometry args={[2.4, 0.02, 6.4]} />
-        <meshStandardMaterial color="#0ea5e9" transparent opacity={0.22} roughness={0.1} metalness={0.2} depthWrite={false} />
-      </mesh>
-      <gridHelper args={[16, 32, "#1e3a5f", "#132a40"]} position={[0.2, 0.005, 0.5]} />
-
-      {/* Enlaces */}
-      {ENLACES.map((e) => {
-        const cortado = cortados.includes(e.id);
-        const activo = enRuta.has(e.id);
-        const col = cortado ? NO : activo ? modoColor : e.tipo === "submarino" ? "#0891b2" : "#475569";
-        return (
-          <mesh key={e.id} geometry={TUBOS[e.id]}>
-            <meshStandardMaterial
-              color={col}
-              emissive={col}
-              emissiveIntensity={cortado ? 0.5 : activo ? 0.9 : 0.12}
-              transparent={cortado}
-              opacity={cortado ? 0.45 : 1}
-              roughness={0.35}
-              toneMapped={!activo}
-            />
-          </mesh>
-        );
-      })}
-      {cortados.map((id) => (
-        <MarcaCorte key={id} id={id} />
-      ))}
-
-      {/* Nodos */}
-      {NODOS.map((n) => {
-        if (n.tipo === "casa") return <Casa key={n.id} pos={n.pos} />;
-        if (n.tipo === "isp") return <Proveedor key={n.id} pos={n.pos} />;
-        if (n.tipo === "router") return <RouterTroncal key={n.id} pos={n.pos} />;
-        if (n.tipo === "estacion") return <Estacion key={n.id} pos={n.pos} />;
-        return <CentroDatos key={n.id} pos={n.pos} color={modoColor} destacado={n.id === destino} />;
-      })}
-      <ServidorDns pos={POS_DNS} resuelto={dnsResuelto} />
-
-      {/* Etiquetas */}
-      {NODOS.map((n) => {
-        const esDest = n.id === destino;
-        const alto = n.tipo === "isp" ? 2.15 : n.tipo === "casa" ? 1.35 : n.tipo === "datos" ? 1.15 : 0.85;
-        const corto = n.id === "casa" ? "Tu casa" : n.id === "isp" ? "Proveedor" : n.id === "bil" ? "Bilbao" : n.id === "ash" ? "Ashburn" : n.etq;
-        return (
-          <Etiqueta key={n.id} sec={!(esDest || n.id === "casa")} pos={[n.pos[0], alto, n.pos[2]]} df={esDest ? 11 : 12.5} fs={14} col={esDest ? `${modoColor}cc` : undefined}>
-            {n.tipo === "datos" && <i className="fa-solid fa-server" style={{ color: esDest ? modoColor : "#94a3b8" }} />}
-            {corto}
-          </Etiqueta>
-        );
-      })}
-      <Etiqueta pos={[POS_DNS[0], 0.02, POS_DNS[2] + 0.62]} df={11.5} fs={14} col={dnsResuelto ? `${AMARILLO}aa` : undefined}>
-        <i className="fa-solid fa-address-book" style={{ color: AMARILLO }} />
-        {dnsResuelto ? `DNS: ${dest.dominio} → ${dest.ip}` : "Servidor DNS"}
-      </Etiqueta>
-      <Etiqueta sec pos={[3.65, -0.45, 2.9]} df={12} fs={14} col="#0891b2aa">
-        <i className="fa-solid fa-water" style={{ color: "#67e8f9" }} />
-        Cable submarino MAREA · 6 600 km
-      </Etiqueta>
-      <Etiqueta sec pos={[3.65, 0.2, -2.3]} df={13} fs={14}>
-        Océano Atlántico (distancias no a escala)
-      </Etiqueta>
-
-      {/* Consulta DNS y paquetes */}
-      {conDns && <Rafaga clave={CLAVE_DNS} nonce={envioNonce} inicio={0} duracion={T_DNS} n={1} color={AMARILLO} tam={0.17} />}
-      <Rafaga clave={clavePaquetes} nonce={envioNonce} inicio={inicioDatos} duracion={T_DATOS} n={paquetesVisibles} color={modoColor} />
-      <Pulso pos={[posDest[0], 0.03, posDest[2]]} nonce={envioNonce} retraso={inicioDatos + T_DATOS - 0.2} color={modoColor} />
-    </group>
-  );
-}
 
 /* ════════════════════════════════════════════════════════════════════════
  * 2. CONSULTA SEGURA A LA IA
@@ -669,7 +387,7 @@ function PantallaEspia({ nonce, retraso, cifrado, texto, cifra, dominio }: { non
   const col = cifrado ? OK : NO;
   if (angosto) return null;
   return (
-    <Html position={[-6.0, 2.95, -0.9]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={[-6.0, 2.95, -0.9]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ width: 270, borderRadius: 10, overflow: "hidden", border: `1px solid ${col}88`, background: "rgba(2,6,14,0.94)", boxShadow: "0 10px 24px -10px #000" }}>
         <div style={{ padding: "5px 9px", fontSize: 14, fontWeight: 900, color: "#fff", background: "rgba(127,29,29,0.55)", letterSpacing: "0.04em" }}>
           <i className="fa-solid fa-user-secret" style={{ marginRight: 6 }} />
@@ -730,8 +448,8 @@ function Tarjeta({ i, verificada, decision, correcta }: { i: number; verificada:
           <meshStandardMaterial color={AMARILLO} emissive={AMARILLO} emissiveIntensity={0.8} />
         </mesh>
       )}
-      <Html position={[0, 0.72, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ padding: "2px 8px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1px solid ${col}`, color: "#fff", fontSize: 11, fontWeight: 900, whiteSpace: "nowrap" }}>
+      <Html position={[0, 0.72, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ padding: "2px 8px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1px solid ${col}`, color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
           {i + 1}
           {verificada && <i className="fa-solid fa-magnifying-glass" style={{ marginLeft: 5, color: AMARILLO }} />}
           {bien !== null && <i className={`fa-solid ${bien ? "fa-check" : "fa-xmark"}`} style={{ marginLeft: 5, color: bien ? OK : NO }} />}
@@ -814,10 +532,16 @@ function EscenaConsulta({
       <PantallaEspia nonce={iaNonce} retraso={T_ENVIO_IA * 0.35} cifrado={iaCifrado} texto={espiaTexto} cifra={espiaCifrado} dominio={s ? s.url.replace(/^https?:\/\//, "") : "—"} />
 
       {/* Internet */}
-      <mesh ref={nube} position={POS_NUBE}>
-        <icosahedronGeometry args={[0.42, 1]} />
-        <meshStandardMaterial color="#1e3a8a" emissive="#3b82f6" emissiveIntensity={0.35} wireframe />
-      </mesh>
+      <group position={POS_NUBE}>
+        <mesh ref={nube}>
+          <icosahedronGeometry args={[0.42, 3]} />
+          <meshPhysicalMaterial color="#1e3a8a" emissive="#3b82f6" emissiveIntensity={0.55} roughness={0.25} metalness={0.3} clearcoat={1} flatShading />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.62, 0.018, 8, 64]} />
+          <meshStandardMaterial color="#93c5fd" emissive="#60a5fa" emissiveIntensity={1.6} />
+        </mesh>
+      </group>
       <Etiqueta sec pos={[POS_NUBE[0], POS_NUBE[1] + 0.72, POS_NUBE[2]]} df={11} fs={14}>
         <i className="fa-solid fa-globe" style={{ color: "#93c5fd" }} />
         Internet
@@ -1008,7 +732,7 @@ function ColumnaHuella({ anios, modoColor }: { anios: number; modoColor: string 
       {/* Referencia: 2 años de uso */}
       <mesh position={[0, 0.2 + hBase / 2, 0]}>
         <boxGeometry args={[0.92, hBase, 0.92]} />
-        <meshBasicMaterial color="#e2e8f0" wireframe transparent opacity={0.25} />
+        <meshStandardMaterial color="#e2e8f0" transparent opacity={0.12} roughness={0.3} depthWrite={false} />
       </mesh>
       <group ref={etq} position={[0, 0.2 + hUso + hInicial + 0.32, 0]}>
         <Etiqueta pos={[0, 0, 0]} df={10} fs={14} col={`${modoColor}aa`}>
@@ -1168,12 +892,12 @@ function Reciclaje({ activo, nonce, lote, modoColor }: { activo: boolean; nonce:
         ))}
       </group>
       {activo && (
-        <Html position={[0.55, -0.05, 0.85]} center distanceFactor={11} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <Html position={[0.55, -0.05, 0.85]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, auto)", gap: 8, padding: "6px 10px", borderRadius: 10, background: "rgba(4,10,22,0.9)", border: `1px solid ${modoColor}aa`, whiteSpace: "nowrap" }}>
             {METALES.map((m) => (
-              <div key={m.id} style={{ textAlign: "center", fontSize: 10, fontWeight: 800, color: "#cbd5e1", lineHeight: 1.25 }}>
+              <div key={m.id} style={{ textAlign: "center", fontSize: 14, fontWeight: 800, color: "#cbd5e1", lineHeight: 1.25 }}>
                 {m.etq}
-                <div style={{ fontSize: 11.5, color: m.color }}>{masa(g[m.id])}</div>
+                <div style={{ fontSize: 14, color: m.color }}>{masa(g[m.id])}</div>
               </div>
             ))}
           </div>
@@ -1260,62 +984,268 @@ function EscenaDispositivo({ anios, destinoFinal, destinoNonce, lote, modoColor 
   );
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+ * 1. EL VIAJE DEL PAQUETE, A TODAS LAS ESCALAS
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/** Lleva el tiempo del envío actual; corre antes que todo lo demás en cada cuadro. */
+function RelojViaje({ reloj, nonce, activo }: { reloj: RelojEnvio; nonce: number; activo: boolean }) {
+  const visto = useRef(nonce);
+  useFrame((_, dt) => {
+    const reinicia = visto.current !== nonce;
+    if (reinicia) visto.current = nonce;
+    pasoReloj(reloj, reinicia, activo, dt);
+  }, -1);
+  return null;
+}
+
+type Pose = { pos: Pt; target: Pt };
+
+/** Entrada a una escala: la cámara aparece más lejos (el globo, desde el espacio) y luego se acerca sola. */
+function entrarEscala(camera: THREE.Camera, controls: OrbitControlsImpl | null, escala: EscalaId, p: THREE.Vector3, t: THREE.Vector3) {
+  const dir = p.clone().sub(t);
+  const k = escala === "globo" ? 2.2 : escala === "centro" ? 1.0 : 1.55;
+  camera.position.copy(t).add(dir.multiplyScalar(k));
+  if (escala === "centro") camera.position.add(new THREE.Vector3(0, 0.4, 3.2));
+  if (escala === "ruta") camera.position.add(new THREE.Vector3(0, 2.5, 0));
+  if (controls) {
+    controls.target.copy(t);
+    controls.update();
+  } else camera.lookAt(t);
+}
+
+/**
+ * Cámara con intención: al cambiar de escala entra desde lejos y se acerca
+ * sola a su encuadre; durante un envío, las escalas pueden llevarla (el globo
+ * sigue al destello, el centro de datos avanza por el pasillo). En cuanto el
+ * alumno arrastra, la cámara es suya hasta la siguiente escala.
+ */
+function RigCamara({ escala, pose, mando, seguir }: { escala: EscalaId; pose: Pose; mando: MandoCamara; seguir: boolean }) {
+  const camera = useThree((s) => s.camera);
+  const controls = useThree((s) => s.controls) as OrbitControlsImpl | null;
+  const clave = `${escala}|${pose.pos.join(",")}|${pose.target.join(",")}`;
+  const ultima = useRef<string>("");
+  const ultimaEscala = useRef<EscalaId | null>(null);
+
+  useEffect(() => {
+    if (ultima.current === clave) return;
+    const cambioEscala = ultimaEscala.current !== escala;
+    ultima.current = clave;
+    ultimaEscala.current = escala;
+    const p = new THREE.Vector3(...pose.pos);
+    const t = new THREE.Vector3(...pose.target);
+    nuevoEncuadre(mando, p, t);
+    if (cambioEscala) entrarEscala(camera, controls, escala, p, t);
+  }, [clave, escala, pose, mando, camera, controls]);
+
+  useEffect(() => {
+    fijarSigue(mando, seguir);
+  }, [seguir, mando]);
+
+  useEffect(() => {
+    if (!controls) return undefined;
+    const tomar = () => soltarCamara(mando);
+    controls.addEventListener("start", tomar);
+    return () => controls.removeEventListener("start", tomar);
+  }, [controls, mando]);
+
+  useFrame((_, dt) => {
+    if (!controls || !gastarVuelo(mando, dt)) return;
+    const k = suave(dt, mando.sigue ? 0.05 : 0.045);
+    camera.position.lerp(mando.pos, k);
+    controls.target.lerp(mando.target, k);
+    controls.update();
+  });
+  return null;
+}
+
+const LIMITES: Record<EscalaId, { min: number; max: number; polMin: number; polMax: number }> = {
+  capas: { min: 1.8, max: 10, polMin: 0.08, polMax: 0.49 },
+  ruta: { min: 4, max: 28, polMin: 0.05, polMax: 0.46 },
+  globo: { min: 3.3, max: 16, polMin: 0.08, polMax: 0.92 },
+  centro: { min: 0.6, max: 9, polMin: 0.2, polMax: 0.62 },
+};
+
+const FONDOS: Record<Exclude<EscalaId, "centro">, { bg: string; fog: [number, number] | null }> = {
+  capas: { bg: "#050b16", fog: [9, 30] },
+  ruta: { bg: "#040a16", fog: [16, 44] },
+  globo: { bg: "#01030a", fog: null },
+};
+
+function EscenaViaje({ p, debil }: { p: PaqueteSceneProps; debil: boolean }) {
+  const scene = useThree((s) => s.scene);
+  const aspecto = useThree((s) => s.size.width / Math.max(1, s.size.height));
+  const reloj = useMemo<RelojEnvio>(() => ({ t: -1 }), []);
+  const mando = useMemo<MandoCamara>(() => ({ pos: new THREE.Vector3(), target: new THREE.Vector3(), vuelo: 0, sigue: false, libre: false }), []);
+  const cortadosClave = p.cortados.join(",");
+  const rutas = useMemo(() => rutasAlternas(p.destino, cortadosClave ? (cortadosClave.split(",") as EnlaceId[]) : []), [p.destino, cortadosClave]);
+  const plan = useMemo(() => planEnvio(p.conDns, p.destino), [p.conDns, p.destino]);
+  const escala = p.escala;
+
+  const aspectoR = Math.round(aspecto * 10) / 10;
+  const pose = useMemo((): Pose => {
+    if (escala === "globo") return poseGlobo(p.destino, aspectoR);
+    if (escala === "ruta") return poseRuta(aspectoR);
+    if (escala === "centro") return poseCentro(aspectoR);
+    return poseCapas(aspectoR);
+  }, [escala, p.destino, aspectoR]);
+  const lim = LIMITES[escala];
+
+  useEffect(() => {
+    if (escala === "centro") return;
+    const f = FONDOS[escala];
+    asignar(scene, "background", new THREE.Color(f.bg));
+    asignar(scene, "fog", f.fog ? new THREE.Fog(f.bg, f.fog[0], f.fog[1]) : null);
+  }, [escala, scene]);
+
+  return (
+    <RelojCtx.Provider value={reloj}>
+      <CamaraCtx.Provider value={mando}>
+        <RelojViaje reloj={reloj} nonce={p.envioNonce} activo={p.envioActivo} />
+        {escala === "capas" && (
+          <>
+            <Environment resolution={128}>
+              <Lightformer form="rect" intensity={2} position={[0, 5, -4]} scale={[10, 4, 1]} color="#bcd7ff" />
+              <Lightformer form="rect" intensity={1.2} position={[-5, 1, 3]} scale={[4, 6, 1]} color={p.modoColor} />
+              <Lightformer form="ring" intensity={1.5} position={[4, 3, 4]} scale={2} color="#ffffff" />
+            </Environment>
+            <EscalaCapas nivelManual={p.capasNivel} tramo={p.tramo} bytesDatos={p.bytesDatos} firma={p.firma} ipDestino={p.ipDestino} plan={plan} color={p.modoColor} />
+          </>
+        )}
+        {escala === "ruta" && (
+          <>
+            <ambientLight intensity={0.32} />
+            <hemisphereLight args={["#bcd7ff", "#0a1220", 0.35]} />
+            <directionalLight position={[4, 9, 6]} intensity={1.2} castShadow={!debil} shadow-mapSize={[2048, 2048]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={8} shadow-camera-bottom={-8} />
+            <Environment resolution={128}>
+              <Lightformer form="rect" intensity={1.6} position={[0, 6, -6]} scale={[14, 5, 1]} color="#93c5fd" />
+              <Lightformer form="rect" intensity={0.9} position={[-7, 2, 4]} scale={[6, 6, 1]} color={p.modoColor} />
+            </Environment>
+            <EscalaRuta
+              destino={p.destino}
+              rutas={rutas}
+              cortados={p.cortados}
+              plan={plan}
+              conDns={p.conDns}
+              dnsResuelto={p.dnsResuelto}
+              nPaquetes={p.paquetesTotales}
+              color={p.modoColor}
+              onCortar={p.onCortar}
+              debil={debil}
+            />
+          </>
+        )}
+        {escala === "globo" && (
+          <Suspense fallback={null}>
+            <EscalaGlobo destino={p.destino} rutaNodos={rutas[0]?.nodos ?? ["casa"]} plan={plan} color={p.modoColor} />
+          </Suspense>
+        )}
+        {escala === "centro" && (
+          <>
+            <Environment resolution={128}>
+              {[-3.9, 0, 3.9].map((x) => (
+                <Lightformer key={x} form="rect" intensity={2.4} position={[x, 3.4, -6]} rotation={[Math.PI / 2, 0, 0]} scale={[0.4, 20, 1]} color="#e3efff" />
+              ))}
+              <Lightformer form="rect" intensity={0.6} position={[0, 1.5, -18]} scale={[10, 3, 1]} color="#7dd3fc" />
+            </Environment>
+            <EscalaCentro destino={p.destino} plan={plan} color={p.modoColor} debil={debil} nPaquetes={p.paquetesTotales} />
+          </>
+        )}
+        <OrbitControls
+          key={escala}
+          makeDefault
+          enablePan={false}
+          enableZoom
+          enableDamping
+          dampingFactor={0.08}
+          minDistance={lim.min}
+          maxDistance={lim.max}
+          minPolarAngle={Math.PI * lim.polMin}
+          maxPolarAngle={Math.PI * lim.polMax}
+          target={pose.target}
+        />
+        <RigCamara escala={escala} pose={pose} mando={mando} seguir={p.seguir} />
+      </CamaraCtx.Provider>
+    </RelojCtx.Provider>
+  );
+}
+
+/** Aleja la cámara lo necesario para que la escena quepa a lo ancho (consulta y dispositivo). */
+function AjusteCamara({ pos, target }: { pos: Pt; target: Pt }) {
+  const camera = useThree((s) => s.camera);
+  const controls = useThree((s) => s.controls) as OrbitControlsImpl | null;
+  const aspecto = useThree((s) => s.size.width / Math.max(1, s.size.height));
+  const aspectoR = Math.round(aspecto * 10) / 10;
+  useEffect(() => {
+    const k = Math.min(2.2, Math.max(1, 1.5 / Math.max(0.3, aspectoR)));
+    const t = new THREE.Vector3(...target);
+    camera.position.copy(new THREE.Vector3(...pos).sub(t).multiplyScalar(k).add(t));
+    if (controls) {
+      controls.target.copy(t);
+      controls.update();
+    }
+  }, [camera, controls, aspectoR, pos, target]);
+  return null;
+}
+
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
 export default function PaqueteInternetScene(p: PaqueteSceneProps) {
   const { vista, modoColor, resetNonce } = p;
+  const [debil] = useState(() => (typeof window === "undefined" ? false : esDebil(window.innerWidth)));
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "viaje") return { pos: [0.2, 10.5, 9.4], target: [0.2, -1.6, 0.6] };
+    if (vista === "viaje") return { pos: [0.9, 1.75, 3.9], target: [-0.35, 0.8, 0] };
     if (vista === "consulta") return { pos: [-0.6, 5.9, 11.6], target: [-0.5, -0.5, 0.3] };
     return { pos: [0.4, 4.9, 10.8], target: [0.4, -0.3, 0.0] };
   }, [vista]);
+  const viaje = vista === "viaje";
 
   return (
-    <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <DetallesCtx.Provider value={p.detalles}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 20, 42]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[4, 9, 6]} intensity={1.15} castShadow shadow-mapSize={[1024, 1024]} />
-      <pointLight position={[-6, 3, 5]} intensity={0.4} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.5} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
+    <div style={{ position: "absolute", inset: 0 }}>
+      <Canvas key={`${vista}-${resetNonce}`} shadows dpr={debil ? [1, 1.5] : [1, 1.75]} camera={{ position: cam.pos, fov: viaje ? 44 : 42, near: 0.05, far: 2000 }} gl={{ antialias: true }}>
+        <DetallesCtx.Provider value={p.detalles}>
+          {!viaje && (
+            <>
+              <color attach="background" args={["#040a16"]} />
+              <fog attach="fog" args={["#040a16", 20, 42]} />
+              <ambientLight intensity={0.55} />
+              <directionalLight position={[4, 9, 6]} intensity={1.15} castShadow shadow-mapSize={[1024, 1024]} />
+              <pointLight position={[-6, 3, 5]} intensity={0.4} color={modoColor} />
+              <Environment resolution={128}>
+                <Lightformer form="rect" intensity={1.5} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
+                <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
+              </Environment>
+            </>
+          )}
 
-      {vista === "viaje" && (
-        <EscenaViaje
-          destino={p.destino}
-          rutaClave={p.rutaClave}
-          cortados={p.cortados}
-          envioNonce={p.envioNonce}
-          conDns={p.conDns}
-          paquetesVisibles={p.paquetesVisibles}
-          dnsResuelto={p.dnsResuelto}
-          modoColor={modoColor}
-        />
-      )}
-      {vista === "consulta" && (
-        <EscenaConsulta
-          sitio={p.sitio}
-          iaNonce={p.iaNonce}
-          iaCifrado={p.iaCifrado}
-          espiaTexto={p.espiaTexto}
-          espiaCifrado={p.espiaCifrado}
-          verificadas={p.verificadas}
-          decisiones={p.decisiones}
-          declarado={p.declarado}
-          modoColor={modoColor}
-        />
-      )}
-      {vista === "dispositivo" && <EscenaDispositivo anios={p.anios} destinoFinal={p.destinoFinal} destinoNonce={p.destinoNonce} lote={p.lote} modoColor={modoColor} />}
+          {viaje && <EscenaViaje p={p} debil={debil} />}
+          {vista === "consulta" && (
+            <EscenaConsulta
+              sitio={p.sitio}
+              iaNonce={p.iaNonce}
+              iaCifrado={p.iaCifrado}
+              espiaTexto={p.espiaTexto}
+              espiaCifrado={p.espiaCifrado}
+              verificadas={p.verificadas}
+              decisiones={p.decisiones}
+              declarado={p.declarado}
+              modoColor={modoColor}
+            />
+          )}
+          {vista === "dispositivo" && <EscenaDispositivo anios={p.anios} destinoFinal={p.destinoFinal} destinoNonce={p.destinoNonce} lote={p.lote} modoColor={modoColor} />}
 
-      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={24} maxPolarAngle={Math.PI * 0.47} minPolarAngle={Math.PI * 0.05} target={cam.target} />
-      <EffectComposer>
-        <Bloom intensity={0.35} luminanceThreshold={0.62} luminanceSmoothing={0.85} mipmapBlur />
-        <Vignette eskil={false} offset={0.18} darkness={0.6} />
-      </EffectComposer>
-      </DetallesCtx.Provider>
-    </Canvas>
+          {!viaje && <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={30} maxPolarAngle={Math.PI * 0.47} minPolarAngle={Math.PI * 0.05} target={cam.target} />}
+          {!viaje && <AjusteCamara pos={cam.pos} target={cam.target} />}
+          {!debil && (
+            <EffectComposer>
+              <Bloom intensity={viaje ? 0.55 : 0.35} luminanceThreshold={viaje ? 0.7 : 0.62} luminanceSmoothing={0.85} mipmapBlur />
+              <Vignette eskil={false} offset={0.18} darkness={0.6} />
+            </EffectComposer>
+          )}
+        </DetallesCtx.Provider>
+      </Canvas>
+      {/* Corte a negro breve al cambiar de escala: la cámara entra desde lejos. */}
+      {viaje && <div key={p.escala} className="pi-corte" aria-hidden />}
+    </div>
   );
 }

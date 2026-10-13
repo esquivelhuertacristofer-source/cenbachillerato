@@ -12,6 +12,9 @@
  *  (1) El viaje del paquete — elegir qué se manda y a dónde, predecir los
  *      paquetes, ver la consulta DNS y la ruta, cortar enlaces y cruzar el
  *      Atlántico por el cable MAREA; latencia y huella de red calculadas.
+ *      Se mira a cuatro escalas que la cámara recorre en cada envío: capas
+ *      (encapsulación), ruta (paquetes numerados por varios caminos), globo
+ *      (la Tierra de noche con los cables submarinos) y centro de datos.
  *  (2) Consulta segura a la IA — elegir el sitio legítimo, quitar datos
  *      personales, ver qué captura un espía con HTTP y con HTTPS, verificar la
  *      respuesta de la IA y declarar su uso.
@@ -30,6 +33,7 @@ import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { CREDITO_ESPACIO } from "./_espacio";
 import { PAQUETE_INTERNET_FICHA } from "./paquete-internet-ficha";
 import type { VistaPaquete } from "./PaqueteInternetScene";
 import {
@@ -63,8 +67,6 @@ import {
   MTU,
   V_FIBRA_KM_S,
   FACTOR_CO2_KG_KWH,
-  T_DNS,
-  T_DATOS,
   T_ENVIO_IA,
   T_RESP_IA,
   T_VUELO,
@@ -106,6 +108,31 @@ import {
   HUECOS_A6,
   num,
 } from "./paquete-internet-data";
+import {
+  type EscalaId,
+  type TramoId,
+  type PlanEnvio,
+  type EtapaId,
+  ESCALAS,
+  ESCALAS_DEF,
+  planEnvio,
+  avanceEtapa,
+  rutasAlternas,
+  tiemposPaquetes,
+  llegaEnDesorden,
+  saltosDe,
+  latenciaEstimadaMs,
+  MS_POR_SALTO,
+  PAQUETES_DIBUJADOS,
+  T_RUTA,
+  TRAMOS,
+  CAPAS_DEF,
+  BYTES_CAPA,
+  BYTES_TRAMA,
+  bytesEnCable,
+  FIRMA_ARCHIVO,
+} from "./paquete-internet-viaje";
+import type { Ruta } from "./paquete-internet-data";
 
 const PaqueteScene = dynamic(() => import("./PaqueteInternetScene"), {
   ssr: false,
@@ -229,6 +256,53 @@ interface EnvioIA {
 }
 
 
+/* ── Medidor del viaje: saltos, distancia y latencia (simulación) ─────── */
+function MedidorViaje({ ruta, plan, nonce, fase }: { ruta: Ruta | null; plan: PlanEnvio | null; nonce: number; fase: string }) {
+  const t0 = useRef(0);
+  const visto = useRef(nonce);
+  const saltos = useRef<HTMLElement>(null);
+  const km = useRef<HTMLElement>(null);
+  const ms = useRef<HTMLElement>(null);
+  const titulo = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (visto.current !== nonce) {
+      visto.current = nonce;
+      t0.current = performance.now();
+    }
+  }, [nonce]);
+  useEffect(() => {
+    let id = 0;
+    const pinta = () => {
+      if (!ruta) {
+        if (saltos.current) saltos.current.textContent = "—";
+        if (km.current) km.current.textContent = "—";
+        if (ms.current) ms.current.textContent = "—";
+        if (titulo.current) titulo.current.textContent = "Sin ruta";
+        return;
+      }
+      const t = (performance.now() - t0.current) / 1000;
+      const enCurso = plan && fase !== "listo" && fase !== "llego";
+      const p = enCurso && plan ? avanceEtapa(plan, "ruta", t) : 1;
+      const total = saltosDe(ruta);
+      if (saltos.current) saltos.current.textContent = enCurso ? `${Math.min(total, Math.floor(p * total + 0.0001))} / ${total}` : `${total}`;
+      if (km.current) km.current.textContent = `${num(ruta.km * p)} km`;
+      if (ms.current) ms.current.textContent = `≈ ${num(latenciaEstimadaMs(ruta) * p, 1)} ms`;
+      if (titulo.current) titulo.current.textContent = fase === "llego" ? "Llegó · medido" : enCurso ? "En camino" : "Ruta prevista";
+      if (enCurso) id = requestAnimationFrame(pinta);
+    };
+    pinta();
+    return () => cancelAnimationFrame(id);
+  }, [ruta, plan, fase]);
+  return (
+    <div className="pi-medidas">
+      <span ref={titulo} className="pi-medidas-tit">Ruta prevista</span>
+      <span>Saltos <b ref={saltos}>—</b></span>
+      <span className="pi-km">Distancia <b ref={km}>—</b></span>
+      <span>Latencia estimada <b ref={ms}>—</b></span>
+    </div>
+  );
+}
+
 /* ── Estilos propios (la pantalla la da LabShell) ── */
 const estilos = (accent: string) => `
   .pi-opts { display:flex; flex-wrap:wrap; gap:8px; }
@@ -243,6 +317,27 @@ const estilos = (accent: string) => `
   .pi-input { width:min(100%, 160px); box-sizing:border-box; padding:9px 12px; border-radius:10px; border:1px solid ${T.lineStrong}; background:rgba(4,10,22,0.55); color:#fff; font-size:16px; font-weight:800; }
   .pi-input:focus { outline:2px solid ${accent}; outline-offset:1px; }
   .pi-opt:focus-visible, .pi-toggle:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  .pi-hud { display:grid; gap:8px; max-width:min(560px, calc(100vw - 48px)); }
+  .pi-escalas { display:flex; gap:4px; flex-wrap:wrap; }
+  .pi-escala { cursor:pointer; display:inline-flex; align-items:center; gap:7px; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.14);
+    background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.8); font-size:14px; font-weight:800; white-space:nowrap; transition:all .15s; }
+  .pi-escala:hover { background:rgba(255,255,255,0.1); color:#fff; }
+  .pi-escala[data-on="true"] { background:${accent}; border-color:${accent}; color:#04121f; }
+  .pi-escala[data-viaje="true"]:not([data-on="true"]) { border-color:${accent}; color:#fff; box-shadow:0 0 0 1px ${accent}55 inset; }
+  .pi-escala:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+  .pi-medidas { display:flex; flex-wrap:wrap; gap:4px 14px; align-items:baseline; font-size:14px; color:rgba(230,238,251,0.78); font-weight:700; }
+  .pi-medidas b { color:#fff; font-family:ui-monospace, monospace; font-variant-numeric:tabular-nums; font-size:15px; margin-left:4px; }
+  .pi-medidas-tit { color:${accent}; font-weight:900; letter-spacing:.06em; text-transform:uppercase; font-size:13px; }
+  .pi-sim { font-size:13px; color:rgba(230,238,251,0.55); font-weight:600; }
+  .pi-corte { position:absolute; inset:0; pointer-events:none; background:#02060e; animation:piCorte .7s ease-out forwards; }
+  @keyframes piCorte { from { opacity:1; } to { opacity:0; } }
+  @media (prefers-reduced-motion: reduce) { .pi-corte { animation-duration:.01s; } }
+  @media (max-width: 560px) {
+    .pi-hud { gap:4px; }
+    .pi-escala { padding:6px 9px; }
+    .pi-escala:not([data-on="true"]) .pi-escala-txt { display:none; }
+    .pi-sim, .pi-medidas-tit, .pi-km { display:none; }
+  }
 `;
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -260,13 +355,20 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
   const [cortados, setCortados] = useState<EnlaceId[]>([]);
   const [prediccion, setPrediccion] = useState("");
   const [envio, setEnvio] = useState<Envio | null>(null);
-  const [fase, setFase] = useState<"listo" | "dns" | "datos" | "llego">("listo");
+  const [fase, setFase] = useState<"listo" | "capas" | "dns" | "datos" | "globo" | "centro" | "llego">("listo");
   const [envioNonce, setEnvioNonce] = useState(0);
   const [resueltos, setResueltos] = useState<DestinoId[]>([]);
   const [envioHecho, setEnvioHecho] = useState(false);
   const [prediccionOk, setPrediccionOk] = useState(false);
   const [cruzoOceano, setCruzoOceano] = useState(false);
   const [vioRodeo, setVioRodeo] = useState(false);
+  // Escalas del viaje
+  const [escala, setEscala] = useState<EscalaId>("globo");
+  const [autoRecorrido, setAutoRecorrido] = useState(false);
+  const [capasNivel, setCapasNivel] = useState(0);
+  const [tramo, setTramo] = useState<TramoId>("wifi");
+  const [capasOk, setCapasOk] = useState(false);
+  const [vioReensamble, setVioReensamble] = useState(false);
 
   // ── Consulta
   const [sitio, setSitio] = useState<SitioId | null>(null);
@@ -303,6 +405,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
   const [sonido, setSonido] = useState(false);
   const [detalles, setDetalles] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
+  const escenaRef = useRef<HTMLDivElement>(null);
   const timers = useRef<number[]>([]);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
   const registraEstrellas = useCallback(
@@ -358,29 +461,50 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
   const destino = DESTINOS.find((d) => d.id === destinoId)!;
   const ruta = rutaMasCorta("casa", destinoId, cortados);
   const rutaBase = rutaMasCorta("casa", destinoId, []);
-  const enviando = fase === "dns" || fase === "datos";
+  const enviando = fase !== "listo" && fase !== "llego";
+  const plan = envio ? planEnvio(envio.conDns, envio.destino) : null;
   const predNum = Number(prediccion.replace(/\s/g, "").replace(",", "."));
   const predValida = prediccion.trim() !== "" && Number.isFinite(predNum) && predNum > 0;
 
+  const autoRef = useRef(false);
+  useEffect(() => {
+    autoRef.current = autoRecorrido;
+  }, [autoRecorrido]);
+  const FASE_DE: Record<EtapaId, typeof fase> = { capas: "capas", dns: "dns", ruta: "datos", globo: "globo", centro: "centro" };
   const enviar = () => {
     if (enviando || !ruta) return;
     const conDns = !resueltos.includes(destinoId);
     const e: Envio = { contenido: contenidoId, destino: destinoId, red: redId, km: ruta.km, rodeo: !!rutaBase && ruta.km > rutaBase.km + 1, conDns, prediccion: predValida ? predNum : null };
+    const pl = planEnvio(conDns, destinoId);
+    const nDib = Math.min(PAQUETES_DIBUJADOS, paquetesDe(contenido.bytes));
+    const desorden = llegaEnDesorden(tiemposPaquetes(rutasAlternas(destinoId, cortados), nDib, T_RUTA));
+    limpiarTimers();
+    if (window.innerWidth <= 1000) {
+      const el = escenaRef.current;
+      despues(60, () => el?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
     setEnvio(e);
     setEnvioNonce((k) => k + 1);
-    setFase(conDns ? "dns" : "datos");
+    setAutoRecorrido(true);
+    setFase("capas");
+    setEscala("capas");
     blip();
-    const tDns = conDns ? T_DNS * 1000 : 0;
-    if (conDns)
-      despues(tDns, () => {
-        setFase("datos");
-        setResueltos((r) => (r.includes(e.destino) ? r : [...r, e.destino]));
-      });
-    despues(tDns + T_DATOS * 1000 + 120, () => {
+    // Cada etapa del viaje: la fase del panel y (si el recorrido es automático) la escala.
+    pl.etapas.forEach((et) => {
+      if (et.ini > 0)
+        despues(et.ini * 1000, () => {
+          setFase(FASE_DE[et.id]);
+          setEscala((x) => (autoRef.current ? et.escala : x));
+          if (et.id === "ruta" && conDns) setResueltos((r) => (r.includes(e.destino) ? r : [...r, e.destino]));
+        });
+    });
+    despues(pl.total * 1000 + 120, () => {
       setFase("llego");
+      setAutoRecorrido(false);
       setEnvioHecho(true);
       if (e.destino === "mad") setCruzoOceano(true);
       if (e.rodeo) setVioRodeo(true);
+      if (desorden) setVioReensamble(true);
       const real = paquetesDe(CONTENIDOS.find((c) => c.id === e.contenido)!.bytes);
       if (e.prediccion !== null && real >= 100) {
         const ok = errorRelativo(e.prediccion, real) <= 0.1;
@@ -388,6 +512,21 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
         sfx(ok);
       } else if (sonido) audioRef.current?.correcto();
     });
+  };
+  const elegirEscala = (id: EscalaId) => {
+    setEscala(id);
+    setAutoRecorrido(false);
+    autoRef.current = false;
+    blip();
+  };
+  const cambiarCapas = (n: number) => {
+    setCapasNivel(n);
+    if (n >= 3) setCapasOk(true);
+    if (escala !== "capas") {
+      setEscala("capas");
+      setAutoRecorrido(false);
+      autoRef.current = false;
+    }
   };
   const cambiarContenido = (id: ContenidoId) => {
     if (enviando) return;
@@ -406,6 +545,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
     if (enviando) return;
     setCortados((xs) => (xs.includes(id) ? xs.filter((x) => x !== id) : [...xs, id]));
     setFase("listo");
+    if (escala !== "ruta") setEscala("ruta");
     blip();
   };
 
@@ -521,6 +661,8 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
       setEnvio(null);
       setFase("listo");
       setResueltos([]);
+      setAutoRecorrido(false);
+      setCapasNivel(0);
     }
     if (modo === "consulta") {
       setSitio(null);
@@ -546,6 +688,8 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
   const objetivos: ObjetivoLab[] = [
+    { txt: "Envolver los datos capa por capa: TCP, IP y la trama de la red", done: capasOk, modo: "viaje" },
+    { txt: "Ver los paquetes numerados llegar en desorden y reensamblarse en orden", done: vioReensamble, modo: "viaje" },
     { txt: "Enviar un archivo: el DNS traduce el nombre y el mensaje viaja en paquetes", done: envioHecho },
     { txt: "Predecir los paquetes de un envío con un error menor al 10 %", done: prediccionOk },
     { txt: "Cruzar el Atlántico por el cable submarino y comparar la latencia", done: cruzoOceano },
@@ -570,9 +714,18 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
     if (fase === "dns" && envDest) {
       chipVivo = `DNS · ¿${envDest.dominio}?`;
       pie = `Tu celular todavía no conoce la dirección de ${envDest.dominio}: primero pregunta al servidor DNS, que responde ${envDest.ip}.`;
+    } else if (fase === "capas" && envCont) {
+      chipVivo = "en tu celular: datos → TCP → IP → trama";
+      pie = `Antes de salir, cada pedazo de ${envCont.etq.toLowerCase()} se envuelve: TCP le pone su número de orden y el puerto, IP las direcciones de origen y destino, y la trama ${envio?.red === "movil" ? "de radio" : "wifi"} lo prepara para el primer tramo.`;
     } else if (fase === "datos" && envCont && envDest) {
       chipVivo = `${num(paquetesDe(envCont.bytes))} ${paquetesDe(envCont.bytes) === 1 ? "paquete" : "paquetes"} → ${envDest.ip}`;
-      pie = `${envCont.etq} (${tamano(envCont.bytes)}) partido en paquetes de hasta ${num(MTU)} bytes. Cada uno lleva la IP de destino y su número de orden; en la escena se dibujan unos cuantos.`;
+      pie = `${envCont.etq} (${tamano(envCont.bytes)}) partido en paquetes de hasta ${num(MTU)} bytes. Cada uno lleva la IP de destino y su número de orden; en la escena se dibujan unos cuantos. Los routers los reparten por varios caminos: llegan en desorden y el destino los acomoda por su número.`;
+    } else if (fase === "globo" && envDest) {
+      chipVivo = envDest.id === "mad" ? "cruzando el Atlántico por MAREA" : envDest.id === "ash" ? "por la fibra hacia Virginia" : "por la fibra hacia Querétaro";
+      pie = `A la escala del planeta: tu paquete viaja como luz por fibra óptica, a unos 200 000 km/s. ${envDest.id === "mad" ? "Para llegar a Europa baja al lecho del océano por el cable MAREA." : "A México también llegan cables submarinos por Cancún y por Tijuana."} Las luces son las ciudades de noche.`;
+    } else if (fase === "centro" && envDest) {
+      chipVivo = `entrando al servidor de ${envDest.dominio}`;
+      pie = `El paquete llega a un centro de datos: filas de servidores, aire frío que sube por el piso y fibra por el techo. Uno de esos servidores es ${envDest.dominio}; ahí TCP vuelve a juntar el archivo en orden.`;
     } else if (fase === "llego" && envio && envCont && envDest) {
       const lat = latenciaMs(envio.km);
       chipVivo = `llegó · ${num(lat, 1)} ms de ida · ${num(envio.km)} km`;
@@ -681,7 +834,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
         </div>
         <button className="pi-toggle pi-enviar" onClick={enviar} disabled={enviando || !ruta} style={{ marginTop: 12, ["--pic" as string]: modoCol }}>
           <i className={`fa-solid ${enviando ? "fa-spinner fa-spin" : "fa-paper-plane"}`} style={{ marginRight: 9, color: modoCol }} />
-          {fase === "dns" ? "Preguntando al DNS…" : fase === "datos" ? "Enviando paquetes…" : !ruta ? "Sin ruta hacia el destino" : `Enviar ${contenido.etq.toLowerCase()} a ${destino.dominio}`}
+          {fase === "capas" ? "Envolviendo en capas…" : fase === "dns" ? "Preguntando al DNS…" : fase === "datos" ? "Enviando paquetes…" : fase === "globo" ? "Cruzando la red…" : fase === "centro" ? "Entrando al servidor…" : !ruta ? "Sin ruta hacia el destino" : `Enviar ${contenido.etq.toLowerCase()} a ${destino.dominio}`}
         </button>
         {fase === "llego" && envio && envCont && envDest && huellaEnvio && (
           <>
@@ -733,8 +886,43 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
             )
           : nota("No queda ningún camino hacia ese servidor: la red quedó partida. Reconecta algún enlace.", WARN, "fa-triangle-exclamation")}
         <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
-          Distancias terrestres en línea recta entre ciudades (la fibra real es más larga, y los routers agregan retardo). El cable MAREA mide {num(ENLACES.find((e) => e.id === "marea")!.km ?? 0)} km. La energía por GB es un promedio de orden de magnitud.
+          Distancias terrestres en línea recta entre ciudades (la fibra real es más larga, y los routers agregan retardo). El cable MAREA mide {num(ENLACES.find((e) => e.id === "marea")!.km ?? 0)} km. La energía por GB es un promedio de orden de magnitud. En la escala «Ruta» también puedes cortar un enlace tocándolo.
         </div>
+        {sub("6 · Las capas de un paquete")}
+        <Deslizador label="Capas puestas" icon="fa-layer-group" colr={modoCol} valor={capasNivel === 0 ? "solo datos" : CAPAS_DEF.slice(1, capasNivel + 1).map((c) => c.etq).join(" + ")} min={0} max={3} step={1} value={capasNivel} onChange={cambiarCapas} hintL="datos" hintR="+ TCP + IP + trama" />
+        <div className="pi-opts" style={{ marginTop: 10 }}>
+          {TRAMOS.map((tr) => (
+            <button key={tr.id} className="pi-opt pi-tramo" data-on={tr.id === tramo} onClick={() => { setTramo(tr.id); if (escala !== "capas") cambiarCapas(capasNivel); blip(); }} style={{ ["--pic" as string]: modoCol, background: tr.id === tramo ? `${modoCol}1f` : "transparent" }}>
+              <i className={`fa-solid ${tr.icono}`} style={{ marginRight: 8 }} />
+              {tr.etq}
+            </button>
+          ))}
+        </div>
+        {(() => {
+          const datosB = Math.min(contenido.bytes, CARGA_UTIL);
+          const total = bytesEnCable(datosB, capasNivel, tramo);
+          const enc = total - datosB;
+          return (
+            <>
+              {lecturas([
+                { label: "Datos del paquete", value: num(datosB), unit: "B", col: "#fbbf24" },
+                { label: "Encabezados", value: num(enc), unit: "B" },
+                { label: "Total en el cable", value: num(total), unit: "B", col: modoCol },
+                { label: "Datos útiles", value: num((datosB / total) * 100, 1), unit: "%" },
+              ])}
+              {nota(
+                capasNivel === 0
+                  ? "Así, sin envolturas, ningún router sabría a dónde mandarlo ni el destino en qué orden acomodarlo. Agrega las capas."
+                  : `${CAPAS_DEF[capasNivel]!.etq}: ${CAPAS_DEF[capasNivel]!.que}`,
+                capasNivel === 3 ? OK : T.text2,
+                capasNivel === 3 ? "fa-circle-check" : "fa-layer-group",
+              )}
+              <div style={{ marginTop: 8, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                TCP {BYTES_CAPA.tcp} B e IP {BYTES_CAPA.ip} B (mínimos); trama Ethernet {BYTES_TRAMA.ethernet} B; trama wifi ≈ {BYTES_TRAMA.wifi} B (aproximado). El dibujo no está a escala: los datos ocupan mucho más que los encabezados.
+              </div>
+            </>
+          );
+        })()}
       </>
     );
   } else if (modo === "consulta") {
@@ -924,6 +1112,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
       escena={
         <>
           <style>{estilos(accent)}</style>
+          <div ref={escenaRef} aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
           <SceneBoundary fallback={sceneFallback}>
             <PaqueteScene
               vista={vista}
@@ -936,6 +1125,16 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
               conDns={envio?.conDns ?? false}
               paquetesVisibles={Math.min(24, envCont ? paquetesDe(envCont.bytes) : 1)}
               dnsResuelto={resueltos.includes(destinoId)}
+              escala={escala}
+              envioActivo={fase !== "listo"}
+              seguir={enviando && autoRecorrido}
+              paquetesTotales={paquetesDe((fase !== "listo" && envCont ? envCont : contenido).bytes)}
+              capasNivel={capasNivel}
+              tramo={tramo}
+              bytesDatos={Math.min(contenido.bytes, CARGA_UTIL)}
+              firma={FIRMA_ARCHIVO[contenidoId] ?? FIRMA_ARCHIVO.texto!}
+              ipDestino={destino.ip}
+              onCortar={cortar}
               sitio={sitio}
               iaNonce={iaNonce}
               iaCifrado={envioIA?.cifrado ?? true}
@@ -964,6 +1163,22 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
           <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
           <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
         </>
+      }
+      leyenda={
+        modo === "viaje" ? (
+          <div className="pi-hud">
+            <div className="pi-escalas" role="tablist" aria-label="Escala del viaje">
+              {ESCALAS.map((id) => (
+                <button key={id} type="button" role="tab" aria-selected={escala === id} className="pi-escala" data-on={escala === id} data-viaje={enviando && plan?.etapas.some((et) => et.escala === id && FASE_DE[et.id] === fase)} onClick={() => elegirEscala(id)} title={ESCALAS_DEF[id].pregunta}>
+                  <i className={`fa-solid ${ESCALAS_DEF[id].icono}`} aria-hidden />
+                  <span className="pi-escala-txt">{ESCALAS_DEF[id].etq}</span>
+                </button>
+              ))}
+            </div>
+            <MedidorViaje ruta={fase !== "listo" && envio ? rutaMasCorta("casa", envio.destino, cortados) : ruta} plan={plan} nonce={envioNonce} fase={fase} />
+            <span className="pi-sim">Simulación, cifras aproximadas: luz en la fibra + ≈ {MS_POR_SALTO} ms por router</span>
+          </div>
+        ) : undefined
       }
       lectura={chipVivo}
       objetivos={objetivos}
@@ -1080,6 +1295,24 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
                   ))}
                 </ul>
                 <p style={{ margin: 0, color: "#fff" }}>{AUTOEVAL_A7.reflexionFinal}</p>
+              </Bloque>
+              <Bloque titulo="El viaje a cuatro escalas (simulación)" icono="fa-earth-americas">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Capas.</strong> Antes de salir, cada pedazo del archivo se envuelve: TCP ({BYTES_CAPA.tcp} B) le pone número de orden y puerto; IP ({BYTES_CAPA.ip} B), las direcciones de origen y destino; y la trama del tramo físico (Ethernet: {BYTES_TRAMA.ethernet} B; wifi: ≈ {BYTES_TRAMA.wifi} B, aproximado) lo prepara para el cable o el aire. La trama se cambia en cada salto; IP y TCP viajan intactos de punta a punta.
+                </p>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Ruta.</strong> Cada router decide a dónde mandar cada paquete según su IP de destino. Paquetes de un mismo archivo pueden tomar caminos distintos y esperar más o menos en las colas, así que llegan en desorden; TCP los acomoda por su número. En la escena se dibujan hasta {PAQUETES_DIBUJADOS} paquetes y los tiempos de cola son ilustrativos.
+                </p>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Globo.</strong> La gran mayoría del tráfico entre continentes viaja por cables de fibra óptica en el fondo del mar, no por satélite. Los trazos de los cables son aproximados: MAREA (Virginia Beach–Bilbao, 6 600 km, 2017), cables que llegan a Cancún desde Florida y a Tijuana/Rosarito desde California, y otros de EE. UU. hacia Europa, Sudamérica y Asia. La Tierra se muestra de noche: las luces son ciudades.
+                </p>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Centro de datos.</strong> Miles de servidores en racks, sobre un piso técnico con losetas perforadas por donde sube aire frío (el «pasillo frío»), y charolas de fibra en el techo. Tu paquete llega a uno solo de ellos.
+                </p>
+                <p style={{ margin: 0, color: T.text3 }}>
+                  Saltos y latencia en pantalla: latencia de ida ≈ distancia ÷ {num(V_FIBRA_KM_S)} km/s + ≈ {MS_POR_SALTO} ms por router (ilustrativo). Son cifras aproximadas de una simulación; una red real tiene más saltos y la fibra no va en línea recta.
+                </p>
+                <p style={{ margin: 0, color: T.text3, fontSize: 14 }}>{CREDITO_ESPACIO}</p>
               </Bloque>
               <Bloque titulo="Ficha teórica" icono="fa-book">
                 <FichaTeorica data={PAQUETE_INTERNET_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
