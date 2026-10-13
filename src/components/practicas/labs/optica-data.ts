@@ -268,3 +268,206 @@ export function fmtAumento(M: number): string {
   if (!isFinite(M)) return "∞";
   return `${ES(M, 2)}×`;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * BANCO ÓPTICO «ÉLITE» (agregado 2026-10): pantalla, Fresnel, dispersión, ojo.
+ * Solo se AGREGAN exports; todo lo de arriba queda igual.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Modos del laboratorio: los tres de siempre más el ojo humano. */
+export type ModoLab = Modo | "ojo";
+
+/** Sub-vistas del modo refracción. */
+export type VistaRefraccion = "frontera" | "fibra" | "prisma";
+
+/* ── Pantalla del banco: la imagen real solo es nítida en dᵢ ─────────────── */
+export const DP_MIN = 0.8;   // posición mínima de la pantalla tras la lente (u)
+export const DP_MAX = 9.5;   // posición máxima (u)
+export const DP_DEF = 6.5;   // empieza desenfocada a propósito
+/** Radio útil (abertura) de la lente del banco, en u. */
+export const LENTE_RADIO_U = 1.85;
+
+export interface EnfoquePantalla {
+  /** Radio del círculo de desenfoque en la pantalla (u): A·|1 − dₚ/dᵢ|. */
+  desenfoque: number;
+  /** Factor de escala de la mancha en la pantalla: −dₚ/dₒ (rayo central). */
+  escala: number;
+  /** 0 (mancha) … 1 (imagen nítida). */
+  nitidez: number;
+  /** ¿Se puede formar imagen en la pantalla? (solo si es real y finita). */
+  hayImagenReal: boolean;
+}
+
+/**
+ * Óptica de lente delgada exacta para una pantalla a la distancia dₚ: cada
+ * punto del objeto manda un cono que llena la abertura A de la lente y que
+ * converge (o diverge) hacia su imagen en dᵢ. En la pantalla ese cono es un
+ * círculo de radio A·|1 − dₚ/dᵢ| centrado donde llega el rayo central
+ * (escala −dₚ/dₒ). En dₚ = dᵢ el radio es cero: imagen nítida.
+ */
+export function enfoquePantalla(f: number, do_: number, dp: number, A = LENTE_RADIO_U): EnfoquePantalla {
+  const r = resolverGauss(f, do_, H_OBJ);
+  const escala = -dp / do_;
+  const desenfoque = r.enInfinito ? A : A * Math.abs(1 - dp / r.di);
+  const nitidez = Math.exp(-((desenfoque / 0.12) ** 2));
+  return { desenfoque, escala, nitidez, hayImagenReal: r.tipoImagen === "real" && !r.enInfinito };
+}
+
+/** Umbral de «imagen nítida» en la pantalla (≈ desenfoque ≤ 0.06 u). */
+export const NITIDEZ_OK = 0.78;
+
+/* ── Reflectancia de Fresnel (luz no polarizada) ─────────────────────────── */
+/**
+ * Fracción de la luz que se REFLEJA en la frontera (0…1). Con reflexión total
+ * interna vale 1. Es la razón por la que el rayo reflejado se ve cada vez más
+ * brillante al acercarse al ángulo crítico.
+ */
+export function fresnelReflectancia(n1: number, n2: number, thetaIncDeg: number): number {
+  const ti = thetaIncDeg * RAD;
+  const ci = Math.cos(ti);
+  const s2 = (n1 / n2) * Math.sin(ti);
+  if (s2 >= 1) return 1;
+  const ct = Math.sqrt(1 - s2 * s2);
+  const rs = (n1 * ci - n2 * ct) / (n1 * ci + n2 * ct);
+  const rp = (n1 * ct - n2 * ci) / (n1 * ct + n2 * ci);
+  return Math.min(1, Math.max(0, (rs * rs + rp * rp) / 2));
+}
+
+/* ── Fibra óptica: el rayo rebota dentro del núcleo ──────────────────────── */
+/** Fracción de luz que sigue dentro tras k rebotes: Rᵏ. */
+export function luzQueLlega(n1: number, n2: number, thetaIncDeg: number, rebotes: number): number {
+  return Math.pow(fresnelReflectancia(n1, n2, thetaIncDeg), Math.max(0, rebotes));
+}
+
+/* ── Dispersión: el índice depende del color (ecuación de Cauchy) ────────── */
+export interface ColorEspectro { id: string; nombre: string; nm: number; color: string }
+export const ESPECTRO: ColorEspectro[] = [
+  { id: "rojo",     nombre: "rojo",     nm: 680, color: "#ff3b30" },
+  { id: "naranja",  nombre: "naranja",  nm: 610, color: "#ff8a1f" },
+  { id: "amarillo", nombre: "amarillo", nm: 580, color: "#ffe23a" },
+  { id: "verde",    nombre: "verde",    nm: 530, color: "#38f06a" },
+  { id: "cian",     nombre: "cian",     nm: 490, color: "#2fe0ff" },
+  { id: "azul",     nombre: "azul",     nm: 460, color: "#3b6bff" },
+  { id: "violeta",  nombre: "violeta",  nm: 410, color: "#a24dff" },
+];
+/** Vidrio del prisma: n = 1.50 en la luz amarilla (589 nm), como en la lectura. */
+export const N_PRISMA_D = 1.5;
+/** Coeficiente B de Cauchy de un vidrio crown (nm²). */
+export const CAUCHY_B = 4200;
+/** n(λ) = n_D + B·(1/λ² − 1/589.3²): el violeta se refracta más que el rojo. */
+export function indiceCauchy(nm: number, nD = N_PRISMA_D, B = CAUCHY_B): number {
+  return nD + B * (1 / (nm * nm) - 1 / (589.3 * 589.3));
+}
+export const PRISMA_APICE = 60; // ° (prisma equilátero)
+export const THETA_PRISMA_MIN = 20;
+export const THETA_PRISMA_MAX = 80;
+export const THETA_PRISMA_DEF = 50;
+
+export interface RayoPrisma { theta1p: number; theta2p: number; theta2: number; desviacion: number; tir: boolean }
+/**
+ * Prisma de ápice A: Snell en la cara de entrada (θ₁ → θ₁′), geometría
+ * θ₂′ = A − θ₁′ y Snell en la cara de salida (θ₂′ → θ₂). Desviación
+ * δ = θ₁ + θ₂ − A. Si n·sen θ₂′ > 1 la luz queda atrapada (reflexión total).
+ */
+export function trazarPrisma(n: number, thetaDeg: number, apiceDeg = PRISMA_APICE): RayoPrisma {
+  const theta1p = Math.asin(Math.sin(thetaDeg * RAD) / n) * DEG;
+  const theta2p = apiceDeg - theta1p;
+  const s = n * Math.sin(theta2p * RAD);
+  if (s > 1) return { theta1p, theta2p, theta2: NaN, desviacion: NaN, tir: true };
+  const theta2 = Math.asin(s) * DEG;
+  return { theta1p, theta2p, theta2, desviacion: thetaDeg + theta2 - apiceDeg, tir: false };
+}
+
+/* ── El ojo humano (modelo de ojo reducido) ──────────────────────────────── */
+export type CondicionOjo = "normal" | "miopia" | "hipermetropia";
+/** Potencia del ojo reducido (córnea + cristalino), en dioptrías: f = 16.7 mm. */
+export const OJO_POTENCIA = 60;
+/** Distancia de los anteojos al plano principal del ojo (m). */
+export const OJO_D_ANTEOJO = 0.012;
+export const PC_MIN = -6;
+export const PC_MAX = 6;
+export interface DatosOjo { id: CondicionOjo; etq: string; largoMm: number; nota: string }
+/** Largo óptico del ojo (plano principal → retina). Miopía: ojo largo; hipermetropía: ojo corto. */
+export const OJOS: DatosOjo[] = [
+  { id: "normal",        etq: "Ojo normal",    largoMm: 1000 / 60, nota: "La imagen de un objeto lejano cae justo sobre la retina." },
+  { id: "miopia",        etq: "Miopía",        largoMm: 1000 / 56, nota: "El ojo es más largo: la imagen cae ANTES de la retina y lo lejano se ve borroso." },
+  { id: "hipermetropia", etq: "Hipermetropía", largoMm: 1000 / 63, nota: "El ojo es más corto: la imagen caería DETRÁS de la retina." },
+];
+export function ojoPorId(id: CondicionOjo): DatosOjo {
+  return OJOS.find((o) => o.id === id) ?? OJOS[0]!;
+}
+/**
+ * Dónde enfoca el ojo (mm tras su plano principal) la luz de un objeto
+ * lejano, con un anteojo de potencia Pc a 12 mm: vergencia al llegar al ojo
+ * V = Pc/(1 − d·Pc), y luego f = 1/(V + P_ojo).
+ */
+export function focoOjoMm(pc: number): number {
+  const V = pc / (1 - OJO_D_ANTEOJO * pc);
+  return 1000 / (V + OJO_POTENCIA);
+}
+/** Graduación exacta que pone la imagen sobre la retina de un ojo de largo L. */
+export function graduacionNecesaria(largoMm: number): number {
+  const V = 1000 / largoMm - OJO_POTENCIA;
+  return V / (1 + OJO_D_ANTEOJO * V);
+}
+/** Error de enfoque en dioptrías (0 = nítido): lo que el ojo «ve» borroso. */
+export function errorDioptrias(largoMm: number, pc: number): number {
+  return 1000 / largoMm - 1000 / focoOjoMm(pc);
+}
+/** Tolerancia: la imagen se considera sobre la retina a ±0.12 mm. */
+export const OJO_TOL_MM = 0.12;
+
+/* ── Prisma: ampliación SOLO visual del abanico de colores ───────────────── */
+/** Los ángulos por color son exactos; el dibujo amplía su diferencia ×6. */
+export const AMPL_PRISMA = 6;
+
+/* ── Fibra óptica: trazo del rayo rebotando en el núcleo ─────────────────── */
+export const FIBRA_X0 = -6;    // entrada del núcleo (escena)
+export const FIBRA_X1 = 6;     // salida del núcleo (escena)
+export const FIBRA_R = 0.5;    // radio del núcleo (escena)
+type P3 = [number, number, number];
+export interface TrazoFibra {
+  tramos: { a: P3; b: P3; k: number }[];
+  fugas: { a: P3; b: P3; k: number }[];
+  /** Fracción de luz que llega al final (0…1). */
+  llega: number;
+  rebotes: number;
+  fin: P3;
+  R: number;
+  sn: Snell;
+}
+/**
+ * El rayo avanza en el núcleo con el ángulo θ₁ respecto a la normal de la
+ * pared. En cada rebote se refleja la fracción R (Fresnel) y escapa 1 − R;
+ * con reflexión total interna R = 1 y la luz llega completa.
+ */
+export function trazarFibra(n1: number, n2: number, thetaInc: number): TrazoFibra {
+  const sn = resolverSnell(n1, n2, thetaInc);
+  const R = fresnelReflectancia(n1, n2, thetaInc);
+  const tan = Math.tan(thetaInc * RAD);
+  const tramos: TrazoFibra["tramos"] = [];
+  const fugas: TrazoFibra["fugas"] = [];
+  let x = FIBRA_X0, y = 0, sube = 1, I = 1, rebotes = 0, llega = 0;
+  let fin: P3 = [x, y, 0];
+  for (let i = 0; i < 90; i++) {
+    const yT = sube * FIBRA_R;
+    const xT = x + Math.abs(yT - y) * tan;
+    if (xT >= FIBRA_X1) {
+      const yF = tan > 1e-6 ? y + (sube * (FIBRA_X1 - x)) / tan : y;
+      tramos.push({ a: [x, y, 0], b: [FIBRA_X1, yF, 0], k: I });
+      fin = [FIBRA_X1, yF, 0];
+      llega = I;
+      break;
+    }
+    tramos.push({ a: [x, y, 0], b: [xT, yT, 0], k: I });
+    if (!sn.reflexionTotal) {
+      const t2 = sn.thetaRefDeg * RAD;
+      fugas.push({ a: [xT, yT, 0], b: [xT + Math.sin(t2) * 1.25, yT + sube * Math.cos(t2) * 1.25, 0], k: I * (1 - R) });
+    }
+    I *= R;
+    x = xT; y = yT; sube = -sube; rebotes++;
+    fin = [x, y, 0];
+    if (I < 0.015) { llega = 0; break; }
+  }
+  return { tramos, fugas, llega, rebotes, fin, R, sn };
+}

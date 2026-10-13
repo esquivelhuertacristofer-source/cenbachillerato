@@ -2,46 +2,54 @@
 
 /**
  * Escena 3D — "Óptica geométrica: lentes, espejos y formación de imágenes"
- * (CNEYT-V-P06-A2).
+ * (CNEYT-V-P06-A2). Un banco óptico de laboratorio de física de verdad.
  *
- * Tres MODOS, según la prop `modo`:
- *  · "lentes"     — banco óptico con una lente convergente o divergente. El objeto
- *    (flecha) se coloca a la distancia dₒ; se trazan dos rayos principales (el
- *    paralelo, que sale por el foco, y el que pasa por el centro, que no se desvía)
- *    y donde se cruzan se forma la imagen. Imagen real (al otro lado) o virtual
- *    (mismo lado, líneas punteadas). Verifica 1/f = 1/dₒ + 1/dᵢ y M = −dᵢ/dₒ.
- *  · "espejos"    — espejo plano, cóncavo o convexo. Mismo trazo de rayos, pero la
- *    luz se refleja: la imagen real queda del MISMO lado que el objeto.
- *  · "refraccion" — frontera entre dos medios (aire, agua, vidrio, diamante). Un
- *    rayo incide con ángulo θ₁ y se refracta con θ₂ según n₁·sen θ₁ = n₂·sen θ₂.
- *    Al superar el ángulo crítico θ_c hay reflexión total interna (fibra óptica).
+ * MODOS (prop `modo`):
+ *  · "lentes"     — riel de aluminio con escala grabada; una vela en su jinete,
+ *    la lente de vidrio óptico (convergente o divergente) y una pantalla
+ *    translúcida. Los tres rayos principales son haces láser (paralelo → F′,
+ *    central sin desviarse, focal → sale paralelo). La imagen real se ve
+ *    NÍTIDA en la pantalla solo cuando la pantalla está en dᵢ; fuera de ahí,
+ *    borrosa con el círculo de desenfoque exacto A·|1 − dₚ/dᵢ|. La imagen
+ *    virtual aparece como un «fantasma» detrás de la lente.
+ *    Gauss: 1/f = 1/dₒ + 1/dᵢ, M = −dᵢ/dₒ.
+ *  · "espejos"    — espejo plano, cóncavo o convexo (casquete de radio R = 2f
+ *    exacto, metal pulido). Imagen real en el aire o virtual tras el espejo.
+ *  · "refraccion" — disco óptico de Hartl con bloques de agua/vidrio/diamante
+ *    (Snell + Fresnel + reflexión total), fibra óptica y prisma (dispersión).
+ *  · "ojo"        — ojo humano en corte: miopía e hipermetropía y su anteojo.
  *
- * Patrón R3F: el default export solo monta <Canvas key={modo}> y delega en
- * <Contenido>. React Compiler: la animación (un fotón que recorre los rayos) vive
- * en useFrame que MUTA la posición de un ref (nunca setState). La construcción de
- * rayos es 2D (plano z = 0) sobre cálculo exacto; los números del panel son los
- * que devuelven resolverGauss / resolverSnell.
+ * Toda la geometría de rayos sale de cálculo cerrado (resolverGauss,
+ * resolverSnell, trazarPrisma, focoOjoMm). React Compiler: las animaciones
+ * mutan refs dentro de useFrame; nunca setState por cuadro.
  */
 
 import * as THREE from "three";
-import { useEffect, useRef } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Html, Line } from "@react-three/drei";
+import { useMemo, useState } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, ContactShadows, PerformanceMonitor, Environment, Lightformer, CubeCamera } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { MesaLaboratorio, calidadEscena } from "./_escenario";
 import {
-  type Modo, type TipoLente, type TipoEspejo,
-  resolverGauss, resolverSnell, medioPorId,
-  H_OBJ, fmtAng, fmtDist, fmt2,
+  type ModoLab, type TipoLente, type TipoEspejo, type VistaRefraccion, type CondicionOjo,
+  resolverGauss, enfoquePantalla, H_OBJ, LENTE_RADIO_U, NITIDEZ_OK, fmtDist,
 } from "./optica-data";
+import {
+  S, SUELO, RIEL_Y, X_RIEL, X_FIN, Y_LIM, PANT_H, FOV,
+  Haces, Pulso, Riel, Jinete, Lente3D, Espejo3D, Vela, Pantalla, MarcaFoco, Etiqueta, Guia,
+  superficieEspejo, discontinuo, polilinea, encuadrar, LATON,
+  type Pt, type Seg,
+} from "./optica-banco3d";
+import { EscenaFrontera, EscenaFibra, EscenaPrisma, FIBRA_X0, FIBRA_X1 } from "./optica-refraccion3d";
+import { EscenaOjo, geometriaOjo } from "./optica-ojo3d";
 
 export interface OpticaSceneProps {
-  modo: Modo;
+  modo: ModoLab;
   // lentes
   tipoLente: TipoLente;
   fLente: number;   // |f|
   doLente: number;
+  dp: number;       // posición de la pantalla tras la lente (u)
   // espejos
   tipoEspejo: TipoEspejo;
   fEspejo: number;  // |f|
@@ -50,393 +58,360 @@ export interface OpticaSceneProps {
   medio1: string;
   medio2: string;
   thetaInc: number;
+  vistaRefr: VistaRefraccion;
+  thetaPrisma: number;
+  // ojo
+  condOjo: CondicionOjo;
+  pc: number;
   // común
   playing: boolean;
   accent: string;
   resetNonce: number;
 }
 
-type Pt = [number, number, number];
+const FONDO = "#04080f";
+const ROJO = "#ff4646";
+const VERDE = "#3dff86";
+const AZUL = "#48b4ff";
 
-/* ── Escala visual ────────────────────────────────────────────────────────── */
-const X = 7;          // semiancho del dominio (scene units)
-const Y = 4.2;        // semialto útil
-const SX = 0.8;       // scene units por "u" (eje X)
-const SY = 0.9;       // scene units por "u" (eje Y)
-
-const P = (ux: number, uy: number): Pt => [ux * SX, uy * SY, 0];
-
-/** Punto de la recta A→B evaluado en scene-x = ex (devuelve null si es vertical). */
-function pointAtX(a: Pt, b: Pt, ex: number): Pt | null {
-  const dx = b[0] - a[0];
-  if (Math.abs(dx) < 1e-6) return null;
-  const t = (ex - a[0]) / dx;
-  return [ex, a[1] + t * (b[1] - a[1]), 0];
+/* ═══════════════════════════════════════════════════════════════════════════
+ * BANCO: lente o espejo
+ * ═══════════════════════════════════════════════════════════════════════════ */
+interface Banco {
+  tip: Pt;
+  I: Pt | null;
+  virtual: boolean;
+  rayos: { col: string; path: Pt[] }[];
+  virtuales: Seg[];
+  M: number;
+  di: number;
+  enInfinito: boolean;
 }
 
-const RAD = Math.PI / 180;
-
-/* ── Fotón que recorre una trayectoria (loop) ─────────────────────────────── */
-function Photon({ path, color, playing, speed = 3.2 }: { path: Pt[]; color: string; playing: boolean; speed?: number }) {
-  const ref = useRef<THREE.Mesh>(null);
-  const dRef = useRef(0);
-
-  useFrame((_, dt) => {
-    const m = ref.current;
-    if (!m || path.length < 2) return;
-    let total = 0;
-    for (let i = 1; i < path.length; i++) {
-      const a = path[i - 1]!, b = path[i]!;
-      total += Math.hypot(b[0] - a[0], b[1] - a[1]);
-    }
-    if (total < 1e-4) return;
-    if (playing) dRef.current = (dRef.current + dt * speed) % total;
-    let d = dRef.current;
-    for (let i = 1; i < path.length; i++) {
-      const a = path[i - 1]!, b = path[i]!;
-      const seg = Math.hypot(b[0] - a[0], b[1] - a[1]);
-      if (d <= seg) {
-        const t = seg < 1e-6 ? 0 : d / seg;
-        m.position.set(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 0.02);
-        return;
-      }
-      d -= seg;
-    }
-  });
-
-  return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[0.16, 20, 20]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} roughness={0.3} />
-    </mesh>
-  );
-}
-
-/* ── Etiqueta: tamaño fijo en píxeles (≥ 14 px). `ancha` se oculta en el celular ── */
-function Etiqueta({ pos, color, children, ancha = false, borde = true }: {
-  pos: Pt; color: string; children: React.ReactNode; ancha?: boolean; borde?: boolean;
-}) {
-  const ancho = useThree((st) => st.size.width);
-  if (ancha && ancho < 640) return null; // el dato ya está en el panel
-  return (
-    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
-      <div style={{
-        whiteSpace: "nowrap", textAlign: "center", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.9)",
-        border: borde ? `1.5px solid ${color}` : "1.5px solid transparent", color, fontWeight: 900, fontSize: 14,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
-      }}>
-        {children}
-      </div>
-    </Html>
-  );
-}
-
-/* ── Encuadre: el dominio horizontal siempre cabe, aun en pantallas angostas ── */
-function Encuadre() {
-  const camera = useThree((st) => st.camera) as THREE.PerspectiveCamera;
-  const { width, height } = useThree((st) => st.size);
-  useEffect(() => {
-    const aspecto = width / Math.max(1, height);
-    const mitad = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    const d = Math.min(30, Math.max(16, (X + 1.4) / (mitad * aspecto)));
-    camera.position.set(0, 0.4 * (d / 16), d);
-    camera.updateProjectionMatrix();
-  }, [camera, width, height]);
-  return null;
-}
-
-/* ── Eje óptico ───────────────────────────────────────────────────────────── */
-function EjeOptico() {
-  return (
-    <Line points={[[-X, 0, 0], [X, 0, 0]] as Pt[]} color="#46587a" lineWidth={1} transparent opacity={0.55} dashed dashSize={0.22} gapSize={0.16} />
-  );
-}
-
-/* ── Flecha vertical (objeto / imagen) ────────────────────────────────────── */
-function Flecha({ x, h, color, label, dashed = false }: { x: number; h: number; color: string; label: string; dashed?: boolean }) {
-  const tip: Pt = [x, h, 0];
-  const base: Pt = [x, 0, 0];
-  const up = h >= 0;
-  const hd = 0.26 * (up ? 1 : -1);
-  return (
-    <group>
-      <Line points={[base, tip] as Pt[]} color={color} lineWidth={dashed ? 2 : 3} transparent opacity={dashed ? 0.7 : 1} dashed={dashed} dashSize={0.16} gapSize={0.12} />
-      <Line points={[[x - 0.16, h - hd, 0], tip, [x + 0.16, h - hd, 0]] as Pt[]} color={color} lineWidth={dashed ? 2 : 3} transparent opacity={dashed ? 0.7 : 1} dashed={dashed} dashSize={0.1} gapSize={0.08} />
-      <Etiqueta pos={[x, h + (up ? 0.6 : -0.6), 0]} color={color}>{label}</Etiqueta>
-    </group>
-  );
-}
-
-/* ── Marca de foco ────────────────────────────────────────────────────────── */
-function Foco({ x, etq, color = "#fbbf24" }: { x: number; etq: string; color?: string }) {
-  return (
-    <group>
-      <mesh position={[x, 0, 0]}>
-        <sphereGeometry args={[0.12, 16, 16]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} roughness={0.4} />
-      </mesh>
-      <Etiqueta pos={[x, -0.62, 0]} color={color} borde={false}>{etq}</Etiqueta>
-    </group>
-  );
-}
-
-/* ── Símbolo de la lente ──────────────────────────────────────────────────── */
-function SimboloLente({ tipo, color }: { tipo: TipoLente; color: string }) {
-  const top = Y - 0.6, bot = -(Y - 0.6);
-  const conv = tipo === "convergente";
-  // flechas en los extremos: hacia afuera (convergente) o hacia adentro (divergente)
-  const a = 0.28;
-  return (
-    <group>
-      <CurvaTubo puntos={[[0, bot, 0], [0, top, 0]] as Pt[]} color={color} grosor={0.054} />
-      {/* punta superior */}
-      <CurvaTubo puntos={[[-a, top + (conv ? -a : a) * 0 - (conv ? a : -a), 0], [0, top, 0], [a, top - (conv ? a : -a), 0]] as Pt[]} color={color} grosor={0.054} />
-      {/* punta inferior */}
-      <CurvaTubo puntos={[[-a, bot + (conv ? a : -a), 0], [0, bot, 0], [a, bot + (conv ? a : -a), 0]] as Pt[]} color={color} grosor={0.054} />
-      {/* cuerpo translúcido */}
-      <mesh position={[0, 0, -0.02]}>
-        <planeGeometry args={[0.5, (top - bot)]} />
-        <meshBasicMaterial color={color} transparent opacity={0.08} side={THREE.DoubleSide} toneMapped={false} />
-      </mesh>
-    </group>
-  );
-}
-
-/* ── Símbolo del espejo (arco) ────────────────────────────────────────────── */
-function SimboloEspejo({ tipo, color }: { tipo: TipoEspejo; color: string }) {
-  const h = Y - 0.5;
-  const N = 28;
-  const curv = tipo === "plano" ? 0 : tipo === "concavo" ? 0.9 : -0.9; // cóncavo abre a la izquierda (hacia el objeto)
-  const pts: Pt[] = [];
-  for (let i = 0; i < N; i++) {
-    const y = -h + (2 * h * i) / (N - 1);
-    const x = curv * (1 - (y / h) * (y / h)); // parábola: vértice en x=0
-    pts.push([x, y, 0]);
-  }
-  return (
-    <group>
-      <CurvaTubo puntos={pts} color={color} grosor={0.054} />
-      {/* rayado del reverso */}
-      {Array.from({ length: 9 }, (_, i) => {
-        const y = -h + (2 * h * (i + 0.5)) / 9;
-        const x = curv * (1 - (y / h) * (y / h));
-        const dir = tipo === "convexo" ? -1 : 1;
-        return <Line key={i} points={[[x, y, 0], [x + dir * 0.22, y - 0.18, 0]] as Pt[]} color={color} lineWidth={1.5} transparent opacity={0.45} />;
-      })}
-    </group>
-  );
-}
-
-/* ── (a) + (b) Construcción de rayos genérica (lente o espejo) ────────────── */
-function EscenaImagen({
-  esLente, f, do_, color, playing,
-}: { esLente: boolean; f: number; do_: number; color: string; playing: boolean }) {
+function trazarBanco(esLente: boolean, fU: number, doU: number, dpU: number, tipoEspejo: TipoEspejo): Banco {
   const ho = H_OBJ;
-  const r = resolverGauss(f, do_, ho);
-  const dir = esLente ? 1 : -1; // los rayos emergentes van a la derecha (lente) o regresan a la izquierda (espejo)
-
-  // puntos en scene-coords
-  const tipObj = P(-do_, ho);            // punta del objeto (siempre a la izquierda)
-  const lensTop = P(0, ho);              // donde el rayo paralelo toca el componente
-  const center: Pt = [0, 0, 0];          // centro / vértice
-
-  const enInf = r.enInfinito;
-  const xImgU = dir * r.di;              // u-x de la imagen (con signo del lado)
-  const hiU = r.hi;
-  const pImg: Pt = P(xImgU, isFinite(hiU) ? hiU : 0);
+  const H = ho * S;
+  const r = resolverGauss(fU, doU, ho);
+  const A = LENTE_RADIO_U * S;
+  const tip: Pt = [-doU * S, H, 0];
+  const finito = !r.enInfinito && isFinite(r.di);
+  const I: Pt | null = finito ? [(esLente ? r.di : -r.di) * S, r.hi * S, 0] : null;
   const virtual = r.tipoImagen === "virtual";
-  const endX = dir * X;                  // borde por donde salen los rayos emergentes
+  const Rs = esLente || !isFinite(fU) ? Infinity : 2 * Math.abs(fU) * S;
+  const xs = (y: number) => (esLente ? 0 : superficieEspejo(tipoEspejo, Rs, y));
+  const xPant = dpU * S;
 
-  // rayos emergentes (solo si la imagen no está en el infinito)
-  const ray1End = enInf ? P(endX / SX, ho) : pointAtX(lensTop, pImg, endX); // paralelo → foco
-  const ray2End = enInf ? pointAtX(tipObj, center, endX) : pointAtX(center, pImg, endX); // por el centro/vértice
-
-  const focColor = "#fbbf24";
-
-  return (
-    <group>
-      <EjeOptico />
-      {esLente
-        ? <SimboloLente tipo={f >= 0 ? "convergente" : "divergente"} color={color} />
-        : null}
-
-      {/* focos */}
-      {isFinite(f) && Math.abs(f) > 1e-3 && (
-        <>
-          <Foco x={(esLente ? Math.abs(f) : -Math.abs(f)) * SX * Math.sign(f === 0 ? 1 : f)} etq={esLente ? "F′" : "F"} color={focColor} />
-          <Foco x={-(esLente ? Math.abs(f) : -Math.abs(f)) * SX * Math.sign(f === 0 ? 1 : f)} etq={esLente ? "F" : "C·F"} color={focColor} />
-        </>
-      )}
-
-      {/* rayo incidente 1 (paralelo al eje) */}
-      <Line points={[tipObj, lensTop] as Pt[]} color={color} lineWidth={2} transparent opacity={0.9} />
-      {ray1End && <Line points={[lensTop, ray1End] as Pt[]} color={color} lineWidth={2} transparent opacity={0.9} />}
-      {/* rayo incidente 2 (por el centro / vértice) */}
-      <Line points={[tipObj, center] as Pt[]} color="#67e8f9" lineWidth={2} transparent opacity={0.9} />
-      {ray2End && <Line points={[center, ray2End] as Pt[]} color="#67e8f9" lineWidth={2} transparent opacity={0.9} />}
-
-      {/* extensiones punteadas a la imagen virtual */}
-      {virtual && !enInf && (
-        <>
-          <Line points={[lensTop, pImg] as Pt[]} color={color} lineWidth={1.5} transparent opacity={0.5} dashed dashSize={0.16} gapSize={0.12} />
-          <Line points={[center, pImg] as Pt[]} color="#67e8f9" lineWidth={1.5} transparent opacity={0.5} dashed dashSize={0.16} gapSize={0.12} />
-        </>
-      )}
-
-      {/* objeto */}
-      <Flecha x={-do_ * SX} h={ho * SY} color="#86efac" label={`objeto · ${fmtDist(do_)}`} />
-
-      {/* imagen */}
-      {!enInf && Math.abs(xImgU) <= (X / SX) + 0.6 && isFinite(hiU) && (
-        <Flecha x={xImgU * SX} h={hiU * SY} color={virtual ? "#fca5a5" : "#fde047"} label={virtual ? `imagen virtual · ${fmtDist(r.di)}` : `imagen real · ${fmtDist(r.di)}`} dashed={virtual} />
-      )}
-
-      {/* imagen en el infinito */}
-      {enInf && (
-        <Etiqueta pos={[dir * (X - 2.4), Y - 0.5, 0]} color="#fde047" ancha>imagen en el infinito</Etiqueta>
-      )}
-
-      <Photon path={[tipObj, center, ray2End ?? center]} color="#67e8f9" playing={playing} />
-    </group>
-  );
-}
-
-/* ── (c) Refracción — ley de Snell ────────────────────────────────────────── */
-function EscenaRefraccion({ medio1, medio2, thetaInc, playing }: { medio1: string; medio2: string; thetaInc: number; playing: boolean }) {
-  const m1 = medioPorId(medio1);
-  const m2 = medioPorId(medio2);
-  const s = resolverSnell(m1.n, m2.n, thetaInc);
-  const R = 4.1;
-
-  const t1 = thetaInc * RAD;
-  const A: Pt = [-Math.sin(t1) * R, Math.cos(t1) * R, 0];   // incidente desde arriba-izquierda
-  const O: Pt = [0, 0, 0];
-  const reflE: Pt = [Math.sin(t1) * R, Math.cos(t1) * R, 0]; // reflejado arriba-derecha
-
-  let refrE: Pt | null = null;
-  if (!s.reflexionTotal) {
-    const t2 = s.thetaRefDeg * RAD;
-    refrE = [Math.sin(t2) * R, -Math.cos(t2) * R, 0];        // refractado abajo-derecha
-  }
-
-  // arcos de ángulo
-  const arc = (ang0: number, ang1: number, rad: number): Pt[] => {
-    const N = 18, out: Pt[] = [];
-    for (let i = 0; i < N; i++) {
-      const a = ang0 + (ang1 - ang0) * (i / (N - 1));
-      out.push([Math.sin(a) * rad, Math.cos(a) * rad, 0]);
+  // dirección del rayo central (de la punta al centro/vértice)
+  const L0 = Math.hypot(tip[0], tip[1]);
+  const dC: [number, number] = [-tip[0] / L0, -tip[1] / L0];
+  const dirSal = (P: Pt): [number, number] => {
+    if (!I) return esLente ? dC : [-dC[0], dC[1]];
+    const v: [number, number] = virtual ? [P[0] - I[0], P[1] - I[1]] : [I[0] - P[0], I[1] - P[1]];
+    const L = Math.hypot(v[0], v[1]);
+    if (L < 1e-6) return esLente ? dC : [-dC[0], dC[1]];
+    return [v[0] / L, v[1] / L];
+  };
+  const extender = (P: Pt, d: [number, number]): Pt => {
+    if (Math.abs(d[0]) < 1e-6) return [P[0], d[1] > 0 ? Y_LIM : RIEL_Y + 0.1, 0];
+    let t = ((d[0] > 0 ? X_FIN : -X_FIN) - P[0]) / d[0];
+    if (esLente && d[0] > 0 && xPant > P[0] + 1e-3) {
+      const ts = (xPant - P[0]) / d[0];
+      const ys = P[1] + d[1] * ts;
+      if (Math.abs(ys) <= PANT_H / 2) t = Math.min(t, ts);
     }
-    return out;
+    if (d[1] > 1e-6) t = Math.min(t, (Y_LIM - P[1]) / d[1]);
+    if (d[1] < -1e-6) t = Math.min(t, (RIEL_Y + 0.08 - P[1]) / d[1]);
+    return [P[0] + d[0] * t, P[1] + d[1] * t, 0];
   };
 
+  const rayos: { col: string; path: Pt[] }[] = [];
+  const golpes: { col: string; P: Pt }[] = [];
+  // 1. Paralelo al eje → sale por el foco
+  const P1: Pt = [xs(H), H, 0];
+  rayos.push({ col: ROJO, path: [tip, P1, extender(P1, dirSal(P1))] });
+  golpes.push({ col: ROJO, P: P1 });
+  // 2. Por el centro óptico / vértice
+  const P2: Pt = [0, 0, 0];
+  rayos.push({ col: VERDE, path: [tip, P2, extender(P2, dirSal(P2))] });
+  golpes.push({ col: VERDE, P: P2 });
+  // 3. Por el foco → sale paralelo (solo si cabe en la abertura)
+  if (isFinite(fU)) {
+    const y3 = ((ho * fU) / (fU - doU)) * S;
+    if (isFinite(y3) && Math.abs(y3) <= A * 0.97) {
+      const P3: Pt = [xs(y3), y3, 0];
+      rayos.push({ col: AZUL, path: [tip, P3, extender(P3, dirSal(P3))] });
+      golpes.push({ col: AZUL, P: P3 });
+    }
+  }
+  // prolongaciones punteadas hacia la imagen virtual
+  const virtuales: Seg[] = [];
+  if (virtual && I && Math.abs(I[0]) <= X_FIN + 2 && Math.abs(I[1]) < 6) {
+    for (const g of golpes) virtuales.push(...discontinuo(g.P, I, g.col, 0.42));
+  }
+  return { tip, I, virtual, rayos, virtuales, M: r.M, di: r.di, enInfinito: r.enInfinito };
+}
+
+function EscenaBanco({ esLente, fU, doU, dpU, tipoEspejo, playing, fino, vivo = false }: {
+  esLente: boolean; fU: number; doU: number; dpU: number; tipoEspejo: TipoEspejo; playing: boolean; fino: boolean; vivo?: boolean;
+}) {
+  const H = H_OBJ * S;
+  const A = LENTE_RADIO_U * S;
+  const b = trazarBanco(esLente, fU, doU, dpU, tipoEspejo);
+  const enf = enfoquePantalla(fU, doU, dpU);
+  const xPant = dpU * S;
+  const nitida = esLente && enf.hayImagenReal && enf.nitidez >= NITIDEZ_OK;
+
+  const segs: Seg[] = [];
+  for (const r of b.rayos) segs.push(...polilinea(r.path, r.col, 1, 0.07));
+  segs.push(...b.virtuales);
+
+  const conv = fU > 0;
+  const fS = Math.abs(fU) * S;
+  const Rs = isFinite(fU) ? 2 * fS : Infinity;
+
+  // ¿Dónde y cómo se dibuja la imagen?
+  const I = b.I;
+  const dentro = I != null && Math.abs(I[0]) <= X_FIN && Math.abs(I[1]) <= 2.9;
+  const escalaImg = Math.abs(b.M);
+  const verFantasma = dentro && b.virtual && escalaImg * H <= 2.6;
+  const verAerea = dentro && !esLente && !b.virtual && I![1] > RIEL_Y + 0.2;
+
+  let etqImg: React.ReactNode = null;
+  if (b.enInfinito) etqImg = <Etiqueta pos={[esLente ? 5.2 : -5.2, 2.3, 0]} color="#fde047">imagen en el infinito</Etiqueta>;
+  else if (I && dentro) {
+    const arriba = I[1] >= 0;
+    const txt = b.virtual ? `imagen virtual · ${fmtDist(b.di)}` : nitida ? `imagen nítida · ${fmtDist(b.di)}` : `imagen real · ${fmtDist(b.di)}`;
+    etqImg = <Etiqueta pos={[I[0], I[1] + (arriba ? 0.5 : -0.5), 0.2]} color={b.virtual ? "#9fe8ff" : nitida ? "#86efac" : "#fde047"}>{txt}</Etiqueta>;
+  } else if (I) {
+    etqImg = <Etiqueta pos={[Math.sign(I[0]) * 6.4, 2.3, 0]} color="#fde047" ancha>imagen a {fmtDist(b.di)}: fuera del banco</Etiqueta>;
+  }
+
   return (
     <group>
-      {/* medios */}
-      <mesh position={[0, Y / 2, -0.05]}>
-        <planeGeometry args={[2 * X, Y]} />
-        <meshBasicMaterial color={m1.color} transparent opacity={0.12} side={THREE.DoubleSide} toneMapped={false} />
-      </mesh>
-      <mesh position={[0, -Y / 2, -0.05]}>
-        <planeGeometry args={[2 * X, Y]} />
-        <meshBasicMaterial color={m2.color} transparent opacity={0.18} side={THREE.DoubleSide} toneMapped={false} />
-      </mesh>
+      <Riel />
 
-      {/* frontera + normal */}
-      <Line points={[[-X, 0, 0], [X, 0, 0]] as Pt[]} color="#e2e8f0" lineWidth={2} transparent opacity={0.75} />
-      <Line points={[[0, Y, 0], [0, -Y, 0]] as Pt[]} color="#94a3b8" lineWidth={1.5} transparent opacity={0.55} dashed dashSize={0.2} gapSize={0.16} />
+      {/* Objeto: vela sobre su platillo de latón */}
+      <Jinete x={b.tip[0]} tope={-0.06}>
+        <mesh position={[0, -0.035, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.21, 0.17, 0.05, 32]} />
+          <meshStandardMaterial {...LATON} />
+        </mesh>
+        <Vela H={H} playing={playing} />
+      </Jinete>
 
-      {/* etiquetas de medio (el detalle está en el panel) */}
-      <Etiqueta pos={[-X + 2.2, Y - 0.6, 0]} color={m1.color} ancha>{m1.nombre} · n₁ = {fmt2(m1.n)}</Etiqueta>
-      <Etiqueta pos={[-X + 2.2, -(Y - 0.6), 0]} color={m2.color} ancha>{m2.nombre} · n₂ = {fmt2(m2.n)}</Etiqueta>
+      {/* Lente o espejo en su jinete */}
+      <Jinete x={0} tope={-A - 0.2}>
+        {esLente
+          ? <Lente3D fU={fU} convergente={conv} A={A} fino={fino} />
+          : (
+            /* El espejo refleja la escena de verdad (vela, rayos, riel): una
+               cámara cúbica justo delante de su cara. En equipos modestos se
+               actualiza solo cuando algo cambia; en los buenos, cada cuadro. */
+            <CubeCamera position={[-0.4, 0, 0]} resolution={fino ? 128 : 256} frames={vivo ? Infinity : 2} near={0.05} far={60}>
+              {(tex) => (
+                <group position={[0.4, 0, 0]}>
+                  <Espejo3D tipo={tipoEspejo} Rs={Rs} A={A} envMap={tex} />
+                </group>
+              )}
+            </CubeCamera>
+          )}
+      </Jinete>
 
-      {/* rayo incidente */}
-      <CurvaTubo puntos={[A, O] as Pt[]} color="#fde047" grosor={0.054} />
-      {/* rayo reflejado (tenue, salvo reflexión total) */}
-      <Line points={[O, reflE] as Pt[]} color="#fbbf24" lineWidth={s.reflexionTotal ? 3 : 1.6} transparent opacity={s.reflexionTotal ? 0.95 : 0.4} dashed={!s.reflexionTotal} dashSize={0.16} gapSize={0.12} />
-      {/* rayo refractado */}
-      {refrE && <CurvaTubo puntos={[O, refrE] as Pt[]} color={m2.color} grosor={0.054} />}
-
-      {/* arcos de ángulo */}
-      <Line points={arc(0, -t1, 1.3)} color="#fde047" lineWidth={1.5} transparent opacity={0.8} />
-      {refrE && <Line points={arc(Math.PI, Math.PI - (s.thetaRefDeg * RAD), 1.3)} color={m2.color} lineWidth={1.5} transparent opacity={0.8} />}
-
-      <Etiqueta pos={[-Math.sin(t1 / 2) * 2.5 - 0.6, Math.cos(t1 / 2) * 2.5, 0]} color="#fde047" borde={false}>θ₁ = {fmtAng(thetaInc)}</Etiqueta>
-      {refrE ? (
-        <Etiqueta pos={[Math.sin((s.thetaRefDeg * RAD) / 2) * 2.5 + 0.6, -Math.cos((s.thetaRefDeg * RAD) / 2) * 2.5, 0]} color={m2.color} borde={false}>θ₂ = {fmtAng(s.thetaRefDeg)}</Etiqueta>
-      ) : (
-        <Etiqueta pos={[1.9, 2.4, 0]} color="#fde047" borde={false}>reflexión total</Etiqueta>
+      {/* Pantalla translúcida (solo con lentes) */}
+      {esLente && (
+        <Jinete x={xPant} tope={-PANT_H / 2 - 0.07}>
+          <Pantalla escala={enf.escala} blur={enf.desenfoque * S} H={H} playing={playing} />
+        </Jinete>
       )}
 
-      <Photon path={refrE ? [A, O, refrE] : [A, O, reflE]} color="#fde047" playing={playing} />
+      {/* Focos (cuentas sobre el eje y marcas en el riel) */}
+      {esLente && (
+        <>
+          <MarcaFoco x={fU * S} />
+          <MarcaFoco x={-fU * S} />
+          <MarcaFoco x={2 * fU * S} tenue />
+          <MarcaFoco x={-2 * fU * S} tenue />
+        </>
+      )}
+      {!esLente && tipoEspejo !== "plano" && (
+        <>
+          <MarcaFoco x={(tipoEspejo === "concavo" ? -1 : 1) * fS} />
+          <MarcaFoco x={(tipoEspejo === "concavo" ? -1 : 1) * Rs} tenue />
+        </>
+      )}
+
+      {/* Haces láser y pulsos de luz */}
+      <Haces segs={segs} depthTest={false} orden={25} />
+      {b.rayos.map((r, i) => <Pulso key={i} path={r.path} color={r.col} playing={playing} speed={3.2} depthTest={false} tam={0.38} />)}
+
+      {/* Imagen virtual: fantasma derecho; imagen real de un espejo: en el aire */}
+      {verFantasma && I && (
+        <group position={[I[0], 0, 0]} scale={[escalaImg, escalaImg, escalaImg]}>
+          <Vela H={H} estilo="fantasma" playing={playing} luz={false} />
+        </group>
+      )}
+      {verAerea && I && (
+        <group position={[I[0], 0, 0]} rotation={[b.M < 0 ? Math.PI : 0, 0, 0]} scale={[Math.min(escalaImg, 2.4), Math.min(escalaImg, 2.4), Math.min(escalaImg, 2.4)]}>
+          <Vela H={H} estilo="aerea" playing={playing} luz={false} />
+        </group>
+      )}
+
+      {/* Etiquetas (máx. 4) */}
+      <Etiqueta pos={[b.tip[0], -0.5, 0.35]} color="#86efac" ancha>objeto · {fmtDist(doU)}</Etiqueta>
+      {etqImg}
+      {esLente ? (
+        <>
+          <Etiqueta pos={[fU * S, -0.42, 0.2]} color="#fbbf24" borde={false} ancha>F′</Etiqueta>
+          <Etiqueta pos={[-fU * S, -0.42, 0.2]} color="#fbbf24" borde={false} ancha>F</Etiqueta>
+        </>
+      ) : tipoEspejo !== "plano" ? (
+        <>
+          <Etiqueta pos={[(tipoEspejo === "concavo" ? -1 : 1) * fS, -0.42, 0.2]} color="#fbbf24" borde={false} ancha>F</Etiqueta>
+          <Etiqueta pos={[(tipoEspejo === "concavo" ? -1 : 1) * Rs, -0.42, 0.2]} color="#fbbf24" borde={false} ancha>C</Etiqueta>
+        </>
+      ) : null}
     </group>
   );
 }
 
-/* ── Wrappers de modo con su título ───────────────────────────────────────── */
-function ModoLente({ tipoLente, fLente, doLente, playing }: Pick<OpticaSceneProps, "tipoLente" | "fLente" | "doLente" | "playing" | "accent">) {
-  const f = tipoLente === "convergente" ? Math.abs(fLente) : -Math.abs(fLente);
-  const col = tipoLente === "convergente" ? "#a78bfa" : "#f472b6";
-  return (
-    <group>
-      <EscenaImagen esLente f={f} do_={doLente} color={col} playing={playing} />
-    </group>
-  );
-}
-
-function ModoEspejo({ tipoEspejo, fEspejo, doEspejo, playing }: Pick<OpticaSceneProps, "tipoEspejo" | "fEspejo" | "doEspejo" | "playing" | "accent">) {
-  const f = tipoEspejo === "plano" ? Infinity : tipoEspejo === "concavo" ? Math.abs(fEspejo) : -Math.abs(fEspejo);
-  const col = "#5eead4";
-  return (
-    <group>
-      <SimboloEspejo tipo={tipoEspejo} color={col} />
-      <EscenaImagen esLente={false} f={f} do_={doEspejo} color="#a78bfa" playing={playing} />
-    </group>
-  );
+/* ── Encuadre de cada modo ────────────────────────────────────────────────── */
+function marcoDe(p: OpticaSceneProps, aspect: number): { objetivo: Pt; distancia: number; dir: Pt; clave: string } {
+  if (p.modo === "lentes" || p.modo === "espejos") {
+    const esLente = p.modo === "lentes";
+    const fU = esLente
+      ? (p.tipoLente === "convergente" ? Math.abs(p.fLente) : -Math.abs(p.fLente))
+      : p.tipoEspejo === "plano" ? Infinity : p.tipoEspejo === "concavo" ? Math.abs(p.fEspejo) : -Math.abs(p.fEspejo);
+    const doU = esLente ? p.doLente : p.doEspejo;
+    const r = resolverGauss(fU, doU, H_OBJ);
+    const xs = [-doU * S, 0];
+    if (esLente) xs.push(p.dp * S + 0.4);
+    if (!r.enInfinito && isFinite(r.di)) {
+      const xi = (esLente ? r.di : -r.di) * S;
+      if (Math.abs(xi) <= X_FIN) xs.push(xi);
+    }
+    if (!esLente && p.tipoEspejo !== "plano") xs.push(1.2);
+    let ymin = RIEL_Y - 0.55, ymax = 2.1;
+    if (!r.enInfinito && isFinite(r.hi)) {
+      const yi = r.hi * S;
+      const xi = (esLente ? r.di : -r.di) * S;
+      if (Math.abs(xi) <= X_FIN && Math.abs(yi) < 3.2) { ymax = Math.max(ymax, yi + 0.8); ymin = Math.min(ymin, yi - 0.6); }
+    }
+    // Margen extra a la izquierda: ahí flota la leyenda del laboratorio.
+    const estrecho = aspect < 1;
+    let xmin = Math.min(...xs) - (estrecho ? 0.7 : 2.3), xmax = Math.max(...xs) + (estrecho ? 0.7 : 1.1);
+    const anchoMin = estrecho ? 7 : 9;
+    if (xmax - xmin < anchoMin) { const c = (xmin + xmax) / 2; xmin = c - anchoMin / 2; xmax = c + anchoMin / 2; }
+    xmin = Math.max(xmin, -X_RIEL - 0.4); xmax = Math.min(xmax, X_RIEL + 0.4);
+    const e = encuadrar(xmin, xmax, ymin, ymax, aspect);
+    return { ...e, dir: esLente ? [-0.44, 0.27, 1] : [-0.66, 0.25, 1], clave: p.modo };
+  }
+  if (p.modo === "refraccion") {
+    if (p.vistaRefr === "fibra") return { ...encuadrar(FIBRA_X0 - 1.4, FIBRA_X1 + 1.3, -1.9, 1.5, aspect), dir: [0.3, 0.24, 1], clave: "fibra" };
+    if (p.vistaRefr === "prisma") return { ...encuadrar(-5.9, 6.3, -2.4, 2.6, aspect), dir: [0.2, 0.3, 1], clave: "prisma" };
+    return { ...encuadrar(-3.6, 3.6, -3.25, 3.35, aspect), dir: [0.12, 0.12, 1], clave: "frontera" };
+  }
+  const G = geometriaOjo(p.condOjo);
+  return { ...encuadrar(-6.4, G.xRetina + 1.5, -2.5, 2.3, aspect), dir: [0.14, 0.2, 1], clave: "ojo" };
 }
 
 /* ── Contenido ────────────────────────────────────────────────────────────── */
-function Contenido(props: OpticaSceneProps) {
-  const { modo, accent, resetNonce, playing } = props;
+function Contenido(props: OpticaSceneProps & { ligero: boolean }) {
+  const { modo, accent, resetNonce, playing, ligero } = props;
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const [debil, setDebil] = useState(false);
+  const calidad = useMemo(() => calidadEscena(), []);
+  const fino = ligero || debil || calidad === "baja";
+  // Lo caro solo en equipos que lo aguantan: espejo del piso y sombra proyectada.
+  const alta = calidad === "alta" && !ligero && !debil;
+  const marco = marcoDe(props, aspect);
+
+  const fLentSign = props.tipoLente === "convergente" ? Math.abs(props.fLente) : -Math.abs(props.fLente);
+  const fEspSign = props.tipoEspejo === "plano" ? Infinity : props.tipoEspejo === "concavo" ? Math.abs(props.fEspejo) : -Math.abs(props.fEspejo);
+
   return (
     <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
-          que el escenario la MIDE de la propia escena al montarse, en
-          vez de que alguien la adivine. */}
-      <Escenario acento={accent} />
-      <Encuadre />
+      <PerformanceMonitor onDecline={() => setDebil(true)} />
+      <color attach="background" args={[FONDO]} />
+      <fog attach="fog" args={[FONDO, 28, 75]} />
 
+      {/* Cuarto oscuro de óptica: un cono de luz sobre la mesa, relleno tenue
+          con el color del laboratorio y un contraluz frío que recorta. */}
+      <ambientLight intensity={0.22} />
+      <spotLight
+        position={[-3, 11, 7]} angle={0.62} penumbra={0.95} intensity={190} decay={2} color="#fff4e6"
+        castShadow={alta} shadow-mapSize-width={1024} shadow-mapSize-height={1024} shadow-bias={-0.0004}
+      />
+      <pointLight position={[-8, 3, 6]} intensity={9} color={accent} />
+      <pointLight position={[4, 5, -8]} intensity={14} color="#bfe8ff" />
+      {/* Entorno de estudio fotográfico (paneles de luz, sin HDR de internet):
+          es lo que reflejan el vidrio de la lente y el metal de los espejos. */}
+      <Environment resolution={256}>
+        <Lightformer intensity={2.2} position={[0, 8, 0]} scale={[14, 6, 1]} color="#ffffff" />
+        <Lightformer intensity={2.4} position={[-7, 3, 7]} scale={[6, 4, 1]} color="#fff3e2" />
+        <Lightformer intensity={1.6} position={[8, 2, 4]} scale={[5, 6, 1]} color="#bfe8ff" />
+        <Lightformer intensity={1.1} position={[0, 2, -9]} scale={[12, 3, 1]} color={accent} />
+        <Lightformer intensity={0.9} position={[-9, 1, -2]} scale={[5, 5, 1]} color={accent} />
+        <Lightformer intensity={0.35} position={[0, -6, 0]} scale={[16, 16, 1]} color="#2a3a55" />
+        <Lightformer form="ring" intensity={3} position={[3, 4, 9]} scale={2} color="#ffffff" />
+        {/* del lado del objeto: lo que devuelven los espejos (miran hacia −x) */}
+        <Lightformer intensity={1.1} position={[-12, 2, 1]} scale={[10, 8, 1]} color="#a9bed6" />
+        <Lightformer intensity={1.6} position={[-8, 7, 5]} scale={[5, 3, 1]} color="#ffffff" />
+      </Environment>
+      <MesaLaboratorio y={SUELO} tam={46} brillo={0.5} calidad={alta ? "media" : "baja"} />
+      <ContactShadows position={[0, SUELO + 0.01, 0]} opacity={0.6} scale={28} blur={2.4} far={6} resolution={256} color="#01040a" />
 
       <group key={`${modo}-${resetNonce}`}>
-        {modo === "lentes" && <ModoLente tipoLente={props.tipoLente} fLente={props.fLente} doLente={props.doLente} playing={playing} accent={accent} />}
-        {modo === "espejos" && <ModoEspejo tipoEspejo={props.tipoEspejo} fEspejo={props.fEspejo} doEspejo={props.doEspejo} playing={playing} accent={accent} />}
-        {modo === "refraccion" && <EscenaRefraccion medio1={props.medio1} medio2={props.medio2} thetaInc={props.thetaInc} playing={playing} />}
+        {modo === "lentes" && (
+          <EscenaBanco esLente fU={fLentSign} doU={props.doLente} dpU={props.dp} tipoEspejo="plano" playing={playing} fino={fino} />
+        )}
+        {modo === "espejos" && (
+          <EscenaBanco esLente={false} fU={fEspSign} doU={props.doEspejo} dpU={props.dp} tipoEspejo={props.tipoEspejo} playing={playing} fino={fino} vivo={alta} />
+        )}
+        {modo === "refraccion" && props.vistaRefr === "frontera" && <EscenaFrontera medio1={props.medio1} medio2={props.medio2} thetaInc={props.thetaInc} playing={playing} />}
+        {modo === "refraccion" && props.vistaRefr === "fibra" && <EscenaFibra medio1={props.medio1} medio2={props.medio2} thetaInc={props.thetaInc} playing={playing} />}
+        {modo === "refraccion" && props.vistaRefr === "prisma" && <EscenaPrisma thetaP={props.thetaPrisma} playing={playing} />}
+        {modo === "ojo" && <EscenaOjo cond={props.condOjo} pc={props.pc} playing={playing} />}
       </group>
 
-
+      <Guia objetivo={marco.objetivo} distancia={marco.distancia} dir={marco.dir} claveVista={`${marco.clave}-${resetNonce}`} />
       <OrbitControls
         makeDefault
         enablePan={false}
-        minDistance={11}
-        maxDistance={32}
-        target={[0, -0.3, 0]}
-        minPolarAngle={Math.PI / 3.4}
-        maxPolarAngle={Math.PI / 1.7}
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={5}
+        maxDistance={42}
+        minPolarAngle={Math.PI / 7}
+        maxPolarAngle={Math.PI / 2.06}
+        minAzimuthAngle={-1.35}
+        maxAzimuthAngle={1.35}
       />
 
-      <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.4} luminanceThreshold={0.7} luminanceSmoothing={0.3} mipmapBlur />
-        <Vignette eskil={false} offset={0.2} darkness={0.4} />
-      </EffectComposer>
+      {!ligero && !debil && (
+        <EffectComposer enableNormalPass={false} multisampling={4}>
+          <Bloom intensity={0.75} luminanceThreshold={0.86} luminanceSmoothing={0.22} mipmapBlur />
+          <Vignette eskil={false} offset={0.25} darkness={0.55} />
+        </EffectComposer>
+      )}
     </>
   );
 }
 
 export default function OpticaScene(props: OpticaSceneProps) {
-  const cam = { position: [0, 0.4, 16] as Pt, fov: 48 };
+  // Celular / táctil: sin postproceso y con vidrio ligero.
+  const ligero = useMemo(() => {
+    if (typeof window === "undefined") return true;
+    return window.matchMedia?.("(pointer: coarse)").matches || window.innerWidth < 640;
+  }, []);
   return (
-    <Canvas key={props.modo} dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={cam}>
-      <Contenido {...props} />
+    <Canvas
+      shadows
+      dpr={[1, 1.75]}
+      gl={{ antialias: true, alpha: false, toneMapping: THREE.ACESFilmicToneMapping }}
+      camera={{ position: [-6, 3, 18], fov: FOV, near: 0.1, far: 200 }}
+    >
+      <Contenido {...props} ligero={ligero} />
     </Canvas>
   );
 }
