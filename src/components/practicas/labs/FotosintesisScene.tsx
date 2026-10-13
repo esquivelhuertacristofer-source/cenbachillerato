@@ -4,277 +4,283 @@
  * Escena 3D del laboratorio de Fotosíntesis — R3F.
  * Se carga de forma diferida (ssr:false) desde LabFotosintesis.tsx.
  *
- * Un cloroplasto estilizado (cuerpo verde translúcido con pilas de tilacoides /
- * grana en su interior) recibe los REACTIVOS y emite los PRODUCTOS de la
- * ecuación 6CO₂ + 6H₂O + luz → C₆H₁₂O₆ + 6O₂:
- *   · fotones de luz solar que bajan del Sol (caudal ∝ intensidad luminosa),
- *   · moléculas de CO₂ que entran (caudal ∝ concentración de CO₂),
- *   · moléculas de H₂O que suben desde la raíz,
- *   · O₂ que escapa hacia arriba y glucosa que baja al tallo (caudal ∝ TASA).
- * El NÚMERO de partículas que fluye en cada chorro es proporcional a su factor,
- * así se ve cómo la luz, el CO₂ y la temperatura limitan el proceso.
+ * UN VIAJE DE ESCALAS («Powers of Ten»): planta → corte de hoja →
+ * cloroplasto → membrana del tilacoide. Al cambiar de modo no hay corte: un
+ * solo número (`zoom`) recorre las escalas; cada una crece alrededor del
+ * punto donde vive la siguiente (ver fotosintesis-zoom.ts) mientras la cámara
+ * se desliza a su punto de vista.
  *
- * Patrón R3F: useFrame solo dentro de <Canvas>; cada chorro vive en un hijo del
- * Canvas y muta REFS sobre un InstancedMesh (sin setState ni Math.random).
+ * Lo que el alumno mueve se VE en todas las escalas:
+ *   · intensidad de luz → cuántos fotones llegan y cuánto brilla el Sol;
+ *   · color de la luz → los fotones rojos y azules se absorben, los verdes
+ *     rebotan (y la planta se ve oscura bajo luz roja: la está absorbiendo);
+ *   · tasa (luz absorbida × CO₂ × temperatura) → burbujas de O₂, electrones,
+ *     H⁺, giro de la ATP sintasa, velocidad del ciclo de Calvin, glucosa.
+ *
+ * Patrón R3F: el estado vivo está en una referencia (`Sim`) que el director
+ * actualiza cada cuadro; las partículas la leen sin re-renderizar React.
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html } from "@react-three/drei";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { factorLuz, factorCO2, tasa } from "./fotosintesis-data";
-import { Escenario } from "./_escenario";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import {
+  factorCO2, factorTemp, tasaConColor, absorcionLuz, aperturaEstoma, COLORES_LUZ, type ColorLuz,
+} from "./fotosintesis-data";
+import { calidadEscena } from "./_escenario";
+import { SimCtx, simInicial, GrupoEscala, type Sim } from "./fotosintesis-runtime";
+import { VISTAS, FONDOS, NUM_ESCALAS, type VistaEscala } from "./fotosintesis-zoom";
+import { EscalaPlanta, SOL_PLANTA } from "./fotosintesis-planta";
+import { EscalaHoja } from "./fotosintesis-hoja";
+import { EscalaCloroplasto } from "./fotosintesis-cloroplasto";
+import { EscalaTilacoide } from "./fotosintesis-tilacoide";
 
 export interface FotosintesisSceneProps {
   luz: number;
   co2: number;
   temp: number;
+  /** Color de la luz (blanca por omisión). */
+  color?: ColorLuz;
+  /** Escala a la que viaja la cámara: 0 planta … 3 tilacoide. */
+  nivel?: number;
   accent: string;
   pausado: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** Avisa cuando la cámara llegó a una escala (para mostrar etiquetas). */
+  onLlegada?: (nivel: number) => void;
 }
 
-const SOL = "#ffd24a";
-const VERDE = "#34D399";
-const AZUL_CO2 = "#7fb2ff";
-const CIAN_H2O = "#67e8f9";
-const O2_COL = "#e8f4ff";
-const GLU = "#ffb454";
+type Calidad = "alta" | "media" | "baja";
 
-type Vec3 = [number, number, number];
-const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-
-/* ─── Chorro de partículas a lo largo de un camino (caudal ∝ rate) ─────── */
-function Chorro({
-  count, from, to, color, rate, pausado, size = 0.13, speed = 0.45, wobble = 0.22,
-}: {
-  count: number; from: Vec3; to: Vec3; color: string; rate: number;
-  pausado: boolean; size?: number; speed?: number; wobble?: number;
-}) {
-  const ref = useRef<THREE.InstancedMesh>(null);
-  const fases = useRef<number[]>(Array.from({ length: count }, (_, i) => i / count));
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  // dirección perpendicular para el bamboleo (estable, no aleatoria)
-  const perp = useMemo(() => {
-    const dir = new THREE.Vector3(to[0] - from[0], to[1] - from[1], to[2] - from[2]).normalize();
-    const up = Math.abs(dir.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
-    return new THREE.Vector3().crossVectors(dir, up).normalize();
-  }, [from, to]);
-
-  useFrame((_, delta) => {
-    const m = ref.current;
-    if (!m) return;
-    const d = pausado ? 0 : delta;
-    const activos = Math.round(clamp(rate, 0, 1) * count);
-    for (let i = 0; i < count; i++) {
-      fases.current[i] = (fases.current[i]! + d * (speed + (i % 3) * 0.04)) % 1;
-      const p = fases.current[i]!;
-      const x = from[0] + (to[0] - from[0]) * p;
-      const y = from[1] + (to[1] - from[1]) * p;
-      const z = from[2] + (to[2] - from[2]) * p;
-      const w = Math.sin((p + i * 0.3) * Math.PI * 2) * wobble * Math.sin(Math.PI * p);
-      dummy.position.set(x + perp.x * w, y + perp.y * w, z + perp.z * w);
-      const visible = i < activos;
-      const s = visible ? size * (0.6 + 0.4 * Math.sin(Math.PI * p)) : 0.0001;
-      dummy.scale.setScalar(Math.max(0.0001, s));
-      dummy.updateMatrix();
-      m.setMatrixAt(i, dummy.matrix);
-    }
-    m.instanceMatrix.needsUpdate = true;
+/* ── Cielo: degradado que cambia de tono con la escala ───────────────── */
+function Cielo({ simRef }: { simRef: React.RefObject<Sim> }) {
+  const mat = useMemo(() => new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    depthWrite: false,
+    fog: false,
+    uniforms: { cenit: { value: new THREE.Color(FONDOS[0]![0]) }, horizonte: { value: new THREE.Color(FONDOS[0]![1]) } },
+    vertexShader: "varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
+    fragmentShader: "uniform vec3 cenit; uniform vec3 horizonte; varying vec3 vP; void main(){ float h = smoothstep(-0.35, 0.75, vP.y); vec3 c = mix(horizonte, cenit, h); c *= 1.0 - 0.25 * smoothstep(0.0, -0.8, vP.y); gl_FragColor = vec4(c, 1.0); }",
+  }), []);
+  const cols = useMemo(() => FONDOS.map(([a, b]) => [new THREE.Color(a), new THREE.Color(b)] as const), []);
+  useFrame(() => {
+    const z = Math.max(0, Math.min(NUM_ESCALAS - 1, simRef.current.zoom));
+    const i = Math.min(NUM_ESCALAS - 2, Math.floor(z));
+    const f = z - i;
+    (mat.uniforms.cenit!.value as THREE.Color).copy(cols[i]![0]).lerp(cols[i + 1]![0], f);
+    (mat.uniforms.horizonte!.value as THREE.Color).copy(cols[i]![1]).lerp(cols[i + 1]![1], f);
   });
-
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, count]}>
-      <sphereGeometry args={[1, 12, 12]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.85} toneMapped={false} />
-    </instancedMesh>
+    <mesh material={mat} raycast={() => null} renderOrder={-1}>
+      <sphereGeometry args={[150, 32, 16]} />
+    </mesh>
   );
 }
 
-/* ─── Cloroplasto con sus tilacoides (grana) ──────────────────────────── */
-function Cloroplasto({ intensidad, pausado }: { intensidad: number; pausado: boolean }) {
-  const grupo = useRef<THREE.Group>(null);
-  const fase = useRef(0);
-
-  useFrame((_, delta) => {
-    const g = grupo.current;
-    if (!g) return;
-    if (!pausado) fase.current += delta;
-    // latido sutil proporcional a la actividad fotosintética
-    const s = 1 + Math.sin(fase.current * 2) * 0.012 * (0.4 + intensidad);
-    g.scale.set(s, s, s);
+/* ── Luz: el Sol (del color elegido) y un relleno suave ──────────────── */
+function Luces({ simRef, sombras }: { simRef: React.RefObject<Sim>; sombras: boolean }) {
+  const sol = useRef<THREE.DirectionalLight>(null);
+  const tmp = useMemo(() => ({ a: new THREE.Vector3(...SOL_PLANTA).normalize().multiplyScalar(14), b: new THREE.Vector3(-6, 10, 7), blanco: new THREE.Color("#fff4e0") }), []);
+  useFrame(() => {
+    const s = simRef.current;
+    const l = sol.current;
+    if (!l) return;
+    const f = Math.min(1, s.zoom);
+    l.position.copy(tmp.a).lerp(tmp.b, f);
+    // A escala molecular la luz de colores lo teñiría todo: ahí manda el
+    // color de los fotones y la iluminación vuelve casi a blanco.
+    l.color.copy(s.colorLuz).lerp(tmp.blanco, Math.min(1, Math.max(0, s.zoom - 1)) * 0.7);
+    l.intensity = 0.2 + s.luz * 3.4;
   });
-
-  // posiciones de las pilas de grana (estables)
-  const grana: { pos: Vec3; n: number }[] = useMemo(
-    () => [
-      { pos: [-0.55, 1.15, 0.15], n: 5 },
-      { pos: [0.5, 1.35, -0.2], n: 6 },
-      { pos: [0.15, 0.85, 0.5], n: 4 },
-      { pos: [-0.35, 1.5, -0.4], n: 4 },
-    ],
-    []
-  );
-
-  return (
-    <group ref={grupo} position={[0, 0, 0]}>
-      {/* membrana externa translúcida */}
-      <mesh scale={[2.25, 1.5, 1.7]} position={[0, 1.2, 0]}>
-        <sphereGeometry args={[1, 40, 32]} />
-        <meshPhysicalMaterial
-          color={"#0e6b3f"}
-          emissive={VERDE}
-          emissiveIntensity={0.12 + intensidad * 0.22}
-          transmission={0.55}
-          thickness={1.2}
-          roughness={0.35}
-          metalness={0}
-          transparent
-          opacity={0.5}
-        />
-      </mesh>
-
-      {/* estroma interior (relleno tenue) */}
-      <mesh scale={[2.05, 1.32, 1.52]} position={[0, 1.2, 0]}>
-        <sphereGeometry args={[1, 24, 18]} />
-        <meshStandardMaterial color={"#0a5a34"} emissive={VERDE} emissiveIntensity={0.06} transparent opacity={0.28} depthWrite={false} />
-      </mesh>
-
-      {/* pilas de tilacoides (grana): discos verdes apilados */}
-      {grana.map((gr, gi) => (
-        <group key={gi} position={gr.pos}>
-          {Array.from({ length: gr.n }).map((_, di) => (
-            <mesh key={di} position={[0, di * 0.12 - (gr.n * 0.12) / 2, 0]} rotation={[0, gi * 0.7, 0]}>
-              <cylinderGeometry args={[0.26, 0.26, 0.07, 20]} />
-              <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.35 + intensidad * 0.5} roughness={0.4} metalness={0.1} toneMapped={false} />
-            </mesh>
-          ))}
-        </group>
-      ))}
-    </group>
-  );
-}
-
-/* ─── Contenido de la escena ──────────────────────────────────────────── */
-function Mundo({ luz, co2, temp, accent: _accent, pausado }: { luz: number; co2: number; temp: number; accent: string; pausado: boolean }) {
-  const fLuz = useMemo(() => factorLuz(luz), [luz]);
-  const fCO2 = useMemo(() => factorCO2(co2), [co2]);
-  const t = useMemo(() => tasa(luz, co2, temp), [luz, co2, temp]);
-
-  const solPos: Vec3 = [-4.6, 4.2, 0.6];
-  const cloEntradaLuz: Vec3 = [-0.9, 1.7, 0.4];
-  const co2Inicio: Vec3 = [4.8, 1.5, -0.6];
-  const co2Fin: Vec3 = [1.1, 1.25, 0];
-  const h2oInicio: Vec3 = [-2.4, -1.6, 0.9];
-  const h2oFin: Vec3 = [-0.7, 0.6, 0.4];
-  const o2Inicio: Vec3 = [0.5, 1.9, 0.6];
-  const o2Fin: Vec3 = [3.6, 3.4, 0.5];
-  const gluInicio: Vec3 = [0, 0.8, 0];
-  const gluFin: Vec3 = [0.2, -1.7, -0.2];
-
-  return (
-    <group position={[0, 0, 0]}>
-      {/* suelo / superficie de la hoja */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.95, 0]} receiveShadow>
-        <circleGeometry args={[7, 48]} />
-        <meshStandardMaterial color="#06241a" roughness={0.95} metalness={0.04} />
-      </mesh>
-
-      {/* Sol */}
-      <mesh position={solPos}>
-        <sphereGeometry args={[0.55, 24, 24]} />
-        <meshStandardMaterial color={SOL} emissive={SOL} emissiveIntensity={1.6} toneMapped={false} />
-      </mesh>
-      <Html position={[solPos[0], solPos[1] + 0.9, solPos[2]]} center distanceFactor={13} pointerEvents="none">
-        <div style={{ display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap" }}>
-          <i className="fa-solid fa-sun" style={{ color: SOL, fontSize: 16 }} />
-          <span style={{ color: "#ffe08a", fontSize: 11, fontWeight: 800 }}>luz solar</span>
-        </div>
-      </Html>
-
-      <Cloroplasto intensidad={t} pausado={pausado} />
-
-      {/* ── Reactivos entrando ── */}
-      {/* fotones de luz (caudal ∝ intensidad luminosa) */}
-      <Chorro count={16} from={solPos} to={cloEntradaLuz} color={SOL} rate={fLuz} pausado={pausado} size={0.12} speed={0.7} wobble={0.12} />
-      {/* CO₂ (caudal ∝ concentración de CO₂) */}
-      <Chorro count={12} from={co2Inicio} to={co2Fin} color={AZUL_CO2} rate={fCO2} pausado={pausado} size={0.15} speed={0.4} />
-      {/* H₂O subiendo desde la raíz */}
-      <Chorro count={12} from={h2oInicio} to={h2oFin} color={CIAN_H2O} rate={0.85} pausado={pausado} size={0.13} speed={0.45} />
-
-      {/* ── Productos saliendo (caudal ∝ TASA) ── */}
-      {/* O₂ */}
-      <Chorro count={14} from={o2Inicio} to={o2Fin} color={O2_COL} rate={t} pausado={pausado} size={0.15} speed={0.5} />
-      {/* glucosa */}
-      <Chorro count={12} from={gluInicio} to={gluFin} color={GLU} rate={t} pausado={pausado} size={0.17} speed={0.4} wobble={0.1} />
-
-      {/* etiquetas de moléculas */}
-      <MolLabel pos={[co2Inicio[0] + 0.2, co2Inicio[1] + 0.5, co2Inicio[2]]} color={AZUL_CO2} icon="fa-arrow-left" txt="6 CO₂" />
-      <MolLabel pos={[h2oInicio[0] - 0.2, h2oInicio[1] - 0.1, h2oInicio[2]]} color={CIAN_H2O} icon="fa-arrow-up" txt="6 H₂O" />
-      <MolLabel pos={[o2Fin[0] + 0.3, o2Fin[1] + 0.4, o2Fin[2]]} color={O2_COL} icon="fa-arrow-up" txt="6 O₂" />
-      <MolLabel pos={[gluFin[0] + 0.6, gluFin[1] + 0.2, gluFin[2]]} color={GLU} icon="fa-arrow-down" txt="C₆H₁₂O₆" />
-
-    </group>
-  );
-}
-
-function MolLabel({ pos, color, icon, txt }: { pos: Vec3; color: string; icon: string; txt: string }) {
-  return (
-    <Html position={pos} center distanceFactor={13} pointerEvents="none">
-      <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(2,12,28,0.8)", border: `1px solid ${color}66`, borderRadius: 9, padding: "5px 9px", whiteSpace: "nowrap" }}>
-        <i className={`fa-solid ${icon}`} style={{ color, fontSize: 11 }} />
-        <span style={{ color: "#eaf2fb", fontSize: 12, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{txt}</span>
-      </div>
-    </Html>
-  );
-}
-
-/* ─── Canvas + contenido ───────────────────────────────────────────────── */
-export default function FotosintesisScene(props: FotosintesisSceneProps) {
-  return (
-    <Canvas
-      shadows
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [5.5, 3.2, 8.5], fov: 44 }}
-    >
-      <Contenido {...props} />
-    </Canvas>
-  );
-}
-
-function Contenido(props: FotosintesisSceneProps) {
-  const { luz, co2, temp, accent, pausado, autoRotate, resetNonce } = props;
   return (
     <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={-1.93} />
+      <hemisphereLight args={["#cfe6ff", "#2a2016", 0.55]} />
+      <directionalLight
+        ref={sol}
+        castShadow={sombras}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-left={-6}
+        shadow-camera-right={6}
+        shadow-camera-top={6}
+        shadow-camera-bottom={-6}
+        shadow-camera-near={1}
+        shadow-camera-far={40}
+        shadow-bias={-0.0006}
+        shadow-normalBias={0.02}
+      />
+      <pointLight position={[6, 2, 6]} intensity={14} color="#9fd8ff" distance={30} />
+      <Environment resolution={256} environmentIntensity={0.55}>
+        <Lightformer intensity={2} position={[0, 7, 3]} scale={[12, 4, 1]} color="#ffffff" />
+        <Lightformer intensity={1.2} position={[-7, 2, -2]} scale={[7, 7, 1]} color="#7dffa0" />
+        <Lightformer intensity={1.1} position={[6, 1, 5]} scale={[5, 5, 1]} color="#bfe8ff" />
+      </Environment>
+    </>
+  );
+}
 
+/* ── Director: estado vivo, zoom entre escalas y viaje de cámara ─────── */
+const suave = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-      <group key={`${resetNonce}`}>
-        <Mundo luz={luz} co2={co2} temp={temp} accent={accent} pausado={pausado} />
+function Director({ simRef, props }: { simRef: React.RefObject<Sim>; props: FotosintesisSceneProps }) {
+  const tam = useThree((s) => s.size);
+  const objetivo = useRef(props);
+  useEffect(() => { objetivo.current = props; }, [props]);
+
+  const colorObj = useMemo(() => new THREE.Color(), []);
+  const viaje = useRef({ activo: false, t: 0, dur: 1, z0: 0, z1: 0, desde: { az: 0, pol: 0, dist: 0, tx: 0, ty: 0 } as VistaEscala, nonce: -1, inicio: true });
+  const tmp = useMemo(() => ({ v: new THREE.Vector3(), esf: new THREE.Spherical() }), []);
+
+  const aspecto = tam.width / Math.max(1, tam.height);
+  const factorDist = aspecto < 1.25 ? Math.pow(1.25 / aspecto, 0.7) : 1;
+  // En vertical la leyenda ocupa la parte de arriba: el sujeto baja un poco.
+  const subeTy = aspecto < 1 ? 0.55 : 0;
+
+  useFrame((estado, delta) => {
+    const camara = estado.camera;
+    const ctl = estado.controls as OrbitControlsImpl | null;
+    const s = simRef.current;
+    const o = objetivo.current;
+    const dt = Math.min(delta, 0.05);
+    const color = o.color ?? "blanca";
+
+    // 1) Estado de la simulación, suavizado (nada brinca al mover un deslizador).
+    const k = 1 - Math.exp(-dt * 4);
+    s.luz += (o.luz / 100 - s.luz) * k;
+    s.absorcion += (absorcionLuz(color) - s.absorcion) * k;
+    s.tasa += (tasaConColor(o.luz, o.co2, o.temp, color) - s.tasa) * k;
+    s.fCO2 += (factorCO2(o.co2) - s.fCO2) * k;
+    s.fTemp += (factorTemp(o.temp) - s.fTemp) * k;
+    s.apertura += (aperturaEstoma(o.luz, o.temp) - s.apertura) * k;
+    colorObj.set(COLORES_LUZ.find((c) => c.id === color)?.hex ?? "#ffffff");
+    s.colorLuz.lerp(colorObj, k);
+    s.colorId = color;
+    s.dt = o.pausado ? 0 : dt;
+    s.t += s.dt;
+
+    // 2) ¿Hay que viajar? (cambio de escala o reinicio de cámara)
+    const v = viaje.current;
+    const nivel = Math.max(0, Math.min(NUM_ESCALAS - 1, o.nivel ?? 0));
+    if (v.inicio || nivel !== v.z1 || o.resetNonce !== v.nonce) {
+      const ancla = ctl ? ctl.target : tmp.v.set(0, 0, 0);
+      tmp.esf.setFromVector3(tmp.v.copy(camara.position).sub(ancla));
+      v.desde = { az: tmp.esf.theta, pol: tmp.esf.phi, dist: tmp.esf.radius, tx: ancla.x, ty: ancla.y };
+      if (v.inicio) {
+        const w = VISTAS[nivel]!;
+        v.desde = { ...w, dist: w.dist * factorDist, ty: w.ty + subeTy };
+        s.zoom = nivel;
+      }
+      v.z0 = s.zoom;
+      v.z1 = nivel;
+      v.t = 0;
+      v.dur = v.inicio ? 0.001 : 1.1 + Math.abs(nivel - s.zoom) * 0.9;
+      v.activo = true;
+      v.nonce = o.resetNonce;
+      v.inicio = false;
+      if (ctl) ctl.enabled = false;
+      props.onLlegada?.(-1);
+    }
+    if (v.activo) {
+      v.t += dt;
+      const p = Math.min(1, v.t / v.dur);
+      const e = suave(p);
+      s.zoom = v.z0 + (v.z1 - v.z0) * e;
+      const a = v.desde;
+      const b = VISTAS[v.z1]!;
+      let dAz = b.az - a.az;
+      dAz = Math.atan2(Math.sin(dAz), Math.cos(dAz));
+      const az = a.az + dAz * e;
+      const pol = a.pol + (b.pol - a.pol) * e;
+      const dist = a.dist + (b.dist * factorDist - a.dist) * e;
+      const tx = a.tx + (b.tx - a.tx) * e;
+      const ty = a.ty + (b.ty + subeTy - a.ty) * e;
+      tmp.esf.set(dist, pol, az);
+      camara.position.setFromSpherical(tmp.esf).add(tmp.v.set(tx, ty, 0));
+      if (ctl) ctl.target.set(tx, ty, 0);
+      camara.lookAt(tx, ty, 0);
+      if (p >= 1) {
+        v.activo = false;
+        s.zoom = v.z1;
+        if (ctl) {
+          ctl.enabled = true;
+          ctl.update();
+        }
+        props.onLlegada?.(v.z1);
+      }
+    }
+  }, -2);
+
+  return null;
+}
+
+/* ── Contenido ───────────────────────────────────────────────────────── */
+function Contenido({ props, calidad }: { props: FotosintesisSceneProps; calidad: Calidad }) {
+  const simRef = useRef<Sim>(simInicial());
+  const ancho = useThree((s) => s.size.width);
+  const angosto = ancho < 640;
+  const pocos = calidad === "baja";
+  const [llegada, setLlegada] = useState(-1);
+  const props2 = useMemo(() => ({ ...props, onLlegada: (n: number) => { setLlegada(n); props.onLlegada?.(n); } }), [props]);
+  const post = calidad !== "baja" && !angosto;
+  const nivel = props.nivel ?? 0;
+
+  return (
+    <SimCtx.Provider value={simRef}>
+      <Director simRef={simRef} props={props2} />
+      <Cielo simRef={simRef} />
+      <Luces simRef={simRef} sombras={!pocos} />
+
+      <group>
+        <GrupoEscala k={0}><EscalaPlanta etiquetas={llegada === 0 && nivel === 0} angosto={angosto} pocos={pocos} /></GrupoEscala>
+        <GrupoEscala k={1}><EscalaHoja etiquetas={llegada === 1 && nivel === 1} angosto={angosto} pocos={pocos} /></GrupoEscala>
+        <GrupoEscala k={2}><EscalaCloroplasto etiquetas={llegada === 2 && nivel === 2} angosto={angosto} pocos={pocos} /></GrupoEscala>
+        <GrupoEscala k={3}><EscalaTilacoide etiquetas={llegada === 3 && nivel === 3} angosto={angosto} pocos={pocos} /></GrupoEscala>
       </group>
 
-
       <OrbitControls
+        makeDefault
         enablePan={false}
-        minDistance={5.5}
-        maxDistance={20}
-        minPolarAngle={Math.PI / 8}
-        maxPolarAngle={Math.PI / 1.95}
-        target={[0, 1.1, 0]}
-        autoRotate={autoRotate}
-        autoRotateSpeed={0.4}
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={6}
+        maxDistance={22}
+        minPolarAngle={Math.PI / 9}
+        maxPolarAngle={Math.PI / 1.85}
+        autoRotate={props.autoRotate}
+        autoRotateSpeed={0.45}
       />
 
-      <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.65} luminanceThreshold={0.5} luminanceSmoothing={0.3} mipmapBlur radius={0.78} />
-        <Vignette eskil={false} offset={0.28} darkness={0.42} />
-      </EffectComposer>
-    </>
+      {post && (
+        <EffectComposer enableNormalPass={false} multisampling={4}>
+          <Bloom intensity={0.75} luminanceThreshold={0.92} luminanceSmoothing={0.18} mipmapBlur radius={0.7} />
+          <Vignette eskil={false} offset={0.26} darkness={0.5} />
+        </EffectComposer>
+      )}
+    </SimCtx.Provider>
+  );
+}
+
+export default function FotosintesisScene(props: FotosintesisSceneProps) {
+  const [calidad, setCalidad] = useState<Calidad>(() => calidadEscena());
+  const [dpr, setDpr] = useState(1.75);
+  return (
+    <Canvas
+      shadows={calidad !== "baja"}
+      dpr={[1, dpr]}
+      gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+      camera={{ position: [4, 3, 12], fov: 38, near: 0.05, far: 400 }}
+    >
+      <PerformanceMonitor
+        onDecline={() => {
+          setDpr(1);
+          setCalidad((c) => (c === "alta" ? "media" : c));
+        }}
+      />
+      <Contenido props={props} calidad={calidad} />
+    </Canvas>
   );
 }

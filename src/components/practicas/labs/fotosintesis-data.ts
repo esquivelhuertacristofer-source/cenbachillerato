@@ -203,3 +203,120 @@ export const QUIZ_A2: QuizEvaluable = {
     },
   ],
 };
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * AGREGADO (laboratorio «élite»): color de la luz y escalas del viaje.
+ * Lo anterior queda intacto: con luz BLANCA, `tasaConColor` da exactamente lo
+ * mismo que `tasa`.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/** Color de la luz que ilumina la planta. */
+export type ColorLuz = "blanca" | "roja" | "azul" | "verde";
+
+/**
+ * Fracción de los fotones de cada color que la CLOROFILA absorbe (modelo
+ * cualitativo). La clorofila absorbe sobre todo el rojo y el azul-violeta y
+ * refleja el verde. La luz blanca es la mezcla de los tres.
+ */
+export const ABSORCION_COLOR: Record<Exclude<ColorLuz, "blanca">, number> = {
+  roja: 0.9,
+  azul: 0.88,
+  verde: 0.15,
+};
+
+export interface OpcionColorLuz {
+  id: ColorLuz;
+  nombre: string;
+  /** Color con que se pinta la luz en la escena. */
+  hex: string;
+  /** Longitud de onda aproximada. */
+  nm: string;
+  icono: string;
+}
+
+export const COLORES_LUZ: OpcionColorLuz[] = [
+  { id: "blanca", nombre: "Blanca", hex: "#fff1d0", nm: "400–700 nm", icono: "fa-sun" },
+  { id: "roja", nombre: "Roja", hex: "#ff4a3d", nm: "≈ 660 nm", icono: "fa-circle" },
+  { id: "azul", nombre: "Azul", hex: "#4d7dff", nm: "≈ 450 nm", icono: "fa-circle" },
+  { id: "verde", nombre: "Verde", hex: "#3ddc6a", nm: "≈ 530 nm", icono: "fa-circle" },
+];
+
+/** Fracción de los fotones que absorbe la clorofila con ese color (0..1). */
+export function absorcionLuz(color: ColorLuz): number {
+  if (color === "blanca") return (ABSORCION_COLOR.roja + ABSORCION_COLOR.azul + ABSORCION_COLOR.verde) / 3;
+  return ABSORCION_COLOR[color];
+}
+
+/**
+ * Luz que de verdad aprovecha la planta (%, relativa a la luz blanca): solo
+ * cuentan los fotones que la clorofila absorbe. Con blanca es igual a `luz`.
+ */
+export function luzEfectiva(luzPct: number, color: ColorLuz): number {
+  return (luzPct * absorcionLuz(color)) / absorcionLuz("blanca");
+}
+
+/** Tasa (0..1) con el color de la luz. Con luz blanca coincide con `tasa`. */
+export function tasaConColor(luzPct: number, co2Pct: number, tempC: number, color: ColorLuz): number {
+  return tasa(luzEfectiva(luzPct, color), co2Pct, tempC);
+}
+
+/** Factor limitante tomando en cuenta el color de la luz. */
+export function factorLimitanteConColor(luzPct: number, co2Pct: number, tempC: number, color: ColorLuz): FactorKey {
+  return factorLimitante(luzEfectiva(luzPct, color), co2Pct, tempC);
+}
+
+/**
+ * Apertura de los estomas (0..1), cualitativa: se abren con la luz y se
+ * cierran con mucho calor para no perder agua. Solo es visual: la tasa sigue
+ * siendo el producto de los tres factores.
+ */
+export function aperturaEstoma(luzPct: number, tempC: number): number {
+  const porLuz = 0.18 + 0.82 * factorLuz(luzPct);
+  const porCalor = tempC <= 34 ? 1 : Math.max(0.25, 1 - (tempC - 34) / 14);
+  return clamp01(porLuz * porCalor);
+}
+
+/** Burbujas de O₂ por minuto en la planta (simulación, proporcional a la tasa). */
+export const burbujasPorMinuto = (t01: number): number => Math.round(t01 * 48);
+
+/** Las cuatro escalas del viaje («Powers of Ten»). */
+export type EscalaId = "planta" | "hoja" | "cloroplasto" | "tilacoide";
+
+export interface Escala {
+  id: EscalaId;
+  etiqueta: string;
+  icono: string;
+  tamano: string;
+  queVes: string;
+}
+
+export const ESCALAS: Escala[] = [
+  {
+    id: "planta",
+    etiqueta: "Planta",
+    icono: "fa-seedling",
+    tamano: "≈ 40 cm",
+    queVes: "La luz del Sol llega a las hojas: los fotones rojos y azules se absorben y los verdes rebotan. Mientras más luz aprovecha, más burbujas de O₂ libera.",
+  },
+  {
+    id: "hoja",
+    etiqueta: "Corte de hoja",
+    icono: "fa-leaf",
+    tamano: "≈ 0.3 mm",
+    queVes: "Bajo la epidermis, las células en empalizada están llenas de cloroplastos. Por los estomas entra el CO₂ y sale el O₂; la nervadura trae el agua y se lleva el azúcar.",
+  },
+  {
+    id: "cloroplasto",
+    etiqueta: "Cloroplasto",
+    icono: "fa-circle-half-stroke",
+    tamano: "≈ 5 µm",
+    queVes: "Una doble membrana encierra el estroma. Dentro, los tilacoides se apilan en granas unidas por lamelas: ahí está la clorofila que capta la luz.",
+  },
+  {
+    id: "tilacoide",
+    etiqueta: "Tilacoide",
+    icono: "fa-bolt",
+    tamano: "≈ 10 nm",
+    queVes: "En la membrana, los fotosistemas usan la luz para romper el agua (sale O₂). Los H⁺ hacen girar la ATP sintasa y, en el estroma, el ciclo de Calvin fija el CO₂ en glucosa.",
+  },
+];

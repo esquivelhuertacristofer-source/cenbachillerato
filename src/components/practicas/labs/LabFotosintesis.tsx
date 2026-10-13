@@ -4,47 +4,61 @@
  * Laboratorio 3D — Fotosíntesis: la fábrica de vida del planeta.
  * Práctica experimental para CNEYT-III-P03-A1 (progresión 3).
  *
- * Un cloroplasto 3D recibe los reactivos (luz, CO₂, H₂O) y emite los productos
- * (glucosa y O₂) de la ecuación 6CO₂ + 6H₂O + luz → C₆H₁₂O₆ + 6O₂. El alumno
- * mueve la intensidad luminosa, la concentración de CO₂ y la temperatura, y ve
- * cómo cambia la TASA fotosintética: cada factor satura y siempre hay uno que
- * LIMITA el proceso (factor limitante). El caudal de partículas en cada chorro
- * es proporcional a su factor, así la idea se ve, no solo se calcula.
+ * UN VIAJE DE ESCALAS, como «Powers of Ten»: de la planta en su maceta al
+ * corte de la hoja, de ahí al cloroplasto y hasta la membrana del tilacoide,
+ * con un zoom continuo (cada escala vive DENTRO de la anterior).
+ *
+ * El experimento central es el de siempre —la ecuación
+ * 6CO₂ + 6H₂O + luz → C₆H₁₂O₆ + 6O₂ y el FACTOR LIMITANTE: la tasa es el
+ * producto de luz × CO₂ × temperatura, cada factor satura y siempre hay uno
+ * que manda— más una variable nueva: el COLOR de la luz. La clorofila absorbe
+ * el rojo y el azul y refleja el verde: con luz verde casi todos los fotones
+ * rebotan y la planta casi no hace fotosíntesis. Todo se VE: fotones que se
+ * absorben o rebotan, burbujas de O₂, estomas que se abren, electrones, H⁺,
+ * el rotor de la ATP sintasa y el ciclo de Calvin, que aceleran con la tasa.
  * Ciencias Naturales, Experimentales y Tecnología III — Ecosistemas (MCCEMS 2025).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { FOTOSINTESIS_FICHA } from "./fotosintesis-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import {
   FASES,
   TIPOS_PLANTA,
-  tasaPct,
-  factorLuz,
   factorCO2,
   factorTemp,
-  factorLimitante,
+  factorLuz,
   ETIQUETA_FACTOR,
   fmtPct,
   LUZ_MIN, LUZ_MAX, LUZ_STEP, LUZ_DEFAULT,
   CO2_MIN, CO2_MAX, CO2_STEP, CO2_DEFAULT,
   TEMP_MIN, TEMP_MAX, TEMP_STEP, TEMP_DEFAULT, TEMP_OPT,
   QUIZ_A2,
+  COLORES_LUZ,
+  ESCALAS,
+  ABSORCION_COLOR,
+  absorcionLuz,
+  luzEfectiva,
+  tasaConColor,
+  factorLimitanteConColor,
+  aperturaEstoma,
+  burbujasPorMinuto,
+  type ColorLuz,
+  type EscalaId,
 } from "./fotosintesis-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 
 const FotosintesisScene = dynamic(() => import("./FotosintesisScene"), {
   ssr: false,
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-leaf fa-spin" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
     </div>
   ),
 });
@@ -52,8 +66,17 @@ const FotosintesisScene = dynamic(() => import("./FotosintesisScene"), {
 const VERDE = "#34D399";
 const SOL = "#ffd24a";
 const AZUL = "#7fb2ff";
+const O2_COL = "#8fd8ff";
 
 const RETO_KEY = "cen-fotosintesis-reto";
+
+/** Lo que se ve moverse en cada escala (leyenda corta sobre la escena). */
+const LEYENDA: Record<EscalaId, { col: string; txt: string }[]> = {
+  planta: [{ col: SOL, txt: "fotones" }, { col: O2_COL, txt: "burbujas de O₂" }, { col: "#ff6b5e", txt: "CO₂" }],
+  hoja: [{ col: "#ff6b5e", txt: "CO₂ / O₂" }, { col: "#67e8f9", txt: "H₂O (xilema)" }, { col: "#ffb454", txt: "glucosa (floema)" }],
+  cloroplasto: [{ col: VERDE, txt: "tilacoides" }, { col: "#ff6b5e", txt: "CO₂ / O₂" }, { col: "#ffb454", txt: "glucosa" }],
+  tilacoide: [{ col: "#fff3a0", txt: "electrones" }, { col: "#ff8a3d", txt: "H⁺" }, { col: "#ffa53d", txt: "ATP" }, { col: "#c39bff", txt: "NADPH" }],
+};
 
 export function LabFotosintesis({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -61,8 +84,11 @@ export function LabFotosintesis({ color }: PracticaLabProps) {
   const [luz, setLuz] = useState(LUZ_DEFAULT);
   const [co2, setCo2] = useState(CO2_DEFAULT);
   const [temp, setTemp] = useState(TEMP_DEFAULT);
+  const [colorLuz, setColorLuz] = useState<ColorLuz>("blanca");
+  const [modo, setModo] = useState<EscalaId>("planta");
   const [pausado, setPausado] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
+  const [recorrido, setRecorrido] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
 
   // objetivos
@@ -70,10 +96,11 @@ export function LabFotosintesis({ color }: PracticaLabProps) {
   const [movioLuz, setMovioLuz] = useState(false);
   const [movioCO2, setMovioCO2] = useState(false);
   const [movioTemp, setMovioTemp] = useState(false);
+  const [visitadas, setVisitadas] = useState<EscalaId[]>(["planta"]);
+  const [probados, setProbados] = useState<ColorLuz[]>([]);
 
-  // teoría (cajón deslizable), reto evaluable y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -96,35 +123,59 @@ export function LabFotosintesis({ color }: PracticaLabProps) {
     };
   }, []);
 
+  const irA = useCallback((id: EscalaId) => {
+    setModo(id);
+    setVisitadas((v) => (v.includes(id) ? v : [...v, id]));
+  }, []);
+
+  // Recorrido automático: de la planta al tilacoide y de regreso.
+  const modoRef = useRef(modo);
+  useEffect(() => { modoRef.current = modo; }, [modo]);
+  useEffect(() => {
+    if (!recorrido) return undefined;
+    const t = window.setInterval(() => {
+      const i = ESCALAS.findIndex((e) => e.id === modoRef.current);
+      irA(ESCALAS[(i + 1) % ESCALAS.length]!.id);
+    }, 7000);
+    return () => window.clearInterval(t);
+  }, [recorrido, irA]);
+
   const bump = () => setResetNonce((n) => n + 1);
   const cambiarLuz = (v: number) => { setLuz(v); setMovioLuz(true); if (sonido) audioRef.current?.blip(); };
   const cambiarCO2 = (v: number) => { setCo2(v); setMovioCO2(true); if (sonido) audioRef.current?.blip(); };
   const cambiarTemp = (v: number) => { setTemp(v); setMovioTemp(true); if (sonido) audioRef.current?.blip(); };
-  const reset = () => { setLuz(LUZ_DEFAULT); setCo2(CO2_DEFAULT); setTemp(TEMP_DEFAULT); bump(); };
+  const cambiarColor = (c: ColorLuz) => {
+    setColorLuz(c);
+    setProbados((p) => (p.includes(c) ? p : [...p, c]));
+    if (sonido) audioRef.current?.blip();
+  };
+  const cambiarModo = (id: EscalaId) => { setRecorrido(false); irA(id); if (sonido) audioRef.current?.blip(); };
+  const reset = () => { setLuz(LUZ_DEFAULT); setCo2(CO2_DEFAULT); setTemp(TEMP_DEFAULT); setColorLuz("blanca"); bump(); };
 
-  const tPct = useMemo(() => tasaPct(luz, co2, temp), [luz, co2, temp]);
-  const fl = useMemo(() => factorLuz(luz) * 100, [luz]);
+  const tPct = useMemo(() => tasaConColor(luz, co2, temp, colorLuz) * 100, [luz, co2, temp, colorLuz]);
+  const luzEf = useMemo(() => luzEfectiva(luz, colorLuz), [luz, colorLuz]);
+  const fl = useMemo(() => factorLuz(luzEf) * 100, [luzEf]);
   const fc = useMemo(() => factorCO2(co2) * 100, [co2]);
   const ft = useMemo(() => factorTemp(temp) * 100, [temp]);
-  const limit = useMemo(() => factorLimitante(luz, co2, temp), [luz, co2, temp]);
+  const limit = useMemo(() => factorLimitanteConColor(luz, co2, temp, colorLuz), [luz, co2, temp, colorLuz]);
+  const absorbe = absorcionLuz(colorLuz) * 100;
+  const apertura = aperturaEstoma(luz, temp) * 100;
+  const escala = ESCALAS.find((e) => e.id === modo)!;
+  const nivel = ESCALAS.findIndex((e) => e.id === modo);
+  const opcionColor = COLORES_LUZ.find((c) => c.id === colorLuz)!;
+
+  const visitoTodas = ESCALAS.every((e) => visitadas.includes(e.id));
+  const comparoColores = probados.includes("verde") && (probados.includes("roja") || probados.includes("azul"));
 
   const objetivos = [
+    { txt: "Haz zoom: viaja de la planta a la membrana del tilacoide", done: visitoTodas },
+    { txt: "Ilumina con luz verde y luego con roja o azul: compara el O₂", done: comparoColores },
     { txt: "Observa el cloroplasto y la ecuación", done: vioProceso },
     { txt: "Sube y baja la luz (mira la saturación)", done: movioLuz },
     { txt: "Cambia la concentración de CO₂", done: movioCO2 },
     { txt: "Busca la temperatura óptima", done: movioTemp },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -132,295 +183,246 @@ export function LabFotosintesis({ color }: PracticaLabProps) {
         <i className="fa-solid fa-leaf" />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>La planta convierte luz en glucosa</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 400, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 400, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la vista 3D, pero la idea sigue: 6 CO₂ + 6 H₂O + luz → C₆H₁₂O₆ + 6 O₂. La velocidad del proceso depende de la luz, el CO₂ y la temperatura.
       </div>
     </div>
   );
 
+  // Una frase corta sobre la escena (≤ 10 palabras).
+  const lectura = colorLuz === "verde"
+    ? <>Luz verde: casi todos los fotones rebotan · tasa {fmtPct(tPct)}</>
+    : <>Tasa {fmtPct(tPct)} · ahora limita {ETIQUETA_FACTOR[limit]}</>;
+
+  const retro =
+    colorLuz === "verde"
+      ? <>Con luz <strong style={{ color: "#3ddc6a" }}>verde</strong> la clorofila absorbe solo ≈ {Math.round(ABSORCION_COLOR.verde * 100)} % de los fotones: los demás rebotan (por eso la hoja se ve verde). Sin energía absorbida casi no se rompe el agua, así que casi no sale O₂.</>
+      : colorLuz === "blanca"
+        ? <>La luz <strong>blanca</strong> trae fotones rojos, verdes y azules: la clorofila se queda con los rojos y azules y rebota los verdes. Prueba un solo color y compara.</>
+        : <>Con luz <strong style={{ color: opcionColor.hex }}>{opcionColor.nombre.toLowerCase()}</strong> la clorofila absorbe ≈ {Math.round(absorbe)} % de los fotones: casi toda la luz se aprovecha y la planta trabaja mejor que con la misma intensidad de luz verde.</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulse { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulse 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-chip { cursor:pointer; padding:8px 14px; border-radius:999px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .15s; }
-        .ex-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#08221a 0%,#03100a 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <FotosintesisScene
-                luz={luz}
-                co2={co2}
-                temp={temp}
-                accent={accent}
-                pausado={pausado}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO — tasa */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${VERDE}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${VERDE}aa`, width: 9, height: 9, borderRadius: "50%", background: VERDE }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 15, fontWeight: 900, color: VERDE, fontFamily: "ui-monospace, monospace" }}>
-                <i className="fa-solid fa-gauge-high" style={{ marginRight: 8 }} />
-                tasa {fmtPct(tPct)}
-              </span>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <FotosintesisScene
+            luz={luz}
+            co2={co2}
+            temp={temp}
+            color={colorLuz}
+            nivel={nivel}
+            accent={accent}
+            pausado={pausado}
+            autoRotate={autoRotate}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: ESCALAS.map((e) => ({ id: e.id, etiqueta: e.etiqueta, icono: e.icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as EscalaId),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={pausado ? "fa-play" : "fa-pause"} titulo={pausado ? "Reanudar" : "Pausar"} activo={!pausado} onClick={() => setPausado((p) => !p)} />
+          <BotonHerramienta icono="fa-route" titulo={recorrido ? "Detener el recorrido de escalas" : "Recorrido automático por las escalas"} activo={recorrido} onClick={() => setRecorrido((r) => !r)} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar la cámara" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={
+        <>
+          <div style={{ display: "grid", gap: 4, minWidth: 150 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+              <span>Tasa</span>
+              <span style={{ color: VERDE, fontFamily: "ui-monospace, monospace" }}>{fmtPct(tPct)}</span>
             </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
-                <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar la cámara">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: ecuación + factor limitante */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(2,10,24,0.9) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 14, color: "#eaf6ee", fontFamily: "ui-monospace, monospace", fontWeight: 800, letterSpacing: "0.01em" }}>
-                <span style={{ color: AZUL }}>6 CO₂</span> + <span style={{ color: "#67e8f9" }}>6 H₂O</span> + <span style={{ color: SOL }}>luz</span> → <span style={{ color: "#ffb454" }}>C₆H₁₂O₆</span> + <span style={{ color: "#e8f4ff" }}>6 O₂</span>
-              </div>
-              <div style={{ fontSize: 12.5, color: "#cfe0d6", lineHeight: 1.5, marginTop: 6 }}>
-                Ahora mismo, lo que más limita la tasa es <strong style={{ color: SOL }}>{ETIQUETA_FACTOR[limit]}</strong>: súbelo y verás acelerar el proceso.
-              </div>
+            <div style={{ height: 7, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+              <div style={{ width: `${Math.min(100, tPct)}%`, height: "100%", background: `linear-gradient(90deg, ${VERDE}, #b6f36a)`, transition: "width 200ms linear" }} />
             </div>
           </div>
-
-          {/* Controles */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: accent }} />
-              Ajusta los factores
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <Deslizador label="Intensidad luminosa" icon="fa-sun" colr={SOL}
-                valor={`${luz}%`} min={LUZ_MIN} max={LUZ_MAX} step={LUZ_STEP} value={luz} onChange={cambiarLuz}
-                hintL="oscuridad" hintR="pleno sol" />
-              <Deslizador label="Concentración de CO₂" icon="fa-wind" colr={AZUL}
-                valor={`${co2}%`} min={CO2_MIN} max={CO2_MAX} step={CO2_STEP} value={co2} onChange={cambiarCO2}
-                hintL="poco CO₂" hintR="mucho CO₂" />
-              <Deslizador label="Temperatura" icon="fa-temperature-half" colr={VERDE}
-                valor={`${temp} °C`} min={TEMP_MIN} max={TEMP_MAX} step={TEMP_STEP} value={temp} onChange={cambiarTemp}
-                hintL="frío" hintR={`óptimo ~${TEMP_OPT} °C`} />
+          {LEYENDA[modo].map((l) => (
+            <div key={l.txt} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 700, color: "#dce6f5" }}>
+              <span style={{ width: 10, height: 10, borderRadius: "50%", background: l.col, boxShadow: `0 0 8px ${l.col}`, flexShrink: 0 }} />
+              {l.txt}
             </div>
-          </div>
+          ))}
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={`Escala: ${escala.etiqueta}`} icono={escala.icono}>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: T.text }}>Tamaño {escala.tamano}.</strong> {escala.queVes}
+                </p>
+              </Bloque>
 
-          {/* Resultado en vivo — factores y tasa */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-chart-simple" style={{ marginRight: 8, color: accent }} />
-              ¿Qué tan rápido va la fotosíntesis?
-            </Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 14 }}>
-              <Readout label="Factor luz" value={fmtPct(fl)} col={SOL} size={15} />
-              <Readout label="Factor CO₂" value={fmtPct(fc)} col={AZUL} size={15} />
-              <Readout label="Factor temp." value={fmtPct(ft)} col={VERDE} size={15} />
-              <Readout label="Tasa total" value={fmtPct(tPct)} col={accent} size={16} />
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-              La tasa total es el producto de los tres factores: si <strong>uno</strong> está bajo, frena a todos los demás (ley del <strong>factor limitante</strong>). Por eso, en un invernadero con mucha luz pero poco CO₂, agregar CO₂ —no más luz— es lo que acelera el crecimiento. La luz y el CO₂ <strong style={{ color: SOL }}>saturan</strong> (pasado cierto punto, más ya casi no ayuda) y la temperatura tiene un <strong style={{ color: VERDE }}>óptimo</strong>: si te pasas, las enzimas del ciclo de Calvin se vuelven menos eficientes.
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>El proceso en dos fases</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {FASES.map((f) => (
-              <div key={f.key} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                <div style={{ flexShrink: 0, width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: f.color, background: `${f.color}1f` }}>
-                  <i className={`fa-solid ${f.key === "luz" ? "fa-bolt" : "fa-arrows-spin"}`} />
+              <Bloque titulo="La luz" icono="fa-sun">
+                <Deslizador label="Intensidad luminosa" icon="fa-sun" colr={SOL}
+                  valor={`${luz}%`} min={LUZ_MIN} max={LUZ_MAX} step={LUZ_STEP} value={luz} onChange={cambiarLuz}
+                  hintL="oscuridad" hintR="pleno sol" />
+                <div style={{ fontSize: 14, fontWeight: 800, color: T.text2, marginTop: 6 }}>Color de la luz</div>
+                <div role="radiogroup" aria-label="Color de la luz" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 74px), 1fr))", gap: 6 }}>
+                  {COLORES_LUZ.map((c) => {
+                    const on = c.id === colorLuz;
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={on}
+                        onClick={() => cambiarColor(c.id)}
+                        style={{
+                          cursor: "pointer", display: "grid", justifyItems: "center", gap: 4, padding: "9px 4px", borderRadius: 12,
+                          border: `1px solid ${on ? c.hex : T.line}`, background: on ? `${c.hex}22` : "rgba(2,12,28,0.45)",
+                          color: on ? "#fff" : T.text2, fontSize: 14, fontWeight: 800, boxShadow: on ? `0 0 16px -6px ${c.hex}` : "none",
+                        }}
+                      >
+                        <span style={{ width: 16, height: 16, borderRadius: "50%", background: c.id === "blanca" ? "conic-gradient(#ff4a3d, #ffd24a, #3ddc6a, #4d7dff, #b07bff, #ff4a3d)" : c.hex, boxShadow: `0 0 10px ${c.hex}` }} />
+                        {c.nombre}
+                      </button>
+                    );
+                  })}
                 </div>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  <strong style={{ color: f.color }}>{f.nombre}</strong> <span style={{ color: T.text3 }}>({f.lugar})</span> — {f.resumen}
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${opcionColor.hex}55`, background: `${opcionColor.hex}12`, color: T.text2 }}>
+                  {retro}
+                </p>
+              </Bloque>
+
+              <Bloque titulo="El aire y el calor" icono="fa-wind">
+                <Deslizador label="Concentración de CO₂" icon="fa-wind" colr={AZUL}
+                  valor={`${co2}%`} min={CO2_MIN} max={CO2_MAX} step={CO2_STEP} value={co2} onChange={cambiarCO2}
+                  hintL="poco CO₂" hintR="mucho CO₂" />
+                <Deslizador label="Temperatura" icon="fa-temperature-half" colr={VERDE}
+                  valor={`${temp} °C`} min={TEMP_MIN} max={TEMP_MAX} step={TEMP_STEP} value={temp} onChange={cambiarTemp}
+                  hintL="frío" hintR={`óptimo ~${TEMP_OPT} °C`} />
+              </Bloque>
+
+              <Bloque titulo="¿Qué tan rápido va la fotosíntesis?" icono="fa-chart-simple">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="Factor luz" value={fmtPct(fl)} col={SOL} />
+                  <Dato label="Factor CO₂" value={fmtPct(fc)} col={AZUL} />
+                  <Dato label="Factor temp." value={fmtPct(ft)} col={VERDE} />
+                  <Dato label="Tasa total" value={fmtPct(tPct)} col={accent} />
+                  <Dato label="Luz absorbida" value={`${Math.round(absorbe)} %`} col={opcionColor.hex} />
+                  <Dato label="O₂ (burbujas/min)" value={`${burbujasPorMinuto(tPct / 100)}`} col={O2_COL} />
+                  <Dato label="Estomas abiertos" value={`${Math.round(apertura)} %`} col="#ff6b5e" />
+                  <Dato label="Giro ATP sintasa" value={fmtPct(tPct)} col="#e85d5d" />
                 </div>
-              </div>
-            ))}
-          </div>
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${SOL}55`, background: `${SOL}10` }}>
+                  Ahora mismo, lo que más limita la tasa es <strong style={{ color: SOL }}>{ETIQUETA_FACTOR[limit]}</strong>: súbelo y verás acelerar el proceso.
+                </p>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  La tasa total es el producto de los tres factores: si <strong>uno</strong> está bajo, frena a todos los demás (ley del <strong>factor limitante</strong>). Por eso, en un invernadero con mucha luz pero poco CO₂, agregar CO₂ —no más luz— es lo que acelera el crecimiento. La luz y el CO₂ <strong style={{ color: SOL }}>saturan</strong> (pasado cierto punto, más ya casi no ayuda) y la temperatura tiene un <strong style={{ color: VERDE }}>óptimo</strong>: si te pasas, las enzimas del ciclo de Calvin se vuelven menos eficientes.
+                </p>
+                <p style={{ margin: 0, color: T.text3, fontSize: 14 }}>
+                  Burbujas por minuto y giro de la ATP sintasa: simulación proporcional a la tasa, no mediciones de una especie.
+                </p>
+              </Bloque>
 
-          <div className="ex-divider" />
-
-          <Eyebrow>¿Por qué las plantas son verdes?</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            La <strong style={{ color: VERDE }}>clorofila</strong> absorbe la luz <strong style={{ color: "#ff6b6b" }}>roja</strong> y la <strong style={{ color: AZUL }}>azul-violeta</strong> para impulsar la fotosíntesis, pero <strong>refleja la verde</strong>: por eso la vemos verde. El <strong>O₂</strong> que respiramos no sale del CO₂, sino de romper el agua (<strong>fotólisis</strong>).
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Tres estrategias de planta</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-            {TIPOS_PLANTA.map((tp) => (
-              <div key={tp.tipo} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                <strong style={{ color: T.text }}>Plantas {tp.tipo}</strong> <span style={{ color: T.text3 }}>({tp.ejemplo})</span>: {tp.ventaja}.
-              </div>
-            ))}
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>En México: la milpa</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            La <strong style={{ color: VERDE }}>milpa</strong> (maíz, frijol y calabaza juntos) aprovecha al máximo la luz por metro cuadrado: el maíz capta la luz directa, el frijol trepa a niveles medios y la calabaza cubre el suelo con la luz difusa. Biodiversidad agrícola al servicio de una fotosíntesis eficiente (UNAM, 2022).
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            Baja la luz casi a cero: el cloroplasto casi deja de emitir O₂ y glucosa. Súbela poco a poco y verás que llega un punto donde más luz ya no acelera nada: ahí el <strong style={{ color: AZUL }}>CO₂</strong> o la <strong style={{ color: VERDE }}>temperatura</strong> pasaron a ser el factor limitante.
-          </span>
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+              <Bloque titulo="Pista" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Baja la luz casi a cero: el cloroplasto casi deja de emitir O₂ y glucosa. Súbela poco a poco y verás que llega un punto donde más luz ya no acelera nada: ahí el <strong style={{ color: AZUL }}>CO₂</strong> o la <strong style={{ color: VERDE }}>temperatura</strong> pasaron a ser el factor limitante.
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-        playPick={sonido ? () => audioRef.current?.blip() : undefined}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={FOTOSINTESIS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
-  );
-}
-
-/* ── Deslizador reutilizable ─────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-      </div>
-      <input type="range" className="ex-range" min={min} max={max} step={step} value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--exc" as string]: colr, ["--exfill" as string]: `${((value - min) / (max - min)) * 100}%` }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
-    </div>
+              playPick={sonido ? () => audioRef.current?.blip() : undefined}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="La ecuación" icono="fa-flask">
+                <div style={{ padding: "10px 12px", borderRadius: 12, background: "rgba(4,10,22,0.45)", border: `1px solid ${VERDE}33`, fontSize: 15, color: "#eaf6ee", fontFamily: "ui-monospace, monospace", fontWeight: 800 }}>
+                  <span style={{ color: AZUL }}>6 CO₂</span> + <span style={{ color: "#67e8f9" }}>6 H₂O</span> + <span style={{ color: SOL }}>luz</span> → <span style={{ color: "#ffb454" }}>C₆H₁₂O₆</span> + <span style={{ color: "#e8f4ff" }}>6 O₂</span>
+                </div>
+              </Bloque>
+              <Bloque titulo="El proceso en dos fases" icono="fa-bolt">
+                {FASES.map((f) => (
+                  <div key={f.key} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                    <div style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: f.color, background: `${f.color}1f` }}>
+                      <i className={`fa-solid ${f.key === "luz" ? "fa-bolt" : "fa-arrows-spin"}`} />
+                    </div>
+                    <div style={{ color: T.text2, lineHeight: 1.45 }}>
+                      <strong style={{ color: f.color }}>{f.nombre}</strong> <span style={{ color: T.text3 }}>({f.lugar})</span> — {f.resumen}
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="¿Por qué las plantas son verdes?" icono="fa-leaf">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  La <strong style={{ color: VERDE }}>clorofila</strong> absorbe la luz <strong style={{ color: "#ff6b6b" }}>roja</strong> y la <strong style={{ color: AZUL }}>azul-violeta</strong> para impulsar la fotosíntesis, pero <strong>refleja la verde</strong>: por eso la vemos verde. El <strong>O₂</strong> que respiramos no sale del CO₂, sino de romper el agua (<strong>fotólisis</strong>).
+                </p>
+                <p style={{ margin: 0, color: T.text3, fontSize: 14 }}>
+                  En este laboratorio la clorofila absorbe ≈ {Math.round(ABSORCION_COLOR.roja * 100)} % de los fotones rojos, ≈ {Math.round(ABSORCION_COLOR.azul * 100)} % de los azules y ≈ {Math.round(ABSORCION_COLOR.verde * 100)} % de los verdes (modelo cualitativo, como la clorofila extraída). En una hoja real, los carotenoides y la dispersión de la luz dentro de la hoja aprovechan algo más del verde.
+                </p>
+              </Bloque>
+              <Bloque titulo="Tres estrategias de planta" icono="fa-seedling">
+                {TIPOS_PLANTA.map((tp) => (
+                  <div key={tp.tipo} style={{ color: T.text2, lineHeight: 1.45 }}>
+                    <strong style={{ color: T.text }}>Plantas {tp.tipo}</strong> <span style={{ color: T.text3 }}>({tp.ejemplo})</span>: {tp.ventaja}.
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="En México: la milpa" icono="fa-wheat-awn">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  La <strong style={{ color: VERDE }}>milpa</strong> (maíz, frijol y calabaza juntos) aprovecha al máximo la luz por metro cuadrado: el maíz capta la luz directa, el frijol trepa a niveles medios y la calabaza cubre el suelo con la luz difusa. Biodiversidad agrícola al servicio de una fotosíntesis eficiente (UNAM, 2022).
+                </p>
+              </Bloque>
+              <Bloque titulo="Las cuatro escalas del viaje" icono="fa-magnifying-glass-plus">
+                {ESCALAS.map((e) => (
+                  <div key={e.id} style={{ color: T.text2, lineHeight: 1.45 }}>
+                    <strong style={{ color: T.text }}>{e.etiqueta}</strong> <span style={{ color: T.text3 }}>({e.tamano})</span>: {e.queVes}
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={FOTOSINTESIS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                El modelo de tasa es cualitativo (relativo, en %): muestra la saturación y el factor limitante, no mediciones de una especie concreta. Los tamaños de las escalas son aproximados; moléculas y fotones se dibujan mucho más grandes de lo que son para que se vean.
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

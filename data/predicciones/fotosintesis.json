@@ -1,0 +1,12 @@
+{
+  "escena": "Una planta en maceta bajo una luz cuyo color puedes cambiar: blanca, roja, azul o verde, siempre con la misma intensidad.",
+  "pregunta": "Con la misma intensidad, ¿con qué color de luz la planta libera menos O₂?",
+  "opciones": [
+    { "id": "a", "texto": "Con luz roja", "icono": "fa-circle" },
+    { "id": "b", "texto": "Con luz verde", "icono": "fa-leaf" },
+    { "id": "c", "texto": "Con luz azul", "icono": "fa-droplet" }
+  ],
+  "correcta": "b",
+  "porque": "La clorofila absorbe sobre todo el rojo y el azul-violeta y refleja el verde. Si casi no absorbe la luz, no hay energía para romper el agua y casi no sale O₂: por eso la hoja se ve verde.",
+  "comoComprobarlo": "En «Planta», deja la intensidad fija y cambia el color de la luz entre roja, azul y verde; cuenta las burbujas de O₂ y mira la tasa."
+}
