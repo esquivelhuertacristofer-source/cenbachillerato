@@ -3,36 +3,33 @@
 /**
  * Escena 3D — "Electromagnetismo: Ohm, Faraday y motores" (CNEYT-V-P07-A2).
  *
- * Tres MODOS, según la prop `modo`:
- *  · "circuito"  — un circuito cerrado: fuente (red de CFE) → resistencia. Los
- *    electrones recorren el lazo a una rapidez proporcional a la corriente I = V/R
- *    y la lámpara brilla según la potencia P = V²/R. (Parte (a) del problema A2.)
- *  · "generador" — una bobina de N vueltas gira dentro de un campo magnético B y,
- *    por inducción de Faraday, produce una FEM alterna FEM = N·B·A·ω·sen(ωt). Un
- *    trazo senoidal y una lámpara que late muestran la salida.
- *  · "motor"     — un rotor gira al convertir energía eléctrica en mecánica; una
- *    barra de eficiencia separa la potencia útil (verde) del calor perdido (rojo).
- *    (Parte (b) del problema A2.)
+ * Tres MODOS, según la prop `modo` (cada uno en su archivo):
+ *  · "circuito"  — un circuito real sobre un banco de trabajo: fuente de
+ *    laboratorio, resistencia con su código de colores, foco y multímetro.
+ *    Los electrones corren a una rapidez ∝ I = V/R; el foco brilla según
+ *    P = V²/R. (Parte (a) del problema A2.)        → electromagnetismo-circuito3d
+ *  · "generador" — turbina Francis → bobina de N vueltas entre los polos de un
+ *    imán → anillos y escobillas → foco y osciloscopio con
+ *    FEM = N·B·A·ω·sen(ωt).                         → electromagnetismo-generador3d
+ *  · "motor"     — motor en corte; la energía de entrada se parte en útil
+ *    (verde) y calor (rojo). (Parte (b) del problema A2.)
+ *                                                   → electromagnetismo-motor3d
  *
- * Patrón R3F: el default export solo monta <Canvas key={modo}> y delega en
- * <Contenido>. React Compiler: TODA la animación vive en useFrame y solo MUTA
- * refs (posición de electrones, rotación de la bobina/rotor, intensidad emisiva
- * de la lámpara, posición del marcador senoidal); nunca llama a setState. Los
- * números de los paneles son los que devuelven los resolvers de los datos.
+ * Un solo <Canvas>: al cambiar de modo o de vista la cámara VIAJA (no salta).
+ * React Compiler: la animación vive en useFrame y solo muta refs.
  */
 
 import * as THREE from "three";
-import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Line } from "@react-three/drei";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, PerformanceMonitor } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
-import {
-  type Modo,
-  resolverCircuito, resolverGenerador, resolverMotor,
-  fmtV, fmtA, fmtR, fmtW, fmtKw, fmtPct,
-} from "./electromagnetismo-data";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { Escenario, calidadEscena } from "./_escenario";
+import type { Modo } from "./electromagnetismo-data";
+import { EscenaCircuito } from "./electromagnetismo-circuito3d";
+import { EscenaGenerador } from "./electromagnetismo-generador3d";
+import { EscenaMotor } from "./electromagnetismo-motor3d";
 
 export interface ElectromagnetismoSceneProps {
   modo: Modo;
@@ -53,368 +50,140 @@ export interface ElectromagnetismoSceneProps {
   playing: boolean;
   accent: string;
   resetNonce: number;
+  /** Índice del punto de vista (ver VISTAS_NOMBRES). 0 = vista general. */
+  vista?: number;
 }
 
 type Pt = [number, number, number];
+type Calidad = "alta" | "media" | "baja";
 
-const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+/** Puntos de vista por modo, en el mismo orden que VISTAS_NOMBRES. */
+const VISTAS: Record<Modo, { pos: Pt; target: Pt }[]> = {
+  circuito: [
+    { pos: [0.3, 6.1, 10.4], target: [0.2, 0.45, 0.1] },
+    { pos: [1.9, 3.7, 6.3], target: [1.9, 0.7, 1.3] },
+    { pos: [2.1, 2.3, 3.7], target: [2.75, 1.45, -0.1] },
+    { pos: [-2.3, 2.4, 3.6], target: [-3.1, 0.85, -0.7] },
+  ],
+  generador: [
+    { pos: [6.2, 7.0, 14.4], target: [0.1, 1.3, 0] },
+    { pos: [1.6, 3.6, 5.4], target: [0.2, 1.75, 0] },
+    { pos: [1.7, 2.3, 5.0], target: [4.2, 1.0, 1.0] },
+    { pos: [-1.6, 3.8, 5.4], target: [-3.6, 1.9, -0.4] },
+  ],
+  motor: [
+    { pos: [4.7, 6.6, 12.8], target: [0.2, 1.0, 1.0] },
+    { pos: [2.4, 3.0, 5.2], target: [0.3, 1.7, 0] },
+    { pos: [0.6, 8.6, 6.2], target: [0.3, 0, 2.2] },
+  ],
+};
 
-/** Punto a la fracción f∈[0,1] de una polilínea cerrada. */
-function pointAtFraction(path: Pt[], f: number): Pt {
-  let total = 0;
-  const segs: number[] = [];
-  for (let i = 1; i < path.length; i++) {
-    const a = path[i - 1]!, b = path[i]!;
-    const L = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    segs.push(L); total += L;
-  }
-  if (total < 1e-6) return path[0] ?? [0, 0, 0];
-  let d = ((f % 1) + 1) % 1 * total;
-  for (let i = 1; i < path.length; i++) {
-    const a = path[i - 1]!, b = path[i]!;
-    const L = segs[i - 1]!;
-    if (d <= L) {
-      const t = L < 1e-6 ? 0 : d / L;
-      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 0.06];
+/** Semiancho del contenido de cada modo (para que quepa en pantallas angostas). */
+const SEMIANCHO: Record<Modo, number> = { circuito: 4.7, generador: 6.0, motor: 5.4 };
+const FOV = 38;
+
+/* ── Cámara que viaja y se aparta cuando el alumno toma el control ────────── */
+function RigCamara({ pos, target, clave }: { pos: THREE.Vector3; target: THREE.Vector3; clave: string }) {
+  const controls = useThree((s) => s.controls) as OrbitControlsImpl | null;
+  const activo = useRef(true);
+  const ultima = useRef<string | null>(null);
+  useEffect(() => {
+    if (!controls) return undefined;
+    const parar = () => { activo.current = false; };
+    controls.addEventListener("start", parar);
+    return () => controls.removeEventListener("start", parar);
+  }, [controls]);
+  useFrame((state, dt) => {
+    if (!controls) return;
+    if (ultima.current !== clave) {
+      // Toma de entrada: la primera vez la cámara llega desde lejos y arriba.
+      if (ultima.current === null) {
+        state.camera.position.copy(pos).sub(target).multiplyScalar(1.7).add(target);
+        state.camera.position.y += 3;
+        controls.target.copy(target);
+      }
+      ultima.current = clave;
+      activo.current = true;
     }
-    d -= L;
-  }
-  return path[path.length - 1] ?? [0, 0, 0];
-}
-
-function Etiqueta({ pos, texto, color, mono = false }: { pos: Pt; texto: string; color: string; mono?: boolean }) {
-  return (
-    <Html position={pos} center pointerEvents="none">
-      <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(5,13,26,0.85)", border: `1px solid ${color}88`, color, fontWeight: 900, fontSize: 14, fontFamily: mono ? "ui-monospace, monospace" : "system-ui, sans-serif" }}>
-        {texto}
-      </div>
-    </Html>
-  );
-}
-
-/* ── (a) Circuito — ley de Ohm ────────────────────────────────────────────── */
-const WX = 4.6;  // semiancho del lazo
-const WY = 2.7;  // semialto del lazo
-
-function Electrones({ path, count, color, speed, playing }: { path: Pt[]; count: number; color: string; speed: number; playing: boolean }) {
-  const refs = useRef<(THREE.Mesh | null)[]>([]);
-  const phase = useRef(0);
-
-  useFrame((_, dt) => {
-    if (playing) phase.current = (phase.current + dt * speed * 0.06) % 1;
-    for (let i = 0; i < count; i++) {
-      const m = refs.current[i];
-      if (!m) continue;
-      const p = pointAtFraction(path, phase.current + i / count);
-      m.position.set(p[0], p[1], p[2]);
-    }
+    if (!activo.current) return;
+    const k = 1 - Math.exp(-Math.min(dt, 0.05) * 2.2);
+    state.camera.position.lerp(pos, k);
+    controls.target.lerp(target, k);
+    controls.update();
+    if (state.camera.position.distanceToSquared(pos) < 1e-4 && controls.target.distanceToSquared(target) < 1e-4) activo.current = false;
   });
+  return null;
+}
 
+function Contenido(props: ElectromagnetismoSceneProps & { calidad: Calidad }) {
+  const { modo, accent, resetNonce, playing, calidad } = props;
+  const size = useThree((s) => s.size);
+  const angosto = size.width < 640;
+  const pocos = calidad === "baja" || angosto;
+  const lista = VISTAS[modo];
+  const iv = Math.max(0, Math.min(lista.length - 1, props.vista ?? 0));
+  const v = lista[iv]!;
+
+  // Que el contenido quepa a lo ANCHO en pantallas verticales: se aleja la cámara.
+  const aspecto = size.width / Math.max(1, size.height);
+  const tanH = Math.tan(THREE.MathUtils.degToRad(FOV / 2)) * aspecto;
+  const destino = useMemo(() => {
+    const target = new THREE.Vector3(...v.target);
+    const pos = new THREE.Vector3(...v.pos);
+    const dist = pos.distanceTo(target);
+    const necesaria = (SEMIANCHO[modo] * (angosto ? 1.0 : 1.08)) / tanH;
+    const factor = iv === 0 ? Math.min(2.6, Math.max(angosto ? 1 : 1.1, necesaria / dist)) : Math.min(1.7, Math.max(1, (necesaria * 0.55) / dist));
+    pos.sub(target).multiplyScalar(factor).add(target);
+    return { pos, target };
+  }, [v, modo, iv, tanH, angosto]);
+
+  const post = calidad !== "baja" && !angosto;
   return (
     <>
-      {Array.from({ length: count }, (_, i) => (
-        <mesh key={i} ref={(el) => { refs.current[i] = el; }}>
-          <sphereGeometry args={[0.13, 14, 14]} />
-          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.2} toneMapped={false} />
-        </mesh>
-      ))}
-    </>
-  );
-}
+      <Escenario acento={accent} suelo={0} calidad={calidad} />
+      {/* luz de trabajo cálida sobre el banco */}
+      <spotLight position={[2, 9, 6]} angle={0.55} penumbra={0.8} intensity={60} distance={30} decay={1.6} color="#fff1dc" />
 
-/** Lámpara cuyo brillo lata o sea fijo según un ref externo. */
-function Lampara({ pos, baseColor, refIntensity }: { pos: Pt; baseColor: string; refIntensity: React.MutableRefObject<number> }) {
-  const matRef = useRef<THREE.MeshStandardMaterial>(null);
-  const lightRef = useRef<THREE.PointLight>(null);
-  useFrame(() => {
-    const v = refIntensity.current;
-    if (matRef.current) matRef.current.emissiveIntensity = v;
-    if (lightRef.current) lightRef.current.intensity = clamp(v * 0.6, 0, 3);
-  });
-  return (
-    <group position={pos}>
-      <mesh>
-        <sphereGeometry args={[0.42, 24, 24]} />
-        <meshStandardMaterial ref={matRef} color={baseColor} emissive={baseColor} emissiveIntensity={1} toneMapped={false} />
-      </mesh>
-      <pointLight ref={lightRef} color={baseColor} intensity={0.6} distance={9} />
-    </group>
-  );
-}
-
-function EscenaCircuito({ V, R, playing, accent }: { V: number; R: number; playing: boolean; accent: string }) {
-  const c = resolverCircuito(V, R, 1, 1);
-  // rapidez visual de los electrones ∝ corriente (escala logarítmica)
-  const speed = clamp(Math.log10(c.I * 10 + 1), 0.3, 3.6);
-  // brillo de la lámpara ∝ potencia (escala logarítmica); se fija en useFrame
-  // para no escribir el ref durante el render (React Compiler / regla de refs).
-  const brillo = useRef(1);
-  useFrame(() => { brillo.current = clamp(Math.log10(c.P + 1) * 0.9, 0.3, 2.6); });
-
-  // lazo rectangular (sentido horario desde arriba-izquierda)
-  const path: Pt[] = [
-    [-WX, WY, 0], [WX, WY, 0], [WX, -WY, 0], [-WX, -WY, 0], [-WX, WY, 0],
-  ];
-
-  // resistencia (zigzag) sobre el lado derecho
-  const zig: Pt[] = [];
-  const zN = 7, zTop = 1.1, zBot = -1.1, zStep = (zTop - zBot) / zN;
-  zig.push([WX, zTop, 0]);
-  for (let i = 0; i < zN; i++) {
-    const y = zTop - zStep * (i + 0.5);
-    zig.push([WX + (i % 2 === 0 ? 0.42 : -0.42), y, 0]);
-  }
-  zig.push([WX, zBot, 0]);
-
-  return (
-    <group>
-
-      {/* cable */}
-      <CurvaTubo puntos={path} color="#94a3b8" grosor={0.054} />
-
-      {/* fuente (batería / red CFE) sobre el lado izquierdo */}
-      <group position={[-WX, 0, 0]}>
-        <mesh><boxGeometry args={[0.55, 1.5, 0.3]} /><meshStandardMaterial color="#1e293b" /></mesh>
-        {/* bornes */}
-        <CurvaTubo puntos={[[-0.18, 0.55, 0.2], [0.18, 0.55, 0.2]] as Pt[]} color="#f87171" grosor={0.072} />
-        <CurvaTubo puntos={[[0, 0.45, 0.2], [0, 0.65, 0.2]] as Pt[]} color="#f87171" grosor={0.072} />
-        <CurvaTubo puntos={[[-0.12, -0.55, 0.2], [0.12, -0.55, 0.2]] as Pt[]} color="#60a5fa" grosor={0.072} />
-        <Etiqueta pos={[-1.05, 0, 0]} texto={`${fmtV(V)}`} color="#fbbf24" mono />
+      <group key={`${modo}-${resetNonce}`}>
+        {modo === "circuito" && <EscenaCircuito V={props.V} R={props.R} playing={playing} angosto={angosto} pocos={pocos} />}
+        {modo === "generador" && <EscenaGenerador N={props.N} B={props.B} area={props.area} f={props.f} playing={playing} angosto={angosto} pocos={pocos} />}
+        {modo === "motor" && <EscenaMotor pElec={props.pElec} efic={props.efic} playing={playing} angosto={angosto} pocos={pocos} />}
       </group>
 
-      {/* resistencia */}
-      <CurvaTubo puntos={zig} color="#fbbf24" grosor={0.072} />
-      <Etiqueta pos={[WX + 1.1, 0, 0]} texto={`R = ${fmtR(R)}`} color="#fbbf24" mono />
-
-      {/* lámpara en la esquina superior derecha */}
-      <Lampara pos={[WX - 1.4, WY, 0]} baseColor="#fde047" refIntensity={brillo} />
-      <Etiqueta pos={[WX - 1.4, WY + 0.7, 0]} texto={`P = ${fmtW(c.P)}`} color="#fde047" mono />
-
-      {/* electrones */}
-      <Electrones path={path} count={14} color={accent} speed={speed} playing={playing} />
-
-      {/* la corriente: el rótulo viaja con el lazo y dice cuánto pasa por segundo */}
-      <Etiqueta pos={[0, WY + 0.7, 0]} texto={`I = ${fmtA(c.I)} →`} color={accent} mono />
-    </group>
-  );
-}
-
-/* ── (b) Generador — inducción de Faraday ─────────────────────────────────── */
-function BobinaGiratoria({ N, color, speed, playing }: { N: number; color: string; speed: number; playing: boolean }) {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
-    if (ref.current && playing) ref.current.rotation.y += dt * speed;
-  });
-  // espira rectangular (en el plano xy), se replica en z para sugerir N vueltas
-  const w = 1.7, h = 1.15;
-  const loop: Pt[] = [[-w, h, 0], [w, h, 0], [w, -h, 0], [-w, -h, 0], [-w, h, 0]];
-  const turns = Math.min(5, Math.max(2, Math.round(N / 80)));
-  return (
-    <group ref={ref}>
-      {Array.from({ length: turns }, (_, i) => {
-        const z = (i - (turns - 1) / 2) * 0.14;
-        return <CurvaTubo key={i} puntos={loop.map((p) => [p[0], p[1], z] as Pt)} color={color} grosor={0.054} />;
-      })}
-      {/* eje de giro */}
-      <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.05, 0.05, 4.4, 10]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
-    </group>
-  );
-}
-
-function TrazoSenoidal({ ampVis, speed, color, playing }: { ampVis: number; speed: number; color: string; playing: boolean }) {
-  const dot = useRef<THREE.Mesh>(null);
-  const phase = useRef(0);
-  const W = 5.2;     // ancho del trazo
-  const x0 = -W / 2; // empieza a la izquierda
-  const ciclos = 2;  // ciclos visibles
-  const k = (ciclos * 2 * Math.PI) / W;
-
-  // curva estática
-  const pts: Pt[] = [];
-  const M = 120;
-  for (let i = 0; i <= M; i++) {
-    const x = x0 + (W * i) / M;
-    pts.push([x, ampVis * Math.sin(k * (x - x0)), 0]);
-  }
-
-  useFrame((_, dt) => {
-    if (playing) phase.current = (phase.current + dt * speed * 0.5) % W;
-    const x = x0 + phase.current;
-    if (dot.current) dot.current.position.set(x, ampVis * Math.sin(k * phase.current), 0.05);
-  });
-
-  return (
-    <group position={[0, -3.0, 0]}>
-      {/* eje */}
-      <Line points={[[x0, 0, 0], [x0 + W, 0, 0]] as Pt[]} color="#46587a" lineWidth={1} transparent opacity={0.6} />
-      <Line points={pts} color={color} lineWidth={2.5} transparent opacity={0.9} />
-      <mesh ref={dot}>
-        <sphereGeometry args={[0.12, 14, 14]} />
-        <meshStandardMaterial color="#fde047" emissive="#fde047" emissiveIntensity={1.3} toneMapped={false} />
-      </mesh>
-      <Etiqueta pos={[x0 - 0.4, 0, 0]} texto="FEM" color={color} mono />
-    </group>
-  );
-}
-
-function EscenaGenerador({ N, B, area, f, playing, accent }: { N: number; B: number; area: number; f: number; playing: boolean; accent: string }) {
-  const g = resolverGenerador(N, B, area, f);
-  const speed = clamp(f / 14, 0.4, 9);          // rad/s visuales ∝ f
-  const ampVis = clamp(Math.log10(g.femPico + 1) * 0.7, 0.3, 2.6);
-
-  // lámpara que late con la frecuencia
-  const brillo = useRef(1);
-  const tRef = useRef(0);
-  useFrame((_, dt) => {
-    if (playing) tRef.current += dt * speed;
-    brillo.current = clamp(0.4 + Math.abs(Math.sin(tRef.current)) * ampVis, 0.3, 2.8);
-  });
-
-  return (
-    <group>
-
-      {/* polos del imán */}
-      <group position={[0, 0.4, 0]}>
-        <mesh position={[-2.6, 0, 0]}><boxGeometry args={[0.5, 2.6, 2.2]} /><meshStandardMaterial color="#ef4444" emissive="#7f1d1d" emissiveIntensity={0.3} /></mesh>
-        <mesh position={[2.6, 0, 0]}><boxGeometry args={[0.5, 2.6, 2.2]} /><meshStandardMaterial color="#3b82f6" emissive="#1e3a8a" emissiveIntensity={0.3} /></mesh>
-        <Etiqueta pos={[-2.6, 1.7, 0]} texto="N" color="#fca5a5" />
-        <Etiqueta pos={[2.6, 1.7, 0]} texto="S" color="#93c5fd" />
-
-        {/* líneas de campo N → S */}
-        {[-0.8, 0, 0.8].map((y, i) => (
-          <Line key={i} points={[[-2.3, y, 0], [2.3, y, 0]] as Pt[]} color="#a5b4fc" lineWidth={1.5} transparent opacity={0.4} dashed dashSize={0.2} gapSize={0.16} />
-        ))}
-        <Etiqueta pos={[0, -1.55, 0]} texto={`B = ${B.toFixed(2)} T`} color="#a5b4fc" mono />
-
-        {/* bobina giratoria */}
-        <BobinaGiratoria N={N} color={accent} speed={speed} playing={playing} />
-      </group>
-
-      {/* lámpara de salida */}
-      <Lampara pos={[0, 2.9, 0]} baseColor="#fde047" refIntensity={brillo} />
-      <Etiqueta pos={[1.7, 2.9, 0]} texto={`${N} vueltas`} color={accent} mono />
-
-      {/* trazo senoidal de la FEM */}
-      <TrazoSenoidal ampVis={ampVis} speed={speed} color={accent} playing={playing} />
-    </group>
-  );
-}
-
-/* ── (c) Motor — eficiencia ───────────────────────────────────────────────── */
-function Rotor({ color, speed, playing }: { color: string; speed: number; playing: boolean }) {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
-    if (ref.current && playing) ref.current.rotation.z += dt * speed;
-  });
-  return (
-    <group ref={ref}>
-      {/* rotor */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.9, 0.9, 0.7, 28]} /><meshStandardMaterial color="#334155" metalness={0.6} roughness={0.35} /></mesh>
-      {/* aspas */}
-      {[0, 1, 2, 3].map((i) => (
-        <mesh key={i} rotation={[0, 0, (i * Math.PI) / 2]} position={[0, 0, 0.42]}>
-          <boxGeometry args={[2.0, 0.34, 0.1]} />
-          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.45} />
-        </mesh>
-      ))}
-      {/* eje */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.6]}><cylinderGeometry args={[0.12, 0.12, 1.6, 12]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
-    </group>
-  );
-}
-
-function EscenaMotor({ pElec, efic, playing, accent }: { pElec: number; efic: number; playing: boolean; accent: string }) {
-  const m = resolverMotor(pElec, efic);
-  const speed = clamp(Math.log10(m.pMec * 5 + 1), 0.3, 4.5);
-  const VERDE = "#34d399", ROJO = "#fb7185";
-
-  // barra de eficiencia (ancho total fijo)
-  const BARW = 6, BARH = 0.7;
-  const wUtil = BARW * (efic / 100);
-  const wCalor = BARW - wUtil;
-  const x0 = -BARW / 2;
-
-  return (
-    <group>
-
-      {/* entrada eléctrica */}
-      <group position={[-4.4, 0.4, 0]}>
-        <mesh><boxGeometry args={[0.7, 1.6, 0.5]} /><meshStandardMaterial color="#1e293b" /></mesh>
-        <mesh position={[0, 0, 0.3]}><sphereGeometry args={[0.18, 12, 12]} /><meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={1} toneMapped={false} /></mesh>
-        <Etiqueta pos={[0, 1.3, 0]} texto={`P_elec = ${fmtKw(pElec)}`} color="#fbbf24" mono />
-      </group>
-      {/* cable de entrada */}
-      <CurvaTubo puntos={[[-3.7, 0.4, 0], [-1.2, 0.4, 0]] as Pt[]} color="#fbbf24" grosor={0.054} />
-
-      {/* rotor en su carcasa entre polos */}
-      <group position={[0.4, 0.4, 0]}>
-        <mesh position={[-1.5, 0, -0.2]}><boxGeometry args={[0.35, 2.0, 1.6]} /><meshStandardMaterial color="#ef4444" emissive="#7f1d1d" emissiveIntensity={0.25} /></mesh>
-        <mesh position={[1.5, 0, -0.2]}><boxGeometry args={[0.35, 2.0, 1.6]} /><meshStandardMaterial color="#3b82f6" emissive="#1e3a8a" emissiveIntensity={0.25} /></mesh>
-        <Rotor color={accent} speed={speed} playing={playing} />
-      </group>
-
-      {/* salida mecánica */}
-      <CurvaTubo puntos={[[2.0, 0.4, 0], [3.8, 0.4, 0]] as Pt[]} color={VERDE} grosor={0.054} />
-      <Etiqueta pos={[4.4, 0.9, 0]} texto={`P_mec = ${fmtKw(m.pMec)}`} color={VERDE} mono />
-
-      {/* calor perdido (sube) */}
-      <Line points={[[0.4, 1.5, 0], [0.4, 2.5, 0]] as Pt[]} color={ROJO} lineWidth={2} transparent opacity={0.7} dashed dashSize={0.18} gapSize={0.14} />
-      <Etiqueta pos={[0.4, 2.9, 0]} texto={`calor = ${fmtKw(m.pPerdida)}`} color={ROJO} mono />
-
-      {/* barra de eficiencia */}
-      <group position={[0, -2.9, 0]}>
-        <mesh position={[x0 + wUtil / 2, 0, 0]}><boxGeometry args={[Math.max(0.001, wUtil), BARH, 0.15]} /><meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.4} /></mesh>
-        <mesh position={[x0 + wUtil + wCalor / 2, 0, 0]}><boxGeometry args={[Math.max(0.001, wCalor), BARH, 0.15]} /><meshStandardMaterial color={ROJO} emissive={ROJO} emissiveIntensity={0.4} /></mesh>
-        <Etiqueta pos={[x0 + wUtil / 2, 0.7, 0]} texto={`útil ${fmtPct(efic)}`} color={VERDE} mono />
-      </group>
-    </group>
-  );
-}
-
-/* ── Contenido ────────────────────────────────────────────────────────────── */
-/** Sube cada escena para que quede entre la barra de arriba y la misión de abajo. */
-const DESPLAZA: Record<Modo, number> = { circuito: 1.25, generador: 2.2, motor: 1.65 };
-
-function Contenido(props: ElectromagnetismoSceneProps) {
-  const { modo, accent, resetNonce, playing } = props;
-  return (
-    <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
-          que el escenario la MIDE de la propia escena al montarse, en
-          vez de que alguien la adivine. */}
-      <Escenario acento={accent} />
-
-
-      <group key={`${modo}-${resetNonce}`} position={[0, DESPLAZA[modo], 0]}>
-        {modo === "circuito" && <EscenaCircuito V={props.V} R={props.R} playing={playing} accent={accent} />}
-        {modo === "generador" && <EscenaGenerador N={props.N} B={props.B} area={props.area} f={props.f} playing={playing} accent={accent} />}
-        {modo === "motor" && <EscenaMotor pElec={props.pElec} efic={props.efic} playing={playing} accent={accent} />}
-      </group>
-
-
+      <RigCamara pos={destino.pos} target={destino.target} clave={`${modo}|${iv}|${resetNonce}|${angosto}`} />
       <OrbitControls
         makeDefault
         enablePan={false}
-        minDistance={12}
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={3}
         maxDistance={30}
-        minPolarAngle={Math.PI / 3.4}
-        maxPolarAngle={Math.PI / 1.7}
+        minPolarAngle={Math.PI / 8}
+        maxPolarAngle={Math.PI / 2.15}
       />
 
-      <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.55} luminanceThreshold={0.5} luminanceSmoothing={0.3} mipmapBlur />
-        <Vignette eskil={false} offset={0.2} darkness={0.45} />
-      </EffectComposer>
+      {post && (
+        <EffectComposer enableNormalPass={false} multisampling={4}>
+          <Bloom intensity={0.7} luminanceThreshold={0.92} luminanceSmoothing={0.18} mipmapBlur />
+          <Vignette eskil={false} offset={0.22} darkness={0.5} />
+        </EffectComposer>
+      )}
     </>
   );
 }
 
 export default function ElectromagnetismoScene(props: ElectromagnetismoSceneProps) {
-  const cam = { position: [0, 0.6, 18] as Pt, fov: 48 };
+  const [calidad, setCalidad] = useState<Calidad>(() => calidadEscena());
+  const [dpr, setDpr] = useState(1.75);
   return (
-    <Canvas key={props.modo} dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={cam}>
-      <Contenido {...props} />
+    <Canvas
+      dpr={[1, dpr]}
+      shadows={calidad !== "baja"}
+      gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+      camera={{ position: [0, 9, 20], fov: FOV, near: 0.1, far: 120 }}
+    >
+      <PerformanceMonitor onDecline={() => { setDpr(1); setCalidad((c) => (c === "alta" ? "media" : "baja")); }} />
+      <Contenido {...props} calidad={calidad} />
     </Canvas>
   );
 }

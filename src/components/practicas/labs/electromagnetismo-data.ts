@@ -299,3 +299,145 @@ export const fmtPct = (p: number): string => `${ES(p, 0)} %`;
 export const fmtHz = (h: number): string => `${ES(h, 0)} Hz`;
 /** Caballos de fuerza. */
 export const fmtHp = (hp: number): string => `${ES(hp, 0)} hp`;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   AGREGADOS (escena «élite»): helpers puros que usa la escena 3D.
+   No cambian ninguna fórmula de arriba; solo traducen los resultados exactos
+   a lo que se dibuja (bandas de color, escalas del osciloscopio, cámara lenta).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/** Colores del código de resistencias (IEC 60062), del 0 al 9. */
+export const COLORES_RESISTENCIA: { nombre: string; hex: string }[] = [
+  { nombre: "negro", hex: "#141414" },
+  { nombre: "café", hex: "#6b3a1c" },
+  { nombre: "rojo", hex: "#d11f1f" },
+  { nombre: "naranja", hex: "#ef7a12" },
+  { nombre: "amarillo", hex: "#f2cc0c" },
+  { nombre: "verde", hex: "#1c9a3c" },
+  { nombre: "azul", hex: "#1f5ed6" },
+  { nombre: "violeta", hex: "#7b3ac6" },
+  { nombre: "gris", hex: "#8c8c8c" },
+  { nombre: "blanco", hex: "#f1f1ee" },
+];
+export const ORO_RESISTENCIA = { nombre: "oro", hex: "#c9a227" };
+export const PLATA_RESISTENCIA = { nombre: "plata", hex: "#c3c7cc" };
+
+export interface BandaResistencia {
+  nombre: string;
+  hex: string;
+  papel: "dígito" | "multiplicador" | "tolerancia";
+  /** Oro y plata son pintura metálica: brillan distinto. */
+  metal: boolean;
+}
+
+export interface CodigoResistencia {
+  bandas: BandaResistencia[];
+  /** El valor que de verdad dicen las bandas (Ω). */
+  valor: number;
+  /** Tolerancia en %. */
+  tolerancia: number;
+  /** "amarillo-violeta-café-oro". */
+  texto: string;
+}
+
+/**
+ * Bandas de color de una resistencia de valor R (Ω).
+ *
+ * Con dos cifras significativas basta el código de 4 bandas (±5 %, oro); si R
+ * necesita tres cifras se usa el de 5 bandas (±1 %, café), que es el de las
+ * resistencias de precisión. Más de tres cifras no se pueden pintar: se
+ * redondea a tres y `valor` dice cuál quedó (p. ej. 1 613 Ω → 1 610 Ω ±1 %).
+ * 470 Ω → amarillo-violeta-café-oro, exactamente como en el taller.
+ */
+export function codigoColoresResistencia(Rin: number): CodigoResistencia {
+  const R = Math.max(1, Math.round(Rin));
+  let digitos: number[];
+  let exp: number; // multiplicador = 10^exp
+  if (R < 10) {
+    digitos = [R, 0];
+    exp = -1;
+  } else if (R < 100) {
+    digitos = [Math.floor(R / 10), R % 10];
+    exp = 0;
+  } else {
+    let e = Math.floor(Math.log10(R));
+    let tres = Math.round(R / 10 ** (e - 2));
+    if (tres >= 1000) { tres = 100; e += 1; }
+    if (tres % 10 === 0) {
+      digitos = [Math.floor(tres / 100), Math.floor(tres / 10) % 10];
+      exp = e - 1;
+    } else {
+      digitos = [Math.floor(tres / 100), Math.floor(tres / 10) % 10, tres % 10];
+      exp = e - 2;
+    }
+  }
+  const cinco = digitos.length === 3;
+  const multi =
+    exp === -1 ? ORO_RESISTENCIA : exp === -2 ? PLATA_RESISTENCIA : COLORES_RESISTENCIA[exp]!;
+  const tol = cinco ? COLORES_RESISTENCIA[1]! : ORO_RESISTENCIA;
+  const bandas: BandaResistencia[] = [
+    ...digitos.map((d) => ({ ...COLORES_RESISTENCIA[d]!, papel: "dígito" as const, metal: false })),
+    { ...multi, papel: "multiplicador", metal: exp < 0 },
+    { ...tol, papel: "tolerancia", metal: !cinco },
+  ];
+  const numero = digitos.reduce((acc, d) => acc * 10 + d, 0);
+  const valor = Math.round(numero * 10 ** exp * 1000) / 1000;
+  return { bandas, valor, tolerancia: cinco ? 1 : 5, texto: bandas.map((b) => b.nombre).join("-") };
+}
+
+/**
+ * Rapidez VISUAL de los electrones (unidades de escena por segundo).
+ * Proporcional a I mientras I ≤ 4·I_ref (ahí, duplicar R parte la rapidez a la
+ * mitad, como dice la misión); por encima se comprime con un logaritmo para
+ * que un calentador de 16 A no se vuelva un borrón.
+ */
+export function rapidezElectrones(I: number, Iref: number): number {
+  const x = Math.max(0, I) / Iref;
+  const v = x <= 4 ? 0.85 * x : 0.85 * 4 * (1 + Math.log(x / 4));
+  return Math.min(16, v);
+}
+
+/** Brillo del foco, 0–1, según la potencia P (W), en escala logarítmica. */
+export function brilloFoco(P: number): number {
+  return Math.max(0.03, Math.min(1, (Math.log10(Math.max(P, 0.01)) + 1) / 4.3));
+}
+
+/** El osciloscopio cuenta el tiempo real; la animación va en cámara lenta ×60. */
+export const CAMARA_LENTA = 60;
+/** Base de tiempo del osciloscopio: 5 ms por división, 10 divisiones. */
+export const OSC_MS_DIV = 5;
+export const OSC_DIV_X = 10;
+export const OSC_DIV_Y = 8;
+
+/** Serie 1-2-5 de escalas verticales (V/div) de un osciloscopio. */
+const SERIE_125 = (() => {
+  const s: number[] = [];
+  for (let e = -2; e <= 5; e++) for (const m of [1, 2, 5]) s.push(m * 10 ** e);
+  return s;
+})();
+
+/**
+ * Escala vertical (V/div) con histéresis: se conserva la actual mientras la
+ * cresta quepa entre 0.4 y 3.8 divisiones; si no, se elige la que la deja en
+ * ~1.5 div. Así, duplicar N DUPLICA la altura de la onda en pantalla (como en
+ * un osciloscopio de verdad) y solo cambia de escala cuando ya no cabe.
+ */
+export function escalaVoltsDiv(femPico: number, actual: number | null): number {
+  if (actual !== null) {
+    const div = femPico / actual;
+    if (div >= 0.4 && div <= 3.8) return actual;
+  }
+  const meta = actual === null ? 1.6 : 3.2;
+  for (const s of SERIE_125) if (femPico / s <= meta) return s;
+  return SERIE_125[SERIE_125.length - 1]!;
+}
+
+/** "200 V/div", "0.5 V/div". */
+export const fmtVDiv = (s: number): string => `${ES(s, s < 1 ? 2 : 0)} V/div`;
+
+/** Puntos de vista de la cámara por modo (la escena tiene las posiciones). */
+export const VISTAS_NOMBRES: Record<Modo, string[]> = {
+  circuito: ["Banco completo", "Resistencia y multímetro", "Foco", "Fuente"],
+  generador: ["Generador completo", "Bobina entre los polos", "Osciloscopio", "Turbina"],
+  motor: ["Motor completo", "Corte del motor", "Balance de energía"],
+};

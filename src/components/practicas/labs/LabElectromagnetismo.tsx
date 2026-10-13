@@ -38,6 +38,7 @@ import {
   PEL_MIN, PEL_MAX, PEL_DEF, EFIC_MIN, EFIC_MAX, EFIC_DEF,
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, DATOS, GLOSARIO, EJEMPLO_A, EJEMPLO_B,
   fmt2, fmt3, fmtV, fmtA, fmtR, fmtW, fmtKw, fmtKwh, fmtMXN, fmtPct, fmtHz, fmtHp,
+  codigoColoresResistencia, VISTAS_NOMBRES, CAMARA_LENTA, OSC_MS_DIV,
 } from "./electromagnetismo-data";
 
 /** Clave de la mejor marca de este laboratorio. */
@@ -85,6 +86,7 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
   const [efic, setEfic] = useState<number>(EFIC_DEF);
 
   const [playing, setPlaying] = useState<boolean>(true);
+  const [vista, setVista] = useState(0);
   const [resetNonce, setResetNonce] = useState(0);
 
   // reto evaluable, teoría (cajón deslizable) y sonido
@@ -121,6 +123,7 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
   const cambiarModo = (m: Modo) => {
     if (sonido) audioRef.current?.blip();
     setModo(m);
+    setVista(0);
     bump();
   };
 
@@ -153,6 +156,10 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
   const vioGenerador = useLatch(modo === "generador");
   const cambioBobina = useLatch(N !== N_DEF || B !== B_DEF);
   const vioMotor = useLatch(modo === "motor");
+
+  const comparoCombustion = useLatch(modo === "motor" && efic <= 40);
+  const codigo = codigoColoresResistencia(R);
+  const vistas = VISTAS_NOMBRES[modo];
 
   const lectura =
     modo === "circuito" ? <>I = {fmtA(cir.I)} · P = {fmtW(cir.P)}</>
@@ -189,7 +196,7 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
             V={V} R={R} horas={horas} precio={precio}
             N={N} B={B} area={area} f={f}
             pElec={pElec} efic={efic}
-            playing={playing} accent={accent} resetNonce={resetNonce}
+            playing={playing} accent={accent} resetNonce={resetNonce} vista={vista}
           />
         </SceneBoundary>
       }
@@ -202,16 +209,18 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
         <>
           <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
           <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reproducir"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-video" titulo={`Cambiar vista: ${vistas[(vista + 1) % vistas.length]}`} onClick={() => setVista((x) => (x + 1) % vistas.length)} />
           <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar a los valores de inicio" onClick={resetModo} />
         </>
       }
       lectura={lectura}
       objetivos={[
-        { txt: "Duplica la resistencia R: los electrones se frenan y la corriente baja a la mitad", done: bajoCorriente },
-        { txt: "Explora el modo Circuito y ajusta V y R", done: exploroCircuito },
+        { txt: "Duplica la resistencia R: los electrones se frenan y la corriente baja a la mitad", done: bajoCorriente, modo: "circuito" },
+        { txt: "Explora el modo Circuito y ajusta V y R", done: exploroCircuito, modo: "circuito" },
         { txt: "Explora el modo Generador (FEM de Faraday)", done: vioGenerador },
-        { txt: "Cambia las vueltas N o el campo B y observa la FEM inducida", done: cambioBobina },
+        { txt: "Cambia las vueltas N o el campo B y observa la FEM inducida", done: cambioBobina, modo: "generador" },
         { txt: "Explora el modo Motor y varía la eficiencia", done: vioMotor },
+        { txt: "Baja la eficiencia a la de un motor de combustión (≤ 40 %): mira cuánto calor sale", done: comparoCombustion, modo: "motor" },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}
       pestanas={[
@@ -279,6 +288,34 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
                     <Dato label="costo" value={fmtMXN(cir.costo)} col="#fde047" />
                   </div>
                 )}
+                {modo === "circuito" && (
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: T.text2, marginBottom: 6 }}>Código de colores de la resistencia</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {codigo.bandas.map((bd, i) => (
+                        <span key={i} title={bd.papel} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 700, color: T.text, padding: "4px 9px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)" }}>
+                          <span aria-hidden style={{ width: 14, height: 14, borderRadius: 4, background: bd.hex, border: "1px solid rgba(255,255,255,0.35)" }} />
+                          {bd.nombre}
+                        </span>
+                      ))}
+                    </div>
+                    <p style={{ margin: "8px 0 0", fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+                      Las bandas dicen <strong style={{ color: C_CIR }}>{fmtR(codigo.valor)} ±{codigo.tolerancia} %</strong>
+                      {codigo.valor !== Math.round(R) ? ` (lo más cercano a ${fmtR(R)} que se puede pintar con 3 cifras).` : "."}
+                      {" "}Los electrones salen del borne negativo (−); la corriente convencional se dibuja al revés.
+                    </p>
+                  </div>
+                )}
+                {modo === "generador" && (
+                  <p style={caja(C_GEN)}>
+                    Osciloscopio: CH1 (amarillo) es la FEM; CH2 (cian) es el flujo Φ = B·A·cos(ωt). La FEM es máxima cuando Φ cruza por cero: lo que induce es el <strong>cambio</strong> del flujo. Base de tiempo {OSC_MS_DIV} ms/div; la bobina gira en cámara lenta ×{CAMARA_LENTA}.
+                  </p>
+                )}
+                {modo === "motor" && (
+                  <p style={caja(C_MOT)}>
+                    La banda amarilla (entrada) se parte en verde (útil, en la flecha) y roja (calor). Con menos eficiencia, la carcasa se calienta y sale más calor.
+                  </p>
+                )}
                 {modo === "generador" && (
                   <div style={par}>
                     <Dato label="FEM máxima" value={fmtV(gen.femPico)} col={modoCol} />
@@ -295,6 +332,14 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
                     <Dato label="eficiencia" value={fmtPct(efic)} col="#86efac" />
                   </div>
                 )}
+              </Bloque>
+
+              <Bloque titulo="Cámara" icono="fa-video">
+                <div style={{ ...rejilla, marginTop: 0 }}>
+                  {vistas.map((nombre, i) => (
+                    <button key={nombre} type="button" onClick={() => setVista(i)} style={chip(modoCol, vista === i)}>{nombre}</button>
+                  ))}
+                </div>
               </Bloque>
             </>
           ),
@@ -350,6 +395,15 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
                 {GLOSARIO.map((g, i) => (
                   <div key={i}><strong style={{ color: accent }}>{g.termino}. </strong><span style={{ color: T.text2 }}>{g.definicion}</span></div>
                 ))}
+              </Bloque>
+              <Bloque titulo="Cómo leer la escena" icono="fa-eye">
+                <ul style={lista}>
+                  <li><strong>Código de colores.</strong> Las dos primeras bandas (o tres, en las de precisión) son cifras, la siguiente es el multiplicador (potencia de 10) y la última la tolerancia: oro ±5 %, café ±1 %. 470 Ω = amarillo (4), violeta (7), café (×10), oro (±5 %).</li>
+                  <li><strong>Electrones.</strong> Salen del borne negativo y regresan al positivo; su rapidez en pantalla es proporcional a I (hasta 4 veces la corriente del ejemplo A2; más arriba se comprime). En un cable real se arrastran a milímetros por segundo: lo que viaja casi a la velocidad de la luz es la señal.</li>
+                  <li><strong>Flujo magnético.</strong> El velo verde/rosa dentro de la bobina es Φ = B·A·cos(ωt): brilla cuando la espira está de frente al campo y se apaga cuando queda de canto. La FEM no depende de cuánto flujo hay, sino de qué tan rápido CAMBIA.</li>
+                  <li><strong>Corriente alterna.</strong> En los cables del generador los electrones van y vienen; el foco parpadea dos veces por vuelta. A 60 Hz eso pasa 120 veces por segundo y el ojo no lo nota: por eso la escena va en cámara lenta ×{CAMARA_LENTA}.</li>
+                  <li><strong>Eficiencia.</strong> El ancho de cada banda del motor es proporcional a la potencia: verde = η·P_elec en la flecha, roja = (1 − η)·P_elec en calor.</li>
+                </ul>
               </Bloque>
               <Bloque titulo="Ficha teórica" icono="fa-book">
                 <FichaTeorica data={ELECTROMAGNETISMO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
