@@ -2,6 +2,13 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
 
+// El host de Supabase sale de la variable de entorno: escrito a mano, un cambio
+// de proyecto dejaba el navegador bloqueando todas las llamadas (el servidor
+// responde 200 y la página se ve vacía). Sin variable, cae al proyecto actual.
+const SUPABASE_HOST = new URL(
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://htonftgqjyedcexngefq.supabase.co",
+).host;
+
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -28,7 +35,7 @@ const securityHeaders = [
       // Images: local + data URIs + blob (avatar previews) + miniaturas YouTube
       "img-src 'self' data: blob: https://i.ytimg.com https://img.youtube.com",
       // Supabase REST + Realtime (WSS)
-      "connect-src 'self' https://xmcfuwdanlciqdxqtslv.supabase.co wss://xmcfuwdanlciqdxqtslv.supabase.co",
+      `connect-src 'self' https://${SUPABASE_HOST} wss://${SUPABASE_HOST}`,
       // Video de actividades: los 211 mp4 generados (TTS+Remotion) se sirven
       // desde el bucket público de R2, y `VideoConPreguntasActivity` los monta
       // en un <video src> nativo (no iframe) cuando la url termina en .mp4.
