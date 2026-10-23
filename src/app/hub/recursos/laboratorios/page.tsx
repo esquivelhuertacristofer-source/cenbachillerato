@@ -216,7 +216,7 @@ function SemestreDestacado({
 }
 
 /* ──────────────────────────────────────────────────────────────
-   DestacadosView — 18 prácticas destacadas (3 por semestre).
+   DestacadosView — prácticas destacadas por semestre.
    ⚠️ TEMPORAL: solo para la presentación.
    ────────────────────────────────────────────────────────────── */
 function DestacadosView() {
@@ -321,7 +321,7 @@ export default function LaboratoriosPage() {
           </h1>
           <p className="labs-hero-frase">
             {enDestacados
-              ? "Una selección de las prácticas más representativas de los seis semestres, cada una con su video. Ábrelas directo, sin importar el semestre."
+              ? "Una selección de las prácticas más representativas de los seis semestres, cada una con su video o una vista real del laboratorio. Ábrelas directo, sin importar el semestre."
               : "Cada práctica experimental de tu semestre en un solo lugar. Ábrelas directo, sin buscar entre materias ni actividades."}
           </p>
           <div className="labs-hero-stats">
