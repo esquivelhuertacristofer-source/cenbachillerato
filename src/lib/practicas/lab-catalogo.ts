@@ -52,7 +52,7 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
   "atlas-cuerpo-humano-3d": {
     slug: "atlas-cuerpo-humano-3d",
     titulo: "Laboratorio 3D — Atlas del cuerpo humano",
-    descripcion: "Casi 1,900 piezas anatómicas reales: corta el cuerpo en tres planos, quita capas, aísla órganos y relaciona estructura y función en los sistemas locomotor, digestivo, circulatorio, respiratorio y nervioso, con latido y respiración en vivo.",
+    descripcion: "Huesos y órganos con su forma real, en 3D: tócalos para saber cómo se llaman, de qué lado están y qué hacen. Enciende y apaga cada sistema y mira los órganos a través del esqueleto.",
   },
   "aula-ingles-interacciones": {
     slug: "aula-ingles-interacciones",
@@ -982,7 +982,7 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
   "sistema-solar-3d": {
     slug: "sistema-solar-3d",
     titulo: "Laboratorio 3D — El Sistema Solar",
-    descripcion: "Viaja por el Sistema Solar con fotos reales de la NASA y los planetas donde están hoy; mide la fuerza del Sol, comprueba T² ∝ a³ con los 8 planetas, las áreas iguales y la rapidez en el perihelio y el afelio.",
+    descripcion: "Explorador espacial: vuela por el Sistema Solar con los planetas donde están hoy, o alrededor de la Tierra fotografiada desde el espacio para ver el día y la noche en este momento, las luces de las ciudades, las nubes y la Luna en la fase de hoy.",
   },
   "sistemas-ecuaciones-2x2": {
     slug: "sistemas-ecuaciones-2x2",

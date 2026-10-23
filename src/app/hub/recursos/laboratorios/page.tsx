@@ -216,17 +216,72 @@ function SemestreDestacado({
 }
 
 /* ──────────────────────────────────────────────────────────────
+   EstrellasDestacadas — franja grande de arriba: los labs que más se quieren
+   lucir. Tarjeta a todo lo ancho con la captura real, título grande y entrada.
+   ────────────────────────────────────────────────────────────── */
+function EstrellasDestacadas({ labs }: { labs: typeof LABS_DESTACADOS }) {
+  return (
+    <section className="dest-star" aria-label="Nuevos laboratorios 3D">
+      <div className="dest-star-head">
+        <span className="dest-star-kicker">
+          <i className="fa-solid fa-star" /> Nuevos
+        </span>
+        <h2 className="dest-star-title">Nuevos laboratorios 3D</h2>
+      </div>
+      <div className="dest-star-grid">
+        {labs.map((lab) => {
+          const color = getRSCColor(getUACPorCodigo(lab.uacCodigo)?.recursoCodigo ?? null);
+          const nombre = nombreLab(lab.slug);
+          return (
+            <Link
+              key={lab.slug}
+              href={lab.ruta}
+              className="dest-star-card"
+              style={
+                {
+                  "--lab-accent": color.hex,
+                  "--lab-accent-rgb": color.rgba,
+                } as CSSProperties
+              }
+              aria-label={`Abrir laboratorio 3D: ${nombre}`}
+            >
+              <span className="dest-star-img">
+                <img src={lab.imagen} alt={`Vista del laboratorio ${nombre}`} loading="eager" decoding="async" />
+                <span className="dest-star-new">NUEVO</span>
+              </span>
+              <span className="dest-star-body">
+                <span className="dest-card-uac">
+                  <i className={`fa-solid ${color.faIcon}`} /> {lab.uacCodigo}
+                </span>
+                <span className="dest-star-name">{nombre}</span>
+                <span className="dest-star-desc">{LAB_CATALOGO[lab.slug]?.descripcion}</span>
+                <span className="dest-star-cta">
+                  <i className="fa-solid fa-cube" /> Abrir laboratorio 3D
+                  <i className="fa-solid fa-arrow-right" />
+                </span>
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────
    DestacadosView — prácticas destacadas por semestre.
    ⚠️ TEMPORAL: solo para la presentación.
    ────────────────────────────────────────────────────────────── */
 function DestacadosView() {
+  const estrellas = LABS_DESTACADOS.filter((l) => l.estrella);
   return (
     <div className="dest-wrap">
+      {estrellas.length > 0 && <EstrellasDestacadas labs={estrellas} />}
       {[1, 2, 3, 4, 5, 6].map((s) => (
         <SemestreDestacado
           key={s}
           semestre={s}
-          labs={LABS_DESTACADOS.filter((l) => l.semestre === s)}
+          labs={LABS_DESTACADOS.filter((l) => l.semestre === s && !l.estrella)}
         />
       ))}
     </div>

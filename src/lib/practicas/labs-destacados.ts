@@ -24,6 +24,8 @@ export interface LabDestacado {
   semestre: number;
   /** YouTube ID del video demostrativo del lab. Sin él, la tarjeta usa `imagen`. */
   videoId?: string;
+  /** Va en la franja grande de arriba de la pestaña, no en la lista de su semestre. */
+  estrella?: boolean;
   /** Captura del lab (en /public) para las tarjetas sin video: lleva directo a la práctica. */
   imagen?: string;
   /** Deep-link a la práctica (verificado en BD). */
@@ -64,9 +66,9 @@ export const LABS_DESTACADOS: LabDestacado[] = [
   { n: 12, slug: "gravitacion-universal", uacCodigo: "CNEYT-V", semestre: 5, imagen: "/media/destacados/gravitacion-universal.webp", ruta: "/hub/laboratorios/gravitacion-universal" },
   { n: 13, slug: "electromagnetismo-ohm-faraday", uacCodigo: "CNEYT-V", semestre: 5, imagen: "/media/destacados/electromagnetismo-ohm-faraday.webp", ruta: "/hub/laboratorios/electromagnetismo-ohm-faraday" },
   { n: 14, slug: "optica-lentes-espejos", uacCodigo: "CNEYT-V", semestre: 5, imagen: "/media/destacados/optica-lentes-espejos.webp", ruta: "/hub/laboratorios/optica-lentes-espejos" },
-  { n: 15, slug: "sistema-solar-3d", uacCodigo: "CNEYT-V", semestre: 5, imagen: "/media/destacados/sistema-solar-3d.webp", ruta: "/hub/laboratorios/sistema-solar-3d" },
+  { n: 15, slug: "sistema-solar-3d", uacCodigo: "CNEYT-V", semestre: 5, estrella: true, imagen: "/media/destacados/sistema-solar-3d.webp", ruta: "/hub/laboratorios/sistema-solar-3d" },
   // ── Semestre 6 ──
   { n: 16, slug: "celula-organelos-3d", uacCodigo: "CNEYT-VI", semestre: 6, imagen: "/media/destacados/celula-organelos-3d.webp", ruta: "/hub/laboratorios/celula-organelos-3d" },
   { n: 17, slug: "adn-dogma-central-3d", uacCodigo: "CNEYT-VI", semestre: 6, imagen: "/media/destacados/adn-dogma-central-3d.webp", ruta: "/hub/laboratorios/adn-dogma-central-3d" },
-  { n: 18, slug: "atlas-cuerpo-humano-3d", uacCodigo: "CNEYT-VI", semestre: 6, imagen: "/media/destacados/atlas-cuerpo-humano-3d.webp", ruta: "/hub/laboratorios/atlas-cuerpo-humano-3d" },
+  { n: 18, slug: "atlas-cuerpo-humano-3d", uacCodigo: "CNEYT-VI", semestre: 6, estrella: true, imagen: "/media/destacados/atlas-cuerpo-humano-3d.webp", ruta: "/hub/laboratorios/atlas-cuerpo-humano-3d" },
 ];

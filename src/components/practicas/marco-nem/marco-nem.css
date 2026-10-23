@@ -1,0 +1,513 @@
+/* =============================================================================
+   NEM Plataforma — Marco inmersivo de laboratorio (MarcoLab.tsx)
+   Prefijo lx- para no chocar con el aula ni con los laboratorios.
+   ============================================================================= */
+
+.lx-raiz {
+  --lx-noche: #08121f;
+  --lx-noche2: #0d1a2c;
+  --lx-texto: #eef4fb;
+  --lx-tenue: #b4c2d4;
+  --lx-linea: rgba(160, 190, 225, 0.16);
+  --lx-claro: color-mix(in oklab, var(--lx-acento) 45%, white);
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--lx-noche);
+  color: var(--lx-texto);
+  font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── Variables que heredan los laboratorios del kit (_kit.tsx) ───────────────
+   Un solo tema, el de noche. El interruptor claro/oscuro se quitó: era quien
+   dejaba letras blancas sobre blanco en los labs escritos para fondo oscuro. */
+.lx-raiz[data-tono='noche'] .lab-wrap,
+.lx-raiz[data-tono='noche'] .lx-panel {
+  --lab-text: #f1f5f9;
+  --lab-text2: #cbd5e1;
+  --lab-text3: #9aa8bd;
+  --lab-line: rgba(148, 180, 220, 0.14);
+  --lab-line-strong: rgba(148, 180, 220, 0.24);
+  --lab-glass: rgba(148, 180, 220, 0.06);
+  --lab-glass-soft: rgba(148, 180, 220, 0.1);
+  --lab-inset: rgba(4, 8, 16, 0.6);
+  --lab-shadow: 0 1px 0 rgba(190, 215, 245, 0.06) inset, 0 18px 44px -24px rgba(0, 0, 0, 0.72);
+}
+
+/* ── App: barra + cuerpo ───────────────────────────────────────────────── */
+.lx-app {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.lx-app[hidden] {
+  display: flex !important;
+  visibility: hidden;
+}
+
+.lx-barra {
+  flex: none;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  background:
+    linear-gradient(90deg, rgba(var(--lx-rgb), 0.28) 0%, transparent 42%),
+    linear-gradient(180deg, #0f2236 0%, #0a1728 100%);
+  border-bottom: 1px solid var(--lx-linea);
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.8);
+  position: relative;
+  z-index: 3;
+}
+.lx-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--lx-texto);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--lx-linea);
+  transition: background 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+.lx-volver:hover { background: rgba(255, 255, 255, 0.12); }
+.lx-volver:hover i { transform: translateX(-2px); }
+.lx-volver i { transition: transform 0.15s; }
+
+.lx-icono {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--lx-acento), color-mix(in oklab, var(--lx-acento) 60%, #000));
+  box-shadow: 0 6px 18px -6px rgba(var(--lx-rgb), 0.8);
+}
+.lx-titulo { min-width: 0; flex: 1; display: flex; flex-direction: column; line-height: 1.15; }
+.lx-titulo h1 {
+  margin: 0;
+  font-family: var(--font-aventura), Georgia, serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lx-titulo span { font-size: 12.5px; font-weight: 700; color: var(--lx-tenue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.lx-acciones { display: flex; align-items: center; gap: 6px; flex: none; }
+.lx-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--lx-linea);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--lx-texto);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.lx-boton:hover { background: rgba(255, 255, 255, 0.13); }
+.lx-boton[data-on='true'] { background: var(--lx-acento); border-color: transparent; color: #fff; }
+.lx-boton[aria-pressed='false'] i.fa-volume-xmark { color: #fca5a5; }
+.lx-redondo { width: 44px; padding: 0; }
+.lx-boton:focus-visible, .lx-volver:focus-visible, .lx-entrar:focus-visible { outline: 3px solid var(--lx-claro); outline-offset: 2px; }
+
+/* ── Cuerpo: escena + panel ────────────────────────────────────────────── */
+.lx-cuerpo {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(360px, 29vw, 460px);
+}
+.lx-escena {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 60% at 50% 42%, rgba(var(--lx-rgb), 0.22) 0%, transparent 70%),
+    radial-gradient(120% 90% at 50% 120%, rgba(0, 0, 0, 0.55) 0%, transparent 60%),
+    linear-gradient(180deg, #0c1a2c 0%, #070e19 100%);
+}
+.lx-raiz[data-tono='papel'] .lx-escena {
+  background:
+    radial-gradient(70% 60% at 50% 40%, #fffaf0 0%, transparent 75%),
+    linear-gradient(180deg, #fff4de 0%, #f6e6c4 100%);
+}
+.lx-escena-in { position: absolute; inset: 0; }
+.lx-escena-in + .lx-escena-in { display: none; }
+.lx-lienzo { position: absolute; inset: 0; }
+.lx-sobre-arriba,
+.lx-sobre-pie {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 2;
+}
+.lx-sobre-arriba { top: 16px; }
+.lx-sobre-pie { bottom: 16px; align-items: flex-end; }
+/* En los labs de papel el pie trae las tarjetas de <Dato> (cifras de 34 px):
+   sobre la escena tapaban un quinto de ella. Se achican sin cambiar el lab. */
+.lx-raiz[data-tono='papel'] .lx-sobre-pie { zoom: 0.8; }
+.lx-sobre-arriba > *,
+.lx-sobre-pie > * { pointer-events: auto; }
+
+.lx-panel {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px 18px 40px;
+  background:
+    linear-gradient(180deg, rgba(var(--lx-rgb), 0.1) 0%, transparent 220px),
+    linear-gradient(180deg, var(--lx-noche2) 0%, var(--lx-noche) 100%);
+  border-left: 1px solid var(--lx-linea);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(160, 190, 225, 0.3) transparent;
+}
+/* Los labs del kit escriben su letra en línea a 12 px (fontSize: 12): ningún
+   piso de CSS la alcanza. El zoom sí: 12 → 13.4 px, 13 → 14.6 px. Solo en el
+   panel de noche; los de papel ya empiezan en 17 px. */
+.lx-raiz[data-tono='noche'] .lx-panel > * { zoom: 1.12; }
+.lx-raiz[data-tono='papel'] .lx-panel {
+  background: #fffdf7;
+  border-left: 3px solid #e8dcc0;
+  color: #1f2937;
+  padding: 0;
+  scrollbar-color: #d9c9a3 transparent;
+}
+/* El laboratorio pinta su propio fondo en el div raíz (el marco viejo se lo
+   imponía con !important). En el panel ese fondo sobra: lo da el panel. */
+.lx-raiz[data-tono='noche'] .lx-panel .lab-wrap > div { background: transparent !important; }
+
+/* Sin escena registrada (laboratorio de puro tablero): el panel es la página
+   entera, con un ancho de lectura y la escena oculta. */
+.lx-cuerpo[data-escena='false'] { grid-template-columns: minmax(0, 1fr); }
+.lx-cuerpo[data-escena='false'] .lx-escena { display: none; }
+.lx-cuerpo[data-escena='false'] .lx-panel { border-left: none; padding: 24px clamp(16px, 4vw, 48px) 56px; }
+.lx-cuerpo[data-escena='false'] .lx-panel > * { max-width: 1400px; margin-inline: auto; }
+
+/* Panel que necesita ancho (tabla periódica): la escena cede. */
+.lx-cuerpo[data-ancho='true'] { grid-template-columns: minmax(0, 1fr) clamp(600px, 50vw, 820px); }
+
+/* Escena con paneles propios (atlas, explorador): todo el cuerpo es escena. */
+.lx-cuerpo[data-lleno='true'] { grid-template-columns: minmax(0, 1fr); }
+.lx-cuerpo[data-lleno='true'] .lx-panel { display: none; }
+.lx-cuerpo[data-lleno='true'] .lx-escena { height: auto; flex: 1; }
+
+/* ── Cajones (teoría, guía) ────────────────────────────────────────────── */
+.lx-velo { position: absolute; inset: 0; z-index: 4; background: rgba(2, 6, 12, 0.55); backdrop-filter: blur(2px); }
+.lx-velo[hidden] { display: none; }
+.lx-cajon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  width: min(620px, 94vw);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0f2034 0%, #091321 100%);
+  border-left: 1px solid var(--lx-linea);
+  box-shadow: -30px 0 60px -30px rgba(0, 0, 0, 0.8);
+  transform: translateX(104%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  visibility: hidden;
+}
+.lx-cajon[data-abierto='true'] { transform: none; visibility: visible; }
+.lx-cajon-cabeza {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px 10px 22px;
+  border-bottom: 1px solid var(--lx-linea);
+}
+.lx-cajon-cabeza strong { font-family: var(--font-aventura), Georgia, serif; font-size: 20px; font-weight: 600; }
+.lx-cajon-cuerpo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px;
+  --lab-text: #f1f5f9;
+  --lab-text2: #cbd5e1;
+  --lab-text3: #9aa8bd;
+  --lab-line: rgba(148, 180, 220, 0.14);
+  --lab-line-strong: rgba(148, 180, 220, 0.24);
+  --lab-glass: rgba(148, 180, 220, 0.06);
+  --lab-glass-soft: rgba(148, 180, 220, 0.1);
+  --lab-inset: rgba(4, 8, 16, 0.6);
+}
+.lx-cajon-cuerpo[data-tono-cajon='papel'] { background: #fffdf7; color: #1f2937; }
+
+/* ── Portada ───────────────────────────────────────────────────────────── */
+.lx-portada {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  overflow-y: auto;
+  background:
+    radial-gradient(80% 90% at 85% 30%, rgba(var(--lx-rgb), 0.55) 0%, transparent 60%),
+    radial-gradient(60% 60% at 70% 90%, rgba(var(--lx-rgb), 0.25) 0%, transparent 70%),
+    linear-gradient(135deg, #0a1626 0%, #050a12 100%);
+}
+.lx-portada-fondo {
+  position: absolute;
+  inset: -4%;
+  background-size: cover;
+  background-position: center right;
+  animation: lx-kenburns 50s ease-in-out infinite alternate;
+}
+.lx-portada-velo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(5, 10, 18, 0.96) 0%, rgba(5, 10, 18, 0.86) 34%, rgba(5, 10, 18, 0.35) 62%, rgba(5, 10, 18, 0.1) 100%),
+    linear-gradient(0deg, rgba(5, 10, 18, 0.7) 0%, transparent 35%);
+}
+@keyframes lx-kenburns {
+  from { transform: scale(1.02); }
+  to { transform: scale(1.1) translate3d(-1.5%, -1%, 0); }
+}
+.lx-portada-volver { position: absolute; top: 18px; left: 18px; z-index: 2; backdrop-filter: blur(10px); }
+.lx-portada-texto {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 100%);
+  padding: 96px clamp(20px, 6vw, 88px) 48px;
+  animation: lx-entra 0.6s ease both;
+}
+@keyframes lx-entra { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.lx-ceja {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lx-claro);
+}
+.lx-portada-titulo {
+  margin: 18px 0 0;
+  font-family: var(--font-aventura), Georgia, serif;
+  font-size: clamp(2.5rem, 5.4vw, 4.8rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+.lx-portada-titulo span, .lx-portada-titulo em { display: block; }
+.lx-portada-titulo em { font-style: italic; color: var(--lx-claro); }
+.lx-portada-desc { margin: 22px 0 0; font-size: clamp(1.05rem, 1.35vw, 1.25rem); line-height: 1.55; color: #dce6f2; max-width: 58ch; }
+.lx-portada-contexto { margin: 12px 0 0; font-size: 14px; font-weight: 700; color: var(--lx-tenue); }
+.lx-portada-rasgos { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 15px; color: #c9d6e6; }
+.lx-portada-rasgos i { color: var(--lx-claro); margin-right: 6px; }
+.lx-entrar {
+  margin-top: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 62px;
+  padding: 0 34px;
+  border-radius: 999px;
+  border: none;
+  font: inherit;
+  font-size: 19px;
+  font-weight: 900;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, color-mix(in oklab, var(--lx-acento) 85%, white), var(--lx-acento));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 18px 40px -14px rgba(var(--lx-rgb), 0.9);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.lx-entrar:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 24px 50px -14px rgba(var(--lx-rgb), 1); }
+.lx-entrar i { transition: transform 0.15s; }
+.lx-entrar:hover i { transform: translateX(4px); }
+.lx-material {
+  margin-top: 34px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(8, 16, 28, 0.72);
+  border: 1px solid var(--lx-linea);
+  backdrop-filter: blur(12px);
+  max-width: 620px;
+}
+.lx-material p { margin: 0 0 10px; font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lx-tenue); }
+.lx-material ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lx-material li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #dce6f2;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--lx-linea);
+}
+.lx-material li[data-necesario='true'] { color: #fff; background: rgba(var(--lx-rgb), 0.35); border-color: rgba(var(--lx-rgb), 0.7); }
+.lx-material small { display: block; margin-top: 10px; font-size: 13px; color: var(--lx-tenue); }
+
+/* ── Teléfono y tableta vertical ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .lx-cuerpo { display: flex; flex-direction: column; }
+  .lx-escena { flex: none; height: max(280px, 46dvh); }
+  .lx-cuerpo[data-escena='false'] .lx-escena { display: none; }
+  .lx-panel { flex: 1; border-left: none; border-top: 1px solid var(--lx-linea); padding: 14px 14px 32px; }
+  .lx-raiz[data-tono='papel'] .lx-panel { border-left: none; border-top: 3px solid #e8dcc0; padding: 0; }
+}
+@media (max-width: 640px) {
+  .lx-barra { height: 56px; gap: 8px; padding: 0 10px; }
+  .lx-sin-tel { display: none !important; }
+  .lx-volver { padding: 0; width: 44px; justify-content: center; }
+  .lx-portada-volver { width: auto; padding: 0 14px; }
+  .lx-titulo h1 { font-size: 17px; }
+  .lx-icono { display: none; }
+  .lx-portada { align-items: flex-end; }
+  .lx-portada-velo { background: linear-gradient(0deg, rgba(5, 10, 18, 0.97) 0%, rgba(5, 10, 18, 0.88) 55%, rgba(5, 10, 18, 0.3) 100%); }
+  .lx-portada-texto { padding: 120px 20px 32px; }
+  .lx-entrar { width: 100%; justify-content: center; }
+  .lx-sobre-arriba { top: 10px; left: 10px; right: 10px; }
+  .lx-sobre-pie { bottom: 10px; left: 10px; right: 10px; }
+  /* En el teléfono las tarjetas de <Dato> y el globo de la consigna tapaban la
+     escena entera: más chicos todavía. */
+  .lx-raiz[data-tono='papel'] .lx-sobre-pie { zoom: 0.5; }
+  .lx-raiz[data-tono='papel'] .lx-sobre-arriba { zoom: 0.78; }
+  .lx-raiz[data-tono='papel'] .lx-escena { height: max(300px, 52dvh); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lx-portada-fondo, .lx-portada-texto { animation: none; }
+  .lx-cajon { transition: none; }
+}
+
+/* ── Piel de marca CEN (atlas, explorador) ─────────────────────────────────
+   Colores medidos en el cartel oficial de CEN: azul #004AC1, navy #00153B,
+   lima #B8EB50. Letra: Montserrat (la libre más cercana a la del cartel). */
+.lx-raiz[data-marca='cen'] {
+  --lx-noche: #00153b;
+  --lx-noche2: #001f55;
+  --lx-claro: #b8eb50;
+  --lx-linea: rgba(184, 235, 80, 0.2);
+  font-family: var(--font-cen), 'Montserrat', system-ui, sans-serif;
+}
+.lx-raiz[data-marca='cen'] .lx-barra {
+  background: linear-gradient(90deg, #004ac1 0%, #0040a8 55%, #00153b 100%);
+  border-bottom: 3px solid #b8eb50;
+}
+.lx-logo-barra {
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 0 12px 0 4px;
+  border-right: 2px solid rgba(255, 255, 255, 0.25);
+  height: 38px;
+}
+.lx-raiz[data-marca='cen'] .lx-titulo h1 {
+  font-family: var(--font-cen), 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 21px;
+  letter-spacing: -0.01em;
+}
+.lx-raiz[data-marca='cen'] .lx-titulo span { color: #d6e6ff; }
+.lx-raiz[data-marca='cen'] .lx-volver,
+.lx-raiz[data-marca='cen'] .lx-boton {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.lx-raiz[data-marca='cen'] .lx-boton[data-on='true'] { background: #b8eb50; color: #00153b; }
+
+/* Portada: cartel CEN. Velo azul, titular muy pesado, acento lima. */
+.lx-raiz[data-marca='cen'] .lx-portada { background: linear-gradient(135deg, #004ac1 0%, #00153b 100%); }
+.lx-raiz[data-marca='cen'] .lx-portada-velo {
+  background:
+    linear-gradient(90deg, rgba(0, 21, 59, 0.97) 0%, rgba(0, 40, 120, 0.88) 36%, rgba(0, 74, 193, 0.35) 64%, rgba(0, 74, 193, 0.05) 100%),
+    linear-gradient(0deg, rgba(0, 21, 59, 0.75) 0%, transparent 35%);
+}
+.lx-portada-logo {
+  position: absolute;
+  top: 16px;
+  right: 22px;
+  z-index: 2;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.6);
+}
+.lx-raiz[data-marca='cen'] .lx-ceja {
+  display: inline-flex;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #b8eb50;
+  color: #00153b;
+  letter-spacing: 0.12em;
+}
+.lx-raiz[data-marca='cen'] .lx-portada-titulo {
+  font-family: var(--font-cen), 'Montserrat', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  /* En mayúsculas y a 900 «EXPLORADOR» no cabía y se partía a media palabra. */
+  font-size: clamp(2.2rem, 4.6vw, 4.4rem);
+  overflow-wrap: normal;
+}
+.lx-raiz[data-marca='cen'] .lx-portada-texto { width: min(820px, 100%); }
+.lx-raiz[data-marca='cen'] .lx-portada-titulo em { font-style: italic; color: #b8eb50; }
+/* Las «rayitas» del cartel junto al titular. */
+.lx-raiz[data-marca='cen'] .lx-portada-titulo::after {
+  content: '';
+  display: block;
+  width: 120px;
+  height: 10px;
+  margin-top: 18px;
+  border-radius: 99px;
+  background: repeating-linear-gradient(90deg, #b8eb50 0 30px, transparent 30px 42px);
+}
+.lx-raiz[data-marca='cen'] .lx-portada-rasgos i { color: #b8eb50; }
+.lx-raiz[data-marca='cen'] .lx-entrar {
+  background: #b8eb50;
+  color: #00153b;
+  font-family: var(--font-cen), 'Montserrat', sans-serif;
+  font-weight: 900;
+  box-shadow: 0 6px 0 #6f9a12, 0 22px 40px -16px rgba(184, 235, 80, 0.7);
+}
+.lx-raiz[data-marca='cen'] .lx-entrar:hover { box-shadow: 0 8px 0 #6f9a12, 0 26px 46px -16px rgba(184, 235, 80, 0.8); }
+@media (max-width: 640px) {
+  .lx-portada-logo { top: 70px; right: auto; left: 18px; padding: 8px 12px; }
+  .lx-portada-logo svg { height: 40px; width: auto; }
+}

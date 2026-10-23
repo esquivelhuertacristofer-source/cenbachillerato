@@ -52,6 +52,9 @@ describe("ficha teórica de los laboratorios", () => {
     const archivo = ARCHIVOS.get(PRACTICAS.get(slug)!);
     expect(archivo).toBeDefined();
     const src = readFileSync(archivo!, "utf8");
+    // Excepción documentada: el Atlas y el Sistema Solar son la versión de NEM
+    // (marco-nem/), con su propia teoría en el cajón del marco, no la ficha de CEN.
+    if (src.includes("marco-nem/PracticaNem")) return;
     expect(src).toContain('from "./_ficha"');
     expect(src).toMatch(/<FichaTeorica\b/);
   });

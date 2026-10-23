@@ -22,6 +22,10 @@ import { LabImagenProvider } from "../lab-imagen-context";
 import { EstiloArrastre } from "../labs/_arrastre";
 import { getPractica } from "../registry";
 
+/* Atlas y Sistema Solar: marco inmersivo de NEM, cargado solo en el navegador. */
+const PracticaNem = dynamic(() => import("../marco-nem/PracticaNem").then((m) => m.PracticaNem), { ssr: false });
+const SLUGS_MARCO_NEM = new Set(["atlas-cuerpo-humano-3d", "sistema-solar-3d"]);
+
 const Expedicion = dynamic(() => import("./Expedicion").then((m) => m.Expedicion), { ssr: false });
 /* Solo en el navegador: arrastra el indice de las viñetas (miles de claves) y
  * en el servidor no hay nada que ilustrar. Importado directo, entraria en el
@@ -50,6 +54,10 @@ export function ExpedicionPractica({
   const practica = getPractica(slug);
 
   if (!practica) return null;
+
+  // Atlas y Sistema Solar traen su propio marco (portada incluida, como en NEM):
+  // no se envuelven en la Expedición para no mostrar dos portadas seguidas.
+  if (SLUGS_MARCO_NEM.has(slug)) return <PracticaNem slug={slug} />;
 
   const imagen = mejorImagenDeLab(slug);
   const Lab = practica.Component;
