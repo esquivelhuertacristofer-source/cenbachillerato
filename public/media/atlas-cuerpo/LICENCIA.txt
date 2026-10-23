@@ -1,0 +1,42 @@
+MODELOS 3D DEL ATLAS DEL CUERPO HUMANO — CRÉDITOS Y LICENCIA
+=============================================================
+
+Archivos: corazon.glb, digestivo.glb, encefalo.glb, endocrino.glb, esqueleto.glb,
+linfatico.glb, musculos.glb, nervios.glb, nervioso.glb, respiratorio.glb,
+sentidos.glb, urinario.glb, vasos.glb (esta carpeta).
+
+Obra original
+-------------
+«Z-Anatomy, the libre 3D atlas of anatomy»
+Gauthier Kervyn y colaboradores — https://www.z-anatomy.com
+Licencia: Creative Commons Atribución-CompartirIgual 4.0 Internacional (CC BY-SA 4.0)
+https://creativecommons.org/licenses/by-sa/4.0/deed.es
+
+Z-Anatomy deriva a su vez de:
+«BodyParts3D», © The Database Center for Life Science (DBCLS)
+Licencia: Creative Commons Atribución-CompartirIgual 2.1 Japón (CC BY-SA 2.1 JP)
+https://dbarchive.biosciencedbc.jp/en/bodyparts3d/
+
+Nombres anatómicos en español: Terminologia Anatomica (TA2), vía Z-Anatomy.
+
+Cambios hechos a los modelos
+----------------------------
+- Se separaron por sistema del cuerpo en trece archivos.
+- Se redujo el número de polígonos para usarlos en la web.
+- Se comprimió la geometría con Draco (KHR_draco_mesh_compression).
+- En la aplicación se recolorean por tipo de tejido con fines de enseñanza
+  (arterias rojas, venas azules, nervios amarillos, etc.).
+
+Licencia de esta versión
+------------------------
+Estos modelos modificados se distribuyen bajo la MISMA licencia,
+Creative Commons Atribución-CompartirIgual 4.0 Internacional (CC BY-SA 4.0).
+Puedes copiarlos, redistribuirlos y adaptarlos, incluso con fines comerciales,
+siempre que des el crédito anterior, indiques los cambios y compartas tus
+adaptaciones bajo la misma licencia.
+
+El crédito también aparece dentro del laboratorio «Atlas del cuerpo humano»
+(sobre la escena y en la pestaña «Teoría» → «Créditos y licencia de los modelos»).
+
+Decodificador Draco (carpeta /draco): © Google, licencia Apache 2.0.
+El worker /draco/draco-worker.js contiene código de three-stdlib (licencia MIT).

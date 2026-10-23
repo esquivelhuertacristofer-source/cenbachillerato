@@ -170,6 +170,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "porque": "Telegrama (3), fotografía (2) y testimonio oral (2) suman 7, más que el mínimo de 6, y son de tres tipos distintos. El diario pesa poco por su sesgo y la carta del ingeniero tiene anacronismos: no cuenta.",
     "comoComprobarlo": "En «Uso ético e interpretación», paso «Tu interpretación», elige la tesis y marca «Sostiene» en cada combinación; observa el medidor de peso y la balanza."
   },
+  "atlas-cuerpo-humano-3d": {
+    "escena": "Un atlas 3D con casi 1,900 piezas reales del cuerpo, que puedes cortar en tres planos.",
+    "pregunta": "Si cortas el tórax en horizontal a la altura del corazón, ¿qué queda a sus lados?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "Los dos pulmones",
+        "icono": "fa-lungs"
+      },
+      {
+        "id": "b",
+        "texto": "El hígado y el estómago",
+        "icono": "fa-utensils"
+      },
+      {
+        "id": "c",
+        "texto": "Los dos riñones",
+        "icono": "fa-droplet"
+      }
+    ],
+    "correcta": "a",
+    "porque": "El corazón está en el mediastino, entre los dos pulmones y cargado a la izquierda. El hígado y el estómago quedan bajo el diafragma; los riñones, todavía más abajo y atrás.",
+    "comoComprobarlo": "En «Explorar», elige el corte transversal en Herramientas del atlas, baja la altura hasta el pecho y toca lo que rodea al corazón."
+  },
   "aula-ingles-interacciones": {
     "escena": "Una maestra de inglés da una instrucción y no alcanzaste a oírla",
     "pregunta": "Si pides repetir con «I don't like it», ¿qué hace la maestra en la clase simulada?",
@@ -4273,6 +4297,30 @@ export const PREDICCIONES_LABS: Record<string, Prediccion> = {
     "correcta": "b",
     "porque": "La sal está disuelta: sus partículas pasan por el filtro y no se asientan. El agua hierve y se evapora a 100 °C, la sal no, y así se separan.",
     "comoComprobarlo": "Elige «Agua salada», prueba cada método con el botón Separar y mira en cuál las partículas viajan a sus vasos."
+  },
+  "sistema-solar-3d": {
+    "escena": "Los ocho planetas giran alrededor del Sol, cada uno en la posición que tiene hoy.",
+    "pregunta": "Un planeta está al doble de distancia del Sol que la Tierra. ¿Cuánto tarda en dar una vuelta?",
+    "opciones": [
+      {
+        "id": "a",
+        "texto": "2 años",
+        "icono": "fa-clock"
+      },
+      {
+        "id": "b",
+        "texto": "Casi 3 años",
+        "icono": "fa-hourglass-half"
+      },
+      {
+        "id": "c",
+        "texto": "4 años",
+        "icono": "fa-calendar"
+      }
+    ],
+    "correcta": "b",
+    "porque": "La 3.ª ley de Kepler dice que T² ∝ a³. Con a = 2 UA, T² = 8 y T = √8 ≈ 2.83 años: la órbita es más larga y, además, el planeta va más despacio.",
+    "comoComprobarlo": "En el modo «Periodos», pon el planeta X en 2 UA, toca «Alinear y soltar» y cuenta las vueltas de la Tierra mientras X da una."
   },
   "sistemas-ecuaciones-2x2": {
     "escena": "Dos rectas sobre el piso se cruzan en una columna dorada; la 2ª recta tiene pendiente −0.5 y la 1ª, −1.",

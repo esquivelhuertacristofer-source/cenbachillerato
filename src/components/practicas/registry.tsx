@@ -235,6 +235,8 @@ const LabCavernaConocimiento = dynamic(() => import("./labs/LabCavernaConocimien
 const LabArchivoFuentes = dynamic(() => import("./labs/LabArchivoFuentes").then((m) => m.LabArchivoFuentes), { ssr: false, loading: LabCargando });
 const LabPreguntasPasado = dynamic(() => import("./labs/LabPreguntasPasado").then((m) => m.LabPreguntasPasado), { ssr: false, loading: LabCargando });
 const LabAgoraCiudadania = dynamic(() => import("./labs/LabAgoraCiudadania").then((m) => m.LabAgoraCiudadania), { ssr: false, loading: LabCargando });
+const LabAtlasCuerpoHumano = dynamic(() => import("./labs/LabAtlasCuerpoHumano").then((m) => m.LabAtlasCuerpoHumano), { ssr: false, loading: LabCargando });
+const LabSistemaSolar = dynamic(() => import("./labs/LabSistemaSolar").then((m) => m.LabSistemaSolar), { ssr: false, loading: LabCargando });
 const LabLecturaEscritura = dynamic(() => import("./labs/LabLecturaEscritura").then((m) => m.LabLecturaEscritura), { ssr: false, loading: LabCargando });
 const LabEncuestaLectora = dynamic(() => import("./labs/LabEncuestaLectora").then((m) => m.LabEncuestaLectora), { ssr: false, loading: LabCargando });
 const LabHechoOpinion = dynamic(() => import("./labs/LabHechoOpinion").then((m) => m.LabHechoOpinion), { ssr: false, loading: LabCargando });
@@ -509,6 +511,8 @@ export const PRACTICAS: Record<string, PracticaDef> = {
   "archivo-fuentes-historicas-3d": { ...PRACTICAS_META["archivo-fuentes-historicas-3d"]!, Component: LabArchivoFuentes },
   "preguntas-pasado-discursos-3d": { ...PRACTICAS_META["preguntas-pasado-discursos-3d"]!, Component: LabPreguntasPasado },
   "agora-ciudadania-3d": { ...PRACTICAS_META["agora-ciudadania-3d"]!, Component: LabAgoraCiudadania },
+  "atlas-cuerpo-humano-3d": { ...PRACTICAS_META["atlas-cuerpo-humano-3d"]!, Component: LabAtlasCuerpoHumano },
+  "sistema-solar-3d": { ...PRACTICAS_META["sistema-solar-3d"]!, Component: LabSistemaSolar },
 };
 
 /** Devuelve la práctica registrada para un slug, o null si no existe. */

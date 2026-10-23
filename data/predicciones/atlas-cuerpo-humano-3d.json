@@ -1,0 +1,24 @@
+{
+  "escena": "Un atlas 3D con casi 1,900 piezas reales del cuerpo, que puedes cortar en tres planos.",
+  "pregunta": "Si cortas el tórax en horizontal a la altura del corazón, ¿qué queda a sus lados?",
+  "opciones": [
+    {
+      "id": "a",
+      "texto": "Los dos pulmones",
+      "icono": "fa-lungs"
+    },
+    {
+      "id": "b",
+      "texto": "El hígado y el estómago",
+      "icono": "fa-utensils"
+    },
+    {
+      "id": "c",
+      "texto": "Los dos riñones",
+      "icono": "fa-droplet"
+    }
+  ],
+  "correcta": "a",
+  "porque": "El corazón está en el mediastino, entre los dos pulmones y cargado a la izquierda. El hígado y el estómago quedan bajo el diafragma; los riñones, todavía más abajo y atrás.",
+  "comoComprobarlo": "En «Explorar», elige el corte transversal en Herramientas del atlas, baja la altura hasta el pecho y toca lo que rodea al corazón."
+}

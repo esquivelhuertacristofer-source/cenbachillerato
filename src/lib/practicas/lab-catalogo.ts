@@ -49,6 +49,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     titulo: "Laboratorio 3D — Archivo de fuentes históricas",
     descripcion: "Examina con la lupa la procedencia e intención de documentos de la expropiación petrolera de 1938, corrobora afirmaciones con hilos en un tablero de corcho, desenmascara una fuente con anacronismos y corrige una foto histórica descontextualizada antes de armar una interpretación argumentada.",
   },
+  "atlas-cuerpo-humano-3d": {
+    slug: "atlas-cuerpo-humano-3d",
+    titulo: "Laboratorio 3D — Atlas del cuerpo humano",
+    descripcion: "Casi 1,900 piezas anatómicas reales: corta el cuerpo en tres planos, quita capas, aísla órganos y relaciona estructura y función en los sistemas locomotor, digestivo, circulatorio, respiratorio y nervioso, con latido y respiración en vivo.",
+  },
   "aula-ingles-interacciones": {
     slug: "aula-ingles-interacciones",
     titulo: "Laboratorio Interactivo — In the classroom: el turno adecuado",
@@ -973,6 +978,11 @@ export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
     slug: "separacion-mezclas",
     titulo: "Laboratorio 3D — Separación de Mezclas",
     descripcion: "Aplica destilación, filtración, cristalización y cromatografía para separar componentes de mezclas homogéneas y heterogéneas.",
+  },
+  "sistema-solar-3d": {
+    slug: "sistema-solar-3d",
+    titulo: "Laboratorio 3D — El Sistema Solar",
+    descripcion: "Viaja por el Sistema Solar con fotos reales de la NASA y los planetas donde están hoy; mide la fuerza del Sol, comprueba T² ∝ a³ con los 8 planetas, las áreas iguales y la rapidez en el perihelio y el afelio.",
   },
   "sistemas-ecuaciones-2x2": {
     slug: "sistemas-ecuaciones-2x2",

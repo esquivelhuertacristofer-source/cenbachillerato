@@ -147,12 +147,18 @@ function DestacadoCard({ lab }: { lab: (typeof LABS_DESTACADOS)[number] }) {
       }
     >
       <div className="dest-card-media">
-        <VideoEmbed
-          videoId={lab.videoId}
-          title={nombre}
-          className="dest-card-video"
-          poster={<Lab3DPreview icon={color.faIcon} />}
-        />
+        {lab.videoId ? (
+          <VideoEmbed
+            videoId={lab.videoId}
+            title={nombre}
+            className="dest-card-video"
+            poster={<Lab3DPreview icon={color.faIcon} />}
+          />
+        ) : (
+          <Link href={lab.ruta} className="dest-card-img" aria-label={`Abrir laboratorio 3D: ${nombre}`}>
+            <img src={lab.imagen} alt={`Vista del laboratorio ${nombre}`} loading="lazy" decoding="async" />
+          </Link>
+        )}
         <span className="dest-card-badge" aria-hidden="true">
           <i className="fa-solid fa-cube" /> 3D interactivo
         </span>

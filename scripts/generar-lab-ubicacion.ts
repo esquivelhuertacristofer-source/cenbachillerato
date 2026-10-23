@@ -14,6 +14,11 @@
  * codigo exacto no. Si no menciona ninguno, queda sin ubicar y el lab se lista
  * igual, en su propio grupo.
  *
+ * UBICACION_FIJA manda sobre lo deducido: es para los laboratorios de
+ * exploracion libre que no cuelgan de una actividad concreta pero si de una
+ * materia. Los 126 de mecanica (CEN Labs) no van aqui ni tienen UAC: forman su
+ * propia area (src/lib/practicas/mecanica) y se quedan con uacCodigo nulo.
+ *
  *   npx tsx scripts/generar-lab-ubicacion.ts
  */
 import { readFileSync, writeFileSync, existsSync } from "fs";
@@ -35,10 +40,27 @@ for (const m of reg.matchAll(/^\s+"?([a-z0-9_-]+)"?:\s*\{[^}]*Component:\s*(\w+)
 }
 
 interface Ubic { uacCodigo: string | null; semestre: number | null; actividadCodigo: string | null }
+
+/** Exploracion libre: la materia es fija y no hay actividad exacta. */
+const UBICACION_FIJA: Record<string, string> = {
+  // Biologia de 6.o: el atlas recorre los sistemas del cuerpo, sin una sola progresion.
+  "atlas-cuerpo-humano-3d": "CNEYT-VI",
+  // Fisica de 5.o, junto a gravitacion-universal (CNEYT-V-P03): Kepler y la gravitacion.
+  "sistema-solar-3d": "CNEYT-V",
+};
+for (const [slug, uac] of Object.entries(UBICACION_FIJA)) {
+  if (!getUACPorCodigo(uac)) throw new Error(`UBICACION_FIJA: la UAC ${uac} de ${slug} no existe`);
+}
 const mapa: Record<string, Ubic> = {};
 let conUac = 0, conCodigo = 0, sinUbicar = 0;
 
 for (const slug of Object.keys(PRACTICAS_META).sort()) {
+  const fija = UBICACION_FIJA[slug];
+  if (fija) {
+    mapa[slug] = { uacCodigo: fija, semestre: getUACPorCodigo(fija)!.semestre, actividadCodigo: null };
+    conUac++;
+    continue;
+  }
   const arch = compAArchivo.get(slugAComp.get(slug) ?? "");
   const ruta = arch ? resolve(LABS, arch + ".tsx") : null;
   let codigos: string[] = [];

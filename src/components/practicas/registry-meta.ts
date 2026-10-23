@@ -5,6 +5,16 @@ export interface PracticaMeta {
 }
 
 export const PRACTICAS_META: Record<string, PracticaMeta> = {
+  "atlas-cuerpo-humano-3d": {
+    slug: "atlas-cuerpo-humano-3d",
+    titulo: "Laboratorio 3D — Atlas del cuerpo humano",
+    descripcion: "Casi 1,900 piezas anatómicas reales: corta el cuerpo en tres planos, quita capas, aísla órganos y relaciona estructura y función en los sistemas locomotor, digestivo, circulatorio, respiratorio y nervioso, con latido y respiración en vivo.",
+  },
+  "sistema-solar-3d": {
+    slug: "sistema-solar-3d",
+    titulo: "Laboratorio 3D — El Sistema Solar",
+    descripcion: "Viaja por el Sistema Solar con fotos reales de la NASA y los planetas donde están hoy; mide la fuerza del Sol, comprueba T² ∝ a³ con los 8 planetas, las áreas iguales y la rapidez en el perihelio y el afelio.",
+  },
   "entrevista-ingles": {
     slug: "entrevista-ingles",
     titulo: "Laboratorio Interactivo — The interview: entrevista y panel en inglés",

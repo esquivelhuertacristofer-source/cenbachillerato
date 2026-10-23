@@ -1,0 +1,12 @@
+{
+  "escena": "Los ocho planetas giran alrededor del Sol, cada uno en la posición que tiene hoy.",
+  "pregunta": "Un planeta está al doble de distancia del Sol que la Tierra. ¿Cuánto tarda en dar una vuelta?",
+  "opciones": [
+    { "id": "a", "texto": "2 años", "icono": "fa-clock" },
+    { "id": "b", "texto": "Casi 3 años", "icono": "fa-hourglass-half" },
+    { "id": "c", "texto": "4 años", "icono": "fa-calendar" }
+  ],
+  "correcta": "b",
+  "porque": "La 3.ª ley de Kepler dice que T² ∝ a³. Con a = 2 UA, T² = 8 y T = √8 ≈ 2.83 años: la órbita es más larga y, además, el planeta va más despacio.",
+  "comoComprobarlo": "En el modo «Periodos», pon el planeta X en 2 UA, toca «Alinear y soltar» y cuenta las vueltas de la Tierra mientras X da una."
+}

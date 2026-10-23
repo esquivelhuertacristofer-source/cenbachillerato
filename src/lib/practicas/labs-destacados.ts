@@ -22,8 +22,10 @@ export interface LabDestacado {
   uacCodigo: string;
   /** Semestre de agrupación en la presentación. */
   semestre: number;
-  /** YouTube ID del video demostrativo del lab. */
-  videoId: string;
+  /** YouTube ID del video demostrativo del lab. Sin él, la tarjeta usa `imagen`. */
+  videoId?: string;
+  /** Captura del lab (en /public) para las tarjetas sin video: lleva directo a la práctica. */
+  imagen?: string;
   /** Deep-link a la práctica (verificado en BD). */
   ruta: string;
 }
@@ -59,8 +61,11 @@ export const LABS_DESTACADOS: LabDestacado[] = [
   { n: 13, slug: "teorema-fundamental-calculo", uacCodigo: "PM-V", semestre: 5, videoId: "a16TcZJMabk", ruta: "/hub/uac/PM-V/progresion/8/actividad/2/practica" },
   { n: 14, slug: "mrua-acelerar-frenar", uacCodigo: "CNEYT-V", semestre: 5, videoId: "TIocE0moulw", ruta: "/hub/uac/CNEYT-V/progresion/1/actividad/2/practica" },
   { n: 15, slug: "fluidos", uacCodigo: "CNEYT-V", semestre: 5, videoId: "_8yQn6BVLtE", ruta: "/hub/uac/CNEYT-V/progresion/6/actividad/2/practica" },
+  // Exploración libre: no cuelgan de una progresión, abren por su ruta propia.
+  { n: 19, slug: "sistema-solar-3d", uacCodigo: "CNEYT-V", semestre: 5, imagen: "/media/destacados/sistema-solar-3d.webp", ruta: "/hub/laboratorios/sistema-solar-3d" },
   // ── Semestre 6 ──
   { n: 16, slug: "distribucion-normal", uacCodigo: "PM-VI", semestre: 6, videoId: "Rakx05e7MAA", ruta: "/hub/uac/PM-VI/progresion/8/actividad/2/practica" },
   { n: 17, slug: "division-celular", uacCodigo: "CNEYT-VI", semestre: 6, videoId: "v-aB7XyQihY", ruta: "/hub/uac/CNEYT-VI/progresion/5/actividad/2/practica" },
   { n: 18, slug: "adn-dogma-central-3d", uacCodigo: "CNEYT-VI", semestre: 6, videoId: "ZrrQA1uUohM", ruta: "/hub/uac/CNEYT-VI/progresion/4/actividad/1/practica" },
+  { n: 20, slug: "atlas-cuerpo-humano-3d", uacCodigo: "CNEYT-VI", semestre: 6, imagen: "/media/destacados/atlas-cuerpo-humano-3d.webp", ruta: "/hub/laboratorios/atlas-cuerpo-humano-3d" },
 ];
