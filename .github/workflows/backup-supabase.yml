@@ -142,7 +142,10 @@ jobs:
           # Formato plano: se restaura con `psql -f` sin pg_restore.
           # --no-owner / --no-privileges: para restaurar en un proyecto de
           # recuperación con roles distintos a los del original.
-          pg_dump "$SUPABASE_DB_URL"             --format=plain             --no-owner             --no-privileges           | gzip -9 > "${NOMBRE}"
+          # Ruta completa del cliente 17: en ubuntu-latest `pg_dump` a secas es el
+          # envoltorio de Ubuntu y elige el 16, que se niega contra un servidor 17.
+          PG17=/usr/lib/postgresql/17/bin
+          "$PG17/pg_dump" "$SUPABASE_DB_URL"            --format=plain             --no-owner             --no-privileges           | gzip -9 > "${NOMBRE}"
 
           TAMANO=$(stat -c%s "${NOMBRE}")
           if [ "$TAMANO" -lt 1024 ]; then
