@@ -184,8 +184,9 @@ export const PRODUCTS: ProductItem[] = [
     color: 'linear-gradient(135deg, #7C2D12 0%, #C2410C 100%)',
     accent: '#F97316',
     image: '/7.webp',
-    href: '#',
-    available: false,
+    href: 'https://www.cenrobotica.com.mx',
+    available: true,
+    external: true,
     telemetry: [
       { val: 'Arduino', lbl: 'Compatible',      icon: 'fa-microchip'},
       { val: 'Coding',  lbl: 'Código Visual',   icon: 'fa-code'     },

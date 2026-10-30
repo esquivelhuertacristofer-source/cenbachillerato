@@ -515,9 +515,10 @@ export function cifrasDeTag(tag: string): { num: string; label: string }[] {
   });
 }
 
-// Robótica e Idiomas no entran al carrusel: son productos "Próximamente" sin
-// currículo construido todavía (ver PRODUCTS en ProductosSection.tsx) — mostrar
-// tiles ahí sería inventar contenido que aún no existe.
+// Robótica e Idiomas no entran al carrusel: Idiomas es "Próximamente" y
+// Robótica vive en su propia plataforma (cenrobotica.com.mx) sin un desglose de
+// materias aquí (ver PRODUCTS en ProductosSection.tsx) — mostrar tiles sería
+// inventar contenido.
 export const PLATAFORMAS: PlataformaMosaico[] = [
   conMaterias({
     id: 'bachillerato',
