@@ -25,7 +25,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { CurvaTubo, TableroDePie } from "./_tablero";
 import {
   func, evalFunc, muestrear, muestrearG, bisectN, TVI, fmt1, fmt2,
   type FuncId, type Modo, type Vista,
@@ -383,7 +383,8 @@ function Contenido({ modo, funcId, xPos, nObj, accent, resetNonce }: Continuidad
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={-BY - 0.5} />
+      <Escenario acento={accent} suelo={-BY - 1.4} />
+      <TableroDePie ancho={2 * BX + 0.5} alto={2 * BY + 0.5} suelo={-BY - 1.4} />
 
 
       <group key={`${modo}-${funcId}-${resetNonce}`}>

@@ -25,7 +25,7 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber"
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { CurvaTubo, TableroDePie } from "./_tablero";
 import {
   VISTA, R_OPT, A_OPT, R_MIN, R_MAX, hDeR, areaTotal,
   muestrear, tangente, clipRecta, fmt1, fmt2,
@@ -59,6 +59,7 @@ const BX = 4.2;               // semiancho del plano
 const BY = 3.0;               // semialto del plano
 const PLANE_X = 3.2;          // desplazamiento del plano (derecha)
 const CYL_X = -5.2;           // desplazamiento del cilindro (izquierda)
+const SUELO_L = -BY - 1.4;     // piso (coordenadas locales del grupo escalado)
 const W = 0.165;              // escala cm → unidades de escena (cilindro)
 
 /* Scratch a nivel de módulo (evita asignar por frame). El plano de costo es
@@ -396,15 +397,21 @@ function Contenido({ rPos, showDecomp, accent, resetNonce, arrastrable, onScrubR
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={-BY - 0.5} />
+      <Escenario acento={accent} suelo={esc * SUELO_L} />
 
 
       <group key={resetNonce} scale={esc}>
         {/* cilindro físico (izquierda) */}
         <Lata rPos={rPos} angosto={angosto} />
+        {/* peana: la lata se apoya en la misma mesa que el tablero */}
+        <mesh position={[CYL_X, (SUELO_L + (-BY - 0.1)) / 2, 0]} castShadow receiveShadow>
+          <boxGeometry args={[5.2, -BY - 0.1 - SUELO_L, 3.2]} />
+          <meshStandardMaterial color="#223247" roughness={0.5} metalness={0.5} envMapIntensity={1.1} />
+        </mesh>
 
         {/* plano de costo (derecha) */}
         <group position={[PLANE_X, 0, 0]}>
+          <TableroDePie ancho={2 * BX + 0.5} alto={2 * BY + 0.5} suelo={SUELO_L} />
           <Plano v={v} />
           {showDecomp && <CurvaTrazo which="base" v={v} color={BASE_COL} width={2.6} dashed />}
           {showDecomp && <CurvaTrazo which="lateral" v={v} color={LAT_COL} width={2.6} dashed />}

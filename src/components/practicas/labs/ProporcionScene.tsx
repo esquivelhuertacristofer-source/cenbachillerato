@@ -20,7 +20,7 @@ import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Tipo } from "./proporcion-data";
 import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { CurvaTubo, TableroDePie } from "./_tablero";
 
 export interface ProporcionSceneProps {
   tipo: Tipo;
@@ -52,6 +52,7 @@ function Etiqueta({ pos, color, lado, children }: { pos: P3; color: string; lado
 }
 
 const W = 8; // ancho del plano (eje X)
+const SUELO_L = -2.2; // piso en coordenadas locales del graficador
 const H = 6; // alto del plano (eje Y)
 const K_COL = "#FFD166"; // color del invariante (razón / producto)
 
@@ -122,11 +123,14 @@ function Contenido(props: ProporcionSceneProps) {
       {/* Sin altura: esta escena no tenía sombra de la que leerla, así
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
-      <Escenario acento={accent} />
+      <Escenario acento={accent} suelo={(-H / 2) * escala + 0.35 + escala * SUELO_L} />
 
 
       {/* Todo el graficador, centrado en el origen del mundo */}
       <group key={`${tipo}-${props.resetNonce}`} position={[(-W / 2) * escala, (-H / 2) * escala + 0.35, 0]} scale={escala}>
+        {/* Tablero de pie detrás de todo el graficador (cara frontal tras el rectángulo, z = -0.2) */}
+        <TableroDePie ancho={W + 0.8} alto={H + 0.8} suelo={SUELO_L} centro={[W / 2, H / 2]} frente={-0.2} />
+
         {/* Cuadrícula de fondo */}
         {grid.map((l, i) => (
           <Line key={`g${i}`} points={l} color="#1d3147" lineWidth={1} transparent opacity={0.55} />

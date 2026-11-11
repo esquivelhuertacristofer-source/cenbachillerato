@@ -25,7 +25,7 @@ import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcGeom, fmtNum2, fmtPar, type Geom } from "./geometria-analitica-data";
 import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { CurvaTubo, TableroDePie } from "./_tablero";
 
 export type ModoGeo = "distancia" | "medio" | "pendiente";
 
@@ -284,7 +284,8 @@ function Contenido({ modo, x1, y1, x2, y2, accent, mostrarTriangulo, autoRotate,
 
   return (
     <>
-      <Escenario acento={accent} suelo={-G * U - 0.4} />
+      <Escenario acento={accent} suelo={-G * U - 1.3} />
+      <TableroDePie ancho={2 * G * U + 0.5} alto={2 * G * U + 0.5} suelo={-G * U - 1.3} />
 
       <group key={`${resetNonce}`}>
         <Escena geo={geo} modo={modo} mostrarTriangulo={mostrarTriangulo} />

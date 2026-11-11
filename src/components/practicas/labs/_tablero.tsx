@@ -37,7 +37,14 @@
  */
 
 import * as THREE from "three";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+
+/** Aclara un color hacia el blanco (marco y superficie del tablero de pie). */
+function aclarar(hex: string, t: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => Math.round(v + (255 - v) * t));
+  return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join("");
+}
 
 /** Punto en el plano del tablero. */
 export type Pt2 = [number, number];
@@ -82,6 +89,10 @@ export function CurvaTubo({
     const n = segmentos ?? Math.min(220, Math.max(24, v.length * 3));
     return new THREE.TubeGeometry(curva, n, grosor, radiales, false);
   }, [puntos, grosor, z, segmentos, radiales]);
+  /* Si los puntos cambian (un deslizador, un barrido animado) se crea otra
+   * geometría: la anterior se libera, o cada cambio dejaría un búfer huérfano
+   * en la GPU. */
+  useEffect(() => () => geo?.dispose(), [geo]);
 
   if (!geo) return null;
   return (
@@ -197,6 +208,78 @@ export function PanelGrafica({
           <boxGeometry args={[w, h, 0.16]} />
           <meshStandardMaterial color={marco} roughness={0.4} metalness={0.75} envMapIntensity={1.2} />
         </mesh>
+      ))}
+    </group>
+  );
+}
+
+/**
+ * El tablero DE PIE: la gráfica deja de flotar.
+ *
+ * Una cuadrícula suelta a media altura sobre una mesa vacía es lo que más
+ * delataba a estas escenas: nada la sostiene, nada le da tamaño y la curva no
+ * tiene dónde proyectar su sombra. Aquí la cuadrícula queda pintada sobre un
+ * tablero con grosor y marco, montado en dos patas que llegan al suelo de la
+ * escena: se lee como un instrumento colocado en el laboratorio, y la sombra
+ * del tubo sobre la superficie dice a qué distancia está la curva del fondo.
+ *
+ * Coste acotado: diez mallas de caja y cilindro, sin texturas.
+ *
+ * Se posiciona como `PanelGrafica` (por la cara frontal). `suelo` es la misma
+ * altura que la escena ya le pasa a `<Escenario suelo>`.
+ */
+export function TableroDePie({
+  ancho,
+  alto,
+  suelo,
+  centro = [0, 0],
+  frente = -0.06,
+  color: colorPedido,
+}: {
+  /** Medidas de la zona de dibujo (el marco va por fuera). */
+  ancho: number;
+  alto: number;
+  /** Altura del piso donde se apoyan las patas. */
+  suelo: number;
+  centro?: [number, number];
+  frente?: number;
+  color?: string;
+}) {
+  const base = "#050e1c";
+  const color = colorPedido ?? aclarar(base, 0.09);
+  const marco = aclarar(base, 0.3);
+  const metal = "#8fa3b8";
+  const gm = 0.16;
+  const [cx, cy] = centro;
+  const abajo = cy - alto / 2 - gm;
+  /* Las patas salen del canto inferior y bajan al piso por detrás de la cara
+   * de dibujo, para no tapar nada de lo que se pinta delante. */
+  const zPata = frente - GROSOR_PANEL - 0.06;
+  const largoPata = Math.max(abajo - suelo, 0.05);
+  const xPata = ancho * 0.36;
+  return (
+    <group>
+      <group position={[cx, cy, 0]}>
+        <PanelGrafica ancho={ancho} alto={alto} frente={frente} color={color} marco={marco} grosorMarco={gm} />
+        {/* Repisa inferior, como la de un pizarrón: cierra el marco por abajo
+            y le da al tablero un borde que recoge la luz. */}
+        <mesh position={[0, -alto / 2 - gm - 0.04, frente + 0.06]} castShadow receiveShadow>
+          <boxGeometry args={[ancho * 0.9, 0.07, 0.34]} />
+          <meshStandardMaterial color={metal} roughness={0.35} metalness={0.8} envMapIntensity={1.2} />
+        </mesh>
+      </group>
+      {[-xPata, xPata].map((x) => (
+        <group key={x} position={[cx + x, 0, zPata]}>
+          <mesh position={[0, suelo + largoPata / 2, 0]} castShadow>
+            <cylinderGeometry args={[0.07, 0.07, largoPata, 14]} />
+            <meshStandardMaterial color={metal} roughness={0.3} metalness={0.85} envMapIntensity={1.2} />
+          </mesh>
+          {/* Pie: lo que hace que el tablero se apoye y no cuelgue. */}
+          <mesh position={[0, suelo + 0.05, 0.1]} castShadow receiveShadow>
+            <boxGeometry args={[0.22, 0.1, 1.5]} />
+            <meshStandardMaterial color={marco} roughness={0.45} metalness={0.6} envMapIntensity={1.1} />
+          </mesh>
+        </group>
       ))}
     </group>
   );

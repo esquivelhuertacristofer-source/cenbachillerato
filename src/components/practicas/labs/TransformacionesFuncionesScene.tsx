@@ -25,7 +25,7 @@ import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcFuncion, evalF, evalPadre, fmtPar, type Funcion, type Modo } from "./transformaciones-funciones-data";
 import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { CurvaTubo, TableroDePie } from "./_tablero";
 
 export interface TransformacionesFuncionesSceneProps {
   modo: Modo;
@@ -238,7 +238,8 @@ function Contenido({ modo, a, h, k, accent, mostrarPadre, balon, autoRotate, pau
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={-G * U - 0.4} />
+      <Escenario acento={accent} suelo={-G * U - 1.3} />
+      <TableroDePie ancho={2 * G * U + 0.5} alto={2 * G * U + 0.5} suelo={-G * U - 1.3} />
 
 
       <group key={`${resetNonce}`}>

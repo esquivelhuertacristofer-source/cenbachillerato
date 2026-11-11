@@ -29,7 +29,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { CurvaTubo, TableroDePie } from "./_tablero";
 import {
   linCaso, lineal, muestrear, clipRecta, tangenteBase,
   dVol, fmt1, fmt2, fmt3,
@@ -305,7 +305,8 @@ function Contenido({ modo, casoId, xPos, r, dr, accent, resetNonce }: Diferencia
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={modo === "esfera" ? -3.6 : -BY - 0.5} />
+      <Escenario acento={accent} suelo={modo === "esfera" ? -3.6 : -BY - 1.4} />
+      {modo !== "esfera" && <TableroDePie ancho={2 * BX + 0.5} alto={2 * BY + 0.5} suelo={-BY - 1.4} />}
 
 
       <group key={resetNonce}>
