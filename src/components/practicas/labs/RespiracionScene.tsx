@@ -13,18 +13,23 @@
  *    regenerando NAD⁺; solo 2 ATP.
  *  - comparar:    mitocondria (≈38 ATP) junto a citoplasma fermentando (2 ATP).
  *
+ * Es un mundo microscópico: no lleva mesa. La célula es un volumen (elipsoide
+ * translúcido de doble capa), la mitocondria una cápsula con crestas, y el
+ * fondo tiene partículas tenues de citosol para dar profundidad.
+ *
  * Esquemática (no a escala). Etiquetas con <Html> (NUNCA <Text> de drei: cuelga
  * el chunk con Turbopack).
  */
 
 import * as THREE from "three";
-import React, { useMemo, useRef } from "react";
+import React, { useLayoutEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escena } from "./respiracion-data";
 import { Escenario } from "./_escenario";
 import { CurvaTubo } from "./_tablero";
+import { ATOMO } from "./_vidrio";
 
 type Pt = [number, number, number];
 
@@ -78,12 +83,118 @@ function Etiqueta({ pos, color, children, ancho = false }: { pos: Pt; color: str
   );
 }
 
-/* Molécula esférica reutilizable */
-function Mol({ r = 0.4, color, refMesh }: { r?: number; color: string; refMesh?: (m: THREE.Mesh | null) => void }) {
+/* Geometrías compartidas por todas las moléculas y partículas. */
+const GEO_ESFERA = new THREE.SphereGeometry(1, 24, 18);
+const GEO_VARILLA = new THREE.CylinderGeometry(1, 1, 1, 10);
+const GEO_CELULA = new THREE.SphereGeometry(1, 48, 32);
+const BLANCO = new THREE.Color("#ffffff");
+
+/* Pseudoaleatorio determinista (sin Math.random en el render). */
+function frac(x: number): number {
+  return x - Math.floor(x);
+}
+
+/* Varilla de enlace entre dos puntos locales. */
+function Varilla({ a, b, r = 0.05, color = "#cbd5e1" }: { a: Pt; b: Pt; r?: number; color?: string }) {
+  const { pos, q, len } = useMemo(() => {
+    const va = new THREE.Vector3(...a);
+    const vb = new THREE.Vector3(...b);
+    const d = vb.clone().sub(va);
+    const l = Math.max(0.0001, d.length());
+    return {
+      pos: va.clone().addScaledVector(d, 0.5),
+      q: new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.multiplyScalar(1 / l)),
+      len: l,
+    };
+  }, [a, b]);
   return (
-    <mesh ref={refMesh}>
-      <sphereGeometry args={[r, 20, 20]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.35} roughness={0.3} metalness={0.1} />
+    <mesh geometry={GEO_VARILLA} position={pos} quaternion={q} scale={[r, len, r]}>
+      <meshStandardMaterial color={color} roughness={0.3} metalness={0.8} envMapIntensity={1.2} />
+    </mesh>
+  );
+}
+
+/* Molécula reutilizable: esfera pulida, o un pequeño racimo bola-varilla.
+ *  - esfera: una sola bola (NADH, lactato, etanol, CO₂, O₂, H₂O…)
+ *  - anillo: glucosa (anillo de 6 con sustituyentes)
+ *  - cadena: piruvato (3 carbonos con un sustituyente) */
+function Mol({ r = 0.4, color, forma = "esfera" }: { r?: number; color: string; forma?: "esfera" | "anillo" | "cadena" }) {
+  const claro = useMemo(() => new THREE.Color(color).lerp(BLANCO, 0.45), [color]);
+  const cuerpo = (
+    <>
+      <meshPhysicalMaterial {...ATOMO} color={color} emissive={color} emissiveIntensity={0.12} />
+    </>
+  );
+  const sust = <meshPhysicalMaterial {...ATOMO} color={claro} emissive={color} emissiveIntensity={0.08} />;
+
+  const anillo = useMemo(() => {
+    const ring: Pt[] = [];
+    const pend: Pt[] = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      ring.push([Math.cos(a) * 0.78 * r, Math.sin(a) * 0.78 * r, 0]);
+      pend.push([Math.cos(a) * 1.28 * r, Math.sin(a) * 1.28 * r, (i % 2 ? 0.28 : -0.28) * r]);
+    }
+    return { ring, pend };
+  }, [r]);
+  const cadena = useMemo(() => {
+    const c: Pt[] = [
+      [-0.85 * r, -0.25 * r, 0],
+      [0, 0.25 * r, 0],
+      [0.85 * r, -0.25 * r, 0],
+    ];
+    const p: Pt = [0, 1.0 * r, 0.2 * r];
+    return { c, p };
+  }, [r]);
+
+  if (forma === "anillo") {
+    return (
+      <group rotation={[0.7, 0, 0]}>
+        {anillo.ring.map((p, i) => (
+          <React.Fragment key={i}>
+            <mesh geometry={GEO_ESFERA} position={p} scale={0.27 * r} castShadow>
+              {cuerpo}
+            </mesh>
+            <Varilla a={p} b={anillo.ring[(i + 1) % 6]!} r={0.045 * r} />
+            <Varilla a={p} b={anillo.pend[i]!} r={0.04 * r} />
+            <mesh geometry={GEO_ESFERA} position={anillo.pend[i]!} scale={0.17 * r}>
+              {sust}
+            </mesh>
+          </React.Fragment>
+        ))}
+      </group>
+    );
+  }
+  if (forma === "cadena") {
+    return (
+      <group>
+        {cadena.c.map((p, i) => (
+          <React.Fragment key={i}>
+            <mesh geometry={GEO_ESFERA} position={p} scale={0.5 * r} castShadow>
+              {cuerpo}
+            </mesh>
+            {i > 0 && <Varilla a={cadena.c[i - 1]!} b={p} r={0.09 * r} />}
+          </React.Fragment>
+        ))}
+        <Varilla a={cadena.c[1]!} b={cadena.p} r={0.07 * r} />
+        <mesh geometry={GEO_ESFERA} position={cadena.p} scale={0.3 * r}>
+          {sust}
+        </mesh>
+      </group>
+    );
+  }
+  return (
+    <mesh geometry={GEO_ESFERA} scale={r} castShadow>
+      {cuerpo}
+    </mesh>
+  );
+}
+
+/* Esfera pulida suelta (O₂, lactato, anillo de Krebs). */
+function Bola({ r, color, pos, emi = 0.15 }: { r: number; color: string; pos: Pt; emi?: number }) {
+  return (
+    <mesh geometry={GEO_ESFERA} position={pos} scale={r} castShadow>
+      <meshPhysicalMaterial {...ATOMO} color={color} emissive={color} emissiveIntensity={emi} />
     </mesh>
   );
 }
@@ -137,21 +248,80 @@ function ATPStack({
     m.instanceMatrix.needsUpdate = true;
   });
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, count]} frustumCulled={false}>
-      <cylinderGeometry args={[0.26, 0.26, 0.1, 18]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.25} metalness={0.4} />
+    <instancedMesh ref={mesh} args={[undefined, undefined, count]} frustumCulled={false} castShadow>
+      <cylinderGeometry args={[0.26, 0.26, 0.1, 24]} />
+      <meshPhysicalMaterial {...ATOMO} color={color} emissive={color} emissiveIntensity={0.3} roughness={0.25} metalness={0.5} />
     </instancedMesh>
   );
 }
 
+/* Partículas tenues de citosol dentro de un elipsoide (posiciones deterministas). */
+function Citosol({ rx, ry, rz, n = 46, color = "#9bd7f5" }: { rx: number; ry: number; rz: number; n?: number; color?: string }) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  useLayoutEffect(() => {
+    const m = mesh.current;
+    if (!m) return;
+    const o = new THREE.Object3D();
+    for (let i = 0; i < n; i++) {
+      const rr = Math.cbrt(frac((i + 1) * 0.61803)) * 0.9;
+      const th = frac((i + 1) * 0.7548776662) * Math.PI * 2;
+      const cp = frac((i + 1) * 0.5698402909) * 2 - 1;
+      const sp = Math.sqrt(1 - cp * cp);
+      o.position.set(rr * sp * Math.cos(th) * rx, rr * sp * Math.sin(th) * ry, rr * cp * rz);
+      o.scale.setScalar(0.05 + (i % 3) * 0.03);
+      o.updateMatrix();
+      m.setMatrixAt(i, o.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  }, [n, rx, ry, rz]);
+  return (
+    <instancedMesh ref={mesh} args={[GEO_ESFERA, undefined, n]} frustumCulled={false}>
+      <meshBasicMaterial color={color} transparent opacity={0.3} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+/* Polvo de fondo: partículas lejanas muy tenues que dan profundidad al vacío. */
+function Polvo() {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const grp = useRef<THREE.Group>(null);
+  const N = 70;
+  useLayoutEffect(() => {
+    const m = mesh.current;
+    if (!m) return;
+    const o = new THREE.Object3D();
+    for (let i = 0; i < N; i++) {
+      o.position.set(
+        (frac((i + 1) * 0.61803) - 0.5) * 32,
+        (frac((i + 1) * 0.7548776662) - 0.5) * 16,
+        -3 - frac((i + 1) * 0.5698402909) * 8,
+      );
+      o.scale.setScalar(0.05 + (i % 4) * 0.035);
+      o.updateMatrix();
+      m.setMatrixAt(i, o.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  }, []);
+  useFrame((st) => {
+    if (grp.current) grp.current.position.y = Math.sin(st.clock.elapsedTime * 0.25) * 0.25;
+  });
+  return (
+    <group ref={grp}>
+      <instancedMesh ref={mesh} args={[GEO_ESFERA, undefined, N]} frustumCulled={false}>
+        <meshBasicMaterial color="#7dd3fc" transparent opacity={0.22} depthWrite={false} />
+      </instancedMesh>
+    </group>
+  );
+}
+
 /* ── GLUCÓLISIS: glucosa (6C) → 2 piruvato (3C) ───────────────────────────── */
-function Glucolisis({ frac, playing }: { frac: number; playing: boolean }) {
+function Glucolisis({ frac: fr, playing }: { frac: number; playing: boolean }) {
   const gluc = useRef<THREE.Group>(null);
   const pirA = useRef<THREE.Group>(null);
   const pirB = useRef<THREE.Group>(null);
   const t = useRef(0);
   // separación de piruvatos: 0 → 1 sobre la 2ª mitad de la animación
-  const sep = clamp01((frac - 0.4) / 0.5);
+  const sep = clamp01((fr - 0.4) / 0.5);
   useFrame((_, dt) => {
     if (playing) t.current += dt;
     if (gluc.current) {
@@ -168,22 +338,22 @@ function Glucolisis({ frac, playing }: { frac: number; playing: boolean }) {
       pirB.current.position.set(1.6 * sep, Math.sin(t.current * 1.6 + 1) * 0.08, 0);
     }
   });
-  const atpVis = clamp01((frac - 0.6) / 0.4);
-  const nadhVis = clamp01((frac - 0.55) / 0.4);
+  const atpVis = clamp01((fr - 0.6) / 0.4);
+  const nadhVis = clamp01((fr - 0.55) / 0.4);
   return (
     <group>
       <Membrana label="Citoplasma" color="#38bdf8" rx={5.2} ry={3.4} />
       <group ref={gluc}>
-        <Mol r={0.85} color={C_GLUCOSA} />
-        {sep < 0.5 && <Etiqueta pos={[0, 1.35, 0]} color={`${C_GLUCOSA}cc`}>Glucosa · C₆H₁₂O₆</Etiqueta>}
+        <Mol r={0.95} color={C_GLUCOSA} forma="anillo" />
+        {sep < 0.5 && <Etiqueta pos={[0, 1.55, 0]} color={`${C_GLUCOSA}cc`}>Glucosa · C₆H₁₂O₆</Etiqueta>}
       </group>
       <group ref={pirA}>
-        <Mol r={0.5} color={C_PIRUVATO} />
+        <Mol r={0.62} color={C_PIRUVATO} forma="cadena" />
       </group>
       <group ref={pirB}>
-        <Mol r={0.5} color={C_PIRUVATO} />
+        <Mol r={0.62} color={C_PIRUVATO} forma="cadena" />
       </group>
-      {sep > 0.5 && <Etiqueta pos={[0, -1.3, 0]} color={`${C_PIRUVATO}cc`}>2 piruvato (3 C)</Etiqueta>}
+      {sep > 0.5 && <Etiqueta pos={[0, -1.4, 0]} color={`${C_PIRUVATO}cc`}>2 piruvato (3 C)</Etiqueta>}
       <ATPStack count={2} vis={atpVis} playing={playing} base={[-2.6, 1.6, 0]} cols={2} />
       {atpVis > 0.5 && <Etiqueta pos={[-2.6, 2.7, 0]} color={`${C_ATP}cc`}>+2 ATP netos</Etiqueta>}
       <ATPStack count={2} vis={nadhVis} playing={playing} base={[2.6, 1.6, 0]} cols={2} color={C_NADH} />
@@ -194,12 +364,13 @@ function Glucolisis({ frac, playing }: { frac: number; playing: boolean }) {
 
 /* Membrana / compartimento.
  *
- * ERA UN PELO DE UN PÍXEL. `lineBasicMaterial` no recibe luz, no proyecta
- * sombra y mide lo mismo de cerca que de lejos: el citoplasma se leía como un
- * óvalo dibujado encima de la escena, no como el interior de una célula. Ahora
- * el contorno tiene cuerpo (tubo) y el compartimento tiene relleno, que es lo
- * que hace que las moléculas se vean DENTRO de algo y no flotando. */
+ * Un volumen, no un dibujo: elipsoide translúcido de doble capa (cara interior
+ * y exterior, sin transmission: lo de dentro es translúcido y por eso la
+ * membrana no puede refractar) más una malla muy tenue que marca la curvatura.
+ * El contorno en tubo conserva la silueta, y el citosol (partículas) da la
+ * sensación de medio donde flotan las moléculas. */
 function Membrana({ label, color, rx, ry }: { label: string; color: string; rx: number; ry: number }) {
+  const rz = Math.min(rx, ry) * 0.8;
   const pts = useMemo<Pt[]>(() => {
     const N = 96;
     const out: Pt[] = [];
@@ -212,13 +383,18 @@ function Membrana({ label, color, rx, ry }: { label: string; color: string; rx: 
 
   return (
     <group>
-      {/* El interior: muy tenue, detrás de todo, para dar profundidad sin
-          robarle protagonismo a lo que ocurre dentro. */}
-      <mesh position={[0, 0, -0.35]} scale={[rx, ry, 1]}>
-        <circleGeometry args={[1, 96]} />
-        <meshBasicMaterial color={color} transparent opacity={0.07} depthWrite={false} />
+      <mesh geometry={GEO_CELULA} scale={[rx, ry, rz]} renderOrder={-1}>
+        <meshPhysicalMaterial color={color} transparent opacity={0.1} roughness={0.2} side={THREE.BackSide} depthWrite={false} />
       </mesh>
-      <CurvaTubo puntos={pts} color={color} grosor={0.055} brillo={0.55} />
+      <mesh geometry={GEO_CELULA} scale={[rx, ry, rz]} renderOrder={2}>
+        <meshPhysicalMaterial color={color} transparent opacity={0.07} roughness={0.15} clearcoat={1} clearcoatRoughness={0.1} depthWrite={false} />
+      </mesh>
+      {/* borde luminoso barato: tercera capa BackSide algo mayor, tenue */}
+      <mesh geometry={GEO_CELULA} scale={[rx * 1.04, ry * 1.04, rz * 1.04]} renderOrder={-2}>
+        <meshBasicMaterial color={color} transparent opacity={0.07} side={THREE.BackSide} depthWrite={false} />
+      </mesh>
+      <Citosol rx={rx} ry={ry} rz={rz} n={label ? 46 : 22} />
+      <CurvaTubo puntos={pts} color={color} grosor={0.055} brillo={0.45} />
       {label && (
         <Etiqueta pos={[0, ry + 0.45, 0]} color={`${color}aa`}>
           {label}
@@ -229,17 +405,17 @@ function Membrana({ label, color, rx, ry }: { label: string; color: string; rx: 
 }
 
 /* ── AEROBIA: mitocondria con Krebs + cadena transportadora ───────────────── */
-function Aerobia({ frac, playing }: { frac: number; playing: boolean }) {
+function Aerobia({ frac: fr, playing }: { frac: number; playing: boolean }) {
   const piruvato = useRef<THREE.Group>(null);
   const krebs = useRef<THREE.Group>(null);
   const agua = useRef<THREE.Group>(null);
   const t = useRef(0);
 
-  const entra = clamp01(frac / 0.25); // piruvato entra
-  const giraKrebs = clamp01((frac - 0.25) / 0.4);
-  const cadena = clamp01((frac - 0.45) / 0.35);
-  const aguaVis = clamp01((frac - 0.65) / 0.3);
-  const atpVis = clamp01((frac - 0.7) / 0.3);
+  const entra = clamp01(fr / 0.25); // piruvato entra
+  const giraKrebs = clamp01((fr - 0.25) / 0.4);
+  const cadena = clamp01((fr - 0.45) / 0.35);
+  const aguaVis = clamp01((fr - 0.65) / 0.3);
+  const atpVis = clamp01((fr - 0.7) / 0.3);
 
   useFrame((_, dt) => {
     if (playing) t.current += dt;
@@ -254,53 +430,40 @@ function Aerobia({ frac, playing }: { frac: number; playing: boolean }) {
     }
   });
 
-  // cresta (membrana interna plegada) como toroides
   return (
     <group>
-      {/* doble membrana mitocondrial */}
-      <Capsula color="#34d399" w={9.2} h={4.8} op={0.05} />
-      <Capsula color="#34d399" w={8.2} h={3.9} op={0.0} wire />
+      {/* doble membrana mitocondrial con crestas */}
+      <Capsula color="#34d399" w={9.2} h={4.8} />
       {/* piruvato entrando */}
       <group ref={piruvato} position={[-4.5, 0, 0]}>
-        <Mol r={0.45} color={C_PIRUVATO} />
-        {giraKrebs < 0.3 && <Etiqueta pos={[0, 0.95, 0]} color={`${C_PIRUVATO}cc`}>piruvato</Etiqueta>}
+        <Mol r={0.55} color={C_PIRUVATO} forma="cadena" />
+        {giraKrebs < 0.3 && <Etiqueta pos={[0, 1.1, 0]} color={`${C_PIRUVATO}cc`}>piruvato</Etiqueta>}
       </group>
 
       {/* ciclo de Krebs: anillo de moléculas */}
       <group ref={krebs} position={[-1.6, 0, 0]}>
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
           <torusGeometry args={[1.0, 0.07, 12, 40]} />
-          <meshStandardMaterial color="#34d399" emissive="#34d399" emissiveIntensity={0.5} roughness={0.4} />
+          <meshPhysicalMaterial {...ATOMO} color="#34d399" emissive="#34d399" emissiveIntensity={0.25} />
         </mesh>
         {Array.from({ length: 6 }).map((_, i) => {
           const a = i * 2.39996;
-          return (
-            <mesh key={i} position={[Math.cos(a), Math.sin(a), 0]}>
-              <sphereGeometry args={[0.2, 14, 14]} />
-              <meshStandardMaterial color={C_NADH} emissive={C_NADH} emissiveIntensity={0.6} roughness={0.3} />
-            </mesh>
-          );
+          return <Bola key={i} r={0.22} color={C_NADH} pos={[Math.cos(a), Math.sin(a), 0]} emi={0.2} />;
         })}
       </group>
       {giraKrebs > 0.3 && <Etiqueta pos={[-1.6, 1.5, 0]} color="#34d399cc">Ciclo de Krebs</Etiqueta>}
 
       {/* CO2 saliendo */}
-      {giraKrebs > 0.4 && (
-        <>
-          <group position={[-1.6, -1.7, 0]}>
-            <Mol r={0.22} color={C_CO2} />
-          </group>
-        </>
-      )}
+      {giraKrebs > 0.4 && <Bola r={0.24} color={C_CO2} pos={[-1.6, -1.7, 0]} emi={0.1} />}
 
       {/* cadena transportadora: 4 complejos */}
       <group position={[1.6, -0.2, 0]}>
         {Array.from({ length: 4 }).map((_, i) => {
           const lit = cadena > i / 4;
           return (
-            <mesh key={i} position={[i * 0.85, 0, 0]}>
+            <mesh key={i} position={[i * 0.85, 0, 0]} castShadow>
               <boxGeometry args={[0.5, 1.1, 0.5]} />
-              <meshStandardMaterial color={lit ? C_O2 : "#1e3a4d"} emissive={C_O2} emissiveIntensity={lit ? 0.7 : 0.05} roughness={0.4} />
+              <meshPhysicalMaterial {...ATOMO} color={lit ? C_O2 : "#1e3a4d"} emissive={C_O2} emissiveIntensity={lit ? 0.4 : 0.03} />
             </mesh>
           );
         })}
@@ -308,13 +471,9 @@ function Aerobia({ frac, playing }: { frac: number; playing: boolean }) {
       </group>
 
       {/* O2 + H2O */}
-      {cadena > 0.5 && (
-        <group position={[4.4, -0.2, 0]}>
-          <Mol r={0.28} color={C_O2} />
-        </group>
-      )}
+      {cadena > 0.5 && <Bola r={0.3} color={C_O2} pos={[4.4, -0.2, 0]} emi={0.15} />}
       <group ref={agua} position={[4.4, -1.6, 0]}>
-        <Mol r={0.3} color={C_H2O} />
+        <Mol r={0.32} color={C_H2O} />
       </group>
 
       {/* cosecha de ATP */}
@@ -324,9 +483,10 @@ function Aerobia({ frac, playing }: { frac: number; playing: boolean }) {
   );
 }
 
-/* Cápsula (estadio) para la mitocondria: dos semicírculos + lados.
- * Contorno con cuerpo (tubo), no un pelo de 1 px. */
-function Capsula({ color, w, h, op, wire = false }: { color: string; w: number; h: number; op: number; wire?: boolean }) {
+/* Mitocondria: cápsula translúcida de doble membrana con crestas internas.
+ * Los contornos en tubo marcan la silueta; las crestas son opacas (dentro de
+ * una membrana sin transmission, así que se ven). */
+function Capsula({ color, w, h }: { color: string; w: number; h: number }) {
   const pts = useMemo<Pt[]>(() => {
     const out: Pt[] = [];
     const N = 80;
@@ -339,25 +499,47 @@ function Capsula({ color, w, h, op, wire = false }: { color: string; w: number; 
     }
     return out;
   }, [w, h]);
+  const geoExt = useMemo(() => new THREE.CapsuleGeometry(h / 2, Math.max(0.01, w - h), 12, 40), [w, h]);
+  const nCrestas = Math.max(3, Math.floor(w / 1.1));
+  const yCresta = (h / 2) * 0.88 - 0.25;
+  const crestas = useMemo(
+    () =>
+      Array.from({ length: nCrestas }).map((_, i) => ({
+        x: (i - (nCrestas - 1) / 2) * ((w - h * 0.6) / nCrestas),
+        y: i % 2 ? -yCresta : yCresta,
+      })),
+    [nCrestas, w, h, yCresta],
+  );
   return (
     <group>
-      <CurvaTubo puntos={pts} color={color} grosor={wire ? 0.03 : 0.06} brillo={wire ? 0.3 : 0.5} />
-      {!wire && op > 0 && (
-        <mesh>
-          <boxGeometry args={[w, h, 0.02]} />
-          <meshStandardMaterial color={color} transparent opacity={op} depthWrite={false} side={THREE.DoubleSide} />
+      {/* membrana externa: cara interior + cara exterior */}
+      <mesh geometry={geoExt} rotation={[0, 0, Math.PI / 2]} scale={[1, 1, 0.8]} renderOrder={-1}>
+        <meshPhysicalMaterial color={color} transparent opacity={0.1} roughness={0.2} side={THREE.BackSide} depthWrite={false} />
+      </mesh>
+      <mesh geometry={geoExt} rotation={[0, 0, Math.PI / 2]} scale={[1, 1, 0.8]} renderOrder={2}>
+        <meshPhysicalMaterial color={color} transparent opacity={0.07} roughness={0.15} clearcoat={1} clearcoatRoughness={0.1} depthWrite={false} />
+      </mesh>
+      {/* membrana interna */}
+      <mesh geometry={geoExt} rotation={[0, 0, Math.PI / 2]} scale={[0.9, 0.88, 0.7]} renderOrder={1}>
+        <meshPhysicalMaterial color={color} transparent opacity={0.07} roughness={0.2} depthWrite={false} />
+      </mesh>
+      {/* crestas: pliegues de la membrana interna, alternando arriba/abajo */}
+      {crestas.map((c, i) => (
+        <mesh key={i} geometry={GEO_ESFERA} position={[c.x, c.y, 0]} scale={[0.1, 0.32, h * 0.2]}>
+          <meshStandardMaterial color="#2f9f7a" roughness={0.45} metalness={0.1} envMapIntensity={0.9} />
         </mesh>
-      )}
+      ))}
+      <CurvaTubo puntos={pts} color={color} grosor={0.05} brillo={0.4} />
     </group>
   );
 }
 
 /* ── FERMENTACIÓN: piruvato → lactato / etanol + CO₂, regenera NAD⁺ ─────────── */
-function Fermentacion({ frac, playing }: { frac: number; playing: boolean }) {
+function Fermentacion({ frac: fr, playing }: { frac: number; playing: boolean }) {
   const nadh = useRef<THREE.Group>(null);
   const prod = useRef<THREE.Group>(null);
   const t = useRef(0);
-  const conv = clamp01((frac - 0.4) / 0.5);
+  const conv = clamp01((fr - 0.4) / 0.5);
   useFrame((_, dt) => {
     if (playing) t.current += dt;
     if (nadh.current) {
@@ -375,12 +557,12 @@ function Fermentacion({ frac, playing }: { frac: number; playing: boolean }) {
       <Membrana label="Citoplasma sin O₂" color="#a78bfa" rx={5.2} ry={3.4} />
       {/* piruvato origen */}
       <group position={[-1.6, 0.4, 0]}>
-        <Mol r={0.45} color={C_PIRUVATO} />
-        <Etiqueta pos={[0, 0.95, 0]} color={`${C_PIRUVATO}cc`}>piruvato</Etiqueta>
+        <Mol r={0.58} color={C_PIRUVATO} forma="cadena" />
+        <Etiqueta pos={[0, 1.1, 0]} color={`${C_PIRUVATO}cc`}>piruvato</Etiqueta>
       </group>
       {/* bucle de NADH ↔ NAD+ */}
       <group ref={nadh}>
-        <Mol r={0.26} color={C_NADH} />
+        <Mol r={0.28} color={C_NADH} />
       </group>
       <Etiqueta pos={[0, 1.9, 0]} color={`${C_NADH}cc`} ancho>NADH → NAD⁺ (se regenera)</Etiqueta>
       {/* productos */}
@@ -390,7 +572,7 @@ function Fermentacion({ frac, playing }: { frac: number; playing: boolean }) {
           <Mol r={0.42} color={C_ETANOL} />
         </group>
         <group position={[1.9, 0.4, 0]}>
-          <Mol r={0.2} color={C_CO2} />
+          <Mol r={0.22} color={C_CO2} />
         </group>
       </group>
       {conv > 0.4 && <Etiqueta pos={[2.4, -2.4, 0]} color={`${C_LACTATO}cc`} ancho>lactato · etanol + CO₂</Etiqueta>}
@@ -410,7 +592,7 @@ function ComparaLado({ aerobia, playing, o2 }: { aerobia: boolean; playing: bool
   const lac = useRef<THREE.Group>(null);
   const oxi = useRef<THREE.Group>(null);
   useFrame((st, dt) => {
-    if (giro.current && playing) giro.current.rotation.z += dt * (aerobia ? 0.5 : 0.2);
+    if (giro.current && playing) giro.current.rotation.y += dt * (aerobia ? 0.5 : 0.2);
     if (aerobia && lac.current) lac.current.scale.setScalar(0.0001 + (1 - o2));
     if (aerobia && oxi.current) {
       oxi.current.scale.setScalar(0.0001 + o2);
@@ -420,9 +602,9 @@ function ComparaLado({ aerobia, playing, o2 }: { aerobia: boolean; playing: bool
   const atp = aerobia ? 2 + 36 * o2 : 2;
   return (
     <group>
-      {aerobia ? <Capsula color="#34d399" w={4.6} h={3.0} op={0.05} /> : <Membrana label="" color="#a78bfa" rx={2.3} ry={1.6} />}
+      {aerobia ? <Capsula color="#34d399" w={4.6} h={3.0} /> : <Membrana label="" color="#a78bfa" rx={2.3} ry={1.6} />}
       <group ref={giro}>
-        <Mol r={0.5} color={aerobia ? C_GLUCOSA : C_PIRUVATO} />
+        {aerobia ? <Mol r={0.55} color={C_GLUCOSA} forma="anillo" /> : <Mol r={0.42} color={C_PIRUVATO} forma="cadena" />}
       </group>
       {aerobia && (
         <>
@@ -430,21 +612,13 @@ function ComparaLado({ aerobia, playing, o2 }: { aerobia: boolean; playing: bool
           <group ref={oxi}>
             {Array.from({ length: 6 }).map((_, i) => {
               const a = (i / 6) * Math.PI * 2;
-              return (
-                <mesh key={i} position={[Math.cos(a) * 1.5, Math.sin(a) * 0.95, 0.2]}>
-                  <sphereGeometry args={[0.2, 14, 14]} />
-                  <meshStandardMaterial color={C_O2} emissive={C_O2} emissiveIntensity={0.5} roughness={0.3} />
-                </mesh>
-              );
+              return <Bola key={i} r={0.2} color={C_O2} pos={[Math.cos(a) * 1.5, Math.sin(a) * 0.95, 0.2]} emi={0.15} />;
             })}
           </group>
           {/* lactato que se acumula cuando falta O₂ */}
           <group ref={lac} position={[0, -1.15, 0.3]}>
             {[-0.5, 0, 0.5].map((x) => (
-              <mesh key={x} position={[x, 0, 0]}>
-                <sphereGeometry args={[0.2, 14, 14]} />
-                <meshStandardMaterial color={C_LACTATO} emissive={C_LACTATO} emissiveIntensity={0.5} roughness={0.3} />
-              </mesh>
+              <Bola key={x} r={0.2} color={C_LACTATO} pos={[x, 0, 0]} emi={0.15} />
             ))}
           </group>
         </>
@@ -457,12 +631,10 @@ function ComparaLado({ aerobia, playing, o2 }: { aerobia: boolean; playing: bool
 function Contenido({ modo, escena, playing, modoColor, resetNonce, o2 }: RespiracionSceneProps) {
   return (
     <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
-          que el escenario la MIDE de la propia escena al montarse, en
-          vez de que alguien la adivine. */}
+      {/* Luz de tres puntos y entorno que reflejar; sin mesa: es un mundo microscópico. */}
       <Escenario acento="#38bdf8" mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
+      <Polvo />
 
       <group key={`${modo}-${resetNonce}`}>
         {modo === "glucolisis" && <Glucolisis frac={escena.frac} playing={playing} />}
@@ -485,7 +657,7 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce, o2 }: Respira
 
       <OrbitControls enablePan={false} minDistance={7} maxDistance={44} autoRotate={false} target={[0, -0.8, 0]} />
       <EffectComposer>
-        <Bloom intensity={0.55} luminanceThreshold={0.25} mipmapBlur />
+        <Bloom intensity={0.45} luminanceThreshold={0.4} mipmapBlur />
         <Vignette eskil={false} offset={0.2} darkness={0.7} />
       </EffectComposer>
     </>

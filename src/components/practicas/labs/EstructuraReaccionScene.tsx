@@ -14,10 +14,12 @@
  *    que dejan de coincidir se ponen naranjas.
  *  - simbologia:  un símbolo a la vez (el que elige el alumno) sobre un carrusel.
  *
- * Todos los átomos de la ecuación son UNA sola malla instanciada (una
- * fotosíntesis llega a ~70 esferas). Esquemática (no a escala): las fórmulas y
- * los conteos de átomos son exactos. Etiquetas con <Html> (NUNCA <Text> de
- * drei: cuelga el chunk con Turbopack), máx. 4 a la vez.
+ * Modelo bola-varilla: todos los átomos de la ecuación son UNA sola malla
+ * instanciada y todos los enlaces OTRA (una fotosíntesis llega a ~70 esferas).
+ * Cada especie reposa sobre su peana, sobre la mesa del <Escenario>.
+ * Esquemática (no a escala): las fórmulas y los conteos de átomos son exactos.
+ * Etiquetas con <Html> (NUNCA <Text> de drei: cuelga el chunk con Turbopack),
+ * máx. 4 a la vez.
  */
 
 import * as THREE from "three";
@@ -26,6 +28,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
+import { ATOMO, METAL } from "./_vidrio";
 import {
   type Modo,
   type Escena,
@@ -90,51 +93,119 @@ function Etiqueta({ pos, color, children, big = false, ancho = false }: { pos: P
   );
 }
 
-/* ── Átomos de una molécula (índice 0 al centro, el resto en círculo) ───────── */
+/* Geometrías compartidas por todas las mallas instanciadas. */
+const GEO_ESFERA = new THREE.SphereGeometry(1, 24, 18);
+const GEO_VARILLA = new THREE.CylinderGeometry(1, 1, 1, 10);
+const GEO_PEANA = new THREE.CylinderGeometry(1, 1, 1, 40);
+const GEO_BISEL = new THREE.TorusGeometry(1, 0.035, 10, 48);
+
+/* ── Átomos de una molécula (índice 0 = centro) ─────────────────────────────── */
 function atomosExpandidos(especie: Especie): string[] {
   const out: string[] = [];
   const entries = Object.entries(especie.atomos);
-  entries.sort((a, b) => {
-    const pri = (el: string) => (el === "C" ? 3 : el === "N" ? 2 : el === "Na" ? 1 : 0);
-    return pri(b[0]) - pri(a[0]);
-  });
+  // El átomo central es el «más central» químicamente: C, luego N, luego Cl/Na, luego O; H nunca.
+  const pri = (el: string) => (el === "C" ? 4 : el === "N" ? 3 : el === "Cl" || el === "Na" ? 2 : el === "O" ? 1 : 0);
+  entries.sort((a, b) => pri(b[0]) - pri(a[0]));
   for (const [el, n] of entries) for (let i = 0; i < n; i++) out.push(el);
   return out;
 }
 
-/* Posición local de un átomo dentro de su molécula */
-function posLocal(i: number, n: number): Pt {
-  if (i === 0) return [0, 0, 0];
-  const a = ((i - 1) / Math.max(1, n - 1)) * Math.PI * 2;
-  const r = 0.5;
-  return [Math.cos(a) * r, Math.sin(a) * r, Math.sin(a * 2) * 0.2];
+const R_ENLACE = 0.6;
+const R_ENLACE_GRANDE = 0.9;
+
+function radioAtomo(i: number, n: number): number {
+  return i === 0 ? (n > 8 ? 0.26 : 0.3) : n > 8 ? 0.17 : 0.22;
+}
+
+/* Posición local de un átomo dentro de su molécula: geometría reconocible
+ * (O₂ y CO₂ lineales, H₂O angular, CH₄ tetraédrica, moléculas grandes en esfera). */
+function posLocal(i: number, n: number, centro: string): Pt {
+  if (i === 0) return n === 2 ? [-R_ENLACE / 2, 0, 0] : [0, 0, 0];
+  const k = i - 1;
+  const m = n - 1;
+  if (n === 2) return [R_ENLACE / 2, 0, 0];
+  if (n === 3) {
+    if (centro === "C") return [(k === 0 ? 1 : -1) * R_ENLACE, 0, 0];
+    return [(k === 0 ? 1 : -1) * Math.sin(0.91) * R_ENLACE, Math.cos(0.91) * R_ENLACE, 0];
+  }
+  if (n === 5) {
+    const t = (R_ENLACE / Math.sqrt(3)) * 1;
+    const v: Pt[] = [
+      [t, t, t],
+      [t, -t, -t],
+      [-t, t, -t],
+      [-t, -t, t],
+    ];
+    return v[k] ?? [0, 0, 0];
+  }
+  if (n > 8) {
+    const y = 1 - ((k + 0.5) * 2) / m;
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    const phi = k * 2.39996;
+    return [Math.cos(phi) * r * R_ENLACE_GRANDE, y * R_ENLACE_GRANDE, Math.sin(phi) * r * R_ENLACE_GRANDE];
+  }
+  const a = (k / m) * Math.PI * 2;
+  return [Math.cos(a) * R_ENLACE, Math.sin(a) * R_ENLACE, ((k % 2) - 0.5) * 0.3];
+}
+
+/* Geometría de una especie: posiciones, radio horizontal (para el paso) y
+ * cuánto baja por debajo de su centro (para apoyarla en la peana). */
+interface Molde {
+  lista: string[];
+  pos: Pt[];
+  rad: number[];
+  rHoriz: number;
+  bajo: number;
+}
+
+function moldeDe(e: Especie): Molde {
+  const lista = atomosExpandidos(e);
+  const n = lista.length;
+  const centro = lista[0] ?? "";
+  const pos = lista.map((_, i) => posLocal(i, n, centro));
+  const rad = lista.map((_, i) => radioAtomo(i, n));
+  let rHoriz = 0;
+  let bajo = 0;
+  pos.forEach((p, i) => {
+    rHoriz = Math.max(rHoriz, Math.hypot(p[0], p[2]) + (rad[i] ?? 0));
+    bajo = Math.max(bajo, -p[1] + (rad[i] ?? 0));
+  });
+  return { lista, pos, rad, rHoriz, bajo };
 }
 
 /* ── Layout de una ecuación en el eje X ───────────────────────────────────── */
 interface Slot {
   tipo: "especie" | "mas" | "flecha";
   especie?: Especie;
+  molde?: Molde;
   lado?: "react" | "prod";
   x: number;
   ancho: number;
   cols: number;
   esc: number; // escala de cada copia de la molécula
+  paso: number; // separación entre copias
 }
+
+/* Base de las moléculas (y local) y alto de cada peana baja. */
+const YB = -0.55;
+const PEANA_H = 0.3;
 
 function construirSlots(r: Reaccion): { slots: Slot[]; ancho: number } {
   const seq: Omit<Slot, "x">[] = [];
   const dimsEspecie = (e: Especie) => {
+    const molde = moldeDe(e);
     const cols = e.coef <= 1 ? 1 : e.coef <= 2 ? 2 : 3;
-    const esc = cols === 1 ? 0.95 : cols === 2 ? 0.75 : 0.58;
-    return { cols, esc, ancho: cols * 1.55 * esc + 0.5 };
+    const esc = cols === 1 ? 1 : cols === 2 ? 0.85 : 0.7;
+    const paso = (2 * molde.rHoriz + 0.12) * esc;
+    return { molde, cols, esc, paso, ancho: cols * paso + 0.3 };
   };
   r.reactivos.forEach((e, i) => {
-    if (i > 0) seq.push({ tipo: "mas", ancho: 1.1, cols: 1, esc: 1 });
+    if (i > 0) seq.push({ tipo: "mas", ancho: 0.9, cols: 1, esc: 1, paso: 1 });
     seq.push({ tipo: "especie", especie: e, lado: "react", ...dimsEspecie(e) });
   });
-  seq.push({ tipo: "flecha", ancho: 1.9, cols: 1, esc: 1 });
+  seq.push({ tipo: "flecha", ancho: 1.6, cols: 1, esc: 1, paso: 1 });
   r.productos.forEach((e, i) => {
-    if (i > 0) seq.push({ tipo: "mas", ancho: 1.1, cols: 1, esc: 1 });
+    if (i > 0) seq.push({ tipo: "mas", ancho: 0.9, cols: 1, esc: 1, paso: 1 });
     seq.push({ tipo: "especie", especie: e, lado: "prod", ...dimsEspecie(e) });
   });
   const total = seq.reduce((s, q) => s + q.ancho, 0);
@@ -147,7 +218,7 @@ function construirSlots(r: Reaccion): { slots: Slot[]; ancho: number } {
   return { slots, ancho: total };
 }
 
-/* ── Todos los átomos en UNA malla instanciada ────────────────────────────── */
+/* ── Todos los átomos y todos los enlaces: DOS mallas instanciadas ─────────── */
 interface AtomoInst {
   cx: number;
   cy: number;
@@ -159,43 +230,70 @@ interface AtomoInst {
   lado: "react" | "prod";
 }
 
+interface EnlaceInst {
+  cx: number;
+  cy: number;
+  a: Pt;
+  b: Pt;
+  radio: number;
+  lado: "react" | "prod";
+}
+
 const _o = new THREE.Object3D();
+const _va = new THREE.Vector3();
+const _vb = new THREE.Vector3();
+const _vd = new THREE.Vector3();
+const _arriba = new THREE.Vector3(0, 1, 0);
 
 function Atomos({ reaccion, foco }: { reaccion: Reaccion; foco: Escena["foco"] }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
+  const enlacesMesh = useRef<THREE.InstancedMesh>(null);
   const t = useRef(0);
   const { slots } = useMemo(() => construirSlots(reaccion), [reaccion]);
-  const atomos = useMemo(() => {
-    const out: AtomoInst[] = [];
+  const { atomos, enlaces } = useMemo(() => {
+    const outA: AtomoInst[] = [];
+    const outE: EnlaceInst[] = [];
     for (const s of slots) {
-      if (s.tipo !== "especie" || !s.especie || !s.lado) continue;
+      if (s.tipo !== "especie" || !s.especie || !s.lado || !s.molde) continue;
       const e = s.especie;
-      const lista = atomosExpandidos(e);
-      const n = lista.length;
+      const m = s.molde;
       const filas = Math.ceil(e.coef / s.cols);
-      const paso = 1.55 * s.esc;
+      const paso = s.paso;
+      // El bloque entero reposa sobre la peana: su parte más baja queda en YB.
+      const yCentroBloque = YB + ((filas - 1) / 2) * paso + m.bajo * s.esc;
       for (let k = 0; k < e.coef; k++) {
         const col = k % s.cols;
         const fila = Math.floor(k / s.cols);
         const colsEnFila = Math.min(s.cols, e.coef - fila * s.cols);
         const cx = s.x + (col - (colsEnFila - 1) / 2) * paso;
-        const cy = ((filas - 1) / 2 - fila) * paso;
-        lista.forEach((el, i) => {
-          const p = posLocal(i, n);
-          out.push({
+        const cy = yCentroBloque + ((filas - 1) / 2 - fila) * paso;
+        m.lista.forEach((el, i) => {
+          const p = m.pos[i] ?? [0, 0, 0];
+          outA.push({
             cx,
             cy,
             lx: p[0] * s.esc,
             ly: p[1] * s.esc,
             lz: p[2] * s.esc,
-            radio: (i === 0 ? 0.34 : 0.26) * s.esc,
+            radio: (m.rad[i] ?? 0.2) * s.esc,
             color: colorElemento(el),
             lado: s.lado!,
           });
+          if (i > 0) {
+            const p0 = m.pos[0] ?? [0, 0, 0];
+            outE.push({
+              cx,
+              cy,
+              a: [p0[0] * s.esc, p0[1] * s.esc, p0[2] * s.esc],
+              b: [p[0] * s.esc, p[1] * s.esc, p[2] * s.esc],
+              radio: 0.07 * s.esc,
+              lado: s.lado!,
+            });
+          }
         });
       }
     }
-    return out;
+    return { atomos: outA, enlaces: outE };
   }, [slots]);
 
   useLayoutEffect(() => {
@@ -216,11 +314,14 @@ function Atomos({ reaccion, foco }: { reaccion: Reaccion; foco: Escena["foco"] }
     const cs = Math.cos(ang);
     const sn = Math.sin(ang);
     const pulso = 1 + 0.08 * (0.5 + 0.5 * Math.sin(t.current * 3));
-    atomos.forEach((a, i) => {
-      const esReact = a.lado === "react";
+    const kDe = (lado: "react" | "prod") => {
+      const esReact = lado === "react";
       const dim = (focoReact && !esReact) || (focoProd && esReact) ? 0.78 : 1;
       const glow = (focoReact && esReact) || (focoProd && !esReact) ? pulso : 1;
-      const k = dim * glow;
+      return dim * glow;
+    };
+    atomos.forEach((a, i) => {
+      const k = kDe(a.lado);
       _o.position.set(a.cx + (a.lx * cs + a.lz * sn) * k, a.cy + a.ly * k, -a.lx * sn + a.lz * cs);
       _o.scale.setScalar(a.radio * k);
       _o.rotation.set(0, 0, 0);
@@ -228,13 +329,53 @@ function Atomos({ reaccion, foco }: { reaccion: Reaccion; foco: Escena["foco"] }
       m.setMatrixAt(i, _o.matrix);
     });
     m.instanceMatrix.needsUpdate = true;
+
+    const em = enlacesMesh.current;
+    if (!em) return;
+    enlaces.forEach((e, i) => {
+      const k = kDe(e.lado);
+      _va.set(e.cx + (e.a[0] * cs + e.a[2] * sn) * k, e.cy + e.a[1] * k, -e.a[0] * sn + e.a[2] * cs);
+      _vb.set(e.cx + (e.b[0] * cs + e.b[2] * sn) * k, e.cy + e.b[1] * k, -e.b[0] * sn + e.b[2] * cs);
+      _vd.subVectors(_vb, _va);
+      const len = Math.max(0.0001, _vd.length());
+      _o.position.copy(_va).addScaledVector(_vd, 0.5);
+      _o.quaternion.setFromUnitVectors(_arriba, _vd.multiplyScalar(1 / len));
+      _o.scale.set(e.radio * k, len, e.radio * k);
+      _o.updateMatrix();
+      em.setMatrixAt(i, _o.matrix);
+    });
+    em.instanceMatrix.needsUpdate = true;
   });
 
   return (
-    <instancedMesh key={atomos.length} ref={mesh} args={[undefined, undefined, atomos.length]} frustumCulled={false}>
-      <sphereGeometry args={[1, 18, 18]} />
-      <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.1} roughness={0.3} metalness={0.1} />
-    </instancedMesh>
+    <>
+      <instancedMesh key={`a${atomos.length}`} ref={mesh} args={[GEO_ESFERA, undefined, atomos.length]} frustumCulled={false} castShadow>
+        <meshPhysicalMaterial {...ATOMO} color="#ffffff" />
+      </instancedMesh>
+      <instancedMesh key={`e${enlaces.length}`} ref={enlacesMesh} args={[GEO_VARILLA, undefined, Math.max(1, enlaces.length)]} frustumCulled={false} castShadow>
+        <meshStandardMaterial {...METAL} color="#cbd5e1" />
+      </instancedMesh>
+    </>
+  );
+}
+
+/* ── Peana baja con bisel metálico bajo cada especie ──────────────────────── */
+function Peana({ x, radio, alto }: { x: number; radio: number; alto: number }) {
+  return (
+    <group position={[x, YB - 0.02, 0]}>
+      {/* cuerpo: llega hasta la mesa (en conservación es una columna) */}
+      <mesh geometry={GEO_PEANA} position={[0, -alto / 2, 0]} scale={[radio, alto, radio]} castShadow receiveShadow>
+        <meshStandardMaterial color="#14263d" roughness={0.42} metalness={0.55} envMapIntensity={1.1} />
+      </mesh>
+      {/* bisel metálico del borde superior */}
+      <mesh geometry={GEO_BISEL} rotation={[Math.PI / 2, 0, 0]} scale={radio}>
+        <meshStandardMaterial {...METAL} />
+      </mesh>
+      {/* zócalo en la base */}
+      <mesh geometry={GEO_PEANA} position={[0, -alto + 0.05, 0]} scale={[radio + 0.14, 0.1, radio + 0.14]} receiveShadow>
+        <meshStandardMaterial {...METAL} color="#7f93ab" />
+      </mesh>
+    </group>
   );
 }
 
@@ -245,30 +386,31 @@ function Flecha({ reversible, glow }: { reversible: boolean; glow: number }) {
   useFrame((_, dt) => {
     t.current += dt;
     if (grp.current) {
-      const e = 0.8 + glow * (0.3 + 0.2 * Math.sin(t.current * 4));
+      const e = 0.9 + glow * (0.3 + 0.2 * Math.sin(t.current * 4));
       grp.current.scale.setScalar(e);
     }
   });
   const color = glow > 0.1 ? "#fde047" : "#94a3b8";
+  const emi = glow > 0.1 ? 0.35 : 0;
   return (
     <group ref={grp}>
-      <mesh position={[-0.1, reversible ? 0.18 : 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.045, 0.045, 1.2, 10]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
+      <mesh position={[-0.1, reversible ? 0.2 : 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.07, 0.07, 1.2, 16]} />
+        <meshPhysicalMaterial {...ATOMO} color={color} emissive={color} emissiveIntensity={emi} />
       </mesh>
-      <mesh position={[0.6, reversible ? 0.18 : 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <coneGeometry args={[0.16, 0.34, 12]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
+      <mesh position={[0.62, reversible ? 0.2 : 0, 0]} rotation={[0, 0, -Math.PI / 2]} castShadow>
+        <coneGeometry args={[0.2, 0.42, 20]} />
+        <meshPhysicalMaterial {...ATOMO} color={color} emissive={color} emissiveIntensity={emi} />
       </mesh>
       {reversible && (
         <>
-          <mesh position={[0.1, -0.18, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.045, 0.045, 1.2, 10]} />
-            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
+          <mesh position={[0.1, -0.2, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.07, 0.07, 1.2, 16]} />
+            <meshPhysicalMaterial {...ATOMO} color={color} emissive={color} emissiveIntensity={emi} />
           </mesh>
-          <mesh position={[-0.6, -0.18, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <coneGeometry args={[0.16, 0.34, 12]} />
-            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
+          <mesh position={[-0.62, -0.2, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+            <coneGeometry args={[0.2, 0.42, 20]} />
+            <meshPhysicalMaterial {...ATOMO} color={color} emissive={color} emissiveIntensity={emi} />
           </mesh>
         </>
       )}
@@ -280,48 +422,53 @@ function Flecha({ reversible, glow }: { reversible: boolean; glow: number }) {
 function Mas() {
   return (
     <group>
-      <mesh>
-        <boxGeometry args={[0.5, 0.12, 0.12]} />
-        <meshStandardMaterial color="#f472b6" emissive="#f472b6" emissiveIntensity={0.5} />
+      <mesh castShadow>
+        <boxGeometry args={[0.6, 0.16, 0.16]} />
+        <meshPhysicalMaterial {...ATOMO} color="#f472b6" />
       </mesh>
-      <mesh>
-        <boxGeometry args={[0.12, 0.5, 0.12]} />
-        <meshStandardMaterial color="#f472b6" emissive="#f472b6" emissiveIntensity={0.5} />
+      <mesh castShadow>
+        <boxGeometry args={[0.16, 0.6, 0.16]} />
+        <meshPhysicalMaterial {...ATOMO} color="#f472b6" />
       </mesh>
     </group>
   );
 }
 
-function Ecuacion({ reaccion, foco, conEtiquetas }: { reaccion: Reaccion; foco: Escena["foco"]; conEtiquetas: boolean }) {
+function Ecuacion({ reaccion, foco, conEtiquetas, peanaH }: { reaccion: Reaccion; foco: Escena["foco"]; conEtiquetas: boolean; peanaH: number }) {
   const { slots } = useMemo(() => construirSlots(reaccion), [reaccion]);
   const focoFlecha = foco === "flecha";
   const focoCoef = foco === "coeficientes";
   const focoSub = foco === "subindices";
   const muchas = slots.length > 5;
+  const yMedio = YB + 0.95;
   return (
     <group>
       {slots.map((s, i) => {
-        if (s.tipo === "mas") return <group key={i} position={[s.x, 0, 0]}><Mas /></group>;
+        if (s.tipo === "mas") return <group key={i} position={[s.x, yMedio, 0]}><Mas /></group>;
         if (s.tipo === "flecha")
           return (
-            <group key={i} position={[s.x, 0, 0]}>
+            <group key={i} position={[s.x, yMedio, 0]}>
               <Flecha reversible={reaccion.reversible} glow={focoFlecha ? 1 : foco === "comparar" || foco === "ecuacion" ? 0.2 : 0} />
             </group>
           );
         const e = s.especie as Especie;
         const esReact = s.lado === "react";
         const base = esReact ? "#38bdf8" : "#34d399";
-        const filas = Math.ceil(e.coef / s.cols);
-        const yLab = -((filas - 1) / 2 * 1.55 * s.esc) - 1.25;
-        return conEtiquetas ? (
-          <Etiqueta key={i} pos={[s.x, yLab, 0]} color={focoSub ? "#fb923c" : focoCoef ? "#fbbf24" : `${base}cc`} ancho={muchas}>
-            {e.coef > 1 && (
-              <span style={{ color: "#fbbf24", fontSize: focoCoef ? 20 : 14, marginRight: 5 }}>{e.coef}</span>
+        const yLab = YB - 0.02 - peanaH - 0.55;
+        return (
+          <React.Fragment key={i}>
+            <Peana x={s.x} radio={s.ancho / 2 - 0.08} alto={peanaH} />
+            {conEtiquetas && (
+              <Etiqueta pos={[s.x, yLab, 0]} color={focoSub ? "#fb923c" : focoCoef ? "#fbbf24" : `${base}cc`} ancho={muchas}>
+                {e.coef > 1 && (
+                  <span style={{ color: "#fbbf24", fontSize: focoCoef ? 20 : 14, marginRight: 5 }}>{e.coef}</span>
+                )}
+                <span style={{ color: focoSub ? "#fdba74" : "#fff", fontSize: focoSub ? 16 : 14 }}>{e.formula}</span>{" "}
+                <span style={{ opacity: 0.7 }}>({e.estado})</span>
+              </Etiqueta>
             )}
-            <span style={{ color: focoSub ? "#fdba74" : "#fff", fontSize: focoSub ? 16 : 14 }}>{e.formula}</span>{" "}
-            <span style={{ opacity: 0.7 }}>({e.estado})</span>
-          </Etiqueta>
-        ) : null;
+          </React.Fragment>
+        );
       })}
     </group>
   );
@@ -338,7 +485,7 @@ function PanelConteo({ reaccion, foco, libre }: { reaccion: Reaccion; foco: Esce
   const maxAt = Math.max(1, ...c.elementos.map((el) => Math.max(c.reactivos[el] ?? 0, c.productos[el] ?? 0)));
   const veredicto = libre || foco === "comparar";
   return (
-    <group position={[0, -3.4, 0]}>
+    <group position={[0, SUELO_CONSERVACION + 0.02, 1.4]}>
       {c.elementos.map((el, i) => {
         const x = i * paso - ancho / 2;
         const nr = c.reactivos[el] ?? 0;
@@ -351,15 +498,15 @@ function PanelConteo({ reaccion, foco, libre }: { reaccion: Reaccion; foco: Esce
         return (
           <group key={el} position={[x, 0, 0]}>
             {verR && (
-              <mesh position={[-0.4, hR / 2, 0]}>
+              <mesh position={[-0.4, hR / 2, 0]} castShadow>
                 <boxGeometry args={[0.6, Math.max(0.05, hR), 0.45]} />
-                <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={0.3} roughness={0.4} />
+                <meshPhysicalMaterial {...ATOMO} color="#38bdf8" emissive="#38bdf8" emissiveIntensity={0.18} />
               </mesh>
             )}
             {verP && (
-              <mesh position={[0.4, hP / 2, 0]}>
+              <mesh position={[0.4, hP / 2, 0]} castShadow>
                 <boxGeometry args={[0.6, Math.max(0.05, hP), 0.45]} />
-                <meshStandardMaterial color={malo ? "#fb923c" : "#34d399"} emissive={malo ? "#fb923c" : "#34d399"} emissiveIntensity={0.3} roughness={0.4} />
+                <meshPhysicalMaterial {...ATOMO} color={malo ? "#fb923c" : "#34d399"} emissive={malo ? "#fb923c" : "#34d399"} emissiveIntensity={0.18} />
               </mesh>
             )}
             <Etiqueta pos={[0, -0.55, 0]} color={malo ? "#fb923c" : `${col}dd`} ancho={n > 2}>
@@ -407,11 +554,34 @@ function Galeria({ simbolo }: { simbolo: number }) {
   );
 }
 
+/* Alturas de la mesa por modo (mundo). */
+const SUELO_CONSERVACION = -3.42;
+const SUELO_SIMBOLOGIA = -2.5;
+
+function camZ(modo: Modo, nSlots: number): number {
+  return modo === "simbologia" ? 11 : nSlots > 5 ? 17 : 13.5;
+}
+
 function Contenido({ modo, escena, reaccion, modoColor, resetNonce, libre, simbolo }: EstructuraReaccionSceneProps) {
   const target: Pt = modo === "conservacion" ? [0, -1.6, 0] : [0, -0.9, 0];
+  const size = useThree((st) => st.size);
+  const { slots, ancho } = useMemo(() => construirSlots(reaccion), [reaccion]);
+
+  // Escala de la ecuación para que ocupe el ancho útil de la pantalla.
+  const z = camZ(modo, slots.length);
+  const anchoVista = 2 * z * Math.tan((25 * Math.PI) / 180) * (size.width / Math.max(1, size.height));
+  const K = Math.min(2.6, Math.max(0.4, (0.82 * anchoVista) / Math.max(1, ancho)));
+
+  // Posición del grupo de la ecuación y altura de la mesa, por modo.
+  const gy = modo === "conservacion" ? 1.5 : -0.75;
+  const gz = modo === "conservacion" ? -1.2 : 0;
+  const topeLocal = YB - 0.02;
+  const peanaH = modo === "conservacion" ? Math.max(PEANA_H, (gy + K * topeLocal - SUELO_CONSERVACION) / K) : PEANA_H;
+  const suelo = modo === "simbologia" ? SUELO_SIMBOLOGIA : gy + K * (topeLocal - peanaH);
+
   return (
     <>
-      <Escenario acento="#38bdf8" mesa={false} niebla={false} />
+      <Escenario acento="#38bdf8" suelo={suelo} mesa niebla />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
 
       <group key={`${modo}-${reaccion.id}-${resetNonce}`}>
@@ -419,9 +589,9 @@ function Contenido({ modo, escena, reaccion, modoColor, resetNonce, libre, simbo
           <Galeria simbolo={simbolo} />
         ) : (
           <>
-            <group position={[0, modo === "conservacion" ? 1.3 : 0, 0]}>
+            <group position={[0, gy, gz]} scale={K}>
               <Atomos reaccion={reaccion} foco={escena.foco} />
-              <Ecuacion reaccion={reaccion} foco={escena.foco} conEtiquetas={modo === "anatomia"} />
+              <Ecuacion reaccion={reaccion} foco={escena.foco} conEtiquetas={modo === "anatomia"} peanaH={peanaH} />
             </group>
             {modo === "conservacion" && <PanelConteo reaccion={reaccion} foco={escena.foco} libre={libre} />}
           </>
@@ -430,7 +600,7 @@ function Contenido({ modo, escena, reaccion, modoColor, resetNonce, libre, simbo
 
       <OrbitControls enablePan={false} minDistance={8} maxDistance={48} autoRotate={false} target={target} />
       <EffectComposer>
-        <Bloom intensity={0.5} luminanceThreshold={0.3} mipmapBlur />
+        <Bloom intensity={0.4} luminanceThreshold={0.5} mipmapBlur />
         <Vignette eskil={false} offset={0.2} darkness={0.7} />
       </EffectComposer>
     </>
@@ -439,8 +609,7 @@ function Contenido({ modo, escena, reaccion, modoColor, resetNonce, libre, simbo
 
 export default function EstructuraReaccionScene(props: EstructuraReaccionSceneProps) {
   const nSlots = construirSlots(props.reaccion).slots.length;
-  const z = props.modo === "simbologia" ? 11 : nSlots > 5 ? 17 : 13.5;
-  const cam: Pt = [0, 0, z];
+  const cam: Pt = [0, 0, camZ(props.modo, nSlots)];
   return (
     <Canvas key={`${props.modo}-${nSlots}`} shadows dpr={[1, 2]} camera={{ position: cam, fov: 50 }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
       <Contenido {...props} />
