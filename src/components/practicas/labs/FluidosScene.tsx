@@ -25,9 +25,10 @@
 import * as THREE from "three";
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line, RoundedBox } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
+import { VIDRIO_FINO, METAL } from "./_vidrio";
 import {
   type Modo,
   fluidoPorId,
@@ -110,25 +111,97 @@ function Titulo({ texto, sub, color, y = 5.2 }: { texto: string; sub?: string; c
   );
 }
 
-/* ── Aristas de una caja (tanque de vidrio) ───────────────────────────────── */
-function CajaAristas({ w, h, d, cy, color }: { w: number; h: number; d: number; cy: number; color: string }) {
-  const x = w / 2, z = d / 2, yb = cy - h / 2, yt = cy + h / 2;
-  const rect = (yy: number): Pt[] => [
-    [-x, yy, -z], [x, yy, -z], [x, yy, z], [-x, yy, z], [-x, yy, -z],
-  ];
-  const verticales: Pt[][] = [
-    [[-x, yb, -z], [-x, yt, -z]], [[x, yb, -z], [x, yt, -z]],
-    [[x, yb, z], [x, yt, z]], [[-x, yb, z], [-x, yt, z]],
-  ];
+/* ── Tanque de vidrio: paredes finas, perfil metálico en las aristas y base ── */
+const PARED = 0.08;   // grosor del vidrio
+const PERFIL = 0.14;  // sección del perfil metálico
+const BASE_H = 0.25;  // grosor de la base
+
+function Tanque({ w, h, d, cy }: { w: number; h: number; d: number; cy: number }) {
+  const yb = cy - h / 2, yt = cy + h / 2;
+  const x = w / 2, z = d / 2;
+  const vidrio = { ...VIDRIO_FINO, opacity: 0.16, depthWrite: false } as const;
+  const perfil = { ...METAL, color: "#c5d2e0" } as const;
+  const esquinas: [number, number][] = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
   return (
     <group>
-      <Line points={rect(yb)} color={color} lineWidth={2} transparent opacity={0.85} />
-      <Line points={rect(yt)} color={color} lineWidth={1.5} transparent opacity={0.5} />
-      {verticales.map((seg, i) => (
-        <Line key={i} points={seg} color={color} lineWidth={2} transparent opacity={0.8} />
+      {/* paredes de vidrio (frente, fondo, laterales) y fondo del tanque */}
+      <mesh position={[0, cy, z - PARED / 2]} renderOrder={3}>
+        <boxGeometry args={[w, h, PARED]} />
+        <meshPhysicalMaterial {...vidrio} />
+      </mesh>
+      <mesh position={[0, cy, -z + PARED / 2]} renderOrder={3}>
+        <boxGeometry args={[w, h, PARED]} />
+        <meshPhysicalMaterial {...vidrio} />
+      </mesh>
+      <mesh position={[x - PARED / 2, cy, 0]} renderOrder={3}>
+        <boxGeometry args={[PARED, h, d]} />
+        <meshPhysicalMaterial {...vidrio} />
+      </mesh>
+      <mesh position={[-x + PARED / 2, cy, 0]} renderOrder={3}>
+        <boxGeometry args={[PARED, h, d]} />
+        <meshPhysicalMaterial {...vidrio} />
+      </mesh>
+      <mesh position={[0, yb - 0.09, 0]} renderOrder={3}>
+        <boxGeometry args={[w, 0.18, d]} />
+        <meshPhysicalMaterial {...vidrio} opacity={0.3} />
+      </mesh>
+
+      {/* perfil metálico: 4 montantes + marco superior e inferior */}
+      {esquinas.map(([sx, sz], i) => (
+        <mesh key={`v${i}`} position={[sx * (x - PERFIL / 2 + 0.02), cy - 0.09, sz * (z - PERFIL / 2 + 0.02)]}>
+          <boxGeometry args={[PERFIL, h + 0.18, PERFIL]} />
+          <meshStandardMaterial {...perfil} />
+        </mesh>
       ))}
+      {[yt - PERFIL / 2 + 0.02, yb - 0.18 + PERFIL / 2].map((yy, k) => (
+        <group key={`m${k}`}>
+          {[-1, 1].map((sz) => (
+            <mesh key={`x${sz}`} position={[0, yy, sz * (z - PERFIL / 2 + 0.02)]}>
+              <boxGeometry args={[w, PERFIL, PERFIL]} />
+              <meshStandardMaterial {...perfil} />
+            </mesh>
+          ))}
+          {[-1, 1].map((sx) => (
+            <mesh key={`z${sx}`} position={[sx * (x - PERFIL / 2 + 0.02), yy, 0]}>
+              <boxGeometry args={[PERFIL, PERFIL, d]} />
+              <meshStandardMaterial {...perfil} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+
+      {/* base sobre la que se apoya */}
+      <mesh position={[0, yb - 0.18 - BASE_H / 2, 0]}>
+        <boxGeometry args={[w + 0.7, BASE_H, d + 0.7]} />
+        <meshStandardMaterial color="#1c2a3a" roughness={0.55} metalness={0.5} />
+      </mesh>
     </group>
   );
+}
+
+/** Agua: volumen translúcido SIN transmission (a través de transmission solo se ve lo opaco). */
+function Agua({ color, top, bottom }: { color: string; top: number; bottom: number }) {
+  const h = top - bottom;
+  return (
+    <group>
+      <mesh position={[0, bottom + h / 2, 0]} renderOrder={1}>
+        <boxGeometry args={[TANK_W - 0.06, h, TANK_D - 0.06]} />
+        <meshPhysicalMaterial color={color} transparent opacity={0.58} roughness={0.06} metalness={0} clearcoat={0.6} clearcoatRoughness={0.1} envMapIntensity={1.1} depthWrite={false} />
+      </mesh>
+      {/* superficie más clara */}
+      <mesh position={[0, top + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
+        <planeGeometry args={[TANK_W - 0.06, TANK_D - 0.06]} />
+        <meshStandardMaterial color="#ffffff" transparent opacity={0.22} roughness={0.02} metalness={0.1} envMapIntensity={1.8} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Material del cuerpo sólido según su densidad: madera, piedra o metal. */
+function materialCuerpo(rho: number) {
+  if (rho < 900) return { color: "#b5834f", roughness: 0.72, metalness: 0 };
+  if (rho < 2500) return { color: "#9aa3ad", roughness: 0.55, metalness: 0.15 };
+  return { color: "#aab4c0", roughness: 0.3, metalness: 0.92 };
 }
 
 /* ── Geometría compartida del tanque ──────────────────────────────────────── */
@@ -143,7 +216,6 @@ function ModoFlotacion({ fluidoId, rhoObj, volL, playing, accent }: Pick<Fluidos
   const r = resolverFlotacion(rhoObj, fluido.rho, volM3);
 
   const fluidTop = 1.4;
-  const fluidH = fluidTop - FLUID_BOTTOM;
   const L = 1.5; // lado visual del cubo
 
   // posición de equilibrio del cubo
@@ -177,25 +249,14 @@ function ModoFlotacion({ fluidoId, rhoObj, volL, playing, accent }: Pick<Fluidos
         color={r.flota ? "#34D399" : "#fca5a5"}
       />
 
-      {/* fluido */}
-      <mesh position={[0, FLUID_BOTTOM + fluidH / 2, 0]}>
-        <boxGeometry args={[TANK_W - 0.06, fluidH, TANK_D - 0.06]} />
-        <meshStandardMaterial color={fluido.color} transparent opacity={0.34} roughness={0.1} metalness={0.0} />
-      </mesh>
-      {/* superficie brillante */}
-      <mesh position={[0, fluidTop, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[TANK_W - 0.06, TANK_D - 0.06]} />
-        <meshStandardMaterial color={fluido.color} transparent opacity={0.25} emissive={fluido.color} emissiveIntensity={0.2} side={THREE.DoubleSide} />
-      </mesh>
-
-      <CajaAristas w={TANK_W} h={TANK_H} d={TANK_D} cy={TANK_CY} color="#7da2c8" />
+      <Agua color={fluido.color} top={fluidTop} bottom={FLUID_BOTTOM} />
+      <Tanque w={TANK_W} h={TANK_H} d={TANK_D} cy={TANK_CY} />
 
       {/* cubo + flechas (se mueven juntos) */}
       <group ref={grp} position={[0, baseY, 0]}>
-        <mesh>
-          <boxGeometry args={[L, L, L]} />
-          <meshStandardMaterial color={accent} roughness={0.35} metalness={0.25} emissive={accent} emissiveIntensity={0.12} />
-        </mesh>
+        <RoundedBox args={[L, L, L]} radius={0.07} smoothness={3}>
+          <meshStandardMaterial {...materialCuerpo(rhoObj)} />
+        </RoundedBox>
         <Flecha3D from={[0, 0, 0]} to={[0, eLen, 0]} color="#34D399" />
         <Flecha3D from={[0, 0, 0]} to={[0, -wLen, 0]} color="#fca5a5" />
         <Etiqueta pos={[0.95, eLen * 0.7, 0]} texto={`E ${fmtFuerza(r.empuje)}`} color="#34D399" />
@@ -254,17 +315,13 @@ function ModoPresion({ fluidoId, prof, pextKpa, playing, accent }: Pick<FluidosS
         y={fluidTop + 2.2}
       />
 
-      {/* fluido con tono más oscuro = idea de mayor presión abajo */}
-      <mesh position={[0, FLUID_BOTTOM + fluidH / 2, 0]}>
-        <boxGeometry args={[TANK_W - 0.06, fluidH, TANK_D - 0.06]} />
-        <meshStandardMaterial color={fluido.color} transparent opacity={0.32} roughness={0.1} />
-      </mesh>
-      <CajaAristas w={TANK_W} h={TANK_H} d={TANK_D} cy={TANK_CY} color="#7da2c8" />
+      <Agua color={fluido.color} top={fluidTop} bottom={FLUID_BOTTOM} />
+      <Tanque w={TANK_W} h={TANK_H} d={TANK_D} cy={TANK_CY} />
 
       {/* émbolo (principio de Pascal) */}
       <mesh position={[0, pistonY + pistonPush * 0.0, 0]}>
         <boxGeometry args={[TANK_W - 0.1, 0.28, TANK_D - 0.1]} />
-        <meshStandardMaterial color={pextKpa > 0 ? "#f59e0b" : "#64748b"} roughness={0.5} metalness={0.4} emissive={pextKpa > 0 ? "#f59e0b" : "#000"} emissiveIntensity={pextKpa > 0 ? 0.25 : 0} />
+        <meshStandardMaterial color={pextKpa > 0 ? "#d98a14" : "#7b8794"} roughness={0.35} metalness={0.8} envMapIntensity={1.2} />
       </mesh>
       {pextKpa > 0 && (
         <>
@@ -373,7 +430,7 @@ function Tubo({ x0, x1, r0, r1, color }: { x0: number; x1: number; r0: number; r
   return (
     <mesh position={[(x0 + x1) / 2, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
       <cylinderGeometry args={[r1, r0, len, 28, 1, true]} />
-      <meshStandardMaterial color={color} transparent opacity={0.22} side={THREE.DoubleSide} roughness={0.2} metalness={0.3} />
+      <meshPhysicalMaterial {...VIDRIO_FINO} color={color} opacity={0.3} depthWrite={false} />
     </mesh>
   );
 }
@@ -407,6 +464,26 @@ function ModoFlujo({ fluidoId, caudalLs, razon, playing, accent }: Pick<FluidosS
       <Tubo x0={X_CONO_A} x1={X_CONO_B} r0={R_ANCHA} r1={rNarrow} color="#8fb3d9" />
       <Tubo x0={X_CONO_B} x1={PIPE_X} r0={rNarrow} r1={rNarrow} color="#8fb3d9" />
 
+      {/* bridas metálicas en los extremos y en las uniones del cono */}
+      {([[-PIPE_X, R_ANCHA], [X_CONO_A, R_ANCHA], [X_CONO_B, rNarrow], [PIPE_X, rNarrow]] as [number, number][]).map(([bx, br], i) => (
+        <mesh key={i} position={[bx, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <torusGeometry args={[br, 0.075, 12, 48]} />
+          <meshStandardMaterial {...METAL} />
+        </mesh>
+      ))}
+
+      {/* base y apoyos: la tubería descansa sobre la mesa */}
+      <mesh position={[0, -3.3, 0]}>
+        <boxGeometry args={[13.4, 0.2, 2.4]} />
+        <meshStandardMaterial color="#1c2a3a" roughness={0.55} metalness={0.5} />
+      </mesh>
+      {([[-5.2, R_ANCHA], [5.2, rNarrow]] as [number, number][]).map(([sx, sr], i) => (
+        <mesh key={i} position={[sx, -(3.2 + sr) / 2, 0]}>
+          <boxGeometry args={[0.6, 3.2 - sr, 1.4]} />
+          <meshStandardMaterial {...METAL} color="#7f8fa3" />
+        </mesh>
+      ))}
+
       <Particulas rNarrow={rNarrow} vWide={r.v1} playing={playing} color={fluido.color} />
 
       {/* manómetros (columnas verticales de fluido) */}
@@ -417,11 +494,15 @@ function ModoFlujo({ fluidoId, caudalLs, razon, playing, accent }: Pick<FluidosS
           <group key={i}>
             <mesh position={[m.x, R_ANCHA + 0.1 + h / 2, 0]}>
               <cylinderGeometry args={[0.13, 0.13, h, 14, 1, true]} />
-              <meshStandardMaterial color="#cbd5e1" transparent opacity={0.3} side={THREE.DoubleSide} />
+              <meshPhysicalMaterial {...VIDRIO_FINO} depthWrite={false} />
             </mesh>
             <mesh position={[m.x, R_ANCHA + 0.1 + (h * 0.82) / 2, 0]}>
               <cylinderGeometry args={[0.1, 0.1, h * 0.82, 14]} />
-              <meshStandardMaterial color={fluido.color} emissive={fluido.color} emissiveIntensity={0.25} />
+              <meshStandardMaterial color={fluido.color} roughness={0.15} metalness={0.05} envMapIntensity={1} />
+            </mesh>
+            <mesh position={[m.x, (R_ANCHA + 0.1 + (i === 0 ? R_ANCHA : rNarrow) - 0.05) / 2, 0]}>
+              <cylinderGeometry args={[0.1, 0.1, R_ANCHA + 0.15 - (i === 0 ? R_ANCHA : rNarrow), 14]} />
+              <meshStandardMaterial {...METAL} />
             </mesh>
             <Etiqueta pos={[m.x, top + 0.5, 0]} texto={`v = ${fmtVel(m.v)}`} sub={`sección ${m.lbl}`} color={i === 1 ? "#fca5a5" : "#86efac"} />
           </group>
@@ -446,9 +527,7 @@ function Contenido(props: FluidosSceneProps) {
       {/* Sin altura: esta escena no tenía sombra de la que leerla, así
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
-      <Escenario acento={accent} mesa={false} niebla={false} />
-
-      <Stars radius={70} depth={30} count={800} factor={3} saturation={0} fade speed={0.5} />
+      <Escenario acento={accent} niebla={false} />
 
       <group key={`${modo}-${resetNonce}`}>
         {modo === "flotacion" && <ModoFlotacion fluidoId={props.fluidoId} rhoObj={props.rhoObj} volL={props.volL} playing={playing} accent={accent} />}
@@ -460,7 +539,8 @@ function Contenido(props: FluidosSceneProps) {
       <OrbitControls
         makeDefault
         enablePan={false}
-        minDistance={12}
+        target={[0, modo === "flujo" ? 0.9 : 0.15, 0]}
+        minDistance={11}
         maxDistance={30}
         minPolarAngle={Math.PI / 4}
         maxPolarAngle={Math.PI / 1.8}
@@ -475,7 +555,7 @@ function Contenido(props: FluidosSceneProps) {
 }
 
 export default function FluidosScene(props: FluidosSceneProps) {
-  const cam = { position: [0.5, 1.5, 16] as Pt, fov: 48 };
+  const cam = { position: [0.5, 3.8, 13.8] as Pt, fov: 48 };
   return (
     <Canvas key={props.modo} dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={cam}>
       <Contenido {...props} />

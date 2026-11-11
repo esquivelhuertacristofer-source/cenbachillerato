@@ -97,29 +97,56 @@ function Encuadre() {
   return null;
 }
 
-/* ── Curva gruesa (Line2): el buffer se reescribe en sitio ───────────────────── */
-function CurvaGruesa({ fn, color, ancho = 4 }: { fn: (x: number) => number; color: string; ancho?: number }) {
-  const ref = useRef<React.ComponentRef<typeof Line>>(null);
-  const puntos = useMemo(
-    () => Array.from({ length: NPTS }, (_, i) => [-X + (2 * X * i) / (NPTS - 1), WAVE_Y, 0] as Pt),
-    [],
-  );
-  useFrame(() => {
-    const l = ref.current;
-    if (!l) return;
-    const attr = l.geometry.getAttribute("instanceStart") as THREE.InterleavedBufferAttribute | undefined;
-    if (!attr) return;
-    const arr = attr.data.array as Float32Array;
+/* ── Onda con volumen: tubo cuyo buffer (posición y normal) se reescribe en sitio ──
+   Mismo cálculo que antes, pero la curva ocupa espacio: recibe luz y se le ve el
+   canto. No se recrea geometría por cuadro: solo se actualizan los atributos. */
+const RAD = 10;       // lados de la sección del tubo
+const GROSOR_ONDA = 0.075;
+
+function CurvaGruesa({ fn, color, ancho = GROSOR_ONDA }: { fn: (x: number) => number; color: string; ancho?: number }) {
+  const geo = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    const nv = NPTS * (RAD + 1);
+    g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(nv * 3), 3));
+    g.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(nv * 3), 3));
+    const idx: number[] = [];
     for (let i = 0; i < NPTS - 1; i++) {
-      const x0 = -X + (2 * X * i) / (NPTS - 1);
-      const x1 = -X + (2 * X * (i + 1)) / (NPTS - 1);
-      const o = i * 6;
-      arr[o] = x0; arr[o + 1] = fn(x0); arr[o + 2] = 0;
-      arr[o + 3] = x1; arr[o + 4] = fn(x1); arr[o + 5] = 0;
+      for (let j = 0; j < RAD; j++) {
+        const a = i * (RAD + 1) + j, b = (i + 1) * (RAD + 1) + j;
+        idx.push(a, b, a + 1, b, b + 1, a + 1);
+      }
     }
-    attr.data.needsUpdate = true;
+    g.setIndex(idx);
+    return g;
+  }, []);
+  useEffect(() => () => geo.dispose(), [geo]);
+  useFrame(() => {
+    const pos = geo.getAttribute("position") as THREE.BufferAttribute;
+    const nor = geo.getAttribute("normal") as THREE.BufferAttribute;
+    const e = 0.01;
+    for (let i = 0; i < NPTS; i++) {
+      const x = -X + (2 * X * i) / (NPTS - 1);
+      const y = fn(x);
+      const dy = (fn(x + e) - fn(x - e)) / (2 * e);
+      const l = Math.hypot(1, dy);
+      const nx = -dy / l, ny = 1 / l;       // normal en el plano de la onda
+      for (let j = 0; j <= RAD; j++) {
+        const th = (2 * Math.PI * j) / RAD;
+        const c = Math.cos(th), sn = Math.sin(th);
+        const k = i * (RAD + 1) + j;
+        const vx = c * nx, vy = c * ny, vz = sn;
+        pos.setXYZ(k, x + ancho * vx, y + ancho * vy, ancho * vz);
+        nor.setXYZ(k, vx, vy, vz);
+      }
+    }
+    pos.needsUpdate = true;
+    nor.needsUpdate = true;
   });
-  return <Line ref={ref} points={puntos} color={color} lineWidth={ancho} frustumCulled={false} />;
+  return (
+    <mesh geometry={geo} frustumCulled={false} castShadow>
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} roughness={0.3} metalness={0.1} side={THREE.DoubleSide} />
+    </mesh>
+  );
 }
 
 /* ── Onda viajera (la longitud de onda visual depende de la frecuencia) ──────── */
@@ -135,65 +162,82 @@ function OndaViajera({ f, color, playing }: { f: number; color: string; playing:
     if (playing) tRef.current += dt;
   });
 
-  return <CurvaGruesa color={color} ancho={4} fn={(x) => WAVE_Y + aVis * Math.sin(k * x - w * tRef.current)} />;
+  return <CurvaGruesa color={color} fn={(x) => WAVE_Y + aVis * Math.sin(k * x - w * tRef.current)} />;
+}
+
+/* ── Bloque de la franja: caja con canto y barniz. El color sigue siendo el dato. ── */
+const PROF = 0.34;   // profundidad de la franja
+function Bloque({ x, w, h, color, op = 1 }: { x: number; w: number; h: number; color: string; op?: number }) {
+  return (
+    <mesh position={[x, BAR_Y, 0]} castShadow>
+      <boxGeometry args={[w, h, PROF]} />
+      <meshPhysicalMaterial
+        color={color} emissive={color} emissiveIntensity={0.42} roughness={0.38} metalness={0.05}
+        clearcoat={0.7} clearcoatRoughness={0.25} transparent={op < 1} opacity={op}
+      />
+    </mesh>
+  );
+}
+
+/** Marco-bandeja de la franja (bisel metálico por detrás y por encima de los bloques). */
+function MarcoBarra({ h }: { h: number }) {
+  return (
+    <group>
+      <mesh position={[0, BAR_Y, -PROF / 2 - 0.08]} castShadow receiveShadow>
+        <boxGeometry args={[2 * X + 0.4, h + 0.3, 0.16]} />
+        <meshStandardMaterial color="#1b2a40" roughness={0.4} metalness={0.7} envMapIntensity={1.1} />
+      </mesh>
+      {[1, -1].map((s) => (
+        <mesh key={s} position={[0, BAR_Y + s * (h / 2 + 0.1), -0.02]} castShadow>
+          <boxGeometry args={[2 * X + 0.4, 0.1, PROF + 0.08]} />
+          <meshStandardMaterial color="#51698a" roughness={0.35} metalness={0.8} envMapIntensity={1.2} />
+        </mesh>
+      ))}
+    </group>
+  );
 }
 
 /* ── Barra del espectro completo (7 bandas) + décadas + umbral ionizante ────── */
-/* Las bandas son meshBasicMaterial a propósito: el color ES el dato (380–700 nm)
-   y cualquier luz lo falsearía; por eso se quedan sin tone mapping. */
 function BarraEspectro({ fSel, color }: { fSel: number; color: string }) {
   const xi = xOfF(F_IONIZANTE);
   const banda = bandaPorFrecuencia(fSel);
   const cxB = clamp((xOfF(banda.fMin) + xOfF(banda.fMax)) / 2, -X + 1.8, X - 1.8);
   return (
     <group>
+      <MarcoBarra h={BAR_H} />
       {/* segmentos de banda */}
       {BANDAS.map((b) => {
         const x0 = xOfF(b.fMin), x1 = xOfF(b.fMax);
         const w = Math.max(x1 - x0, 0.02), cx = (x0 + x1) / 2;
         if (b.esVisible) {
           // mini-arcoíris en la franja visible (izq = menos f = rojo; der = más f = violeta)
-          const N = 16;
+          const N = 12;
           return (
             <group key={b.id}>
               {Array.from({ length: N }, (_, i) => {
                 const nm = NM_MAX - ((NM_MAX - NM_MIN) * i) / (N - 1);
                 const sx = x0 + (w * (i + 0.5)) / N;
-                return (
-                  <mesh key={i} position={[sx, BAR_Y, 0]}>
-                    <planeGeometry args={[w / N + 0.01, BAR_H]} />
-                    <meshBasicMaterial color={colorVisible(nm)} toneMapped={false} side={THREE.DoubleSide} />
-                  </mesh>
-                );
+                return <Bloque key={i} x={sx} w={w / N + 0.01} h={BAR_H} color={colorVisible(nm)} />;
               })}
             </group>
           );
         }
-        return (
-          <mesh key={b.id} position={[cx, BAR_Y, 0]}>
-            <planeGeometry args={[w, BAR_H]} />
-            <meshBasicMaterial color={b.color} transparent opacity={0.92} toneMapped={false} side={THREE.DoubleSide} />
-          </mesh>
-        );
+        return <Bloque key={b.id} x={cx} w={Math.max(w - 0.04, 0.02)} h={BAR_H} color={b.color} op={0.95} />;
       })}
-
-      {/* marco de la barra */}
-      <Line points={[[-X, BAR_Y + BAR_H / 2, 0], [X, BAR_Y + BAR_H / 2, 0]] as Pt[]} color="#0a1424" lineWidth={2} transparent opacity={0.7} />
-      <Line points={[[-X, BAR_Y - BAR_H / 2, 0], [X, BAR_Y - BAR_H / 2, 0]] as Pt[]} color="#0a1424" lineWidth={2} transparent opacity={0.7} />
 
       {/* marcas de década (sin texto: la escala va en el medidor del panel) */}
       {DECADAS.map((d) => {
         const x = xOfLogF(d);
-        return <Line key={d} points={[[x, BAR_Y - BAR_H / 2 - 0.05, 0], [x, BAR_Y - BAR_H / 2 - 0.3, 0]] as Pt[]} color="#6b7fa3" lineWidth={2} transparent opacity={0.8} />;
+        return <Line key={d} points={[[x, BAR_Y - BAR_H / 2 - 0.2, 0.1], [x, BAR_Y - BAR_H / 2 - 0.45, 0.1]] as Pt[]} color="#6b7fa3" lineWidth={2} transparent opacity={0.8} />;
       })}
 
       {/* banda actual, bajo la barra */}
-      <Etiqueta pos={[cxB, BAR_Y - 0.95, 0]} color={banda.esVisible ? "#e6f7ff" : color}>
+      <Etiqueta pos={[cxB, BAR_Y - 1.05, 0]} color={banda.esVisible ? "#e6f7ff" : color}>
         <i className={`fa-solid ${banda.icono}`} style={{ marginRight: 6 }} />{banda.nombre}
       </Etiqueta>
 
       {/* umbral de radiación ionizante (inicio de los rayos X) */}
-      <Line points={[[xi, BAR_Y - 0.45, 0], [xi, WAVE_Y + 2.0, 0]] as Pt[]} color="#f87171" lineWidth={2.5} transparent opacity={0.85} dashed dashSize={0.18} gapSize={0.14} />
+      <Line points={[[xi, BAR_Y - 0.45, 0.2], [xi, WAVE_Y + 2.0, 0.2]] as Pt[]} color="#f87171" lineWidth={2.5} transparent opacity={0.85} dashed dashSize={0.18} gapSize={0.14} />
       <Etiqueta pos={[clamp(xi, -X + 1.1, X - 1.1), WAVE_Y + 2.45, 0]} color="#fca5a5">
         <i className="fa-solid fa-radiation" style={{ marginRight: 5 }} />ionizante →
       </Etiqueta>
@@ -201,12 +245,22 @@ function BarraEspectro({ fSel, color }: { fSel: number; color: string }) {
   );
 }
 
-/* ── Marcador (esfera + hilo al dibujo) ───────────────────────────────────────── */
-function Marcador({ x, col }: { x: number; col: string }) {
+/* ── Marcador: corredera con cuerpo (placa que cruza la franja + esfera + punta) ── */
+function Marcador({ x, col, h = BAR_H }: { x: number; col: string; h?: number }) {
   return (
     <>
-      <Line points={[[x, BAR_Y, 0], [x, WAVE_Y, 0]] as Pt[]} color={col} lineWidth={3} transparent opacity={0.85} />
-      <mesh position={[x, BAR_Y, 0.05]}>
+      <Line points={[[x, BAR_Y, 0.3], [x, WAVE_Y, 0.3]] as Pt[]} color={col} lineWidth={3} transparent opacity={0.85} />
+      {/* placa que abraza la franja */}
+      <mesh position={[x, BAR_Y, 0.02]} castShadow>
+        <boxGeometry args={[0.13, h + 0.5, PROF + 0.2]} />
+        <meshPhysicalMaterial color="#e8eef7" roughness={0.3} metalness={0.5} clearcoat={0.6} />
+      </mesh>
+      {/* punta que señala la banda, por debajo */}
+      <mesh position={[x, BAR_Y - h / 2 - 0.42, 0.02]} castShadow>
+        <coneGeometry args={[0.2, 0.38, 20]} />
+        <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.4} roughness={0.35} />
+      </mesh>
+      <mesh position={[x, BAR_Y, PROF / 2 + 0.2]} castShadow>
         <sphereGeometry args={[0.24, 28, 28]} />
         <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.45} roughness={0.35} />
       </mesh>
@@ -250,7 +304,7 @@ function EscenaEspectro({ logF, playing }: Pick<EspectroSceneProps, "logF" | "pl
 }
 
 /* ── (b) Luz visible ──────────────────────────────────────────────────────── */
-const SEG_VIS = 72;
+const SEG_VIS = 36;
 
 function EscenaVisible({ nm, playing }: Pick<EspectroSceneProps, "nm" | "playing">) {
   const cv = resolverVisible(nm);
@@ -271,32 +325,25 @@ function EscenaVisible({ nm, playing }: Pick<EspectroSceneProps, "nm" | "playing
   return (
     <group>
       {/* barra de arcoíris */}
+      <MarcoBarra h={BAR_H + 0.1} />
       {Array.from({ length: SEG_VIS }, (_, i) => {
-        const t = i / (SEG_VIS - 1);
+        const t = (i + 0.5) / SEG_VIS;
         const nmS = NM_MIN + (NM_MAX - NM_MIN) * t;
-        const x = -X + 2 * X * t;
-        return (
-          <mesh key={i} position={[x, BAR_Y, 0]}>
-            <planeGeometry args={[(2 * X) / SEG_VIS + 0.02, BAR_H + 0.1]} />
-            <meshBasicMaterial color={colorVisible(nmS)} toneMapped={false} side={THREE.DoubleSide} />
-          </mesh>
-        );
+        return <Bloque key={i} x={-X + 2 * X * t} w={(2 * X) / SEG_VIS + 0.01} h={BAR_H + 0.1} color={colorVisible(nmS)} />;
       })}
-      <Line points={[[-X, BAR_Y + (BAR_H + 0.1) / 2, 0], [X, BAR_Y + (BAR_H + 0.1) / 2, 0]] as Pt[]} color="#0a1424" lineWidth={2} transparent opacity={0.6} />
-      <Line points={[[-X, BAR_Y - (BAR_H + 0.1) / 2, 0], [X, BAR_Y - (BAR_H + 0.1) / 2, 0]] as Pt[]} color="#0a1424" lineWidth={2} transparent opacity={0.6} />
 
       {/* marcas de nm: solo 3 llevan texto */}
       {[400, 450, 500, 550, 600, 650, 700].map((tick) => {
         const x = xOfNm(tick);
-        return <Line key={tick} points={[[x, BAR_Y - (BAR_H + 0.1) / 2 - 0.05, 0], [x, BAR_Y - (BAR_H + 0.1) / 2 - 0.3, 0]] as Pt[]} color="#6b7fa3" lineWidth={2} transparent opacity={0.8} />;
+        return <Line key={tick} points={[[x, BAR_Y - (BAR_H + 0.1) / 2 - 0.2, 0.1], [x, BAR_Y - (BAR_H + 0.1) / 2 - 0.45, 0.1]] as Pt[]} color="#6b7fa3" lineWidth={2} transparent opacity={0.8} />;
       })}
       {[400, 550, 700].map((tick) => (
-        <Etiqueta key={tick} pos={[clamp(xOfNm(tick), -X + 0.9, X - 0.9), BAR_Y - 0.95, 0]} color="#c8d4eb" borde={false}>{tick} nm</Etiqueta>
+        <Etiqueta key={tick} pos={[clamp(xOfNm(tick), -X + 0.9, X - 0.9), BAR_Y - 1.05, 0]} color="#c8d4eb" borde={false}>{tick} nm</Etiqueta>
       ))}
 
-      <CurvaGruesa color={col} ancho={4} fn={(x) => WAVE_Y + aVis * Math.sin(k * x - w * tRef.current)} />
+      <CurvaGruesa color={col} fn={(x) => WAVE_Y + aVis * Math.sin(k * x - w * tRef.current)} />
 
-      <Marcador x={xM} col={col} />
+      <Marcador x={xM} col={col} h={BAR_H + 0.1} />
       <Lectura x={xM} col={col} titulo={`${fmt0(nm)} nm · ${cv.nombre}`} detalle={[`f = ${fmtFrec(cv.f)}`, `E = ${fmtEnergia(cv.E_eV)}`]} />
     </group>
   );
@@ -322,7 +369,7 @@ function EscenaAplicaciones({ aplId, playing }: Pick<EspectroSceneProps, "aplId"
         const sel = a.id === apl.id;
         const c = CAT_COLOR[a.categoria];
         return (
-          <mesh key={a.id} position={[x, BAR_Y + BAR_H / 2 + 0.2, 0.05]}>
+          <mesh key={a.id} position={[x, BAR_Y + BAR_H / 2 + 0.3, 0.2]}>
             <sphereGeometry args={[sel ? 0.18 : 0.1, 18, 18]} />
             <meshStandardMaterial color={sel ? col : c} emissive={sel ? col : c} emissiveIntensity={sel ? 0.6 : 0.35} roughness={0.4} />
           </mesh>

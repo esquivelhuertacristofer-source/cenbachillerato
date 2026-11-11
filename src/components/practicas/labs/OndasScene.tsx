@@ -27,6 +27,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
+import { METAL } from "./_vidrio";
 import {
   type Modo, resolverOnda, resolverInterferencia, resolverDoppler, medioPorId,
   fmt0, fmt2, fmtLambda,
@@ -51,7 +52,6 @@ type Pt = [number, number, number];
 /* ── Escala visual (la onda en pantalla es esquemática) ───────────────────── */
 const X = 7;                 // semiancho del dominio visible (unidades de escena)
 const NPTS = 200;            // puntos por curva
-const NDOT = 64;             // partículas del medio (modo onda)
 const LAMBDA_REF = 85;       // m — λ del aire a 4 Hz (referencia de escala)
 const LV_BASE = 3.0;         // unidades visuales por λ en la referencia
 
@@ -101,8 +101,8 @@ function Encuadre() {
   useEffect(() => {
     const aspecto = width / Math.max(1, height);
     const mitad = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    const d = clamp((X + 1.2) / (mitad * aspecto), 15, 30);
-    camera.position.set(0, 0.7 * (d / 15), d);
+    const d = clamp((X + 1.9) / (mitad * aspecto), 15, 30);
+    camera.position.set(0, 3.4 * (d / 15), d);
     camera.updateProjectionMatrix();
   }, [camera, width, height]);
   return null;
@@ -144,6 +144,99 @@ function EjeX() {
   return <Line points={[[-X, 0, 0], [X, 0, 0]] as Pt[]} color="#475a78" lineWidth={1.5} transparent opacity={0.6} dashed dashSize={0.25} gapSize={0.18} />;
 }
 
+/* ── Soportes: banco de apoyo y postes con abrazadera a la altura de la cuerda ─ */
+const X_POSTE = X + 0.55;    // posición de los postes
+const Y_BANCO = -2.9;        // centro del banco; su cara superior queda en -2.8
+
+function Banco() {
+  return (
+    <mesh position={[0, Y_BANCO, 0]}>
+      <boxGeometry args={[2 * X_POSTE + 1.6, 0.2, 1.5]} />
+      <meshStandardMaterial color="#1c2a3a" roughness={0.55} metalness={0.5} />
+    </mesh>
+  );
+}
+
+function Poste({ x }: { x: number }) {
+  const alto = 2.95; // de la cara del banco (-2.8) hasta la abrazadera (+0.15)
+  return (
+    <group position={[x, 0, 0]}>
+      <mesh position={[0, -2.8 + alto / 2, 0]}>
+        <boxGeometry args={[0.36, alto, 0.36]} />
+        <meshStandardMaterial {...METAL} color="#8d9db0" />
+      </mesh>
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[0.24, 24, 24]} />
+        <meshStandardMaterial {...METAL} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ── Cuerda: tubo continuo cuyo buffer se reescribe en sitio cada cuadro ───── */
+const SEG = 140;   // tramos a lo largo de la cuerda
+const RAD = 8;     // lados de la sección
+const COS_R = Array.from({ length: RAD + 1 }, (_, j) => Math.cos((2 * Math.PI * j) / RAD));
+const SIN_R = Array.from({ length: RAD + 1 }, (_, j) => Math.sin((2 * Math.PI * j) / RAD));
+
+function Cuerda({ fn, color, radio = 0.09 }: { fn: (x: number) => number; color: string; radio?: number }) {
+  const mesh = useRef<THREE.Mesh>(null);
+  const L = X_POSTE;
+  const geo = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    const nv = (SEG + 1) * (RAD + 1);
+    g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(nv * 3), 3));
+    g.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(nv * 3), 3));
+    const idx: number[] = [];
+    for (let i = 0; i < SEG; i++) {
+      for (let j = 0; j < RAD; j++) {
+        const a = i * (RAD + 1) + j;
+        const b = a + RAD + 1;
+        idx.push(a, a + 1, b, a + 1, b + 1, b);
+      }
+    }
+    g.setIndex(idx);
+    return g;
+  }, []);
+  useEffect(() => () => geo.dispose(), [geo]);
+
+  useFrame(() => {
+    const m = mesh.current;
+    if (!m) return;
+    const pos = m.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const nor = m.geometry.getAttribute("normal") as THREE.BufferAttribute;
+    const P = pos.array as Float32Array;
+    const N = nor.array as Float32Array;
+    /* La cuerda está atada a los postes: el extremo no se desplaza. */
+    const anclada = (x: number) => {
+      const t = clamp((L - Math.abs(x)) / 1.1, 0, 1);
+      return fn(x) * t * t * (3 - 2 * t);
+    };
+    const e = 0.02;
+    for (let i = 0; i <= SEG; i++) {
+      const x = -L + (2 * L * i) / SEG;
+      const y = anclada(x);
+      const yp = (anclada(x + e) - anclada(x - e)) / (2 * e);
+      const inv = 1 / Math.hypot(1, yp);
+      const nx = -yp * inv, ny = inv;
+      for (let j = 0; j <= RAD; j++) {
+        const o = (i * (RAD + 1) + j) * 3;
+        const c = COS_R[j]!, sn = SIN_R[j]!;
+        N[o] = c * nx; N[o + 1] = c * ny; N[o + 2] = sn;
+        P[o] = x + radio * N[o]!; P[o + 1] = y + radio * N[o + 1]!; P[o + 2] = radio * sn;
+      }
+    }
+    pos.needsUpdate = true;
+    nor.needsUpdate = true;
+  });
+
+  return (
+    <mesh ref={mesh} geometry={geo} frustumCulled={false}>
+      <meshStandardMaterial color={color} roughness={0.42} metalness={0.1} envMapIntensity={1} side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
 /* ── (a) Escena de onda viajera ───────────────────────────────────────────── */
 function EscenaOnda({ A, f, medioId, playing }: Pick<OndasSceneProps, "A" | "f" | "medioId" | "playing">) {
   const medio = medioPorId(medioId);
@@ -154,45 +247,30 @@ function EscenaOnda({ A, f, medioId, playing }: Pick<OndasSceneProps, "A" | "f" 
   const w = omegaVisual(f);
 
   const tRef = useRef(0);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const dotsRef = useRef<THREE.InstancedMesh>(null);
   const tracerRef = useRef<THREE.Mesh>(null);
 
   useFrame((_, dt) => {
     if (playing) tRef.current += dt;
     const t = tRef.current;
-    const y = (x: number) => aVis * Math.sin(k * x - w * t);
-
-    const dots = dotsRef.current;
-    if (dots) {
-      for (let i = 0; i < NDOT; i++) {
-        const x = -X + (2 * X * i) / (NDOT - 1);
-        dummy.position.set(x, y(x), 0);
-        dummy.updateMatrix();
-        dots.setMatrixAt(i, dummy.matrix);
-      }
-      dots.instanceMatrix.needsUpdate = true;
-    }
-    if (tracerRef.current) tracerRef.current.position.y = y(0);
+    if (tracerRef.current) tracerRef.current.position.y = aVis * Math.sin(-w * t);
   });
 
   // regla de λ: se desplaza con la amplitud para no taparse con la cresta
   const yTop = aVis + 0.75;
   return (
     <group>
+      <Banco />
+      <Poste x={-X_POSTE} />
+      <Poste x={X_POSTE} />
       <EjeX />
 
-      <CurvaGruesa color={medio.color} ancho={4} opacity={0.9} fn={(x) => aVis * Math.sin(k * x - w * tRef.current)} />
-      <instancedMesh ref={dotsRef} args={[undefined, undefined, NDOT]}>
-        <sphereGeometry args={[0.1, 16, 16]} />
-        <meshStandardMaterial color={medio.color} emissive={medio.color} emissiveIntensity={0.35} roughness={0.4} />
-      </instancedMesh>
+      <Cuerda color={medio.color} fn={(x) => aVis * Math.sin(k * x - w * tRef.current)} />
 
       {/* trazador: una partícula del medio que SOLO sube y baja (no avanza) */}
       <Line points={[[0, -aVis - 0.3, 0], [0, aVis + 0.3, 0]] as Pt[]} color="#ffffff" lineWidth={1.5} transparent opacity={0.3} dashed dashSize={0.12} gapSize={0.1} />
       <mesh ref={tracerRef}>
         <sphereGeometry args={[0.2, 24, 24]} />
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} roughness={0.3} />
+        <meshStandardMaterial color="#f1f5f9" roughness={0.28} metalness={0.15} />
       </mesh>
       <Etiqueta pos={[0.2, -aVis - 0.85, 0]} color="#ffffff" ancha>solo sube y baja</Etiqueta>
 
@@ -218,9 +296,7 @@ function EscenaInterferencia({ A, phi, estacionaria, playing }: Pick<OndasSceneP
   const w = omegaVisual(6);
 
   const tRef = useRef(0);
-  useFrame((_, dt) => {
-    if (playing) tRef.current += dt;
-  });
+  const antiRefs = useRef<(THREE.Mesh | null)[]>([]);
 
   const y1 = (x: number) => aVis * Math.sin(k * x - w * tRef.current);
   const y2 = estacionaria
@@ -238,6 +314,14 @@ function EscenaInterferencia({ A, phi, estacionaria, playing }: Pick<OndasSceneP
       if (Math.abs(xA) <= X) antinodos.push([xA, 0, 0]);
     }
   }
+  useFrame((_, dt) => {
+    if (playing) tRef.current += dt;
+    for (let i = 0; i < antinodos.length; i++) {
+      const m = antiRefs.current[i];
+      if (m) m.position.y = y1(antinodos[i]![0]) + y2(antinodos[i]![0]);
+    }
+  });
+
   const nodoEtq = nodos.find((p) => p[0] > 1.2 && p[0] < 3.2) ?? nodos[0];
   const antiEtq = antinodos.find((p) => p[0] > -0.2) ?? antinodos[0];
 
@@ -246,11 +330,14 @@ function EscenaInterferencia({ A, phi, estacionaria, playing }: Pick<OndasSceneP
 
   return (
     <group>
+      <Banco />
+      <Poste x={-X_POSTE} />
+      <Poste x={X_POSTE} />
       <EjeX />
 
       <CurvaGruesa color={C_W1} ancho={3} opacity={0.5} fn={y1} />
       <CurvaGruesa color={C_W2} ancho={3} opacity={0.5} fn={y2} />
-      <CurvaGruesa color={etqCol} ancho={6} fn={(x) => y1(x) + y2(x)} />
+      <Cuerda color={etqCol} radio={0.1} fn={(x) => y1(x) + y2(x)} />
 
       {estacionaria ? (
         <>
@@ -260,13 +347,13 @@ function EscenaInterferencia({ A, phi, estacionaria, playing }: Pick<OndasSceneP
           {nodos.map((p, i) => (
             <mesh key={`n${i}`} position={p}>
               <sphereGeometry args={[0.15, 18, 18]} />
-              <meshStandardMaterial color={C_NODO} emissive={C_NODO} emissiveIntensity={0.4} roughness={0.4} />
+              <meshStandardMaterial color={C_NODO} roughness={0.35} metalness={0.3} />
             </mesh>
           ))}
           {antinodos.map((p, i) => (
-            <mesh key={`a${i}`} position={p}>
-              <sphereGeometry args={[0.12, 18, 18]} />
-              <meshStandardMaterial color={C_ESTAC} emissive={C_ESTAC} emissiveIntensity={0.5} roughness={0.4} />
+            <mesh key={`a${i}`} ref={(el) => { antiRefs.current[i] = el; }} position={p}>
+              <sphereGeometry args={[0.17, 18, 18]} />
+              <meshStandardMaterial color={C_ESTAC} roughness={0.35} metalness={0.2} />
             </mesh>
           ))}
           {nodoEtq && <Etiqueta pos={[nodoEtq[0], -0.7, 0]} color={C_NODO}>nodo (quieto)</Etiqueta>}
@@ -344,6 +431,21 @@ function EscenaDoppler({ fd, vs, playing, accent }: Pick<OndasSceneProps, "fd" |
 
   return (
     <group>
+      {/* banco, carril de la fuente y peanas de los observadores */}
+      <Banco />
+      <Poste x={-X_POSTE} />
+      <Poste x={X_POSTE} />
+      <mesh position={[0, -0.8, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.06, 0.06, 2 * X_POSTE, 16]} />
+        <meshStandardMaterial {...METAL} />
+      </mesh>
+      {[-1, 1].map((sg) => (
+        <mesh key={sg} position={[sg * (X - 0.3), -2.72, 0]}>
+          <cylinderGeometry args={[0.45, 0.5, 0.16, 28]} />
+          <meshStandardMaterial color="#8d9db0" roughness={0.3} metalness={0.9} />
+        </mesh>
+      ))}
+
       {/* frentes de onda (pool de anillos) */}
       {Array.from({ length: K_RINGS }, (_, i) => (
         <mesh
@@ -360,7 +462,11 @@ function EscenaDoppler({ fd, vs, playing, accent }: Pick<OndasSceneProps, "fd" |
       <group ref={fuenteRef}>
         <mesh>
           <sphereGeometry args={[0.34, 28, 28]} />
-          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.5} roughness={0.35} />
+          <meshStandardMaterial color={accent} roughness={0.3} metalness={0.2} />
+        </mesh>
+        <mesh position={[0, -0.55, 0]}>
+          <boxGeometry args={[0.6, 0.4, 0.5]} />
+          <meshStandardMaterial {...METAL} color="#7f8fa3" />
         </mesh>
         {vs > 0 && (
           <mesh position={[0.5, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
@@ -375,14 +481,14 @@ function EscenaDoppler({ fd, vs, playing, accent }: Pick<OndasSceneProps, "fd" |
       <group position={[X - 0.3, -2.4, 0]}>
         <mesh>
           <sphereGeometry args={[0.24, 20, 20]} />
-          <meshStandardMaterial color={C_ACERCA} emissive={C_ACERCA} emissiveIntensity={0.4} roughness={0.4} />
+          <meshStandardMaterial color={C_ACERCA} roughness={0.3} metalness={0.2} />
         </mesh>
         <Etiqueta pos={[-0.6, 0.7, 0]} color={C_ACERCA}>{fmt0(d.fAcerca)} Hz</Etiqueta>
       </group>
       <group position={[-X + 0.3, -2.4, 0]}>
         <mesh>
           <sphereGeometry args={[0.24, 20, 20]} />
-          <meshStandardMaterial color={C_ALEJA} emissive={C_ALEJA} emissiveIntensity={0.4} roughness={0.4} />
+          <meshStandardMaterial color={C_ALEJA} roughness={0.3} metalness={0.2} />
         </mesh>
         <Etiqueta pos={[0.6, 0.7, 0]} color={C_ALEJA}>{fmt0(d.fAleja)} Hz</Etiqueta>
       </group>
@@ -396,7 +502,7 @@ function Contenido({ modo, A, f, medioId, phi, estacionaria, fd, vs, playing, ac
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. Sin altura: el
           escenario la MIDE de la propia escena al montarse. */}
-      <Escenario acento={accent} mesa={false} niebla={false} />
+      <Escenario acento={accent} niebla={false} />
       <Encuadre />
 
       <group key={`${modo}-${resetNonce}`}>
@@ -424,7 +530,7 @@ function Contenido({ modo, A, f, medioId, phi, estacionaria, fd, vs, playing, ac
 }
 
 export default function OndasScene(props: OndasSceneProps) {
-  const cam = { position: [0, 0.7, 15] as Pt, fov: 46 };
+  const cam = { position: [0, 3.4, 15] as Pt, fov: 46 };
   return (
     <Canvas key={props.modo} dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={cam}>
       <Contenido {...props} />
